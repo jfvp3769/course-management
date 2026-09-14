@@ -285,38 +285,126 @@
     }
 
     html.theme-dark span[class*="bg-rose-100"],
-    html.theme-dark span[class*="bg-rose-200"] {
+    html.theme-dark span[class*="bg-rose-200"],
+    html.theme-dark span[class*="bg-rose-50"] {
       background-color: #3b0d18 !important;
       border-color: #be123c !important;
       color: #fecdd3 !important;
     }
 
     html.theme-dark span[class*="bg-emerald-100"],
-    html.theme-dark span[class*="bg-emerald-200"] {
+    html.theme-dark span[class*="bg-emerald-200"],
+    html.theme-dark span[class*="bg-emerald-50"] {
       background-color: #063526 !important;
       border-color: #059669 !important;
       color: #a7f3d0 !important;
     }
 
     html.theme-dark span[class*="bg-blue-100"],
-    html.theme-dark span[class*="bg-blue-200"] {
+    html.theme-dark span[class*="bg-blue-200"],
+    html.theme-dark span[class*="bg-blue-50"] {
       background-color: #0f274a !important;
       border-color: #2563eb !important;
       color: #bfdbfe !important;
     }
 
+    html.theme-dark span[class*="bg-orange-100"],
+    html.theme-dark span[class*="bg-orange-200"],
+    html.theme-dark span[class*="bg-orange-50"] {
+      background-color: #431407 !important;
+      border-color: #ea580c !important;
+      color: #fed7aa !important;
+    }
+
     html.theme-dark span[class*="bg-indigo-100"],
-    html.theme-dark span[class*="bg-indigo-200"] {
+    html.theme-dark span[class*="bg-indigo-200"],
+    html.theme-dark span[class*="bg-indigo-50"] {
       background-color: #1f1b4d !important;
       border-color: #4f46e5 !important;
       color: #c7d2fe !important;
     }
 
     html.theme-dark span[class*="bg-purple-100"],
-    html.theme-dark span[class*="bg-purple-200"] {
+    html.theme-dark span[class*="bg-purple-200"],
+    html.theme-dark span[class*="bg-purple-50"] {
       background-color: #2b1245 !important;
       border-color: #7c3aed !important;
       color: #e9d5ff !important;
+    }
+
+    /* ================= FINAL GRADE BADGES (ROSTER & GRADEBOOK) ================= */
+    .grade-msu-cell {
+      display: inline-block !important;
+      min-width: 52px !important;
+      text-align: center !important;
+      border-width: 1px !important;
+      border-style: solid !important;
+      letter-spacing: 0.025em;
+      box-sizing: border-box !important;
+    }
+
+    html.theme-dark .grade-msu-cell {
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4) !important;
+    }
+
+    /* 1.00 - 1.75: Passing / Honors (Emerald) */
+    html.theme-dark .grade-msu-cell.bg-emerald-50,
+    html.theme-dark .grade-msu-cell.bg-emerald-100,
+    html.theme-dark span.grade-msu-cell[class*="emerald"] {
+      background-color: #063526 !important;
+      border-color: #059669 !important;
+      color: #6ee7b7 !important;
+    }
+
+    /* 2.00 - 2.50: Passing / Satisfactory (Blue) */
+    html.theme-dark .grade-msu-cell.bg-blue-50,
+    html.theme-dark .grade-msu-cell.bg-blue-100,
+    html.theme-dark span.grade-msu-cell[class*="blue"] {
+      background-color: #0f274a !important;
+      border-color: #2563eb !important;
+      color: #93c5fd !important;
+    }
+
+    /* 2.75 - 3.00: Passing / Threshold (Amber) */
+    html.theme-dark .grade-msu-cell.bg-amber-50,
+    html.theme-dark .grade-msu-cell.bg-amber-100,
+    html.theme-dark span.grade-msu-cell[class*="amber"] {
+      background-color: #3b2306 !important;
+      border-color: #b45309 !important;
+      color: #fef08a !important;
+    }
+
+    /* 5.00: Failing (Rose) */
+    html.theme-dark .grade-msu-cell.bg-rose-50,
+    html.theme-dark .grade-msu-cell.bg-rose-100,
+    html.theme-dark span.grade-msu-cell[class*="rose"] {
+      background-color: #3b0d18 !important;
+      border-color: #be123c !important;
+      color: #fecdd3 !important;
+    }
+
+    /* INC: Incomplete (Orange) */
+    html.theme-dark .grade-msu-cell.bg-orange-50,
+    html.theme-dark .grade-msu-cell.bg-orange-100,
+    html.theme-dark span.grade-msu-cell[class*="orange"] {
+      background-color: #431407 !important;
+      border-color: #ea580c !important;
+      color: #fed7aa !important;
+    }
+
+    /* WDRW / DRP / Special / Pending (Slate) */
+    html.theme-dark .grade-msu-cell.bg-slate-100,
+    html.theme-dark .grade-msu-cell.bg-slate-200,
+    html.theme-dark span.grade-msu-cell[class*="slate"] {
+      background-color: #1e293b !important;
+      border-color: #475569 !important;
+      color: #94a3b8 !important;
+    }
+
+    /* Prevent Gradebook parent td pastel bleed in dark mode */
+    html.theme-dark #gradebook-table-body td.bg-amber-50\/70,
+    html.theme-dark #gradebook-table-body td.bg-amber-100\/80 {
+      background-color: #1e293b !important;
     }
 
     /* Table & Matrix Data Contrast Enhancements */
@@ -2065,9 +2153,43 @@
       color: #cbd5e1 !important;
     }
 
-
-
-
+    /* ================= MANAGE COURSES MODAL DARK THEME ================= */
+    html.theme-dark #manage-courses-modal > div {
+      background-color: #1e293b !important;
+      border-color: #334155 !important;
+      color: #f8fafc !important;
+    }
+    html.theme-dark #manage-courses-modal .bg-slate-50 {
+      background-color: #0f172a !important;
+      border-color: #334155 !important;
+    }
+    html.theme-dark #manage-courses-modal .bg-white {
+      background-color: #1e293b !important;
+      border-color: #334155 !important;
+      color: #f8fafc !important;
+    }
+    html.theme-dark #manage-courses-modal .text-slate-900 {
+      color: #f8fafc !important;
+    }
+    html.theme-dark #manage-courses-modal .text-slate-800 {
+      color: #f1f5f9 !important;
+    }
+    html.theme-dark #manage-courses-modal .text-slate-700,
+    html.theme-dark #manage-courses-modal .text-slate-600 {
+      color: #cbd5e1 !important;
+    }
+    html.theme-dark #manage-courses-modal .border-slate-200,
+    html.theme-dark #manage-courses-modal .border-slate-300 {
+      border-color: #334155 !important;
+    }
+    html.theme-dark #manage-courses-modal input[type="text"] {
+      background-color: #0b1329 !important;
+      border-color: #334155 !important;
+      color: #f8fafc !important;
+    }
+    html.theme-dark #manage-courses-modal button:hover {
+      filter: brightness(1.15);
+    }
 /* ================= BALANCED NARROW LAPTOP STYLING (< 1366px) ================= */
 @media (max-width: 1366px) {
   /* Keep sidebar in natural side-by-side flow (NO fixed floating overlay) */
@@ -2290,3 +2412,60 @@ html.theme-dark #roster-table thead th {
 html.theme-dark #gradebook-table-body tr {
   background-color: #1e293b !important;
 }
+
+/* ================= HEADER ACTION EXPANDABLE BUTTONS ================= */
+.header-action-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 2rem !important; /* 32px matching h-8 */
+  padding-left: 0.625rem !important; /* 10px */
+  padding-right: 0.625rem !important;
+  border-radius: 0.5rem !important;
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  flex-shrink: 0 !important;
+  cursor: pointer;
+  user-select: none;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: background-color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease, color 0.4s ease, transform 0.2s ease !important;
+}
+
+.header-action-btn:active {
+  transform: scale(0.96);
+}
+
+/* Individual fitted expand widths to eliminate dead overshoot lag */
+.header-btn-settings { --expand-w: 116px; }
+.header-btn-subjects { --expand-w: 118px; }
+.header-btn-hub      { --expand-w: 142px; }
+.header-btn-guide    { --expand-w: 80px; }
+.header-btn-theme    { --expand-w: 84px; }
+
+.header-action-btn .header-btn-label {
+  display: inline-block !important;
+  max-width: 0 !important;
+  opacity: 0 !important;
+  margin-left: 0 !important;
+  overflow: hidden !important;
+  white-space: nowrap !important;
+  vertical-align: middle !important;
+  pointer-events: none;
+  will-change: max-width, opacity, margin-left;
+  transition: max-width 0.58s cubic-bezier(0.25, 1, 0.35, 1),
+              opacity 0.35s ease,
+              margin-left 0.58s cubic-bezier(0.25, 1, 0.35, 1) !important;
+}
+
+.header-action-btn:hover .header-btn-label,
+.header-action-btn:focus-visible .header-btn-label {
+  max-width: var(--expand-w, 120px) !important;
+  opacity: 1 !important;
+  margin-left: 0.375rem !important; /* 6px */
+  transition: max-width 0.68s cubic-bezier(0.25, 1, 0.35, 1),
+              opacity 0.5s ease 0.06s,
+              margin-left 0.68s cubic-bezier(0.25, 1, 0.35, 1) !important;
+}
+

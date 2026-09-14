@@ -2908,25 +2908,194 @@ function getNextRandomTip(currentIndex = -1) {
     }
 
     // ================= MANAGE COURSES & SECTIONS =================
+    function moveSubjectOrder(index, direction) {
+      if (!courseData || !courseData.subjects) return;
+      const newIndex = index + direction;
+      if (newIndex < 0 || newIndex >= courseData.subjects.length) return;
+
+      const item = courseData.subjects[index];
+      const otherItem = courseData.subjects[newIndex];
+      const safeCodeA = item.code.replace(/[^a-zA-Z0-9_-]/g, '_');
+      const safeCodeB = otherItem.code.replace(/[^a-zA-Z0-9_-]/g, '_');
+
+      // 1. FIRST: Capture bounding rects before DOM re-render
+      const cardA = document.getElementById(`manage-subject-card-${safeCodeA}`);
+      const cardB = document.getElementById(`manage-subject-card-${safeCodeB}`);
+      const rectA = cardA ? cardA.getBoundingClientRect() : null;
+      const rectB = cardB ? cardB.getBoundingClientRect() : null;
+
+      // 2. Mutate state
+      courseData.subjects.splice(index, 1);
+      courseData.subjects.splice(newIndex, 0, item);
+
+      saveAppState();
+      renderMatrixTable();
+      openManageCoursesModal();
+
+      // 3. LAST, INVERT, PLAY: Animate the physical card swap
+      if (rectA && rectB) {
+        const newCardA = document.getElementById(`manage-subject-card-${safeCodeA}`);
+        const newCardB = document.getElementById(`manage-subject-card-${safeCodeB}`);
+        if (newCardA && newCardB) {
+          const newRectA = newCardA.getBoundingClientRect();
+          const newRectB = newCardB.getBoundingClientRect();
+          const deltaYA = rectA.top - newRectA.top;
+          const deltaYB = rectB.top - newRectB.top;
+
+          newCardA.style.transform = `translateY(${deltaYA}px)`;
+          newCardA.style.transition = 'none';
+          newCardA.style.willChange = 'transform';
+          newCardA.style.zIndex = '10';
+
+          newCardB.style.transform = `translateY(${deltaYB}px)`;
+          newCardB.style.transition = 'none';
+          newCardB.style.willChange = 'transform';
+          newCardB.style.zIndex = '5';
+
+          // Force reflow
+          newCardA.offsetHeight;
+
+          requestAnimationFrame(() => {
+            newCardA.style.transition = 'transform 580ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 580ms ease';
+            newCardA.style.transform = 'translateY(0)';
+            newCardA.classList.add('ring-2', 'ring-msu-gold/80', 'shadow-md');
+
+            newCardB.style.transition = 'transform 580ms cubic-bezier(0.22, 1, 0.36, 1)';
+            newCardB.style.transform = 'translateY(0)';
+
+            setTimeout(() => {
+              newCardA.style.transform = '';
+              newCardA.style.transition = '';
+              newCardA.style.willChange = '';
+              newCardA.style.zIndex = '';
+              newCardA.classList.remove('ring-2', 'ring-msu-gold/80', 'shadow-md');
+
+              newCardB.style.transform = '';
+              newCardB.style.transition = '';
+              newCardB.style.willChange = '';
+              newCardB.style.zIndex = '';
+            }, 640);
+          });
+        }
+      }
+
+      showToast(`Moved ${item.code} ${direction < 0 ? 'up (left in matrix)' : 'down (right in matrix)'}!`);
+    }
+
+    function moveSectionOrder(subIdx, secIdx, direction) {
+      if (!courseData || !courseData.subjects || !courseData.subjects[subIdx]) return;
+      const sub = courseData.subjects[subIdx];
+      if (!sub.sections) return;
+      const newIdx = secIdx + direction;
+      if (newIdx < 0 || newIdx >= sub.sections.length) return;
+
+      const sec = sub.sections[secIdx];
+      const otherSec = sub.sections[newIdx];
+      const safeSub = sub.code.replace(/[^a-zA-Z0-9_-]/g, '_');
+      const safeSecA = sec.replace(/[^a-zA-Z0-9_-]/g, '_');
+      const safeSecB = otherSec.replace(/[^a-zA-Z0-9_-]/g, '_');
+
+      // 1. FIRST: Capture bounding rects before DOM re-render
+      const rowA = document.getElementById(`manage-sec-row-${safeSub}__${safeSecA}`);
+      const rowB = document.getElementById(`manage-sec-row-${safeSub}__${safeSecB}`);
+      const rectA = rowA ? rowA.getBoundingClientRect() : null;
+      const rectB = rowB ? rowB.getBoundingClientRect() : null;
+
+      // 2. Mutate state
+      sub.sections.splice(secIdx, 1);
+      sub.sections.splice(newIdx, 0, sec);
+
+      saveAppState();
+      renderMatrixTable();
+      openManageCoursesModal();
+
+      // 3. LAST, INVERT, PLAY: Animate the physical row swap
+      if (rectA && rectB) {
+        const newRowA = document.getElementById(`manage-sec-row-${safeSub}__${safeSecA}`);
+        const newRowB = document.getElementById(`manage-sec-row-${safeSub}__${safeSecB}`);
+        if (newRowA && newRowB) {
+          const newRectA = newRowA.getBoundingClientRect();
+          const newRectB = newRowB.getBoundingClientRect();
+          const deltaYA = rectA.top - newRectA.top;
+          const deltaYB = rectB.top - newRectB.top;
+
+          newRowA.style.transform = `translateY(${deltaYA}px)`;
+          newRowA.style.transition = 'none';
+          newRowA.style.willChange = 'transform';
+          newRowA.style.zIndex = '10';
+
+          newRowB.style.transform = `translateY(${deltaYB}px)`;
+          newRowB.style.transition = 'none';
+          newRowB.style.willChange = 'transform';
+          newRowB.style.zIndex = '5';
+
+          // Force reflow
+          newRowA.offsetHeight;
+
+          requestAnimationFrame(() => {
+            newRowA.style.transition = 'transform 500ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 500ms ease';
+            newRowA.style.transform = 'translateY(0)';
+            newRowA.classList.add('ring-2', 'ring-msu-gold/80', 'shadow-xs');
+
+            newRowB.style.transition = 'transform 500ms cubic-bezier(0.22, 1, 0.36, 1)';
+            newRowB.style.transform = 'translateY(0)';
+
+            setTimeout(() => {
+              newRowA.style.transform = '';
+              newRowA.style.transition = '';
+              newRowA.style.willChange = '';
+              newRowA.style.zIndex = '';
+              newRowA.classList.remove('ring-2', 'ring-msu-gold/80', 'shadow-xs');
+
+              newRowB.style.transform = '';
+              newRowB.style.transition = '';
+              newRowB.style.willChange = '';
+              newRowB.style.zIndex = '';
+            }, 550);
+          });
+        }
+      }
+
+      showToast(`Moved section ${sec} ${direction < 0 ? 'up (left in matrix)' : 'down (right in matrix)'}!`);
+    }
+
     function openManageCoursesModal() {
       renderColorSwatches('new');
       const container = document.getElementById('manage-courses-list');
       if (!container) return;
 
-      container.innerHTML = courseData.subjects.map(sub => {
+      // Preserve scroll position inside modal if re-rendering while open
+      const scrollParent = container.parentElement;
+      const prevScrollTop = scrollParent ? scrollParent.scrollTop : 0;
+
+      container.innerHTML = courseData.subjects.map((sub, subIdx) => {
         const subSlots = weeklyTimetable.filter(t => t.course === sub.code);
+        const isFirstSub = (subIdx === 0);
+        const isLastSub = (subIdx === courseData.subjects.length - 1);
+        const safeSub = sub.code.replace(/[^a-zA-Z0-9_-]/g, '_');
 
         return `
-          <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-2.5">
-            <div class="flex items-start justify-between">
-              <div>
-                <div class="flex items-center gap-2">
-                  <span class="font-extrabold text-sm text-slate-900">${escapeHtml(sub.code)}</span>
-                  <span class="text-[10px] font-bold px-2 py-0.5 rounded ${sub.headerBg}">${sub.units} Units</span>
+          <div id="manage-subject-card-${safeSub}" class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-2.5 transition-shadow">
+            <div class="flex items-center justify-between gap-2.5">
+              <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                <!-- Leftmost Stacked Reorder Arrows -->
+                <div class="inline-flex flex-col border border-slate-300 rounded-md overflow-hidden bg-white shadow-2xs shrink-0 select-none">
+                  <button type="button" onclick="moveSubjectOrder(${subIdx}, -1)" ${isFirstSub ? 'disabled' : ''} class="w-5 h-3.5 flex items-center justify-center hover:bg-slate-100 text-slate-600 hover:text-slate-900 border-b border-slate-200 transition ${isFirstSub ? 'opacity-20 cursor-not-allowed pointer-events-none' : 'cursor-pointer active:scale-95'}" title="Move ${escapeHtml(sub.code)} Up (Shift Left in Matrix)">
+                    <svg class="w-2.5 h-2.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7"/></svg>
+                  </button>
+                  <button type="button" onclick="moveSubjectOrder(${subIdx}, 1)" ${isLastSub ? 'disabled' : ''} class="w-5 h-3.5 flex items-center justify-center hover:bg-slate-100 text-slate-600 hover:text-slate-900 transition ${isLastSub ? 'opacity-20 cursor-not-allowed pointer-events-none' : 'cursor-pointer active:scale-95'}" title="Move ${escapeHtml(sub.code)} Down (Shift Right in Matrix)">
+                    <svg class="w-2.5 h-2.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                  </button>
                 </div>
-                <div class="text-xs text-slate-600 font-medium">${escapeHtml(sub.title)}</div>
+                <div class="min-w-0 flex-1">
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <span class="font-extrabold text-sm text-slate-900">${escapeHtml(sub.code)}</span>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded ${sub.headerBg}">${sub.units} Units</span>
+                  </div>
+                  <div class="text-xs text-slate-600 font-medium truncate">${escapeHtml(sub.title)}</div>
+                </div>
               </div>
-              <div class="flex items-center gap-1.5">
+              <div class="flex items-center gap-1.5 shrink-0">
                 <button onclick="openEditSubjectModal('${escapeJsString(sub.code)}')" class="px-2.5 py-1 bg-white hover:bg-slate-100 border border-slate-300 rounded-lg text-slate-700 font-semibold text-xs flex items-center gap-1">
                   ✎ Edit Details
                 </button>
@@ -2945,10 +3114,22 @@ function getNextRandomTip(currentIndex = -1) {
                 ${sub.sections.map((sec, secIdx) => {
                   const secSlots = subSlots.filter(s => s.section === sec);
                   const accentBar = getSectionAccent(secIdx);
+                  const isFirstSec = (secIdx === 0);
+                  const isLastSec = (secIdx === sub.sections.length - 1);
+                  const safeSec = sec.replace(/[^a-zA-Z0-9_-]/g, '_');
 
                   return `
-                    <div class="bg-white p-2.5 rounded-lg border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs ${accentBar}">
-                      <div class="flex items-center gap-2.5 min-w-0">
+                    <div id="manage-sec-row-${safeSub}__${safeSec}" class="bg-white p-2.5 rounded-lg border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs ${accentBar} transition-shadow">
+                      <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                        <!-- Leftmost Stacked Reorder Arrows -->
+                        <div class="inline-flex flex-col border border-slate-300 rounded-md overflow-hidden bg-white shadow-2xs shrink-0 select-none">
+                          <button type="button" onclick="moveSectionOrder(${subIdx}, ${secIdx}, -1)" ${isFirstSec ? 'disabled' : ''} class="w-5 h-3.5 flex items-center justify-center hover:bg-slate-100 text-slate-600 hover:text-slate-900 border-b border-slate-200 transition ${isFirstSec ? 'opacity-20 cursor-not-allowed pointer-events-none' : 'cursor-pointer active:scale-95'}" title="Move Section ${escapeHtml(sec)} Up (Shift Left in Matrix)">
+                            <svg class="w-2.5 h-2.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7"/></svg>
+                          </button>
+                          <button type="button" onclick="moveSectionOrder(${subIdx}, ${secIdx}, 1)" ${isLastSec ? 'disabled' : ''} class="w-5 h-3.5 flex items-center justify-center hover:bg-slate-100 text-slate-600 hover:text-slate-900 transition ${isLastSec ? 'opacity-20 cursor-not-allowed pointer-events-none' : 'cursor-pointer active:scale-95'}" title="Move Section ${escapeHtml(sec)} Down (Shift Right in Matrix)">
+                            <svg class="w-2.5 h-2.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                          </button>
+                        </div>
                         <span class="font-extrabold text-xs bg-slate-100 text-slate-800 px-2.5 py-1 rounded-md border border-slate-300 shrink-0">${escapeHtml(sec)}</span>
                         <div class="text-[11px] text-slate-600 font-medium truncate">
                           ${secSlots.length > 0 
@@ -2972,6 +3153,10 @@ function getNextRandomTip(currentIndex = -1) {
           </div>
         `;
       }).join('');
+
+      if (scrollParent) {
+        scrollParent.scrollTop = prevScrollTop;
+      }
 
       document.getElementById('manage-courses-modal').classList.remove('hidden');
     }
@@ -4278,7 +4463,7 @@ function getNextRandomTip(currentIndex = -1) {
               </span>
             </td>
             <td class="py-2.5 px-3 text-center whitespace-nowrap">
-              <span class="inline-block px-2 py-0.5 rounded font-mono font-black text-xs border border-slate-300 ${gradeBadgeClass}" title="Weighted Score: ${res.total.toFixed(2)}% • Status: ${escapeHtml(res.msu.status)}">
+              <span class="grade-msu-cell inline-block px-2 py-0.5 rounded font-mono font-black text-xs border ${gradeBadgeClass}" title="Weighted Score: ${res.total.toFixed(2)}% • Status: ${escapeHtml(res.msu.status)}">
                 ${escapeHtml(gradeText)}
               </span>
             </td>
@@ -5617,7 +5802,7 @@ function getNextRandomTip(currentIndex = -1) {
             ${isUnbalanced ? '<td class="py-2 px-1 text-center border-r border-rose-200 bg-rose-50/40 text-rose-600 font-bold text-xs" title="Total weight does not equal 100%">⚠️</td>' : ''}
             <td class="py-2.5 px-2 text-center font-extrabold text-xs font-mono text-slate-800 bg-slate-100/90 border-r border-slate-200 grade-total-cell">${(parseFloat(gradeResult.total) || 0).toFixed(2)}%</td>
             <td class="py-2.5 px-2 text-center border-r border-slate-200 bg-amber-50/70">
-              <span class="grade-msu-cell px-2 py-0.5 rounded font-mono font-black text-xs border border-slate-300 ${gradeResult.msu.class}">${gradeResult.msu.grade}</span>
+              <span class="grade-msu-cell inline-block px-2 py-0.5 rounded font-mono font-black text-xs border ${gradeResult.msu.class}">${gradeResult.msu.grade}</span>
             </td>
             <td class="py-2.5 px-2 text-center ${stickyCellBg} border-l border-slate-200">
               <select onchange="updateGradeStatusOverride('${escapeHtml(s.id)}', this.value)" class="grade-status-select text-[11px] font-bold rounded border border-slate-300 px-1 py-1 bg-white focus:ring-1 focus:ring-msu-maroon ${gradeResult.msu.status === 'Passed' ? 'text-emerald-700' : (gradeResult.msu.status === 'Incomplete' ? 'text-orange-700' : (gradeResult.msu.status === 'Withdrawn' || gradeResult.msu.status === 'Dropped' ? 'text-slate-600' : 'text-rose-700'))}">
@@ -5708,7 +5893,7 @@ function getNextRandomTip(currentIndex = -1) {
               ${classAvgTotal.toFixed(2)}%
             </td>
             <td class="py-2.5 px-2 text-center border-r border-slate-200 bg-amber-100/80">
-              <span class="px-2 py-0.5 rounded font-mono font-black text-xs border border-slate-300 ${classAvgMsu.class}">${classAvgMsu.grade}</span>
+              <span class="grade-msu-cell inline-block px-2 py-0.5 rounded font-mono font-black text-xs border ${classAvgMsu.class}">${classAvgMsu.grade}</span>
             </td>
             <td class="py-2.5 px-2 text-center bg-slate-100 border-l border-slate-200 whitespace-nowrap">
               <span class="text-[11px] font-black ${passRate >= 75 ? 'text-emerald-700' : 'text-rose-700'}">${passRate.toFixed(2)}% Pass</span>
@@ -5841,7 +6026,7 @@ function getNextRandomTip(currentIndex = -1) {
 
         if (totalCell) totalCell.innerText = (parseFloat(gradeResult.total) || 0).toFixed(2) + '%';
         if (msuCell) {
-          msuCell.className = 'grade-msu-cell px-2.5 py-1 rounded font-mono font-black text-xs border border-slate-300 ' + gradeResult.msu.class;
+          msuCell.className = 'grade-msu-cell inline-block px-2 py-0.5 rounded font-mono font-black text-xs border ' + gradeResult.msu.class;
           msuCell.innerText = gradeResult.msu.grade;
         }
         if (statusSelect && statusSelect.options && statusSelect.options.length > 0 && !student.statusOverride) {
@@ -5877,7 +6062,7 @@ function getNextRandomTip(currentIndex = -1) {
           headerRow.push(`${cat.name} (${cat.weight}%)`);
         }
       });
-      headerRow.push('Total %', 'MSU Grade', 'Status');
+      headerRow.push('Total %', 'Final Grade', 'Status');
 
       let csv = headerRow.map(h => `"${h.replace(/"/g, '""')}"`).join(',') + '\n';
 
