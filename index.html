@@ -2383,9 +2383,11 @@
   </div>
 
   <!-- Floating Feedback & Bug Report Button (Lower Left) -->
-  <button type="button" id="btn-feedback-floating" onclick="openFeedbackModal()" class="fixed bottom-6 left-6 z-40 flex items-center h-10 w-10 hover:w-32 px-2.5 rounded-full shadow-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 hover:text-amber-600 hover:border-amber-400 transition-all duration-300 ease-out group overflow-hidden backdrop-blur-xs" title="Report a bug or suggest a feature">
-    <span class="text-base shrink-0 flex items-center justify-center group-hover:rotate-12 transition-transform duration-200">💡</span>
-    <span class="max-w-0 opacity-0 group-hover:max-w-xs group-hover:opacity-100 group-hover:ml-2 transition-all duration-300 ease-out whitespace-nowrap text-xs font-extrabold overflow-hidden">Feedback</span>
+  <button type="button" id="btn-feedback-floating" onclick="openFeedbackModal()" class="fixed bottom-6 left-6 z-40 flex items-center h-10 w-10 hover:w-32 p-0 rounded-full shadow-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 hover:text-amber-600 hover:border-amber-400 transition-all duration-300 ease-out group overflow-hidden backdrop-blur-xs" title="Report a bug or suggest a feature">
+    <span class="w-10 h-10 shrink-0 flex items-center justify-center text-lg select-none">
+      <span class="inline-flex items-center justify-center transform translate-y-[1px] group-hover:rotate-12 transition-transform duration-200">💡</span>
+    </span>
+    <span class="max-w-0 opacity-0 group-hover:max-w-xs group-hover:opacity-100 group-hover:pr-3.5 transition-all duration-300 ease-out whitespace-nowrap text-xs font-extrabold overflow-hidden">Feedback</span>
   </button>
 
   <!-- Feedback & Bug Report Modal -->
