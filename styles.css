@@ -2469,3 +2469,52 @@ html.theme-dark #gradebook-table-body tr {
               margin-left 0.68s cubic-bezier(0.25, 1, 0.35, 1) !important;
 }
 
+/* ================= BACKUP REMINDER BANNER & NOTIFICATIONS ================= */
+#backup-reminder-banner {
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(0, 0, 0, 0.06);
+}
+
+html.theme-dark #backup-reminder-banner {
+  background-color: rgba(26, 30, 42, 0.96) !important;
+  border-color: rgba(245, 158, 11, 0.35) !important;
+  box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.08) !important;
+}
+
+html.theme-dark #backup-reminder-banner h4 {
+  color: #f8fafc !important;
+}
+
+html.theme-dark #backup-reminder-banner #backup-reminder-message {
+  color: #94a3b8 !important;
+}
+
+html.theme-dark #backup-reminder-banner #backup-reminder-badge {
+  background-color: rgba(245, 158, 11, 0.18) !important;
+  color: #fbbf24 !important;
+  border-color: rgba(245, 158, 11, 0.4) !important;
+}
+
+html.theme-dark #backup-reminder-banner button[onclick*="snoozeBackupReminder"] {
+  background-color: #334155 !important;
+  color: #e2e8f0 !important;
+  border-color: #475569 !important;
+}
+
+html.theme-dark #backup-reminder-banner button[onclick*="snoozeBackupReminder"]:hover {
+  background-color: #3e4f66 !important;
+}
+
+html.theme-dark #backup-reminder-banner button[onclick*="dismissBackupReminderBanner"] {
+  color: #94a3b8 !important;
+}
+
+html.theme-dark #backup-reminder-banner button[onclick*="dismissBackupReminderBanner"]:hover {
+  background-color: #334155 !important;
+  color: #f1f5f9 !important;
+}
+
+html.theme-dark #ei-last-backup-status {
+  color: #94a3b8 !important;
+}
+
+
