@@ -1,4 +1,168 @@
-    /* =========================================================
+const PORTAL_TIPS = [
+  {
+    title: "Fast Keyboard Shortcuts in Planner",
+    type: "Tip",
+    icon: "⌨️",
+    content: "Use <kbd class='px-1.5 py-0.5 bg-slate-200 text-slate-800 rounded font-mono font-bold text-[11px]'>Ctrl+Z</kbd> to instantly undo syllabus changes and <kbd class='px-1.5 py-0.5 bg-slate-200 text-slate-800 rounded font-mono font-bold text-[11px]'>Ctrl+Y</kbd> (or Ctrl+Shift+Z) to redo card moves and lesson entries in the Matrix."
+  },
+  {
+    title: "Direct Copy-Paste from Google Sheets",
+    type: "Tip",
+    icon: "📋",
+    content: "Have a class roster in Excel or Google Sheets? Click <b>'Paste Class List'</b> in the Roster tab to import columns (ID, Last Name, First Name, Email) in seconds without manual row-by-row data entry."
+  },
+  {
+    title: "Compact Grading View",
+    type: "Tip",
+    icon: "📊",
+    content: "Toggle <b>'Collapse Sub-activities'</b> in the Gradebook toolbar to hide daily seatworks and view only high-level exam category totals and overall weighted course percentages."
+  },
+  {
+    title: "100% Offline Persistence",
+    type: "Did You Know?",
+    icon: "💾",
+    content: "Every modification you make to grades, activities, and schedules is saved in local browser storage, allowing full functionality without requiring an active internet connection."
+  },
+  {
+    title: "Cascading 'No Class' Suspensions",
+    type: "Did You Know?",
+    icon: "🔄",
+    content: "Declaring a 'No Class' day (for university holidays, sports events, or weather suspensions) automatically cascades your remaining lesson topics forward into future available class days."
+  },
+  {
+    title: "One-Click Faculty Gmail Integration",
+    type: "Did You Know?",
+    icon: "✉️",
+    content: "Configure your official faculty Google account in Settings. Clicking any student's email link will immediately launch Gmail logged in under that specific institutional account."
+  },
+  {
+    title: "Complete JSON Backups & Migration",
+    type: "Tip",
+    icon: "📦",
+    content: "Use the <b>Export / Import Hub</b> anytime to download complete JSON snapshots of your semester records to safely transfer data between work and home laptops."
+  },
+  {
+    title: "Real-Time Active Class Indicator",
+    type: "Did You Know?",
+    icon: "⏰",
+    content: "The header live clock actively monitors your Weekly Timetable and displays a golden indicator badge whenever one of your scheduled lectures or lab periods is currently in session."
+  },
+  {
+    title: "Dual Top & Bottom Scrollbars",
+    type: "Did You Know?",
+    icon: "🎚️",
+    content: "The Lesson Planner Matrix, Gradebook, and Student Roster feature synchronized scrollbars at both the top and bottom of the table so you can navigate wide tables without scrolling to the bottom."
+  },
+  {
+    title: "Personalized School Branding & Logo",
+    type: "Tip",
+    icon: "🏫",
+    content: "Click <b>Portal Settings</b> in the header anytime to customize your university or department name and upload your own school logo. High-resolution logos are automatically optimized!"
+  },
+  {
+    title: "Vertical Resizing for Sidebar Widgets",
+    type: "Tip",
+    icon: "📐",
+    content: "You can drag the bottom edge of the <b>Next Activities</b> widget to resize it to your preferred height. Double-click the widget header anytime to reset it back to default."
+  },
+  {
+    title: "Gradebook Out-of-Bounds Detection",
+    type: "Did You Know?",
+    icon: "🚨",
+    content: "Entering a score higher than an assessment's configured maximum highlights the cell with a glowing red warning ring and toast notification to catch data entry typos immediately."
+  },
+  {
+    title: "Interactive Drag & Drop Lessons",
+    type: "Tip",
+    icon: "🖐️",
+    content: "In the Lesson Matrix, you can drag and drop lecture topic cards across days and sections to easily reorganize your teaching schedule when topics take longer than planned."
+  },
+  {
+    title: "One-Click Filtered Student Announcements",
+    type: "Tip",
+    icon: "📢",
+    content: "Filter the Roster by section or final grade status (e.g. students with INC or below 3.00), then click <b>'Email Filtered Students'</b> in the sidebar to open a pre-addressed BCC email draft."
+  },
+  {
+    title: "Section Renaming & Schedule Editing",
+    type: "Did You Know?",
+    icon: "✏️",
+    content: "Under Manage Subjects, clicking <b>'Edit Section'</b> lets you rename sections or alter meeting days and hours with automatic state migration across your timetable, matrix, and student rosters."
+  },
+  {
+    title: "PDF Academic Calendar Text Extraction",
+    type: "Did You Know?",
+    icon: "📄",
+    content: "Upload your official university academic calendar PDF in the Calendar tab. The built-in PDF.js engine extracts event titles, dates, and examination periods into your timeline."
+  },
+  {
+    title: "Gradebook Input Error Radar",
+    type: "Tip",
+    icon: "🎯",
+    content: "The Gradebook sidebar features an <b>Input Error Radar</b> that automatically flags empty score cells and zero entries. Click any listed student to jump directly to their score cell."
+  },
+  {
+    title: "Custom Passing Criteria & Scales",
+    type: "Tip",
+    icon: "⚖️",
+    content: "Click <b>'Grading Scale'</b> to customize grade thresholds from 1.00 (98-100%) to 5.00 (<75%), adjust passing percentages, and preview real-time grade distributions for your section."
+  },
+  {
+    title: "Customizable Subject Column Widths",
+    type: "Tip",
+    icon: "↔️",
+    content: "Need more room for detailed syllabus notes? Hover between subject column headers in the Lesson Matrix and drag the divider edge to expand or narrow any column."
+  },
+  {
+    title: "Academic Week-Based Progress",
+    type: "Did You Know?",
+    icon: "📈",
+    content: "The top navigation bar tracks cumulative semester elapsed percentage based on certified academic calendar weeks, providing an accurate, objective term timeline at a glance."
+  },
+  {
+    title: "Instant 'Jump to Today' Locator",
+    type: "Tip",
+    icon: "🎯",
+    content: "Click <b>'Jump to Today'</b> below the Lesson Matrix or in Today's Schedule to instantly scroll and highlight the current teaching day with an amber ambient focus glow."
+  },
+  {
+    title: "Full Sunday Class Schedule Support",
+    type: "Did You Know?",
+    icon: "☀️",
+    content: "For weekend programs and graduate courses, Sunday is fully supported in the Weekly Timetable grid, conflict detector, and Today's Schedule agenda widgets."
+  },
+  {
+    title: "Integrated Bug & Feedback Dispatcher",
+    type: "Tip",
+    icon: "🐛",
+    content: "Encounter an issue or have an idea? Click the floating bug button in the bottom-left corner anytime to send feedback directly to the system maintainer with diagnostics included."
+  },
+  {
+    title: "Safe Multi-Section Student Enrollment",
+    type: "Did You Know?",
+    icon: "🛡️",
+    content: "Students enrolled across multiple courses or lab sections share a single unified ID record, and removing a student from one section preserves their enrollment in other courses."
+  },
+  {
+    title: "Installable Desktop Web App (PWA)",
+    type: "Did You Know?",
+    icon: "💻",
+    content: "This course manager includes a web app manifest and Service Worker—click your browser's install icon in the address bar to run it as a standalone, distraction-free desktop application!"
+  }
+];
+
+// Expose tips globally and update tip display logic
+window.PORTAL_TIPS = PORTAL_TIPS;
+
+function getNextRandomTip(currentIndex = -1) {
+  let nextIdx;
+  do {
+    nextIdx = Math.floor(Math.random() * PORTAL_TIPS.length);
+  } while (PORTAL_TIPS.length > 1 && nextIdx === currentIndex);
+  return { ...PORTAL_TIPS[nextIdx], index: nextIdx };
+}
+
+/* =========================================================
        MSU-GSC COURSE & LESSON MANAGER - HIGH PERFORMANCE ENGINE
        ========================================================= */
 
@@ -157,6 +321,8 @@
     // Default Seed Data Verified from MSU-GSC AY 2026-2027 Calendar
     const DEFAULT_DATA = {
       semesterConfig: {
+        schoolName: "Mindanao State University - General Santos",
+        schoolLogo: "",
         title: "1st Semester, Academic Year 2026–2027",
         startDate: "2026-08-10",
         endDate: "2026-12-11",
@@ -425,7 +591,9 @@
         const stored = localStorage.getItem(STORAGE_KEY);
         if (stored) {
           const parsed = JSON.parse(stored);
-          if (parsed.semesterConfig) semesterConfig = parsed.semesterConfig;
+          if (parsed.semesterConfig) {
+            semesterConfig = Object.assign({}, DEFAULT_DATA.semesterConfig, parsed.semesterConfig);
+          }
           if (parsed.courseData) courseData = parsed.courseData;
           if (parsed.columnWidths) columnWidths = parsed.columnWidths;
           if (parsed.weeklyTimetable) weeklyTimetable = parsed.weeklyTimetable;
@@ -477,7 +645,14 @@
         try {
           const data = JSON.parse(e.target.result);
           if (data.semesterConfig && data.courseData) {
-            semesterConfig = data.semesterConfig;
+            semesterConfig = Object.assign({}, DEFAULT_DATA.semesterConfig, data.semesterConfig);
+            applyHeaderBranding();
+
+      // Attach Easter Egg trigger to School Logo & Name
+      const brandLogo = document.getElementById('header-school-logo');
+      const brandName = document.getElementById('header-school-name');
+      if (brandLogo) brandLogo.addEventListener('click', handleLogoEasterEggTap);
+      if (brandName) brandName.addEventListener('click', handleLogoEasterEggTap);
             courseData = data.courseData;
             columnWidths = data.columnWidths || columnWidths;
             weeklyTimetable = data.weeklyTimetable || weeklyTimetable;
@@ -517,6 +692,13 @@
         () => {
           localStorage.removeItem(STORAGE_KEY);
           semesterConfig = JSON.parse(JSON.stringify(DEFAULT_DATA.semesterConfig));
+          applyHeaderBranding();
+
+      // Attach Easter Egg trigger to School Logo & Name
+      const brandLogo = document.getElementById('header-school-logo');
+      const brandName = document.getElementById('header-school-name');
+      if (brandLogo) brandLogo.addEventListener('click', handleLogoEasterEggTap);
+      if (brandName) brandName.addEventListener('click', handleLogoEasterEggTap);
           courseData = JSON.parse(JSON.stringify(DEFAULT_DATA.courseData));
           columnWidths = JSON.parse(JSON.stringify(DEFAULT_DATA.columnWidths));
           weeklyTimetable = JSON.parse(JSON.stringify(DEFAULT_DATA.weeklyTimetable));
@@ -571,6 +753,9 @@
       }
       updateTabSidebar(tabId);
       checkAndSyncBackdrop();
+      if (typeof initAllDualScrollbars === 'function') {
+        setTimeout(initAllDualScrollbars, 60);
+      }
     }
 
     // ================= SEMESTER TIMELINE & ACADEMIC DATE LOGIC =================
@@ -2366,11 +2551,71 @@
       saveAppState();
     }
 
-    // ================= SEMESTER SETTINGS =================
+    // ================= SEMESTER & BRANDING SETTINGS =================
+    let tempUploadedLogo = undefined;
+
+    function applyHeaderBranding() {
+      const defaultSchool = (DEFAULT_DATA.semesterConfig && DEFAULT_DATA.semesterConfig.schoolName)
+        ? DEFAULT_DATA.semesterConfig.schoolName
+        : "Mindanao State University - General Santos";
+      const sName = (semesterConfig && semesterConfig.schoolName) ? semesterConfig.schoolName : defaultSchool;
+
+      const headerNameEl = document.getElementById('header-school-name');
+      if (headerNameEl) {
+        headerNameEl.textContent = sName;
+        headerNameEl.title = sName;
+      }
+
+      const logoImg = document.getElementById('header-school-logo');
+      const fallbackEl = document.getElementById('header-logo-fallback');
+      if (logoImg) {
+        logoImg.style.display = 'block';
+        if (fallbackEl) fallbackEl.style.display = 'none';
+
+        if (semesterConfig && semesterConfig.schoolLogo) {
+          logoImg.src = semesterConfig.schoolLogo;
+          logoImg.classList.remove('scale-[1.38]');
+          logoImg.classList.add('scale-100');
+        } else {
+          logoImg.src = 'msu-logo.png';
+          logoImg.classList.add('scale-[1.38]');
+          logoImg.classList.remove('scale-100');
+        }
+      }
+
+      if (fallbackEl) {
+        const initials = sName.split(/\s+/).map(w => w[0]).filter(c => /[A-Za-z0-9]/.test(c)).slice(0, 3).join('').toUpperCase() || 'MSU';
+        fallbackEl.textContent = initials;
+      }
+    }
+
     function openTermSettingsModal() {
-      document.getElementById('setting-term-title').value = semesterConfig.title;
-      document.getElementById('setting-start-date').value = semesterConfig.startDate;
-      document.getElementById('setting-end-date').value = semesterConfig.endDate;
+      tempUploadedLogo = (semesterConfig && semesterConfig.schoolLogo !== undefined) ? semesterConfig.schoolLogo : "";
+
+      const schoolNameInput = document.getElementById('setting-school-name');
+      if (schoolNameInput) {
+        schoolNameInput.value = (semesterConfig && semesterConfig.schoolName)
+          ? semesterConfig.schoolName
+          : (DEFAULT_DATA.semesterConfig.schoolName || "Mindanao State University - General Santos");
+      }
+
+      const logoPreview = document.getElementById('setting-logo-preview');
+      if (logoPreview) {
+        if (tempUploadedLogo) {
+          logoPreview.src = tempUploadedLogo;
+          logoPreview.classList.remove('scale-[1.38]');
+        } else {
+          logoPreview.src = 'msu-logo.png';
+          logoPreview.classList.add('scale-[1.38]');
+        }
+      }
+
+      const fileInput = document.getElementById('setting-logo-file');
+      if (fileInput) fileInput.value = '';
+
+      document.getElementById('setting-term-title').value = semesterConfig.title || '';
+      document.getElementById('setting-start-date').value = semesterConfig.startDate || '';
+      document.getElementById('setting-end-date').value = semesterConfig.endDate || '';
       const emailInput = document.getElementById('setting-faculty-email');
       if (emailInput) {
         emailInput.value = semesterConfig.facultyEmail || '';
@@ -2380,9 +2625,78 @@
 
     function closeTermSettingsModal() {
       document.getElementById('term-settings-modal').classList.add('hidden');
+      tempUploadedLogo = undefined;
+    }
+
+    function handleLogoFileSelect(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      if (!file.type.startsWith('image/')) {
+        showToast("Please select a valid image file (PNG, JPG, SVG, WebP).", "⚠️");
+        return;
+      }
+
+      // Use an offscreen Image and Canvas to downscale high-resolution images of ANY size
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          const maxDim = 256;
+          let w = img.width;
+          let h = img.height;
+
+          if (w > maxDim || h > maxDim) {
+            if (w > h) {
+              h = Math.round((h * maxDim) / w);
+              w = maxDim;
+            } else {
+              w = Math.round((w * maxDim) / h);
+              h = maxDim;
+            }
+          }
+
+          const canvas = document.createElement('canvas');
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = 'high';
+          ctx.drawImage(img, 0, 0, w, h);
+
+          // Export as PNG to preserve transparent backgrounds
+          const compressedDataUrl = canvas.toDataURL('image/png');
+
+          tempUploadedLogo = compressedDataUrl;
+          const preview = document.getElementById('setting-logo-preview');
+          if (preview) {
+            preview.src = compressedDataUrl;
+            preview.classList.remove('scale-[1.38]');
+          }
+          showToast("Logo optimized & ready to save! (Scaled to crisp 256px)", "✓");
+        };
+        img.onerror = function() {
+          showToast("Could not process image file.", "⚠️");
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function resetDefaultLogo() {
+      tempUploadedLogo = "";
+      const preview = document.getElementById('setting-logo-preview');
+      if (preview) {
+        preview.src = 'msu-logo.png';
+        preview.classList.add('scale-[1.38]');
+      }
+      const fileInput = document.getElementById('setting-logo-file');
+      if (fileInput) fileInput.value = '';
+      showToast("Reset to official MSU seal.", "ℹ️");
     }
 
     function saveTermSettings() {
+      const schoolName = (document.getElementById('setting-school-name')?.value || '').trim();
       const title = document.getElementById('setting-term-title').value.trim();
       const start = document.getElementById('setting-start-date').value;
       const end = document.getElementById('setting-end-date').value;
@@ -2398,10 +2712,23 @@
         return;
       }
 
+      semesterConfig.schoolName = schoolName || (DEFAULT_DATA.semesterConfig.schoolName || "Mindanao State University - General Santos");
+      if (tempUploadedLogo !== undefined) {
+        semesterConfig.schoolLogo = tempUploadedLogo;
+      }
+
       semesterConfig.title = title || semesterConfig.title;
       semesterConfig.startDate = start;
       semesterConfig.endDate = end;
       semesterConfig.facultyEmail = facultyEmail;
+
+      applyHeaderBranding();
+
+      // Attach Easter Egg trigger to School Logo & Name
+      const brandLogo = document.getElementById('header-school-logo');
+      const brandName = document.getElementById('header-school-name');
+      if (brandLogo) brandLogo.addEventListener('click', handleLogoEasterEggTap);
+      if (brandName) brandName.addEventListener('click', handleLogoEasterEggTap);
 
       document.getElementById('header-term-title').innerText = semesterConfig.title + ' • Course Planning & Activity Matrix';
       document.getElementById('planner-term-label').innerText = semesterConfig.title + ' Matrix';
@@ -2413,7 +2740,7 @@
       updateSemesterProgressBar();
       saveAppState();
       closeTermSettingsModal();
-      showToast("Academic semester timeline updated successfully!");
+      showToast("Portal branding & academic timeline updated successfully!");
     }
 
     // ================= TIMETABLE MODAL EDITING =================
@@ -6148,11 +6475,13 @@
       if (isCurrentlyCollapsed) {
         sidebar.classList.remove('tab-sidebar-collapsed', 'hidden');
         sidebar.classList.add('tab-sidebar-expanded');
+        const c = sidebar.closest('.tab-layout-container'); if(c) { c.classList.remove('sidebar-collapsed'); c.classList.add('sidebar-expanded'); }
         localStorage.setItem('sidebar_collapsed_' + tabId, '0');
         updateSidebarToggleButton(tabId, false);
       } else {
         sidebar.classList.remove('tab-sidebar-expanded');
         sidebar.classList.add('tab-sidebar-collapsed');
+        const c = sidebar.closest('.tab-layout-container'); if(c) { c.classList.remove('sidebar-expanded'); c.classList.add('sidebar-collapsed'); }
         localStorage.setItem('sidebar_collapsed_' + tabId, '1');
         updateSidebarToggleButton(tabId, true);
       }
@@ -8301,8 +8630,273 @@
       }
     }
 
+    // ================= FACULTY QUICK TIPS & FEATURE HIGHLIGHTS =================
+    const FACULTY_TIPS = PORTAL_TIPS;
+
+    let currentTipIndex = 0;
+
+    function renderCurrentTip() {
+      const tipsList = (typeof PORTAL_TIPS !== 'undefined' && Array.isArray(PORTAL_TIPS) && PORTAL_TIPS.length > 0)
+        ? PORTAL_TIPS
+        : (typeof FACULTY_TIPS !== 'undefined' ? FACULTY_TIPS : []);
+      if (tipsList.length === 0) return;
+
+      const tip = tipsList[currentTipIndex % tipsList.length];
+
+      const iconBox = document.getElementById('tip-icon-box');
+      const badge = document.getElementById('tip-badge');
+      const counter = document.getElementById('tip-counter');
+      const title = document.getElementById('tip-title');
+      const desc = document.getElementById('tip-desc');
+
+      const isDidYouKnow = tip.type === 'Did You Know?';
+      if (iconBox) iconBox.textContent = tip.icon || (isDidYouKnow ? '💡' : '📌');
+      if (badge) {
+        badge.textContent = tip.type || tip.badge || 'Tip';
+        if (isDidYouKnow) {
+          badge.className = 'px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30';
+        } else {
+          badge.className = 'px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-msu-maroon/10 text-msu-maroon border border-msu-maroon/20';
+        }
+      }
+      if (counter) counter.textContent = 'Tip of the Day';
+      if (title) title.textContent = tip.title;
+      if (desc) desc.innerHTML = tip.content || tip.desc;
+    }
+
+    function getActiveTipsCount() {
+      return (typeof PORTAL_TIPS !== 'undefined' && Array.isArray(PORTAL_TIPS) && PORTAL_TIPS.length > 0)
+        ? PORTAL_TIPS.length
+        : 8;
+    }
+
+    function nextTip() {
+      const total = getActiveTipsCount();
+      currentTipIndex = (currentTipIndex + 1) % total;
+      renderCurrentTip();
+    }
+
+    function prevTip() {
+      const total = getActiveTipsCount();
+      currentTipIndex = (currentTipIndex - 1 + total) % total;
+      renderCurrentTip();
+    }
+
+    function goToTip(idx) {
+      const total = getActiveTipsCount();
+      if (idx >= 0 && idx < total) {
+        currentTipIndex = idx;
+        renderCurrentTip();
+      }
+    }
+
+    function openTipsModal(force = false) {
+      const modal = document.getElementById('tips-modal');
+      if (!modal) return;
+      if (force) {
+        const checkbox = document.getElementById('tips-hide-today-checkbox');
+        if (checkbox) checkbox.checked = false;
+      }
+      renderCurrentTip();
+      modal.classList.remove('hidden');
+    }
+
+    function closeTipsModal() {
+      const modal = document.getElementById('tips-modal');
+      if (modal) modal.classList.add('hidden');
+
+      const checkbox = document.getElementById('tips-hide-today-checkbox');
+      if (checkbox && checkbox.checked) {
+        const todayStr = new Date().toLocaleDateString('en-CA');
+        localStorage.setItem('msu_hide_tips_date', todayStr);
+      }
+    }
+
+    function checkDailyTipsOnStartup() {
+      try {
+        const savedDate = localStorage.getItem('msu_hide_tips_date');
+        const todayStr = new Date().toLocaleDateString('en-CA');
+        if (savedDate === todayStr) {
+          return; // Hidden for today
+        }
+
+        // Cycle through tips based on day of year
+        const startOfYear = new Date(new Date().getFullYear(), 0, 1);
+        const dayOfYear = Math.floor((new Date() - startOfYear) / (1000 * 60 * 60 * 24));
+        const total = getActiveTipsCount();
+        currentTipIndex = Math.abs(dayOfYear) % total;
+
+        // Slight delay so the UI cleanly renders before popup opens
+        setTimeout(() => {
+          openTipsModal(false);
+        }, 600);
+      } catch (e) {
+        console.warn("Could not check daily tips state:", e);
+      }
+    }
+
+
+    // ================= EASTER EGG: SECRET KNOWLEDGE VAULT (ALL 25 TIPS) =================
+    let vaultActiveCategory = 'all';
+    let vaultSearchTerm = '';
+
+    function openEasterEggModal() {
+      const modal = document.getElementById('easter-egg-tips-modal');
+      if (!modal) return;
+      vaultActiveCategory = 'all';
+      vaultSearchTerm = '';
+      const input = document.getElementById('vault-search-input');
+      if (input) input.value = '';
+      updateVaultFilterButtons();
+      renderEasterEggTipsList();
+      modal.classList.remove('hidden');
+    }
+
+    function closeEasterEggModal() {
+      const modal = document.getElementById('easter-egg-tips-modal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function filterVaultTips(cat) {
+      vaultActiveCategory = cat;
+      updateVaultFilterButtons();
+      renderEasterEggTipsList();
+    }
+
+    function searchVaultTips() {
+      const input = document.getElementById('vault-search-input');
+      vaultSearchTerm = (input ? input.value : '').toLowerCase().trim();
+      renderEasterEggTipsList();
+    }
+
+    function updateVaultFilterButtons() {
+      const allBtn = document.getElementById('vault-filter-all');
+      const tipBtn = document.getElementById('vault-filter-tip');
+      const dykBtn = document.getElementById('vault-filter-dyk');
+
+      const activeClass = 'px-3 py-1.5 rounded-lg bg-msu-maroon text-white border border-msu-maroon transition shadow-2xs';
+      const inactiveClass = 'px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-600 transition';
+
+      if (allBtn) allBtn.className = vaultActiveCategory === 'all' ? activeClass : inactiveClass;
+      if (tipBtn) tipBtn.className = vaultActiveCategory === 'Tip' ? activeClass : inactiveClass;
+      if (dykBtn) dykBtn.className = vaultActiveCategory === 'Did You Know?' ? activeClass : inactiveClass;
+    }
+
+    function renderEasterEggTipsList() {
+      const listContainer = document.getElementById('easter-egg-tips-list');
+      if (!listContainer) return;
+
+      const tips = (typeof PORTAL_TIPS !== 'undefined' && Array.isArray(PORTAL_TIPS)) ? PORTAL_TIPS : [];
+      
+      const filtered = tips.filter(t => {
+        const matchesCat = vaultActiveCategory === 'all' || t.type === vaultActiveCategory;
+        const textContent = `${t.title} ${t.content || t.desc} ${t.type}`.toLowerCase();
+        const matchesSearch = !vaultSearchTerm || textContent.includes(vaultSearchTerm);
+        return matchesCat && matchesSearch;
+      });
+
+      if (filtered.length === 0) {
+        listContainer.innerHTML = `
+          <div class="py-12 text-center text-slate-400 dark:text-slate-500 space-y-2">
+            <span class="text-3xl">🔍</span>
+            <p class="text-sm font-semibold">No tips match "${escapeHtml(vaultSearchTerm)}"</p>
+            <button type="button" onclick="document.getElementById('vault-search-input').value=''; searchVaultTips();" class="text-xs text-msu-maroon hover:underline font-bold">Clear search filter</button>
+          </div>
+        `;
+        return;
+      }
+
+      listContainer.innerHTML = filtered.map((t, idx) => {
+        const isDyk = t.type === 'Did You Know?';
+        const badgeClass = isDyk 
+          ? 'bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-500/30' 
+          : 'bg-msu-maroon/10 text-msu-maroon dark:text-rose-300 border-msu-maroon/20';
+        const iconBg = isDyk ? 'bg-amber-100 border-amber-300 dark:bg-amber-950/40 dark:border-amber-700' : 'bg-rose-100 border-rose-300 dark:bg-rose-950/40 dark:border-rose-700';
+
+        return `
+          <div class="bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl p-3.5 sm:p-4 flex gap-3.5 items-start hover:border-amber-400 dark:hover:border-amber-500/60 transition shadow-2xs">
+            <div class="w-10 h-10 rounded-xl ${iconBg} border text-xl flex items-center justify-center shrink-0 shadow-xs">
+              ${t.icon || (isDyk ? '💡' : '📌')}
+            </div>
+            <div class="space-y-1 min-w-0 flex-1">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider border ${badgeClass}">
+                  ${escapeHtml(t.type)}
+                </span>
+                <span class="text-[10px] text-slate-400 dark:text-slate-500 font-mono font-bold ml-auto">#${tips.indexOf(t) + 1} of ${tips.length}</span>
+              </div>
+              <h4 class="font-extrabold text-sm text-slate-900 dark:text-slate-100 leading-snug">${escapeHtml(t.title)}</h4>
+              <div class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed pt-0.5">${t.content || t.desc}</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Easter Egg Triggers: (1) 5 quick clicks on School Logo / Name; (2) Konami Code
+    let logoTapCount = 0;
+    let logoTapTimer = null;
+
+    function handleLogoEasterEggTap() {
+      logoTapCount++;
+      
+      const logoEl = document.getElementById('header-school-logo') || document.getElementById('header-school-name');
+      if (logoEl) {
+        logoEl.style.transition = 'transform 0.15s ease';
+        logoEl.style.transform = `scale(${1 + logoTapCount * 0.05})`;
+        setTimeout(() => { if (logoEl) logoEl.style.transform = 'scale(1)'; }, 180);
+      }
+
+      clearTimeout(logoTapTimer);
+      if (logoTapCount >= 5) {
+        logoTapCount = 0;
+        showToast('🎉 Secret Knowledge Vault Unlocked! All 25 Tips Revealed!', '✨');
+        openEasterEggModal();
+      } else {
+        logoTapTimer = setTimeout(() => {
+          logoTapCount = 0;
+        }, 2200);
+      }
+    }
+
+    // Konami Code sequence
+    const KONAMI_CODE = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
+    let konamiIndex = 0;
+
+    window.addEventListener('keydown', (e) => {
+      // Ignore if user is typing in an input/textarea
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) {
+        return;
+      }
+      const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+      const expected = KONAMI_CODE[konamiIndex].toLowerCase();
+      if (key === expected) {
+        konamiIndex++;
+        if (konamiIndex === KONAMI_CODE.length) {
+          konamiIndex = 0;
+          showToast('🕹️ Konami Code Activated! Welcome to the Secret Vault!', '✨');
+          openEasterEggModal();
+        }
+      } else {
+        konamiIndex = 0;
+      }
+    });
+
+    // Expose helpers for power users & console explorers
+    window.unlockSecretTips = openEasterEggModal;
+    window.openSecretVault = openEasterEggModal;
+
     window.onload = function() {
       const hasStoredData = loadAppState();
+
+      // Apply customized or default institution branding immediately
+      applyHeaderBranding();
+
+      // Attach Easter Egg trigger to School Logo & Name
+      const brandLogo = document.getElementById('header-school-logo');
+      const brandName = document.getElementById('header-school-name');
+      if (brandLogo) brandLogo.addEventListener('click', handleLogoEasterEggTap);
+      if (brandName) brandName.addEventListener('click', handleLogoEasterEggTap);
 
       // Ensure all students across all subject sections have explicit scores initialized
       if (courseData && courseData.subjects) {
@@ -8345,6 +8939,9 @@
       if (hasStoredData) {
         showToast("Restored your saved course & lesson data!");
       }
+
+      // Check and present Tip of the Day if not hidden for today
+      checkDailyTipsOnStartup();
     };
 
     // ================= PRESENT WEEK INITIALIZATION =================
@@ -8410,17 +9007,19 @@
     function applyDarkTheme(theme, showNotice = true) {
       const label = document.getElementById('theme-toggle-label');
       const icon = document.getElementById('theme-toggle-icon');
+      const sunSvg = '<svg class="w-3.5 h-3.5 text-amber-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>';
+      const moonSvg = '<svg class="w-3.5 h-3.5 text-amber-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>';
       if (theme === 'dark') {
-        document.documentElement.classList.add('theme-dark');
+        document.documentElement.classList.add('theme-dark', 'dark');
         localStorage.setItem('msu_dark_mode', 'dark');
         if (label) label.innerText = 'Light Mode';
-        if (icon) icon.innerText = '☀️';
+        if (icon) icon.innerHTML = sunSvg;
         if (showNotice) showToast('Switched to Dark Mode theme!');
       } else {
-        document.documentElement.classList.remove('theme-dark');
+        document.documentElement.classList.remove('theme-dark', 'dark');
         localStorage.setItem('msu_dark_mode', 'light');
         if (label) label.innerText = 'Dark Mode';
-        if (icon) icon.innerText = '🌙';
+        if (icon) icon.innerHTML = moonSvg;
         if (showNotice) showToast('Switched to Light Mode.');
       }
     }
@@ -8504,3 +9103,81 @@
         }
       }
     }
+
+// ================= TOP HORIZONTAL SCROLLBAR SYNCHRONIZATION =================
+function setupDualScrollbar(topWrapperId, bottomWrapperId, trackId) {
+  const topEl = document.getElementById(topWrapperId);
+  const bottomEl = document.getElementById(bottomWrapperId);
+  const trackEl = document.getElementById(trackId);
+  if (!topEl || !bottomEl || !trackEl) return;
+
+  function syncTrackWidth() {
+    const scrollW = bottomEl.scrollWidth;
+    const clientW = bottomEl.clientWidth;
+    if (clientW === 0) return; // Tab is hidden
+
+    const maxScroll = Math.max(0, scrollW - clientW);
+    const topClientW = topEl.clientWidth || clientW;
+    trackEl.style.width = (topClientW + maxScroll) + "px";
+    topEl.style.display = maxScroll > 2 ? "block" : "none";
+    topEl.scrollLeft = bottomEl.scrollLeft;
+  }
+
+  let activeScroller = null;
+  topEl.addEventListener("scroll", () => {
+    if (activeScroller === "bottom") return;
+    activeScroller = "top";
+    bottomEl.scrollLeft = topEl.scrollLeft;
+    requestAnimationFrame(() => { if (activeScroller === "top") activeScroller = null; });
+  }, { passive: true });
+
+  bottomEl.addEventListener("scroll", () => {
+    if (activeScroller === "top") return;
+    activeScroller = "bottom";
+    topEl.scrollLeft = bottomEl.scrollLeft;
+    requestAnimationFrame(() => { if (activeScroller === "bottom") activeScroller = null; });
+  }, { passive: true });
+
+  if (window.ResizeObserver) {
+    const ro = new ResizeObserver(() => syncTrackWidth());
+    ro.observe(bottomEl);
+    if (bottomEl.firstElementChild) ro.observe(bottomEl.firstElementChild);
+  }
+  window.addEventListener("resize", syncTrackWidth);
+  setTimeout(syncTrackWidth, 150);
+}
+
+function initAllDualScrollbars() {
+  setupDualScrollbar("matrix-top-scroll-wrapper", "matrix-scroll-wrapper", "matrix-top-scroll-track");
+  setupDualScrollbar("gradebook-top-scroll-wrapper", "gradebook-scroll-wrapper", "gradebook-top-scroll-track");
+  
+  const rosterTable = document.getElementById("table-roster") || document.getElementById("roster-table");
+  if (rosterTable && rosterTable.parentElement) {
+    const parent = rosterTable.parentElement;
+    if (!parent.id) parent.id = "roster-scroll-wrapper";
+    setupDualScrollbar("roster-top-scroll-wrapper", parent.id, "roster-top-scroll-track");
+  } else if (document.getElementById("roster-scroll-wrapper")) {
+    setupDualScrollbar("roster-top-scroll-wrapper", "roster-scroll-wrapper", "roster-top-scroll-track");
+  }
+}
+
+function prevGuideStep() {
+  if (typeof navigateGuideStep === 'function') navigateGuideStep(-1);
+}
+
+function nextGuideStep() {
+  if (typeof navigateGuideStep === 'function') navigateGuideStep(1);
+}
+
+// Reset activity list scroll to top on render to avoid chopped cards
+function fixNextActivitiesScroll() {
+  const list = document.getElementById("planner-milestones-list") || document.getElementById("next-activities-list") || document.querySelector(".next-activities-scroll-area");
+  if (list) {
+    list.scrollTop = 0;
+  }
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+  initAllDualScrollbars();
+  fixNextActivitiesScroll();
+});

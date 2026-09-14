@@ -13,6 +13,7 @@
       pdfjsLib.GlobalWorkerOptions.workerSrc = 'pdf.worker.min.js';
     }
     tailwind.config = {
+      darkMode: 'class',
       theme: {
         extend: {
           colors: {
@@ -28,6 +29,18 @@
       }
     }
   </script>
+    <script>
+    (function() {
+      try {
+        var t = localStorage.getItem('msu_dark_mode');
+        if (t === 'dark') {
+          document.documentElement.classList.add('theme-dark', 'dark');
+        } else {
+          document.documentElement.classList.remove('theme-dark', 'dark');
+        }
+      } catch (e) {}
+    })();
+  </script>
   <link rel="stylesheet" href="styles.css">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#800000">
@@ -42,16 +55,16 @@
 
   <!-- Header Banner -->
   <header class="bg-gradient-to-r from-msu-darkMaroon via-msu-maroon to-slate-900 text-white shadow-lg sticky top-0 z-30 border-b-2 border-msu-gold">
-    <div class="max-w-7xl 2xl:max-w-[1720px] mx-auto px-3 sm:px-6 py-2.5 flex flex-col lg:flex-row lg:items-center justify-between gap-2.5 lg:gap-4">
+    <div class="max-w-7xl xl:max-w-[1440px] 2xl:max-w-[1720px] mx-auto px-3 sm:px-6 py-2.5 flex flex-col lg:flex-row lg:items-center justify-between gap-2.5 lg:gap-4">
       <!-- University Brand & Status Indicator -->
       <div class="flex items-center gap-3 min-w-0">
         <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-full shadow-md flex items-center justify-center shrink-0 border-2 border-msu-gold overflow-hidden bg-white">
-          <img src="msu-logo.png" alt="MSU-GenSan Official Seal" class="w-full h-full object-cover scale-[1.38] rounded-full" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-          <div class="hidden w-full h-full rounded-full bg-amber-400 text-rose-950 font-black text-xs items-center justify-center">MSU</div>
+          <img id="header-school-logo" src="msu-logo.png" alt="Official Seal" class="w-full h-full object-cover scale-[1.38] rounded-full" onerror="this.style.display='none'; document.getElementById('header-logo-fallback').style.display='flex';">
+          <div id="header-logo-fallback" class="hidden w-full h-full rounded-full bg-amber-400 text-rose-950 font-black text-xs items-center justify-center">MSU</div>
         </div>
         <div class="min-w-0 flex-1">
           <div class="flex items-center gap-2 flex-wrap">
-            <h1 class="text-sm sm:text-base lg:text-lg font-extrabold tracking-tight truncate leading-tight">Mindanao State University - General Santos</h1>
+            <h1 id="header-school-name" class="text-sm sm:text-base lg:text-lg font-extrabold tracking-tight truncate leading-tight">Mindanao State University - General Santos</h1>
             <span class="hidden md:inline-flex bg-msu-gold/25 text-amber-200 border border-amber-300/40 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shrink-0">Faculty Portal</span>
             <span id="save-status-indicator" class="bg-emerald-950/60 text-emerald-300 border border-emerald-500/40 text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shrink-0">
               <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
@@ -64,9 +77,9 @@
 
       <!-- Action Buttons (Responsive Padding, Adaptive Labels & Scroll Protection) -->
       <div class="flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar py-0.5 max-w-full shrink-0">
-        <button onclick="openTermSettingsModal()" class="px-2.5 sm:px-3 py-1.5 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition shrink-0 shadow-2xs" title="Semester Settings">
+        <button onclick="openTermSettingsModal()" class="px-2.5 sm:px-3 py-1.5 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition shrink-0 shadow-2xs" title="Portal & Semester Settings">
           <svg class="w-3.5 h-3.5 text-amber-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-          <span><span class="hidden sm:inline">Semester </span>Settings</span>
+          <span><span class="hidden sm:inline">Portal </span>Settings</span>
         </button>
 
         <button onclick="openManageCoursesModal()" class="px-2.5 sm:px-3 py-1.5 bg-rose-950/70 hover:bg-rose-900 border border-amber-500/30 rounded-lg text-xs font-semibold text-amber-100 flex items-center gap-1.5 transition shrink-0 shadow-2xs" title="Manage Subjects">
@@ -79,20 +92,22 @@
           <span>Export<span class="hidden md:inline"> / Import</span> Hub</span>
         </button>
 
-        <button type="button" onclick="openUserGuideModal()" class="px-2.5 sm:px-3 py-1.5 bg-amber-950/70 hover:bg-amber-900 border border-amber-500/30 rounded-lg text-xs font-semibold text-amber-100 flex items-center gap-1.5 transition shrink-0 shadow-2xs" title="Open Setup Walkthrough & Faculty Guide">
-          <svg class="w-3.5 h-3.5 text-amber-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-          <span>Guide</span>
+        <button type="button" onclick="openUserGuideModal()" class="px-2.5 sm:px-3 py-1.5 bg-amber-950/70 hover:bg-amber-900 border border-amber-500/30 rounded-lg text-xs font-semibold text-amber-100 flex items-center gap-1.5 transition shrink-0 shadow-2xs" title="Open Faculty User Guide & Walkthrough">
+          <svg class="w-3.5 h-3.5 text-amber-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+          <span>User Guide</span>
         </button>
 
         <button type="button" id="btn-theme-toggle" onclick="toggleDarkModeTheme()" class="px-2.5 sm:px-3 py-1.5 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition text-amber-200 shrink-0 shadow-2xs" title="Toggle Theme">
-          <span id="theme-toggle-icon">🌙</span>
+          <span id="theme-toggle-icon" class="inline-flex items-center justify-center shrink-0">
+            <svg class="w-3.5 h-3.5 text-amber-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+          </span>
           <span id="theme-toggle-label" class="hidden sm:inline">Dark Mode</span>
         </button>
       </div>
     </div>
 
     <!-- Navigation Tabs & Adaptive Clock -->
-    <nav aria-label="Main Navigation" class="max-w-7xl 2xl:max-w-[1720px] mx-auto px-3 sm:px-6 flex items-center justify-between border-t border-rose-900/60 gap-2 sm:gap-4 overflow-hidden">
+    <nav aria-label="Main Navigation" class="max-w-7xl xl:max-w-[1440px] 2xl:max-w-[1720px] mx-auto px-3 sm:px-6 flex items-center justify-between border-t border-rose-900/60 gap-2 sm:gap-4 overflow-hidden">
       <!-- Horizontally Scrollable Tab Strip -->
       <div class="flex items-center overflow-x-auto no-scrollbar py-0.5 flex-1 min-w-0" role="tablist">
         <button role="tab" aria-selected="true" aria-controls="tab-content-planner" onclick="switchTab('planner')" id="tab-btn-planner" class="tab-btn px-3 sm:px-4 py-2.5 text-xs sm:text-sm font-bold border-b-2 border-msu-gold text-amber-200 flex items-center gap-1.5 sm:gap-2 shrink-0">
@@ -121,7 +136,7 @@
       <div id="header-live-clock" aria-live="off" class="text-[11px] sm:text-xs font-mono text-amber-200/90 flex items-center gap-1.5 tracking-tight font-medium shrink-0 py-1.5 pl-2">
         <svg class="w-3.5 h-3.5 text-amber-400 shrink-0 hidden sm:inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
         <span class="hidden xl:inline"><span id="clock-day-text">Tuesday</span>, </span>
-        <span class="hidden lg:inline" id="clock-date-text">September 8, 2026</span>
+        <span class="hidden xl:inline" id="clock-date-text">September 8, 2026</span>
         <span class="hidden lg:inline text-amber-400/60 font-sans">•</span>
         <span id="clock-time-text" class="font-bold text-white bg-black/35 px-2 py-0.5 rounded border border-amber-400/20 shadow-2xs whitespace-nowrap">08:55:40 AM</span>
       </div>
@@ -129,7 +144,7 @@
   </header>
 
   <!-- Content Container -->
-  <main class="flex-1 max-w-7xl 2xl:max-w-[1720px] w-full mx-auto px-3 sm:pl-5 sm:pr-12 pt-4 pb-6">
+  <main class="flex-1 max-w-7xl xl:max-w-[1440px] 2xl:max-w-[1720px] w-full mx-auto px-3 sm:px-5 pt-4 pb-6">
 
     <!-- ================= TAB 1: LESSON PLANNER MATRIX ================= -->
     <section id="tab-content-planner" class="tab-content mt-0 pt-0 space-y-3">
@@ -185,17 +200,24 @@
 
       <!-- Main Planner Table Area (Permanent 100% Full Width - Zero Resizing) -->
       <div class="w-full space-y-3">
-        <!-- Top Synchronized Scrollbar -->
-        <div id="top-scrollbar-container" class="overflow-x-auto bg-slate-200/80 rounded-t-xl border-x border-t border-slate-300 h-3">
-          <div id="top-scrollbar-dummy" class="h-3"></div>
-        </div>
 
-        <!-- Calibrated for 7-day view (7 rows x 72px + 86px sticky headers + borders = 592px) -->
-        <div id="matrix-scroll-wrapper" class="bg-white rounded-b-2xl shadow-lg border border-slate-200 overflow-x-auto h-[592px] overflow-y-auto relative">
-          <table id="matrix-table" class="w-full border-collapse text-left text-xs min-w-[1050px]">
+        <!-- Main Content Window / Table Card -->
+
+        <div class="bg-white main-table-card rounded-xl shadow-md border border-slate-200 overflow-hidden flex flex-col">
+
+          <!-- Top Scrollbar inside main content window, directly above column headers -->
+
+          <div id="matrix-top-scroll-wrapper" class="dual-top-scroll"><div id="matrix-top-scroll-track" style="height: 1px; width: 100%;"></div></div>
+
+          <!-- Scrollable Table Body -->
+
+          <div id="matrix-scroll-wrapper" class="overflow-x-auto h-[592px] overflow-y-auto relative">
+
+            <table id="matrix-table" class="w-full border-collapse text-left text-xs min-w-[1050px]">
             <thead id="matrix-head" class="bg-slate-100 sticky top-0 z-30 shadow-sm select-none"></thead>
             <tbody id="matrix-body" class="divide-y divide-slate-200"></tbody>
           </table>
+        </div>
         </div>
 
         <!-- LEGEND & WEEK NAVIGATOR / HORIZONTAL SCROLLBAR CONTROLS BELOW MATRIX TABLE -->
@@ -307,7 +329,7 @@
           <div class="overflow-x-auto overflow-y-hidden relative" id="timetable-scroll-wrapper">
             <div class="w-full relative">
               <!-- Header Grid (Sticky Top) -->
-              <div class="grid grid-cols-[90px_repeat(7,1fr)] bg-slate-100 border-b border-slate-300 text-xs font-bold text-slate-700 select-none sticky top-0 z-30 shadow-xs">
+              <div class="min-w-[850px] grid grid-cols-[90px_repeat(7,1fr)] bg-slate-100 border-b border-slate-300 text-xs font-bold text-slate-700 select-none sticky top-0 z-30 shadow-xs">
                 <div class="p-3 border-r border-slate-300 text-center font-mono text-slate-500 bg-slate-100 sticky left-0 z-40">TIME</div>
                 <div class="p-3 border-r border-slate-200 text-center">Sunday</div>
                 <div class="p-3 border-r border-slate-200 text-center">Monday</div>
@@ -319,7 +341,7 @@
               </div>
 
               <!-- Body Grid -->
-              <div class="relative grid grid-cols-[90px_repeat(7,1fr)]" style="height: 594px;">
+              <div class="relative grid grid-cols-[90px_repeat(7,1fr)] min-w-[850px]" style="height: 594px;">
               <div class="absolute inset-0 flex flex-col pointer-events-none z-0">
                 <div class="timetable-hour-slot border-b border-slate-200"></div>
                 <div class="timetable-hour-slot border-b border-slate-200"></div>
@@ -563,7 +585,7 @@
             </div>
 
             <!-- Bottom Row: Balanced Management Actions & Filter Toolbar Strip -->
-            <div class="flex items-center justify-between gap-2.5 pt-2.5 border-t border-slate-100 flex-wrap sm:flex-nowrap text-xs">
+            <div class="flex items-center justify-between gap-2.5 pt-2.5 border-t border-slate-100 flex-wrap xl:flex-nowrap text-xs">
               <!-- Left: Operational Student Actions -->
               <div class="flex items-center gap-2 flex-wrap">
                 <button type="button" onclick="openBulkImportModal()" class="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-lg text-xs flex items-center gap-1.5 shadow-2xs transition active:scale-95 shrink-0 whitespace-nowrap" title="Paste student list from Excel or Google Sheets into currently selected section">
@@ -625,8 +647,19 @@
           <!-- Main Roster Area (Permanent 100% Full Width - Zero Resizing) -->
           <div class="w-full space-y-3">
 
-        <div class="bg-white rounded-xl shadow-md border border-slate-200 overflow-x-auto max-h-[620px]">
-          <table class="w-full text-left text-xs border-collapse">
+        <!-- Main Content Window / Table Card -->
+
+        <div class="bg-white main-table-card rounded-xl shadow-md border border-slate-200 overflow-hidden flex flex-col">
+
+          <!-- Top Scrollbar inside main content window, directly above column headers -->
+
+          <div id="roster-top-scroll-wrapper" class="dual-top-scroll"><div id="roster-top-scroll-track" style="height: 1px; width: 100%;"></div></div>
+
+          <!-- Scrollable Table Body -->
+
+          <div id="roster-scroll-wrapper" class="overflow-x-auto max-h-[620px]">
+
+            <table id="roster-table" class="w-full text-left text-xs border-collapse">
             <thead class="sticky top-0 bg-slate-100 z-10 shadow-xs">
               <tr class="border-b border-slate-300 text-slate-700 font-bold bg-slate-100">
                 <th onclick="toggleRosterSort('id')" class="py-3 px-4 cursor-pointer select-none hover:bg-slate-200 transition">
@@ -661,6 +694,7 @@
             </thead>
             <tbody id="student-table-body" class="divide-y divide-slate-200"></tbody>
           </table>
+        </div>
         </div>
       </div>
     </div>
@@ -869,14 +903,27 @@
 
       <!-- Main Gradebook Matrix Area (Permanent 100% Full Width - Zero Resizing) -->
       <div class="w-full space-y-3">
-        <div id="gradebook-scroll-wrapper" class="bg-white rounded-xl shadow-md border border-slate-200 overflow-auto max-h-[620px]">
-          <table class="w-full text-left text-xs border-collapse min-w-[850px]">
+        
+        <!-- Main Content Window / Table Card -->
+
+        <div class="bg-white main-table-card rounded-xl shadow-md border border-slate-200 overflow-hidden flex flex-col">
+
+          <!-- Top Scrollbar inside main content window, directly above column headers -->
+
+          <div id="gradebook-top-scroll-wrapper" class="dual-top-scroll"><div id="gradebook-top-scroll-track" style="height: 1px; width: 100%;"></div></div>
+
+          <!-- Scrollable Table Body -->
+
+          <div id="gradebook-scroll-wrapper" class="overflow-auto max-h-[620px]">
+
+            <table class="w-full text-left text-xs border-collapse min-w-[850px]">
             <thead id="gradebook-table-head" class="sticky top-0 bg-slate-100 z-35 shadow-xs">
               <!-- Dynamic 2-tier headers injected by renderGradebook() -->
             </thead>
             <tbody id="gradebook-table-body" class="divide-y divide-slate-200"></tbody>
             <tfoot id="gradebook-table-foot" class="sticky bottom-0 bg-slate-100 z-30 shadow-xs border-t-2 border-slate-300 font-bold text-xs"></tfoot>
           </table>
+        </div>
         </div>
       </div>
     </div>
@@ -933,47 +980,84 @@
 
   <!-- ================= MODALS & DIALOGS ================= -->
 
-  <!-- 1. SEMESTER SETTINGS MODAL -->
+  <!-- 1. SEMESTER & INSTITUTION SETTINGS MODAL -->
   <div id="term-settings-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
-    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4 border border-slate-200">
-      <div class="flex items-start justify-between">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4 border border-slate-200 max-h-[92vh] flex flex-col">
+      <div class="flex items-start justify-between shrink-0">
         <div>
-          <h3 class="font-bold text-base text-slate-900">Academic Semester Settings</h3>
-          <p class="text-xs text-slate-500">Configure start and end dates for the academic term.</p>
+          <h3 class="font-bold text-base text-slate-900">Portal & Semester Settings</h3>
+          <p class="text-xs text-slate-500">Configure institution branding, academic term dates, and faculty email.</p>
         </div>
         <button aria-label="Close modal" onclick="closeTermSettingsModal()" class="text-slate-400 hover:text-slate-600 p-1">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
       </div>
 
-      <div class="space-y-3 text-xs">
-        <div>
-          <label class="font-bold text-slate-700 block mb-1">Term / Semester Title</label>
-          <input type="text" id="setting-term-title" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-xs font-semibold focus:ring-2 focus:ring-msu-maroon">
-        </div>
-        <div class="grid grid-cols-2 gap-3">
+      <div class="space-y-4 text-xs overflow-y-auto pr-1 flex-1">
+        <!-- Section: Institution Branding -->
+        <div class="space-y-3 bg-slate-50/80 p-3.5 rounded-xl border border-slate-200">
+          <div class="flex items-center gap-1.5 text-slate-800 font-extrabold uppercase tracking-wider text-[11px]">
+            <svg class="w-4 h-4 text-msu-maroon shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+            <span>Institution Branding & Header</span>
+          </div>
+
           <div>
-            <label class="font-bold text-slate-700 block mb-1">Semester Start Date</label>
-            <input type="date" id="setting-start-date" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-xs font-semibold focus:ring-2 focus:ring-msu-maroon">
-            <span class="text-[10px] text-slate-400 mt-0.5 block">Classes begin</span>
+            <label class="font-bold text-slate-700 block mb-1">School / University Name</label>
+            <input type="text" id="setting-school-name" placeholder="e.g. Mindanao State University - General Santos" class="w-full bg-white border border-slate-300 rounded-lg p-2.5 text-xs font-semibold focus:ring-2 focus:ring-msu-maroon text-slate-900">
+          </div>
+
+          <div>
+            <label class="font-bold text-slate-700 block mb-1">School / Department Logo</label>
+            <div class="flex items-center gap-3 bg-white p-2.5 rounded-lg border border-slate-200">
+              <div class="w-12 h-12 rounded-full border-2 border-msu-gold bg-white flex items-center justify-center overflow-hidden shrink-0 shadow-xs">
+                <img id="setting-logo-preview" src="msu-logo.png" alt="Logo Preview" class="w-full h-full object-cover scale-[1.38] rounded-full">
+              </div>
+              <div class="flex-1 min-w-0 space-y-1.5">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <label class="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 rounded-md text-xs font-bold shadow-2xs transition active:scale-95">
+                    <svg class="w-3.5 h-3.5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                    <span>Upload Logo Image</span>
+                    <input type="file" id="setting-logo-file" accept="image/*" class="hidden" onchange="handleLogoFileSelect(event)">
+                  </label>
+                  <button type="button" id="setting-logo-reset-btn" onclick="resetDefaultLogo()" class="px-2.5 py-1.5 bg-slate-50 hover:bg-slate-100 text-slate-600 border border-slate-200 rounded-md text-xs font-semibold transition active:scale-95">
+                    Reset Default Logo
+                  </button>
+                </div>
+                <p class="text-[10px] text-slate-500 leading-tight">Supports PNG, JPG, SVG, WebP of any file size. High-resolution images are automatically downscaled & compressed client-side to ~256px for ultra-light offline storage.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section: Academic Semester Timeline -->
+        <div class="space-y-3">
+          <div>
+            <label class="font-bold text-slate-700 block mb-1">Term / Semester Title</label>
+            <input type="text" id="setting-term-title" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-xs font-semibold focus:ring-2 focus:ring-msu-maroon text-slate-900">
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="font-bold text-slate-700 block mb-1">Semester Start Date</label>
+              <input type="date" id="setting-start-date" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-xs font-semibold focus:ring-2 focus:ring-msu-maroon text-slate-900">
+              <span class="text-[10px] text-slate-400 mt-0.5 block">Classes begin</span>
+            </div>
+            <div>
+              <label class="font-bold text-slate-700 block mb-1">Semester End Date</label>
+              <input type="date" id="setting-end-date" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-xs font-semibold focus:ring-2 focus:ring-msu-maroon text-slate-900">
+              <span class="text-[10px] text-slate-400 mt-0.5 block">Last day of term</span>
+            </div>
           </div>
           <div>
-            <label class="font-bold text-slate-700 block mb-1">Semester End Date</label>
-            <input type="date" id="setting-end-date" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-xs font-semibold focus:ring-2 focus:ring-msu-maroon">
-            <span class="text-[10px] text-slate-400 mt-0.5 block">Last day of term</span>
+            <label class="font-bold text-slate-700 block mb-1">Default Faculty Email / Google Account</label>
+            <input type="email" id="setting-faculty-email" placeholder="e.g. yourname@msugensan.edu.ph" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-xs font-semibold focus:ring-2 focus:ring-msu-maroon text-slate-900">
+            <span class="text-[10px] text-slate-400 mt-0.5 block">When set, outgoing student emails will automatically open Gmail under this specific logged-in Google account. Leave empty to use system default mail app.</span>
           </div>
-        </div>
-        <div>
-          <label class="font-bold text-slate-700 block mb-1">Default Faculty Email / Google Account</label>
-          <input type="email" id="setting-faculty-email" placeholder="e.g. yourname@msugensan.edu.ph" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-xs font-semibold focus:ring-2 focus:ring-msu-maroon">
-          <span class="text-[10px] text-slate-400 mt-0.5 block">When set, outgoing student emails will automatically open Gmail under this specific logged-in Google account. Leave empty to use system default mail app.</span>
         </div>
       </div>
 
-      
-      <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+      <div class="flex justify-end gap-2 pt-3 border-t border-slate-100 shrink-0">
         <button onclick="closeTermSettingsModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-semibold text-xs">Cancel</button>
-        <button onclick="saveTermSettings()" class="px-4 py-2 bg-msu-maroon hover:bg-msu-darkMaroon text-white rounded-xl font-bold text-xs shadow-md">Apply & Update Timeline</button>
+        <button onclick="saveTermSettings()" class="px-4 py-2 bg-msu-maroon hover:bg-msu-darkMaroon text-white rounded-xl font-bold text-xs shadow-md">Apply & Save Settings</button>
       </div>
     </div>
   </div>
@@ -1683,7 +1767,6 @@
           <input type="file" id="calendar-file-input" accept=".pdf,.csv,.json,.txt" class="hidden" onchange="handleCalendarFileUpload(event)">
         </div>
 
-        
         <!-- Quick 1-Click Load for MSU-GSC Calendar -->
         <div class="p-3 bg-amber-50/80 border border-amber-200 rounded-xl space-y-2">
           <div class="flex items-center justify-between">
@@ -1841,8 +1924,6 @@
       </div>
     </div>
   </div>
-
-
 
   <!-- ================= GRADING SCALE CONFIGURATION MODAL ================= -->
   <div id="grading-scale-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 hidden">
@@ -2039,7 +2120,6 @@
       </form>
     </div>
   </div>
-
 
   <!-- ================= 17. COMPREHENSIVE EXPORT & IMPORT CENTER MODAL ================= -->
   <div id="export-import-modal" class="fixed inset-0 z-[85] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
@@ -2366,26 +2446,26 @@
           </div>
         </div>
 
-        <!-- Bottom Navigation with "<- Prev" and "Next ->" -->
+        <!-- Bottom Navigation with Close and Prev/Next -->
         <div class="p-3 bg-slate-50 border-t border-slate-200 flex items-center justify-between shrink-0 text-xs">
-          <div class="flex items-center gap-1.5">
-            <button type="button" onclick="navigateGuideStep(-1)" class="px-2.5 py-1 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 rounded-lg font-bold text-xs transition shadow-2xs">
+          <button type="button" onclick="closeUserGuideModal()" class="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg text-xs border border-slate-300 transition">Close</button>
+          <div class="flex items-center gap-2">
+            <button type="button" id="btn-guide-prev" onclick="navigateGuideStep(-1)" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg text-xs border border-slate-300 transition">
               &larr; Prev
             </button>
-            <button type="button" onclick="navigateGuideStep(1)" class="px-2.5 py-1 bg-msu-maroon hover:bg-msu-darkMaroon text-white rounded-lg font-bold text-xs transition shadow-2xs">
+            <button type="button" id="btn-guide-next" onclick="navigateGuideStep(1)" class="px-4 py-1.5 bg-msu-maroon hover:bg-msu-darkMaroon text-white font-semibold rounded-lg text-xs transition shadow-2xs">
               Next &rarr;
             </button>
           </div>
-          <button type="button" onclick="closeUserGuideModal()" class="px-3.5 py-1 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-xs font-bold transition">Close</button>
         </div>
       </div>
     </div>
   </div>
 
   <!-- Floating Feedback & Bug Report Button (Lower Left) -->
-  <button type="button" id="btn-feedback-floating" onclick="openFeedbackModal()" class="fixed bottom-6 left-6 z-40 flex items-center h-10 w-10 hover:w-32 p-0 rounded-full shadow-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 hover:text-amber-600 hover:border-amber-400 transition-all duration-300 ease-out group overflow-hidden backdrop-blur-xs" title="Report a bug or suggest a feature">
-    <span class="w-10 h-10 shrink-0 flex items-center justify-center text-lg select-none">
-      <span class="inline-flex items-center justify-center transform translate-y-[1px] group-hover:rotate-12 transition-transform duration-200">💡</span>
+  <button type="button" id="btn-feedback-floating" onclick="openFeedbackModal()" class="fixed bottom-6 left-6 z-40 flex items-center h-11 w-11 hover:w-36 p-0 rounded-full shadow-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 hover:text-amber-600 hover:border-amber-400 transition-all duration-300 ease-out group overflow-hidden backdrop-blur-xs" title="Report a bug or suggest a feature">
+    <span class="feedback-icon-wrapper w-11 h-11 shrink-0 flex items-center justify-center select-none">
+      <span class="feedback-emoji inline-flex items-center justify-center leading-none text-xl group-hover:rotate-12 transition-transform duration-200">🐛</span>
     </span>
     <span class="max-w-0 opacity-0 group-hover:max-w-xs group-hover:opacity-100 group-hover:pr-3.5 transition-all duration-300 ease-out whitespace-nowrap text-xs font-extrabold overflow-hidden">Feedback</span>
   </button>
@@ -2444,6 +2524,101 @@
           </button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- Faculty Portal Tips & Quick Feature Guide Modal -->
+  <div id="tips-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 hidden" onclick="if(event.target===this) closeTipsModal()">
+    <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-slate-200 overflow-hidden animate-in fade-in zoom-in-95 duration-150 flex flex-col">
+      <!-- Gradient Header -->
+      <div class="bg-gradient-to-r from-msu-darkMaroon via-msu-maroon to-slate-900 px-5 py-3.5 text-white flex items-center justify-between border-b border-msu-gold/40">
+        <div class="flex items-center gap-2.5">
+          <span class="text-xl">💡</span>
+          <div>
+            <h3 class="font-extrabold text-sm sm:text-base tracking-tight leading-tight">Faculty Portal Quick Tip</h3>
+            <p class="text-[11px] text-amber-200/90 font-medium">Helpful shortcuts & capabilities to streamline your workflow</p>
+          </div>
+        </div>
+        <button type="button" aria-label="Close modal" onclick="closeTipsModal()" class="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-slate-300 hover:text-white text-xs transition" title="Close">✕</button>
+      </div>
+
+      <!-- Single Tip Content Card (No scrolling or prev/next) -->
+      <div class="p-5 space-y-4">
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 flex gap-3.5 items-start">
+          <div id="tip-icon-box" class="w-12 h-12 rounded-xl bg-amber-100 border border-amber-300 text-2xl flex items-center justify-center shrink-0 shadow-xs">
+            📋
+          </div>
+          <div class="space-y-1 min-w-0 flex-1">
+            <div class="flex items-center gap-2">
+              <span id="tip-badge" class="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-msu-maroon/10 text-msu-maroon border border-msu-maroon/20">Lesson Matrix</span>
+              <span id="tip-counter" class="text-[10px] text-slate-400 font-semibold ml-auto">Tip of the Day</span>
+            </div>
+            <h4 id="tip-title" class="font-extrabold text-sm text-slate-900 leading-snug">Fast Keyboard Shortcuts in Planner</h4>
+            <div id="tip-desc" class="text-xs text-slate-600 leading-relaxed pt-0.5">Use <b>Ctrl+Z</b> to instantly undo syllabus changes and <b>Ctrl+Y</b> (or Ctrl+Shift+Z) to redo. You can also click any date's status badge to declare or toggle 'No Class' days.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="px-5 py-3 bg-slate-50 border-t border-slate-200 flex items-center justify-between flex-wrap gap-2">
+        <label class="flex items-center gap-2 cursor-pointer select-none text-xs text-slate-600 hover:text-slate-900 font-medium">
+          <input type="checkbox" id="tips-hide-today-checkbox" class="rounded border-slate-300 text-msu-maroon focus:ring-msu-maroon w-4 h-4 cursor-pointer">
+          <span>Don't show tips again today</span>
+        </label>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="openUserGuideModal(); closeTipsModal();" class="text-xs text-msu-maroon hover:underline font-semibold pr-1">Full Guide</button>
+          <button type="button" onclick="closeTipsModal()" class="px-4 py-1.5 bg-msu-maroon hover:bg-msu-darkMaroon text-white font-bold text-xs rounded-xl shadow-xs transition active:scale-95">Got it!</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= EASTER EGG: SECRET FACULTY KNOWLEDGE VAULT ================= -->
+  <div id="easter-egg-tips-modal" class="fixed inset-0 z-[100] bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-5 hidden" onclick="if(event.target===this) closeEasterEggModal()">
+    <div class="bg-white rounded-2xl max-w-3xl w-full shadow-2xl border border-amber-400/40 overflow-hidden animate-in fade-in zoom-in-95 duration-150 flex flex-col max-h-[90vh]">
+      <!-- Easter Egg Glowing Gold & Maroon Header -->
+      <div class="bg-gradient-to-r from-msu-darkMaroon via-msu-maroon to-slate-900 px-5 py-4 text-white flex items-center justify-between border-b-2 border-msu-gold shadow-md shrink-0">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-amber-400/20 border border-amber-300/40 flex items-center justify-center text-2xl shadow-xs">
+            ✨
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 class="font-black text-base sm:text-lg tracking-tight text-white">Secret Faculty Knowledge Vault</h3>
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-400/20 text-amber-300 border border-amber-400/40">Easter Egg</span>
+            </div>
+            <p class="text-[11px] sm:text-xs text-amber-200/90 font-medium">Complete compendium of all 25 portal tips, shortcuts & hidden capabilities</p>
+          </div>
+        </div>
+        <button type="button" aria-label="Close modal" onclick="closeEasterEggModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-slate-300 hover:text-white text-sm transition" title="Close">✕</button>
+      </div>
+
+      <!-- Controls: Category Filter Tabs & Instant Search -->
+      <div class="p-3.5 bg-slate-50 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2.5 shrink-0">
+        <div class="flex items-center gap-1.5 text-xs font-bold">
+          <button type="button" id="vault-filter-all" onclick="filterVaultTips('all')" class="px-3 py-1.5 rounded-lg bg-msu-maroon text-white border border-msu-maroon transition shadow-2xs">All (25)</button>
+          <button type="button" id="vault-filter-tip" onclick="filterVaultTips('Tip')" class="px-3 py-1.5 rounded-lg bg-white text-slate-700 hover:bg-slate-100 border border-slate-300 transition">📌 Quick Tips (14)</button>
+          <button type="button" id="vault-filter-dyk" onclick="filterVaultTips('Did You Know?')" class="px-3 py-1.5 rounded-lg bg-white text-slate-700 hover:bg-slate-100 border border-slate-300 transition">💡 Did You Know? (11)</button>
+        </div>
+        <div class="relative flex-1 sm:max-w-xs">
+          <input type="text" id="vault-search-input" oninput="searchVaultTips()" placeholder="Search tips & shortcuts..." class="w-full pl-8 pr-3 py-1.5 text-xs bg-white border border-slate-300 rounded-lg text-slate-800 placeholder-slate-400 focus:ring-2 focus:ring-msu-maroon focus:border-msu-maroon outline-none transition">
+          <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs">🔍</span>
+        </div>
+      </div>
+
+      <!-- Scrollable 25 Tips Grid -->
+      <div id="easter-egg-tips-list" class="p-4 sm:p-5 overflow-y-auto space-y-3 flex-1">
+        <!-- Injected dynamically by app.js -->
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="px-5 py-3 bg-slate-50 border-t border-slate-200 flex items-center justify-between flex-wrap gap-2 shrink-0 text-xs">
+        <div class="flex items-center gap-1.5 text-slate-500 font-medium">
+          <span>🏆</span>
+          <span><b>Secret Unlocked:</b> Tap School Logo 5x or press Konami code (<kbd class="px-1 py-0.5 bg-slate-200 rounded font-mono text-[10px]">↑↑↓↓←→←→BA</kbd>) anytime!</span>
+        </div>
+        <button type="button" onclick="closeEasterEggModal()" class="px-4 py-1.5 bg-msu-maroon hover:bg-msu-darkMaroon text-white font-bold rounded-xl shadow-xs transition active:scale-95">Close Vault</button>
+      </div>
     </div>
   </div>
 
