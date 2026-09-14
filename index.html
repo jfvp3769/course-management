@@ -1,0 +1,2460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MSU-GSC Course & Lesson Manager</title>
+  <!-- Local Offline Tailwind JIT Script -->
+  <script src="tailwind.cdn.js"></script>
+  <!-- Local Offline PDF.js Core & Worker -->
+  <script src="pdf.min.js"></script>
+  <script>
+    if (typeof pdfjsLib !== 'undefined') {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'pdf.worker.min.js';
+    }
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            msu: {
+              maroon: '#800000',
+              gold: '#DAA520',
+              deepGold: '#B8860B',
+              darkMaroon: '#5A0000',
+              softMaroon: '#9B111E'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#800000">
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col antialiased selection:bg-rose-900 selection:text-white">
+
+  <!-- Toast Notification Bar (Bottom Right to avoid obscuring header buttons and clock) -->
+  <div id="toast" class="fixed bottom-6 right-6 z-[120] transform transition-all duration-300 translate-y-12 opacity-0 pointer-events-none bg-slate-900 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 text-sm font-medium border border-slate-700">
+    <span id="toast-icon">ℹ️</span>
+    <span id="toast-message">Notification message</span>
+  </div>
+
+  <!-- Header Banner -->
+  <header class="bg-gradient-to-r from-msu-darkMaroon via-msu-maroon to-slate-900 text-white shadow-lg sticky top-0 z-30 border-b-2 border-msu-gold">
+    <div class="max-w-7xl 2xl:max-w-[1720px] mx-auto px-3 sm:px-6 py-2.5 flex flex-col lg:flex-row lg:items-center justify-between gap-2.5 lg:gap-4">
+      <!-- University Brand & Status Indicator -->
+      <div class="flex items-center gap-3 min-w-0">
+        <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-full shadow-md flex items-center justify-center shrink-0 border-2 border-msu-gold overflow-hidden bg-white">
+          <img src="msu-logo.png" alt="MSU-GenSan Official Seal" class="w-full h-full object-cover scale-[1.38] rounded-full" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+          <div class="hidden w-full h-full rounded-full bg-amber-400 text-rose-950 font-black text-xs items-center justify-center">MSU</div>
+        </div>
+        <div class="min-w-0 flex-1">
+          <div class="flex items-center gap-2 flex-wrap">
+            <h1 class="text-sm sm:text-base lg:text-lg font-extrabold tracking-tight truncate leading-tight">Mindanao State University - General Santos</h1>
+            <span class="hidden md:inline-flex bg-msu-gold/25 text-amber-200 border border-amber-300/40 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shrink-0">Faculty Portal</span>
+            <span id="save-status-indicator" class="bg-emerald-950/60 text-emerald-300 border border-emerald-500/40 text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shrink-0">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span>Saved Offline</span>
+            </span>
+          </div>
+          <p id="header-term-title" class="text-[11px] sm:text-xs text-amber-100/90 font-medium truncate mt-0.5">Faculty Course Management Portal • AY 2026–2027</p>
+        </div>
+      </div>
+
+      <!-- Action Buttons (Responsive Padding, Adaptive Labels & Scroll Protection) -->
+      <div class="flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar py-0.5 max-w-full shrink-0">
+        <button onclick="openTermSettingsModal()" class="px-2.5 sm:px-3 py-1.5 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition shrink-0 shadow-2xs" title="Semester Settings">
+          <svg class="w-3.5 h-3.5 text-amber-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          <span><span class="hidden sm:inline">Semester </span>Settings</span>
+        </button>
+
+        <button onclick="openManageCoursesModal()" class="px-2.5 sm:px-3 py-1.5 bg-rose-950/70 hover:bg-rose-900 border border-amber-500/30 rounded-lg text-xs font-semibold text-amber-100 flex items-center gap-1.5 transition shrink-0 shadow-2xs" title="Manage Subjects">
+          <svg class="w-3.5 h-3.5 text-amber-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+          <span><span class="hidden sm:inline">Manage </span>Subjects</span>
+        </button>
+
+        <button onclick="openExportImportModal()" class="px-2.5 sm:px-3 py-1.5 bg-emerald-950/70 hover:bg-emerald-900 border border-emerald-500/30 rounded-lg text-xs font-semibold text-emerald-100 flex items-center gap-1.5 transition shrink-0 shadow-2xs" title="Open Data Export & Import Center">
+          <svg class="w-3.5 h-3.5 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
+          <span>Export<span class="hidden md:inline"> / Import</span> Hub</span>
+        </button>
+
+        <button type="button" onclick="openUserGuideModal()" class="px-2.5 sm:px-3 py-1.5 bg-amber-950/70 hover:bg-amber-900 border border-amber-500/30 rounded-lg text-xs font-semibold text-amber-100 flex items-center gap-1.5 transition shrink-0 shadow-2xs" title="Open Setup Walkthrough & Faculty Guide">
+          <svg class="w-3.5 h-3.5 text-amber-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+          <span>Guide</span>
+        </button>
+
+        <button type="button" id="btn-theme-toggle" onclick="toggleDarkModeTheme()" class="px-2.5 sm:px-3 py-1.5 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition text-amber-200 shrink-0 shadow-2xs" title="Toggle Theme">
+          <span id="theme-toggle-icon">🌙</span>
+          <span id="theme-toggle-label" class="hidden sm:inline">Dark Mode</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs & Adaptive Clock -->
+    <nav aria-label="Main Navigation" class="max-w-7xl 2xl:max-w-[1720px] mx-auto px-3 sm:px-6 flex items-center justify-between border-t border-rose-900/60 gap-2 sm:gap-4 overflow-hidden">
+      <!-- Horizontally Scrollable Tab Strip -->
+      <div class="flex items-center overflow-x-auto no-scrollbar py-0.5 flex-1 min-w-0" role="tablist">
+        <button role="tab" aria-selected="true" aria-controls="tab-content-planner" onclick="switchTab('planner')" id="tab-btn-planner" class="tab-btn px-3 sm:px-4 py-2.5 text-xs sm:text-sm font-bold border-b-2 border-msu-gold text-amber-200 flex items-center gap-1.5 sm:gap-2 shrink-0">
+          <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+          <span>Lesson Planner Matrix</span>
+        </button>
+        <button role="tab" aria-selected="false" aria-controls="tab-content-timetable" onclick="switchTab('timetable')" id="tab-btn-timetable" class="tab-btn px-3 sm:px-4 py-2.5 text-xs sm:text-sm font-medium border-b-2 border-transparent text-slate-300 hover:text-white flex items-center gap-1.5 sm:gap-2 shrink-0 transition">
+          <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <span>Weekly Timetable</span>
+        </button>
+        <button role="tab" aria-selected="false" aria-controls="tab-content-calendar" onclick="switchTab('calendar')" id="tab-btn-calendar" class="tab-btn px-3 sm:px-4 py-2.5 text-xs sm:text-sm font-medium border-b-2 border-transparent text-slate-300 hover:text-white flex items-center gap-1.5 sm:gap-2 shrink-0 transition">
+          <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          <span>Academic Calendar<span class="hidden md:inline"> Events</span></span>
+        </button>
+        <button role="tab" aria-selected="false" aria-controls="tab-content-roster" onclick="switchTab('roster')" id="tab-btn-roster" class="tab-btn px-3 sm:px-4 py-2.5 text-xs sm:text-sm font-medium border-b-2 border-transparent text-slate-300 hover:text-white flex items-center gap-1.5 sm:gap-2 shrink-0 transition">
+          <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+          <span>Class List<span class="hidden md:inline"> (Roster)</span></span>
+        </button>
+        <button role="tab" aria-selected="false" aria-controls="tab-content-gradebook" onclick="switchTab('gradebook')" id="tab-btn-gradebook" class="tab-btn px-3 sm:px-4 py-2.5 text-xs sm:text-sm font-medium border-b-2 border-transparent text-slate-300 hover:text-white flex items-center gap-1.5 sm:gap-2 shrink-0 transition">
+          <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+          <span>Class Record & Grades</span>
+        </button>
+      </div>
+
+      <!-- Real-time Live Header Clock (Collapses gracefully to only time on narrow viewports) -->
+      <div id="header-live-clock" aria-live="off" class="text-[11px] sm:text-xs font-mono text-amber-200/90 flex items-center gap-1.5 tracking-tight font-medium shrink-0 py-1.5 pl-2">
+        <svg class="w-3.5 h-3.5 text-amber-400 shrink-0 hidden sm:inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <span class="hidden xl:inline"><span id="clock-day-text">Tuesday</span>, </span>
+        <span class="hidden lg:inline" id="clock-date-text">September 8, 2026</span>
+        <span class="hidden lg:inline text-amber-400/60 font-sans">•</span>
+        <span id="clock-time-text" class="font-bold text-white bg-black/35 px-2 py-0.5 rounded border border-amber-400/20 shadow-2xs whitespace-nowrap">08:55:40 AM</span>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Content Container -->
+  <main class="flex-1 max-w-7xl 2xl:max-w-[1720px] w-full mx-auto px-3 sm:pl-5 sm:pr-12 pt-4 pb-6">
+
+    <!-- ================= TAB 1: LESSON PLANNER MATRIX ================= -->
+    <section id="tab-content-planner" class="tab-content mt-0 pt-0 space-y-3">
+      <div class="tab-layout-container">
+        <div class="tab-main-window mt-0 pt-0 space-y-3">
+          <!-- Compact Unified Matrix Header & Timeline Bar -->
+          <div class="relative bg-white p-4 rounded-xl rounded-tr-none shadow-sm border border-slate-200 min-h-[82px] flex flex-wrap items-center justify-between gap-3 mr-9 sm:mr-0">
+            <div>
+              <div class="flex items-center gap-2 flex-wrap">
+                <h2 id="planner-term-label" class="text-base sm:text-lg font-extrabold text-slate-900 tracking-tight">1st Semester Schedule & Activity Matrix</h2>
+                <span id="planner-total-weeks-badge" class="px-2 py-0.5 bg-msu-maroon/10 text-msu-maroon font-bold text-xs rounded-md border border-msu-maroon/20">18 Weeks</span>
+              </div>
+              <p class="text-xs text-slate-500 mt-0.5">Map weekly lecture topics, schedule daily activities, and manage class suspensions across the term.</p>
+            </div>
+
+            <!-- Controls: Month Filter & Action Buttons -->
+            <div class="flex items-center gap-2 flex-wrap text-xs">
+              <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1 shadow-xs">
+                <span class="font-semibold text-slate-500 text-[11px]">Filter Month:</span>
+                <select id="filter-month" onchange="filterMatrixByMonth()" class="bg-transparent border-0 text-xs font-semibold text-slate-700 focus:ring-0 p-0 cursor-pointer">
+                  <option value="all">Full Semester</option>
+                </select>
+              </div>
+
+              <button onclick="openDeclareNoClassModal()" class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-300 rounded-lg font-bold flex items-center gap-1.5 transition active:scale-95 shadow-xs" title="Declare holiday or suspension">
+                <svg class="w-3.5 h-3.5 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+                <span>Declare "No Class" Day(s)</span>
+              </button>
+
+              <div class="inline-flex items-center gap-1.5">
+                <button id="btn-planner-undo" onclick="undoPlannerAction()" class="px-2.5 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 rounded-lg font-bold flex items-center gap-1.5 transition active:scale-95 opacity-60 cursor-not-allowed text-xs shadow-xs" disabled title="Undo last action in Lesson Matrix (Ctrl+Z)">
+                  <span class="font-black">↺</span>
+                  <span>Undo</span>
+                </button>
+                <button id="btn-planner-redo" onclick="redoPlannerAction()" class="px-2.5 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 rounded-lg font-bold flex items-center gap-1.5 transition active:scale-95 opacity-60 cursor-not-allowed text-xs shadow-xs" disabled title="Redo last undone action in Lesson Matrix (Ctrl+Y or Ctrl+Shift+Z)">
+                  <span class="font-black">↻</span>
+                  <span>Redo</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Sidebar Docked Ear Tag Outside Top Window -->
+            <button id="btn-toggle-planner-sidebar" onclick="toggleTabSidebar('planner')" class="sidebar-docked-tag sidebar-tag-expanded group shadow-sm" title="Hide Sidebar" aria-label="Toggle Lesson Matrix Sidebar">
+              <div class="flex items-center gap-2 min-w-0">
+                <svg class="w-4 h-4 text-slate-600 transition-transform group-hover:-translate-x-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
+                </svg>
+                <span class="font-extrabold text-xs sm:text-sm text-slate-900 tracking-tight truncate sidebar-tab-title">Planner Overview</span>
+              </div>
+              <span class="sr-only sidebar-toggle-text">Hide</span>
+            </button>
+          </div>
+
+      <!-- Main Planner Table Area (Permanent 100% Full Width - Zero Resizing) -->
+      <div class="w-full space-y-3">
+        <!-- Top Synchronized Scrollbar -->
+        <div id="top-scrollbar-container" class="overflow-x-auto bg-slate-200/80 rounded-t-xl border-x border-t border-slate-300 h-3">
+          <div id="top-scrollbar-dummy" class="h-3"></div>
+        </div>
+
+        <!-- Calibrated for 7-day view (7 rows x 72px + 86px sticky headers + borders = 592px) -->
+        <div id="matrix-scroll-wrapper" class="bg-white rounded-b-2xl shadow-lg border border-slate-200 overflow-x-auto h-[592px] overflow-y-auto relative">
+          <table id="matrix-table" class="w-full border-collapse text-left text-xs min-w-[1050px]">
+            <thead id="matrix-head" class="bg-slate-100 sticky top-0 z-30 shadow-sm select-none"></thead>
+            <tbody id="matrix-body" class="divide-y divide-slate-200"></tbody>
+          </table>
+        </div>
+
+        <!-- LEGEND & WEEK NAVIGATOR / HORIZONTAL SCROLLBAR CONTROLS BELOW MATRIX TABLE -->
+        <div class="flex flex-wrap items-center justify-between text-xs text-slate-600 bg-white px-4 py-2.5 rounded-xl border border-slate-200 gap-3">
+          <div class="flex items-center gap-4 flex-wrap">
+            <span class="font-bold text-slate-700">Legend:</span>
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-blue-100 border border-blue-400"></span> Class Meeting</span>
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-amber-100 border border-amber-400"></span> Exam Period</span>
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-rose-100 border border-rose-400"></span> No Class</span>
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-slate-300"></span> Weekend</span>
+            <span class="text-slate-500 font-medium">↔ Drag headers edge to resize columns. Display fits exactly 7 days.</span>
+          </div>
+
+          <div class="flex items-center gap-2.5 flex-wrap ml-auto shrink-0">
+            <!-- Jump to Today Button (Moved beside Week Navigator) -->
+            <button onclick="scrollToToday()" class="px-3 py-1.5 bg-amber-400 hover:bg-amber-300 text-slate-900 font-bold rounded-lg text-xs flex items-center gap-1.5 shadow-xs border border-amber-500/30 transition hover:shadow active:scale-95" title="Jump directly to today's date in matrix">
+              <svg class="w-3.5 h-3.5 text-msu-maroon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              <span>Jump to Today</span>
+            </button>
+
+            <!-- Week Navigator Controls -->
+            <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-lg p-1">
+              <button onclick="navigateWeek(-1)" class="p-1 rounded bg-white hover:bg-slate-200 border border-slate-200 text-slate-700 shadow-xs" title="Previous Week">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+              </button>
+              <span id="current-week-nav-label" class="text-xs font-bold text-slate-800 px-2 min-w-[75px] text-center">Week 1</span>
+              <button onclick="navigateWeek(1)" class="p-1 rounded bg-white hover:bg-slate-200 border border-slate-200 text-slate-700 shadow-xs" title="Next Week">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+        <aside id="sidebar-planner" class="tab-sidebar tab-sidebar-expanded w-full xl:w-80 shrink-0 space-y-3" aria-label="Planner Sidebar Widgets">
+
+          <!-- Card 1: Next Activities (from Matrix & Calendar) -->
+          <div id="planner-widget-next-activities" class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs space-y-2.5">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-extrabold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                Next Activities
+              </span>
+              <span id="planner-next-activities-badge" class="text-[10px] text-slate-500 font-bold px-1.5 py-0.5 rounded bg-slate-100">Upcoming</span>
+            </div>
+            <div id="planner-milestones-list" class="space-y-2 max-h-[380px] overflow-y-auto pr-0.5 no-scrollbar"></div>
+          </div>
+
+          <!-- Card 2: Teaching Days & Activity Distribution -->
+          <div id="planner-widget-teaching-days" class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs space-y-2.5">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-extrabold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                Teaching Days Distribution
+              </span>
+              <span id="planner-pacing-pct-badge" class="text-[10px] font-black px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200"></span>
+            </div>
+            <div id="planner-pacing-stats" class="grid grid-cols-2 gap-2 text-center text-xs"></div>
+          </div>
+
+          <!-- Card 3: Subject & Section Pace -->
+          <div id="planner-widget-subject-pace" class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs space-y-2.5">
+            <div class="flex items-center justify-between widget-drag-handle">
+              <span class="text-[11px] font-extrabold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                Subject & Section Pace
+              </span>
+              <span id="planner-subject-pace-badge" class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-200">Per Section</span>
+            </div>
+            <div id="planner-subject-pace-list" class="space-y-2 text-xs"></div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ================= TAB 2: WEEKLY TIMETABLE ================= -->
+    <section id="tab-content-timetable" class="tab-content mt-0 pt-0 space-y-3 hidden">
+      <div class="tab-layout-container">
+        <div class="tab-main-window mt-0 pt-0 space-y-3">
+          <div class="relative bg-white p-3.5 sm:p-4 rounded-xl rounded-tr-none shadow-xs border border-slate-200 flex flex-wrap items-center justify-between gap-4 mr-9 sm:mr-0">
+        <div>
+          <h2 class="text-base sm:text-lg font-extrabold text-slate-900">Weekly Schedule</h2>
+          <p class="text-xs text-slate-500 mt-0.5">Class meeting hours (7:00 AM – 6:00 PM) with automated room and schedule conflict detection.</p>
+        </div>
+        <div class="flex items-center gap-2 flex-wrap">
+          <button onclick="openAddScheduleModal()" class="px-3.5 py-1.5 bg-msu-maroon hover:bg-msu-darkMaroon text-white font-bold rounded-lg text-xs flex items-center gap-2 shadow-xs transition">
+            <svg class="w-4 h-4 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            <span>Add Section Schedule</span>
+          </button>
+        </div>
+
+        <!-- Sidebar Docked Ear Tag Outside Top Window -->
+        <button id="btn-toggle-timetable-sidebar" onclick="toggleTabSidebar('timetable')" class="sidebar-docked-tag sidebar-tag-expanded group shadow-sm" title="Hide Sidebar" aria-label="Toggle Timetable Sidebar">
+          <div class="flex items-center gap-2 min-w-0">
+            <svg class="w-4 h-4 text-slate-600 transition-transform group-hover:-translate-x-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
+            </svg>
+            <span class="font-extrabold text-xs sm:text-sm text-slate-900 tracking-tight truncate sidebar-tab-title">Timetable Overview</span>
+          </div>
+          <span class="sr-only sidebar-toggle-text">Hide</span>
+        </button>
+      </div>
+
+      <!-- Main Timetable Grid (Permanent 100% Full Width - Zero Resizing) -->
+      <div class="w-full space-y-3">
+        <div class="bg-white rounded-xl shadow-md border border-slate-200 overflow-hidden flex flex-col">
+          <!-- Single scroll container so headers and columns are 100% aligned -->
+          <div class="overflow-x-auto overflow-y-hidden relative" id="timetable-scroll-wrapper">
+            <div class="w-full relative">
+              <!-- Header Grid (Sticky Top) -->
+              <div class="grid grid-cols-[90px_repeat(7,1fr)] bg-slate-100 border-b border-slate-300 text-xs font-bold text-slate-700 select-none sticky top-0 z-30 shadow-xs">
+                <div class="p-3 border-r border-slate-300 text-center font-mono text-slate-500 bg-slate-100 sticky left-0 z-40">TIME</div>
+                <div class="p-3 border-r border-slate-200 text-center">Sunday</div>
+                <div class="p-3 border-r border-slate-200 text-center">Monday</div>
+                <div class="p-3 border-r border-slate-200 text-center">Tuesday</div>
+                <div class="p-3 border-r border-slate-200 text-center">Wednesday</div>
+                <div class="p-3 border-r border-slate-200 text-center">Thursday</div>
+                <div class="p-3 border-r border-slate-200 text-center">Friday</div>
+                <div class="p-3 text-center">Saturday</div>
+              </div>
+
+              <!-- Body Grid -->
+              <div class="relative grid grid-cols-[90px_repeat(7,1fr)]" style="height: 594px;">
+              <div class="absolute inset-0 flex flex-col pointer-events-none z-0">
+                <div class="timetable-hour-slot border-b border-slate-200"></div>
+                <div class="timetable-hour-slot border-b border-slate-200"></div>
+                <div class="timetable-hour-slot border-b border-slate-200"></div>
+                <div class="timetable-hour-slot border-b border-slate-200"></div>
+                <div class="timetable-hour-slot border-b border-slate-200"></div>
+                <div class="timetable-hour-slot border-b border-slate-200"></div>
+                <div class="timetable-hour-slot border-b border-slate-200"></div>
+                <div class="timetable-hour-slot border-b border-slate-200"></div>
+                <div class="timetable-hour-slot border-b border-slate-200"></div>
+                <div class="timetable-hour-slot border-b border-slate-200"></div>
+                <div class="timetable-hour-slot border-b border-slate-200"></div>
+              </div>
+
+              <!-- Col 0: Hour Labels -->
+              <div class="border-r border-slate-300 bg-slate-50/90 select-none z-10">
+                <div class="timetable-hour-slot border-b border-slate-200 p-2 text-center text-[11px] font-bold font-mono text-slate-600">07:00 AM</div>
+                <div class="timetable-hour-slot border-b border-slate-200 p-2 text-center text-[11px] font-bold font-mono text-slate-600">08:00 AM</div>
+                <div class="timetable-hour-slot border-b border-slate-200 p-2 text-center text-[11px] font-bold font-mono text-slate-600">09:00 AM</div>
+                <div class="timetable-hour-slot border-b border-slate-200 p-2 text-center text-[11px] font-bold font-mono text-slate-600">10:00 AM</div>
+                <div class="timetable-hour-slot border-b border-slate-200 p-2 text-center text-[11px] font-bold font-mono text-slate-600">11:00 AM</div>
+                <div class="timetable-hour-slot border-b border-slate-200 p-2 text-center text-[11px] font-bold font-mono text-slate-600">12:00 PM</div>
+                <div class="timetable-hour-slot border-b border-slate-200 p-2 text-center text-[11px] font-bold font-mono text-slate-600">01:00 PM</div>
+                <div class="timetable-hour-slot border-b border-slate-200 p-2 text-center text-[11px] font-bold font-mono text-slate-600">02:00 PM</div>
+                <div class="timetable-hour-slot border-b border-slate-200 p-2 text-center text-[11px] font-bold font-mono text-slate-600">03:00 PM</div>
+                <div class="timetable-hour-slot border-b border-slate-200 p-2 text-center text-[11px] font-bold font-mono text-slate-600">04:00 PM</div>
+                <div class="timetable-hour-slot border-b border-slate-200 p-2 text-center text-[11px] font-bold font-mono text-slate-600">05:00 PM</div>
+              </div>
+
+              <!-- Cols 1-7: Dynamic Days -->
+              <div id="timetable-col-Sunday" class="relative border-r border-slate-200 h-full"></div>
+              <div id="timetable-col-Monday" class="relative border-r border-slate-200 h-full"></div>
+              <div id="timetable-col-Tuesday" class="relative border-r border-slate-200 h-full"></div>
+              <div id="timetable-col-Wednesday" class="relative border-r border-slate-200 h-full"></div>
+              <div id="timetable-col-Thursday" class="relative border-r border-slate-200 h-full"></div>
+              <div id="timetable-col-Friday" class="relative border-r border-slate-200 h-full"></div>
+              <div id="timetable-col-Saturday" class="relative h-full"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+      <aside id="sidebar-timetable" class="tab-sidebar tab-sidebar-expanded w-full xl:w-80 shrink-0 space-y-3" aria-label="Timetable Sidebar Widgets">
+          <div id="timetable-widget-next-class" class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-extrabold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+                Next Upcoming Class
+              </span>
+              <span id="timetable-next-class-status" class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200">Upcoming</span>
+            </div>
+            <div id="timetable-next-class-card" class="text-xs"></div>
+          </div>
+
+          <!-- Card 1: Faculty Teaching Load Summary -->
+          <div id="timetable-widget-load" class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs space-y-2.5">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-extrabold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                Teaching Load Summary
+              </span>
+              <span id="timetable-load-badge" class="text-[10px] font-bold px-1.5 py-0.5 bg-blue-50 text-blue-700 rounded border border-blue-200">Load</span>
+            </div>
+            <div id="timetable-load-stats" class="space-y-2 text-xs"></div>
+            <div id="timetable-daily-distribution" class="pt-2 border-t border-slate-100 space-y-1.5 text-[11px]"></div>
+          </div>
+
+          <!-- Card 2: Room Utilization & Conflict Checker -->
+          <div id="timetable-widget-conflicts" class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs space-y-2.5">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-extrabold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                Conflict Auditor
+              </span>
+            </div>
+            <div id="timetable-conflicts-container" class="text-xs"></div>
+          </div>
+
+          <!-- Card 3: Today's Pocket Agenda -->
+          <div id="timetable-widget-today" class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs space-y-2.5">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-extrabold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                Today's Schedule
+              </span>
+              <span id="timetable-today-day-label" class="text-[10px] text-slate-500 font-bold"></span>
+            </div>
+            <!-- Weekday Picker Pills -->
+            <div id="timetable-agenda-day-pills" class="flex items-center gap-1 overflow-x-auto pb-1 text-[10px]"></div>
+            <div id="timetable-today-agenda" class="space-y-1.5 max-h-48 overflow-y-auto pr-1"></div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ================= TAB 3: ACADEMIC CALENDAR EVENTS ================= -->
+    <section id="tab-content-calendar" class="tab-content mt-0 pt-0 space-y-3 hidden">
+      <div class="tab-layout-container">
+        <div class="tab-main-window mt-0 pt-0 space-y-3">
+          <div class="relative bg-white p-3.5 sm:p-4 rounded-xl rounded-tr-none shadow-xs border border-slate-200 flex flex-wrap items-center justify-between gap-4 mr-9 sm:mr-0">
+        <div>
+          <div class="flex items-center gap-2">
+            <h2 class="text-base sm:text-lg font-extrabold text-slate-900">Mindanao State University - General Santos</h2>
+            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300">Official Calendar</span>
+          </div>
+          <p class="text-xs text-slate-500 mt-0.5">Official academic calendar milestones, examination dates, and scheduled university suspensions.</p>
+        </div>
+        <div class="flex items-center gap-2 flex-wrap">
+          <button onclick="openAddCalendarEventModal()" class="px-3.5 py-1.5 bg-msu-maroon hover:bg-msu-darkMaroon text-white font-bold rounded-lg text-xs flex items-center gap-1.5 shadow-xs transition">
+            <svg class="w-4 h-4 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            Add Event
+          </button>
+          <button onclick="openUploadCalendarModal()" class="px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-lg text-xs flex items-center gap-1.5 transition">
+            <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+            Upload / Replace Calendar
+          </button>
+        </div>
+
+        <!-- Sidebar Docked Ear Tag Outside Top Window -->
+        <button id="btn-toggle-calendar-sidebar" onclick="toggleTabSidebar('calendar')" class="sidebar-docked-tag sidebar-tag-expanded group shadow-sm" title="Hide Sidebar" aria-label="Toggle Calendar Sidebar">
+          <div class="flex items-center gap-2 min-w-0">
+            <svg class="w-4 h-4 text-slate-600 transition-transform group-hover:-translate-x-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
+            </svg>
+            <span class="font-extrabold text-xs sm:text-sm text-slate-900 tracking-tight truncate sidebar-tab-title">Calendar Overview</span>
+          </div>
+          <span class="sr-only sidebar-toggle-text">Hide</span>
+        </button>
+      </div>
+
+      <!-- Main Calendar Table (Permanent 100% Full Width - Zero Resizing) -->
+      <div class="w-full space-y-3">
+        <div id="calendar-scroll-wrapper" class="bg-white rounded-xl shadow-md border border-slate-200 overflow-auto max-h-[640px]">
+        <table class="w-full text-left text-xs border-collapse min-w-[850px]">
+          <thead class="sticky top-0 bg-slate-100 z-10 shadow-xs">
+            <tr class="border-b border-slate-300 text-slate-700 font-bold">
+              <th class="py-2.5 px-3 w-44 text-center relative select-none">
+                <button type="button" id="calendar-type-header-btn" onclick="toggleCalendarTypeDropdown(event)" class="inline-flex items-center justify-center gap-1.5 font-bold text-slate-700 hover:text-msu-maroon hover:bg-slate-200/70 px-2.5 py-1.5 rounded-lg transition w-full">
+                  <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
+                  <span id="calendar-type-header-label">Type: All</span>
+                  <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                </button>
+                <div id="calendar-type-menu" class="hidden absolute left-2 top-full mt-1 w-52 bg-white rounded-xl shadow-xl border border-slate-200 py-1.5 z-30 text-left font-normal divide-y divide-slate-100">
+                  <div class="p-1 space-y-0.5">
+                    <button type="button" onclick="setCalendarTypeFilter('all')" class="w-full px-3 py-1.5 text-xs flex items-center justify-between rounded-lg hover:bg-slate-100 transition text-slate-800 font-semibold" data-type="all">
+                      <span>All Event Types</span>
+                      <span class="type-check text-msu-maroon font-bold" data-for="all">✓</span>
+                    </button>
+                    <button type="button" onclick="setCalendarTypeFilter('holiday')" class="w-full px-3 py-1.5 text-xs flex items-center justify-between rounded-lg hover:bg-slate-100 transition text-slate-800 font-semibold" data-type="holiday">
+                      <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-rose-500"></span>Holidays & Suspensions</span>
+                      <span class="type-check text-msu-maroon font-bold hidden" data-for="holiday">✓</span>
+                    </button>
+                    <button type="button" onclick="setCalendarTypeFilter('exam')" class="w-full px-3 py-1.5 text-xs flex items-center justify-between rounded-lg hover:bg-slate-100 transition text-slate-800 font-semibold" data-type="exam">
+                      <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-amber-500"></span>Major Examinations</span>
+                      <span class="type-check text-msu-maroon font-bold hidden" data-for="exam">✓</span>
+                    </button>
+                    <button type="button" onclick="setCalendarTypeFilter('milestone')" class="w-full px-3 py-1.5 text-xs flex items-center justify-between rounded-lg hover:bg-slate-100 transition text-slate-800 font-semibold" data-type="milestone">
+                      <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-emerald-500"></span>Term Milestones</span>
+                      <span class="type-check text-msu-maroon font-bold hidden" data-for="milestone">✓</span>
+                    </button>
+                    <button type="button" onclick="setCalendarTypeFilter('activity')" class="w-full px-3 py-1.5 text-xs flex items-center justify-between rounded-lg hover:bg-slate-100 transition text-slate-800 font-semibold" data-type="activity">
+                      <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-blue-500"></span>University Activities</span>
+                      <span class="type-check text-msu-maroon font-bold hidden" data-for="activity">✓</span>
+                    </button>
+                    <button type="button" onclick="setCalendarTypeFilter('admin')" class="w-full px-3 py-1.5 text-xs flex items-center justify-between rounded-lg hover:bg-slate-100 transition text-slate-800 font-semibold" data-type="admin">
+                      <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-slate-500"></span>Administrative</span>
+                      <span class="type-check text-msu-maroon font-bold hidden" data-for="admin">✓</span>
+                    </button>
+                  </div>
+                </div>
+              </th>
+              <th class="py-3 px-4">Campus Activity / Milestone</th>
+              <th class="py-3 px-4 bg-amber-50/80 text-msu-maroon font-extrabold border-x border-amber-200">1st Semester (2026)</th>
+              <th class="py-3 px-4 bg-blue-50/50 text-blue-950 font-extrabold border-r border-blue-200">2nd Semester (2027)</th>
+              <th class="py-3 px-4 bg-emerald-50/50 text-emerald-950 font-extrabold border-r border-emerald-200">Summer (2027)</th>
+              <th class="py-3 px-4 text-center w-28">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="calendar-table-body" class="divide-y divide-slate-200"></tbody>
+        </table>
+        </div>
+      </div>
+    </div>
+
+      <aside id="sidebar-calendar" class="tab-sidebar tab-sidebar-expanded w-full xl:w-80 shrink-0 space-y-3" aria-label="Calendar Sidebar Widgets">
+        <!-- Card 1: Next Deadlines -->
+        <div id="calendar-widget-deadlines" class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] font-extrabold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              Upcoming Deadlines
+            </span>
+          </div>
+          <div id="calendar-upcoming-deadlines" class="space-y-1.5 text-xs"></div>
+        </div>
+
+        <!-- Card 2: Lost Teaching Days Impact -->
+        <div id="calendar-widget-lost-days" class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] font-extrabold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              Lost Teaching Days Impact
+            </span>
+          </div>
+          <div id="calendar-lost-days-list" class="space-y-1.5 text-xs"></div>
+        </div>
+
+        <!-- Card 3: Event Classification Breakdown -->
+        <div id="calendar-widget-distribution" class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs space-y-2.5">
+          <div class="text-[11px] font-extrabold text-slate-800 uppercase tracking-wider">Event Distribution</div>
+          <div id="calendar-events-distribution" class="grid grid-cols-2 gap-2 text-xs text-center"></div>
+        </div>
+      </aside>
+      </div>
+    </section>
+
+    <!-- ================= TAB 4: CLASS LIST (ROSTER) ================= -->
+    <section id="tab-content-roster" class="tab-content mt-0 pt-0 space-y-3 hidden">
+      <div class="tab-layout-container">
+        <div class="tab-main-window mt-0 pt-0 space-y-3">
+          <div class="relative bg-white p-3.5 sm:p-4 rounded-xl !rounded-tr-none shadow-sm border border-slate-200 space-y-3 mr-9 sm:mr-0">
+            <!-- Top Row: Page Title and Primary Section Context -->
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+              <div>
+                <h2 class="text-base sm:text-lg font-extrabold text-slate-900">Student Roster & Class Lists</h2>
+                <p class="text-xs text-slate-500 mt-0.5">Manage enrolled student rosters, import spreadsheet class records, and broadcast communications.</p>
+              </div>
+
+              <!-- Primary Context: Section Selector & Google Classroom Link -->
+              <div class="flex items-center gap-2 bg-slate-50 p-1.5 rounded-lg border border-slate-200 shadow-2xs shrink-0 self-start md:self-auto">
+                <span class="text-[11px] font-bold text-slate-600 flex items-center gap-1 pl-1 uppercase tracking-wider">
+                  <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                  Section:
+                </span>
+                <select id="roster-section-filter" onchange="filterStudentTable()" class="bg-white border border-slate-300 rounded-md px-2.5 py-1 text-xs font-bold text-slate-800 shadow-2xs focus:ring-2 focus:ring-msu-maroon focus:outline-none max-w-[170px] truncate">
+                </select>
+                <div id="roster-classroom-btn-container" class="inline-flex items-center"></div>
+              </div>
+            </div>
+
+            <!-- Bottom Row: Balanced Management Actions & Filter Toolbar Strip -->
+            <div class="flex items-center justify-between gap-2.5 pt-2.5 border-t border-slate-100 flex-wrap sm:flex-nowrap text-xs">
+              <!-- Left: Operational Student Actions -->
+              <div class="flex items-center gap-2 flex-wrap">
+                <button type="button" onclick="openBulkImportModal()" class="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-lg text-xs flex items-center gap-1.5 shadow-2xs transition active:scale-95 shrink-0 whitespace-nowrap" title="Paste student list from Excel or Google Sheets into currently selected section">
+                  <svg class="w-3.5 h-3.5 text-emerald-200 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                  <span>Paste Class List</span>
+                </button>
+                <button type="button" onclick="openAddSingleStudentModal()" class="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-700 font-bold rounded-lg text-xs border border-slate-300 transition active:scale-95 shadow-2xs shrink-0 whitespace-nowrap" title="Add a single student to currently selected section">
+                  + Single Student
+                </button>
+                <button type="button" id="roster-remove-all-btn" onclick="removeAllStudentsFromSection()" class="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 hover:text-rose-800 border border-rose-200 rounded-lg text-xs font-bold flex items-center gap-1.5 transition active:scale-95 shadow-2xs shrink-0 whitespace-nowrap" title="Remove all enrolled students for this section">
+                  <svg class="w-3.5 h-3.5 text-rose-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                  <span>Remove All Students</span>
+                </button>
+              </div>
+
+              <!-- Right: Search Input, Grade Filter & Section Count -->
+              <div class="flex items-center gap-2 flex-wrap ml-auto">
+                <div class="relative w-36 sm:w-44">
+                  <input type="text" id="roster-search" oninput="filterStudentTable()" placeholder="Search student..." class="w-full bg-slate-50 border border-slate-300 rounded-lg pl-7 pr-2.5 py-1.5 text-xs focus:ring-2 focus:ring-msu-maroon shadow-2xs">
+                  <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                </div>
+
+                <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-lg px-2 py-1 shadow-2xs">
+                  <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Grade:</span>
+                  <select id="roster-grade-filter" onchange="filterStudentTable()" class="bg-transparent border-0 text-xs font-bold text-slate-700 focus:ring-0 p-0 cursor-pointer">
+                    <option value="all">All Grades</option>
+                    <option value="1.00">1.00</option>
+                    <option value="1.25">1.25</option>
+                    <option value="1.50">1.50</option>
+                    <option value="1.75">1.75</option>
+                    <option value="2.00">2.00</option>
+                    <option value="2.25">2.25</option>
+                    <option value="2.50">2.50</option>
+                    <option value="2.75">2.75</option>
+                    <option value="3.00">3.00</option>
+                    <option value="INC">INC</option>
+                    <option value="5.00">5.00</option>
+                    <option value="WDRW">WDRW</option>
+                    <option value="DRP">DRP</option>
+                  </select>
+                </div>
+
+                <div class="text-slate-600 font-bold whitespace-nowrap text-xs px-2.5 py-1 bg-slate-100 rounded-lg border border-slate-200 shadow-2xs" id="roster-count-badge">Section Count: 0 Students</div>
+              </div>
+            </div>
+
+            <!-- Sidebar Docked Ear Tag Outside Top Window -->
+            <button id="btn-toggle-roster-sidebar" onclick="toggleTabSidebar('roster')" class="sidebar-docked-tag sidebar-tag-expanded group shadow-sm" title="Hide Sidebar" aria-label="Toggle Roster Sidebar">
+              <div class="flex items-center justify-center gap-2 w-full min-w-0">
+                <svg class="w-4 h-4 text-slate-600 transition-transform group-hover:-translate-x-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
+                </svg>
+                <span class="font-extrabold text-xs sm:text-sm text-slate-900 tracking-tight truncate sidebar-tab-title text-center">Roster Overview</span>
+              </div>
+              <span class="sr-only sidebar-toggle-text">Hide</span>
+            </button>
+          </div>
+
+          <!-- Main Roster Area (Permanent 100% Full Width - Zero Resizing) -->
+          <div class="w-full space-y-3">
+
+        <div class="bg-white rounded-xl shadow-md border border-slate-200 overflow-x-auto max-h-[620px]">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead class="sticky top-0 bg-slate-100 z-10 shadow-xs">
+              <tr class="border-b border-slate-300 text-slate-700 font-bold bg-slate-100">
+                <th onclick="toggleRosterSort('id')" class="py-3 px-4 cursor-pointer select-none hover:bg-slate-200 transition">
+                  <div class="flex items-center gap-1">
+                    <span>Student ID</span>
+                    <span id="roster-sort-id" class="text-[10px] text-slate-400 opacity-60">⇅</span>
+                  </div>
+                </th>
+                <th onclick="toggleRosterSort('name')" class="py-3 px-4 cursor-pointer select-none hover:bg-slate-200 transition">
+                  <div class="flex items-center gap-1">
+                    <span>Last Name</span>
+                    <span id="roster-sort-name" class="text-[10px] text-slate-400 opacity-60">⇅</span>
+                  </div>
+                </th>
+                <th class="py-3 px-4">First Name</th>
+                <th class="py-3 px-4">Email Address</th>
+                <th class="py-3 px-4">Enrolled Section</th>
+                <th onclick="toggleRosterSort('grade')" class="py-3 px-3 text-center cursor-pointer select-none hover:bg-slate-200 transition whitespace-nowrap">
+                  <div class="flex items-center justify-center gap-1">
+                    <span>Final Grade</span>
+                    <span id="roster-sort-grade" class="text-[10px] text-slate-400 opacity-60">⇅</span>
+                  </div>
+                </th>
+                <th onclick="toggleRosterSort('date')" class="py-3 px-4 cursor-pointer select-none hover:bg-slate-200 transition">
+                  <div class="flex items-center gap-1">
+                    <span>Date Added</span>
+                    <span id="roster-sort-date" class="text-[10px] text-slate-400 opacity-60">⇅</span>
+                  </div>
+                </th>
+                <th class="py-3 px-4 text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="student-table-body" class="divide-y divide-slate-200"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+      <aside id="sidebar-roster" class="tab-sidebar tab-sidebar-expanded w-full xl:w-80 shrink-0 space-y-3" aria-label="Roster Sidebar Widgets">
+        <!-- Card 1: Section Enrollment Meters -->
+        <div id="roster-widget-enrollment" class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] font-extrabold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+              Enrollment by Section
+            </span>
+            <span id="roster-total-students-badge" class="text-[10px] font-bold px-1.5 py-0.5 bg-indigo-50 text-indigo-700 rounded border border-indigo-200">0 Total</span>
+          </div>
+          <div id="roster-sections-breakdown" class="space-y-2 text-xs"></div>
+        </div>
+
+        <!-- Card 2: Section Broadcast & Communications -->
+        <div id="roster-widget-communications" class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs space-y-2.5">
+          <div class="text-[11px] font-extrabold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+            Section Communications
+          </div>
+          <p class="text-[11px] text-slate-500">Broadcast notices to the entire section or target only your active filtered results.</p>
+          <div class="flex flex-col gap-2">
+            <button type="button" id="roster-email-filtered-btn" onclick="emailFilteredStudentsBCC()" class="px-3 py-2 bg-blue-50 hover:bg-blue-100 text-blue-900 rounded-lg text-xs font-bold flex items-center justify-between border border-blue-300 transition shadow-2xs" title="Send BCC email to students matching active search or grade filter">
+              <span class="flex items-center gap-1.5">
+                <span>✉️</span>
+                <span>Email Filtered Students</span>
+              </span>
+              <span class="text-blue-700 font-black">BCC ↗</span>
+            </button>
+            <button type="button" onclick="emailSectionBCC()" class="px-3 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-900 rounded-lg text-xs font-bold flex items-center justify-between border border-emerald-300 transition shadow-2xs" title="Send BCC email to all enrolled students in section">
+              <span class="flex items-center gap-1.5">
+                <span>📢</span>
+                <span>Email Entire Section</span>
+              </span>
+              <span class="text-emerald-700 font-black">BCC ↗</span>
+            </button>
+            <button type="button" onclick="copySectionEmails()" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-lg text-xs font-semibold flex items-center justify-between border border-slate-300 transition">
+              <span class="flex items-center gap-1.5">
+                <span>📋</span>
+                <span>Copy Student Emails</span>
+              </span>
+              <span class="text-slate-500 font-bold">Copy</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Card 3: Roster Data Health -->
+        <div id="roster-widget-health" class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs space-y-2">
+          <div class="text-[11px] font-extrabold text-slate-800 uppercase tracking-wider">Roster Health</div>
+          <div id="roster-health-status" class="text-xs"></div>
+        </div>
+      </aside>
+      </div>
+    </section>
+
+    <!-- ================= TAB 5: CLASS RECORD & GRADES ================= -->
+    <section id="tab-content-gradebook" class="tab-content mt-0 pt-0 space-y-3 hidden">
+      <div class="tab-layout-container">
+        <div class="tab-main-window mt-0 pt-0 space-y-3">
+          <div class="relative bg-white p-3.5 sm:p-4 rounded-xl rounded-tr-none shadow-xs border border-slate-200 space-y-3 mr-9 sm:mr-0">
+        <!-- Top Row: Page Title, Section Context & Primary I/O Action -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+          <div>
+            <h2 class="text-base sm:text-lg font-extrabold text-slate-900">Grading Matrix & Class Record</h2>
+            <p class="text-xs text-slate-500 mt-0.5">Grading Scale (1.00 - 5.00). Computes real-time weighted Prelim and Final grades.</p>
+          </div>
+          
+          <!-- Context Controls: Section Selector & Export/Import Button -->
+          <div class="flex items-center gap-2 flex-wrap shrink-0 self-start md:self-auto">
+            <div class="flex items-center gap-2 bg-slate-50 p-1.5 rounded-lg border border-slate-200 shadow-2xs">
+              <span class="text-[11px] font-bold text-slate-600 flex items-center gap-1 pl-1 uppercase tracking-wider">
+                <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                Section:
+              </span>
+              <select id="gradebook-section-select" onchange="renderGradebook()" class="bg-white border border-slate-300 rounded-md px-2.5 py-1 text-xs font-bold text-slate-800 shadow-2xs focus:ring-2 focus:ring-msu-maroon focus:outline-none"></select>
+              <div id="gradebook-classroom-btn-container" class="inline-flex items-center"></div>
+            </div>
+
+            <button onclick="openExportImportModal('grades')" class="px-3 py-2 bg-emerald-50 hover:bg-emerald-100 active:bg-emerald-200 text-emerald-900 font-bold rounded-lg text-xs border border-emerald-300 flex items-center gap-1.5 transition active:scale-95 shadow-2xs" title="Import Scores or Export Class Record CSV">
+              <svg class="w-3.5 h-3.5 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
+              <span>Export / Import Grades</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Bottom Row: Unified View & Configuration Toggles (Left) vs Data Filters (Right) -->
+        <div class="flex items-center justify-between gap-3 pt-2.5 border-t border-slate-100 flex-wrap">
+          <!-- Left: View Toggles & Configuration Buttons with Soft Colors & Press Visual Feedback -->
+          <div class="flex items-center gap-2 flex-wrap">
+            <button id="gradebook-collapse-toggle-btn" onclick="toggleAllGradebookSubActivities()" class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg text-xs flex items-center gap-1.5 transition border border-slate-300 shadow-2xs active:scale-95" title="Toggle between detailed sub-activities and collapsed category overview">
+              <span id="gradebook-collapse-icon">⊞</span>
+              <span id="gradebook-collapse-text">Collapse Sub-activities</span>
+            </button>
+            <button onclick="openGradingCriteriaModal()" class="px-2.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 active:bg-indigo-200 text-indigo-900 border border-indigo-300 font-bold rounded-lg text-xs flex items-center gap-1.5 transition shadow-2xs active:scale-95" title="Customize Graded Activities & Weight Distribution">
+              <svg class="w-3.5 h-3.5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><circle cx="12" cy="12" r="3"/></svg>
+              <span>Grading Criteria</span>
+            </button>
+            <button id="gradebook-scale-toggle-btn" onclick="toggleGradingScaleDrawer()" class="px-2.5 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 font-bold rounded-lg text-xs flex items-center gap-1.5 transition shadow-2xs active:scale-95" title="View active grading scale thresholds">
+              <svg class="w-3.5 h-3.5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              <span>Grading Scale</span>
+            </button>
+            <button id="gradebook-stats-toggle-btn" onclick="toggleGradebookStatsDrawer()" class="px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-300 font-bold rounded-lg text-xs flex items-center gap-1.5 transition shadow-2xs active:scale-95" title="Toggle Class Statistics & Performance Analytics">
+              <svg class="w-3.5 h-3.5 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+              <span>Class Statistics</span>
+            </button>
+          </div>
+
+          <!-- Right: Data Filtering Dropdowns -->
+          <div class="flex items-center gap-2 flex-wrap ml-auto">
+            <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1 shadow-2xs">
+              <span class="text-[11px] font-bold text-slate-500 uppercase">Grade:</span>
+              <select id="gradebook-grade-filter" onchange="renderGradebook()" class="bg-transparent border-0 text-xs font-bold text-slate-700 focus:ring-0 p-0 cursor-pointer">
+                <option value="all">All Grades</option>
+                <option value="1.00">1.00</option>
+                <option value="1.25">1.25</option>
+                <option value="1.50">1.50</option>
+                <option value="1.75">1.75</option>
+                <option value="2.00">2.00</option>
+                <option value="2.25">2.25</option>
+                <option value="2.50">2.50</option>
+                <option value="2.75">2.75</option>
+                <option value="3.00">3.00</option>
+                <option value="INC">INC</option>
+                <option value="5.00">5.00</option>
+                <option value="WDRW">WDRW</option>
+                <option value="DRP">DRP</option>
+              </select>
+            </div>
+
+            <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1 shadow-2xs">
+              <span class="text-[11px] font-bold text-slate-500 uppercase">Status:</span>
+              <select id="gradebook-status-filter" onchange="renderGradebook()" class="bg-transparent border-0 text-xs font-bold text-slate-700 focus:ring-0 p-0 cursor-pointer">
+                <option value="all">All Status</option>
+                <option value="Passed">Passed</option>
+                <option value="Failed">Failed</option>
+                <option value="Incomplete">Incomplete</option>
+                <option value="Dropped">Dropped</option>
+                <option value="Withdrawn">Withdrawn</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sidebar Docked Ear Tag Outside Top Window -->
+        <button id="btn-toggle-gradebook-sidebar" onclick="toggleTabSidebar('gradebook')" class="sidebar-docked-tag sidebar-tag-expanded group shadow-sm" title="Hide Sidebar" aria-label="Toggle Gradebook Sidebar">
+          <div class="flex items-center justify-center gap-2 w-full min-w-0">
+            <svg class="w-4 h-4 text-slate-600 transition-transform group-hover:-translate-x-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
+            </svg>
+            <span class="font-extrabold text-xs sm:text-sm text-slate-900 tracking-tight truncate sidebar-tab-title text-center">Gradebook Overview</span>
+          </div>
+          <span class="sr-only sidebar-toggle-text">Hide</span>
+        </button>
+      </div>
+
+      <!-- Active Grading Scale Reference Drawer -->
+      <div id="grading-scale-drawer" class="hidden bg-amber-50/70 p-3 rounded-xl border border-amber-200 text-xs shadow-xs space-y-2">
+        <div class="flex items-center justify-between font-bold text-amber-950 flex-wrap gap-2">
+          <div class="flex items-center gap-2">
+            <span class="flex items-center gap-1.5">
+              <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              <span id="grading-scale-drawer-title">Official Grading Scale & Equivalence</span>
+            </span>
+            <span id="grading-scale-drawer-badge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-200 text-amber-900">Default Scale</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="openGradingScaleModal()" class="px-2.5 py-1 bg-white hover:bg-amber-100 text-amber-900 border border-amber-300 rounded-lg font-bold text-xs flex items-center gap-1 transition shadow-2xs">
+              <svg class="w-3.5 h-3.5 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+              <span>Customize Scale</span>
+            </button>
+            <button onclick="document.getElementById('grading-scale-drawer').classList.add('hidden')" class="text-amber-800 hover:text-amber-950 font-bold text-sm leading-none p-1">&times;</button>
+          </div>
+        </div>
+        <div id="grading-scale-cards-grid" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-12 gap-1.5 text-center font-mono">
+          <!-- Dynamic cards injected via renderGradingScaleDrawer() -->
+        </div>
+      </div>
+      <!-- Intelligent Class Statistics & Analytics Drawer -->
+      <div id="gradebook-stats-drawer" class="hidden bg-white p-4 rounded-xl border border-slate-200 text-xs shadow-xs space-y-3.5 animate-in fade-in duration-200">
+        <!-- Dynamically rendered by renderGradebookStats() -->
+      </div>
+
+      <!-- Warning / Error Banner for Unbalanced Criteria (when total != 100%) -->
+      <div id="gradebook-weight-alert" class="hidden bg-rose-50 border-2 border-rose-300 text-rose-900 px-4 py-3 rounded-xl flex items-center justify-between gap-3 text-xs shadow-xs animate-in fade-in duration-200">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-rose-100 border border-rose-300 text-rose-700 flex items-center justify-center shrink-0">
+            <svg class="w-5 h-5 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+          </div>
+          <div>
+            <div class="font-black text-rose-950 text-xs sm:text-sm flex items-center gap-2">
+              <span>Grading Configuration Error: Total Activity Percentage Does Not Add Up to 100%</span>
+            </div>
+            <p id="gradebook-weight-alert-msg" class="text-rose-800 text-xs mt-0.5 leading-relaxed">
+              The total percentage of configured activities does not equal 100%. Please adjust category weights.
+            </p>
+          </div>
+        </div>
+        <button type="button" onclick="openGradingCriteriaModal()" class="px-3.5 py-1.5 bg-rose-600 hover:bg-rose-700 active:scale-95 text-white font-bold rounded-lg text-xs shadow-xs transition shrink-0 flex items-center gap-1.5">
+          <span>Fix Grading Criteria</span>
+          <span>⚙️</span>
+        </button>
+      </div>
+
+      <!-- Main Gradebook Matrix Area (Permanent 100% Full Width - Zero Resizing) -->
+      <div class="w-full space-y-3">
+        <div id="gradebook-scroll-wrapper" class="bg-white rounded-xl shadow-md border border-slate-200 overflow-auto max-h-[620px]">
+          <table class="w-full text-left text-xs border-collapse min-w-[850px]">
+            <thead id="gradebook-table-head" class="sticky top-0 bg-slate-100 z-35 shadow-xs">
+              <!-- Dynamic 2-tier headers injected by renderGradebook() -->
+            </thead>
+            <tbody id="gradebook-table-body" class="divide-y divide-slate-200"></tbody>
+            <tfoot id="gradebook-table-foot" class="sticky bottom-0 bg-slate-100 z-30 shadow-xs border-t-2 border-slate-300 font-bold text-xs"></tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+
+      <aside id="sidebar-gradebook" class="tab-sidebar tab-sidebar-expanded w-full xl:w-80 shrink-0 space-y-3" aria-label="Gradebook Sidebar Widgets">
+          <!-- Card 0: Input Error Radar -->
+          <div id="gradebook-widget-errors" class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs flex flex-col space-y-2">
+            <div class="flex items-center justify-between shrink-0">
+              <span class="text-[11px] font-extrabold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                Input Error Radar
+              </span>
+              <span id="gradebook-errors-badge" class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800">0 Errors</span>
+            </div>
+            <p class="text-[11px] text-slate-500 shrink-0">Detects scores exceeding maximum items, negative values, or non-numeric entries. Click to focus the input cell.</p>
+            <div id="gradebook-errors-list" class="space-y-1.5 flex-1 min-h-[90px] overflow-y-auto no-scrollbar py-0.5"></div>
+          </div>
+
+          <!-- Card 1: At-Risk Radar -->
+          <div id="gradebook-widget-atrisk" class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs flex flex-col space-y-2">
+            <div class="flex items-center justify-between shrink-0">
+              <span class="text-[11px] font-extrabold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                At-Risk Student Radar
+              </span>
+              <span id="gradebook-atrisk-badge" class="text-[10px] font-bold px-1.5 py-0.5 rounded"></span>
+            </div>
+            <p class="text-[11px] text-slate-500 shrink-0">Students with non-passing final grade (MSU grade > 3.00, INC, or Failed). Click to inspect in gradebook.</p>
+            <div id="gradebook-atrisk-list" class="space-y-1.5 flex-1 min-h-[90px] overflow-y-auto no-scrollbar py-0.5"></div>
+          </div>
+
+          <!-- Card 2: Criteria Weights & 100% Validation -->
+          <div id="gradebook-widget-weights" class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs space-y-2.5">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-extrabold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                Weight Distribution
+              </span>
+              <span id="gradebook-weights-sum-badge" class="text-[10px] font-bold px-1.5 py-0.5 rounded"></span>
+            </div>
+            <div id="gradebook-weights-list" class="space-y-1.5 text-xs"></div>
+          </div>
+
+          <!-- Card 3: MSU Grade Curve Distribution -->
+          <div id="gradebook-widget-distribution" class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs space-y-2.5">
+            <div class="text-[11px] font-extrabold text-slate-800 uppercase tracking-wider">Grade Distribution</div>
+            <div id="gradebook-grade-distribution" class="space-y-1 text-xs"></div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ================= MODALS & DIALOGS ================= -->
+
+  <!-- 1. SEMESTER SETTINGS MODAL -->
+  <div id="term-settings-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4 border border-slate-200">
+      <div class="flex items-start justify-between">
+        <div>
+          <h3 class="font-bold text-base text-slate-900">Academic Semester Settings</h3>
+          <p class="text-xs text-slate-500">Configure start and end dates for the academic term.</p>
+        </div>
+        <button aria-label="Close modal" onclick="closeTermSettingsModal()" class="text-slate-400 hover:text-slate-600 p-1">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="font-bold text-slate-700 block mb-1">Term / Semester Title</label>
+          <input type="text" id="setting-term-title" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-xs font-semibold focus:ring-2 focus:ring-msu-maroon">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="font-bold text-slate-700 block mb-1">Semester Start Date</label>
+            <input type="date" id="setting-start-date" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-xs font-semibold focus:ring-2 focus:ring-msu-maroon">
+            <span class="text-[10px] text-slate-400 mt-0.5 block">Classes begin</span>
+          </div>
+          <div>
+            <label class="font-bold text-slate-700 block mb-1">Semester End Date</label>
+            <input type="date" id="setting-end-date" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-xs font-semibold focus:ring-2 focus:ring-msu-maroon">
+            <span class="text-[10px] text-slate-400 mt-0.5 block">Last day of term</span>
+          </div>
+        </div>
+        <div>
+          <label class="font-bold text-slate-700 block mb-1">Default Faculty Email / Google Account</label>
+          <input type="email" id="setting-faculty-email" placeholder="e.g. yourname@msugensan.edu.ph" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-xs font-semibold focus:ring-2 focus:ring-msu-maroon">
+          <span class="text-[10px] text-slate-400 mt-0.5 block">When set, outgoing student emails will automatically open Gmail under this specific logged-in Google account. Leave empty to use system default mail app.</span>
+        </div>
+      </div>
+
+      
+      <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+        <button onclick="closeTermSettingsModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-semibold text-xs">Cancel</button>
+        <button onclick="saveTermSettings()" class="px-4 py-2 bg-msu-maroon hover:bg-msu-darkMaroon text-white rounded-xl font-bold text-xs shadow-md">Apply & Update Timeline</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. LESSON PLANNER ACTIVITY MODAL -->
+  <div id="lesson-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4 border border-slate-200">
+      <div class="flex items-start justify-between">
+        <div>
+          <span class="text-[10px] font-bold uppercase tracking-wider text-msu-maroon" id="modal-subtitle">Meeting Planning</span>
+          <h3 id="modal-title" class="font-black text-lg text-slate-900">Plan Activity</h3>
+        </div>
+        <button aria-label="Close modal" onclick="closeLessonModal()" class="text-slate-400 hover:text-slate-600 p-1">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="space-y-3.5 text-xs">
+        <div>
+          <label class="font-bold text-slate-700 block mb-1">Topic / Lesson Content</label>
+          <input type="text" id="modal-topic" placeholder="e.g. Chapter 2: Stresses and Strains in Thin Cylinders" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-xs focus:ring-2 focus:ring-msu-maroon">
+        </div>
+
+        <div>
+          <label class="font-bold text-slate-700 block mb-1">Activity / Exercise Description</label>
+          <textarea id="modal-activity" rows="2" placeholder="e.g. Board work problem solving + Group seatwork #2" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-xs focus:ring-2 focus:ring-msu-maroon"></textarea>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="font-bold text-slate-700 block mb-1">Activity Type</label>
+            <select id="modal-type" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs">
+              <option value="Lecture">Lecture & Discussion</option>
+              <option value="Laboratory">Laboratory Work</option>
+              <option value="Seatwork">Seatwork / Recitation</option>
+              <option value="Quiz">Quiz / Evaluation</option>
+              <option value="Exam">Major Examination</option>
+              <option value="Field Work">Field Work / Surveying</option>
+              <option value="No Class">No Class / Suspended</option>
+            </select>
+          </div>
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="font-bold text-slate-700">Status</label>
+              <button type="button" onclick="toggleModalCompleteQuick()" class="text-[10px] text-emerald-700 font-bold hover:underline cursor-pointer">
+                ✓ Quick Set Done
+              </button>
+            </div>
+            <select id="modal-status" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs">
+              <option value="Planned">Planned</option>
+              <option value="Completed">Completed</option>
+              <option value="Rescheduled">Rescheduled</option>
+              <option value="Cancelled">Cancelled</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="font-bold text-slate-700 block mb-1">Special Notes / Homework / Reminders</label>
+          <input type="text" id="modal-notes" placeholder="e.g. Remind students to bring scientific calculators" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs">
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between pt-3 border-t border-slate-200 flex-wrap gap-2">
+        <div id="modal-shift-actions" class="flex items-center gap-2 flex-wrap">
+          <button type="button" id="btn-mark-noclass-shift" onclick="markMeetingAsNoClassAndShift()" class="h-9 px-3 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-lg font-bold text-xs border border-rose-300 inline-flex items-center gap-1.5 transition active:scale-95 shadow-2xs" title="Mark this day as No Class and push all subsequent planned meetings forward by 1 slot">
+            <span>🚫</span>
+            <span>Mark "No Class" & Push Forward</span>
+          </button>
+          <button type="button" id="btn-pullback-schedule" onclick="pullBackScheduleFromModal()" class="h-9 px-3 bg-slate-50 hover:bg-slate-100 text-slate-700 rounded-lg font-bold text-xs border border-slate-300 inline-flex items-center gap-1.5 transition active:scale-95 shadow-2xs" title="Pull Back to Prev Slot: Move this activity and subsequent schedule back to previous meeting slot">
+            <span>◀</span>
+            <span>Prev Slot</span>
+          </button>
+          <button type="button" id="btn-movelast-schedule" onclick="moveToNextViableSlotFromModal()" class="h-9 px-3 bg-slate-50 hover:bg-slate-100 text-slate-700 rounded-lg font-bold text-xs border border-slate-300 inline-flex items-center gap-1.5 transition active:scale-95 shadow-2xs" title="Move to Next Viable Slot: Move this activity forward to next meeting slot">
+            <span>Next Slot</span>
+            <span>▶</span>
+          </button>
+        </div>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="clearLessonModalData()" class="h-9 px-3.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg font-bold text-xs border border-slate-300 inline-flex items-center justify-center transition active:scale-95" title="Clear form">Clear</button>
+          <button type="button" onclick="saveLessonModalData()" class="h-9 px-4 bg-msu-maroon hover:bg-msu-darkMaroon text-white rounded-lg font-bold text-xs shadow-md inline-flex items-center justify-center transition active:scale-95" title="Save Activity (Ctrl+Enter)">Save Activity</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. EDIT ACADEMIC EVENT / HOLIDAY SCHEDULE MODAL -->
+  <div id="event-editor-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-5 sm:p-6 shadow-2xl space-y-3.5 border border-slate-200 max-h-[92vh] overflow-y-auto">
+      <div class="flex items-start justify-between border-b border-slate-100 pb-2">
+        <div>
+          <span class="text-[10px] font-bold uppercase tracking-wider text-msu-maroon">Campus Calendar Sync</span>
+          <h3 class="font-extrabold text-base text-slate-900" id="event-modal-title">Edit Event Schedule</h3>
+        </div>
+        <button aria-label="Close modal" onclick="closeEventEditorModal()" class="text-slate-400 hover:text-slate-600 p-1">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <input type="hidden" id="edit-event-orig-date">
+      <input type="hidden" id="edit-event-index" value="-1">
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="font-bold text-slate-700 block mb-1">Calendar Event / Holiday Title</label>
+          <input type="text" id="edit-event-name" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-xs font-bold text-slate-900" placeholder="e.g. START OF CLASSES / University Convocation">
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 items-end">
+          <div>
+            <label class="font-bold text-slate-700 block mb-1">Classification Type</label>
+            <select id="edit-event-type" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs font-semibold">
+              <option value="holiday">Holiday / Suspension</option>
+              <option value="exam">Major Examination</option>
+              <option value="milestone">Term Milestone</option>
+              <option value="activity">University Activity</option>
+              <option value="admin">Administrative</option>
+            </select>
+          </div>
+          <div class="flex items-center gap-2 p-2 bg-slate-50 border border-slate-200 rounded-lg">
+            <input type="checkbox" id="edit-event-is-noclass" class="rounded text-rose-600 focus:ring-rose-500">
+            <label for="edit-event-is-noclass" class="font-semibold text-slate-800 text-[11px] cursor-pointer select-none">No Class / Suspended</label>
+          </div>
+        </div>
+
+        <!-- Academic Term Schedules with Single Date or Range -->
+        <div class="border-t border-slate-200 pt-2.5 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <label class="font-extrabold text-slate-800 text-xs">Academic Term Schedules</label>
+            <span class="text-[10px] text-slate-500 font-medium">Single date or multiple (range) dates</span>
+          </div>
+
+          <!-- 1st Semester (2026) -->
+          <div class="p-2.5 bg-amber-50/50 rounded-xl border border-amber-200/80 space-y-1.5">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-1.5">
+                <span class="font-bold text-msu-maroon text-xs">1st Semester (2026)</span>
+                <span class="px-1.5 py-0.2 rounded text-[9px] font-extrabold bg-amber-200/70 text-amber-900">Current View</span>
+              </div>
+              <select id="edit-event-first-mode" onchange="updateEventTermInputs('first')" class="bg-white border border-slate-300 rounded-lg px-2 py-1 text-xs font-semibold text-slate-700">
+                <option value="none">Not Scheduled</option>
+                <option value="single">Single Date</option>
+                <option value="range">Date Range</option>
+              </select>
+            </div>
+            <div id="edit-event-first-inputs" class="grid grid-cols-2 gap-2 hidden pt-1">
+              <div>
+                <label id="edit-event-first-start-label" class="text-[10px] font-bold text-slate-600 block mb-0.5">Date</label>
+                <input type="date" id="edit-event-first-start" class="w-full bg-white border border-slate-300 rounded-lg p-1.5 text-xs font-mono font-bold">
+              </div>
+              <div id="edit-event-first-end-col" class="hidden">
+                <label class="text-[10px] font-bold text-slate-600 block mb-0.5">End Date</label>
+                <input type="date" id="edit-event-first-end" class="w-full bg-white border border-slate-300 rounded-lg p-1.5 text-xs font-mono font-bold">
+              </div>
+            </div>
+          </div>
+
+          <!-- 2nd Semester (2027) -->
+          <div class="p-2.5 bg-blue-50/40 rounded-xl border border-blue-200/70 space-y-1.5">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-blue-950 text-xs">2nd Semester (2027)</span>
+              <select id="edit-event-second-mode" onchange="updateEventTermInputs('second')" class="bg-white border border-slate-300 rounded-lg px-2 py-1 text-xs font-semibold text-slate-700">
+                <option value="none">Not Scheduled</option>
+                <option value="single">Single Date</option>
+                <option value="range">Date Range</option>
+              </select>
+            </div>
+            <div id="edit-event-second-inputs" class="grid grid-cols-2 gap-2 hidden pt-1">
+              <div>
+                <label id="edit-event-second-start-label" class="text-[10px] font-bold text-slate-600 block mb-0.5">Date</label>
+                <input type="date" id="edit-event-second-start" class="w-full bg-white border border-slate-300 rounded-lg p-1.5 text-xs font-mono font-bold">
+              </div>
+              <div id="edit-event-second-end-col" class="hidden">
+                <label class="text-[10px] font-bold text-slate-600 block mb-0.5">End Date</label>
+                <input type="date" id="edit-event-second-end" class="w-full bg-white border border-slate-300 rounded-lg p-1.5 text-xs font-mono font-bold">
+              </div>
+            </div>
+          </div>
+
+          <!-- Summer (2027) -->
+          <div class="p-2.5 bg-emerald-50/40 rounded-xl border border-emerald-200/70 space-y-1.5">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-emerald-950 text-xs">Summer (2027)</span>
+              <select id="edit-event-summer-mode" onchange="updateEventTermInputs('summer')" class="bg-white border border-slate-300 rounded-lg px-2 py-1 text-xs font-semibold text-slate-700">
+                <option value="none">Not Scheduled</option>
+                <option value="single">Single Date</option>
+                <option value="range">Date Range</option>
+              </select>
+            </div>
+            <div id="edit-event-summer-inputs" class="grid grid-cols-2 gap-2 hidden pt-1">
+              <div>
+                <label id="edit-event-summer-start-label" class="text-[10px] font-bold text-slate-600 block mb-0.5">Date</label>
+                <input type="date" id="edit-event-summer-start" class="w-full bg-white border border-slate-300 rounded-lg p-1.5 text-xs font-mono font-bold">
+              </div>
+              <div id="edit-event-summer-end-col" class="hidden">
+                <label class="text-[10px] font-bold text-slate-600 block mb-0.5">End Date</label>
+                <input type="date" id="edit-event-summer-end" class="w-full bg-white border border-slate-300 rounded-lg p-1.5 text-xs font-mono font-bold">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label class="font-bold text-slate-700 block mb-1">Daily Matrix Note (Optional)</label>
+          <input type="text" id="edit-event-custom-note" placeholder="e.g. Observance of Al-Isra' Wal-Mi'raj" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs">
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between pt-2 border-t border-slate-100">
+        <button type="button" id="btn-delete-academic-event" onclick="deleteAcademicEvent()" class="px-3 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold rounded-lg text-xs border border-rose-200 flex items-center gap-1">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+          Remove Event
+        </button>
+        <div class="flex justify-end gap-2">
+          <button onclick="closeEventEditorModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-semibold text-xs">Cancel</button>
+          <button onclick="saveAcademicEventChanges()" class="px-4 py-2 bg-msu-maroon hover:bg-msu-darkMaroon text-white rounded-xl font-bold text-xs shadow-md">Save Event</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. EDIT SECTION SCHEDULE MODAL -->
+  <div id="schedule-modal" class="fixed inset-0 z-[80] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4 border border-slate-200">
+      <div class="flex items-start justify-between">
+        <div>
+          <h3 id="sched-editor-title" class="font-bold text-base text-slate-900">Edit Section Schedule</h3>
+          <p class="text-xs text-slate-500" id="sched-editor-subtitle">Update class meeting days, time window, and classroom.</p>
+        </div>
+        <button aria-label="Close modal" onclick="closeScheduleEditorModal()" class="text-slate-400 hover:text-slate-600 p-1">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <input type="hidden" id="sched-edit-index" value="-1">
+
+      <div class="space-y-3 text-xs">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="font-bold text-slate-700 block mb-1">Subject</label>
+            <select id="sched-course-select" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs font-bold text-slate-800" onchange="updateScheduleSectionDropdown()"></select>
+          </div>
+          <div>
+            <label class="font-bold text-slate-700 block mb-1">Section</label>
+            <select id="sched-section-select" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs font-bold text-slate-800"></select>
+          </div>
+        </div>
+
+        <div>
+          <label class="font-bold text-slate-700 block mb-1">Meeting Days (Select all that apply)</label>
+          <div class="grid grid-cols-3 gap-2 bg-slate-50 p-2.5 rounded-xl border border-slate-200" id="sched-days-group">
+            <label class="flex items-center gap-1.5 text-xs font-semibold cursor-pointer">
+              <input type="checkbox" value="Sunday" class="rounded text-msu-maroon focus:ring-msu-maroon"> Sun
+            </label>
+            <label class="flex items-center gap-1.5 text-xs font-semibold cursor-pointer">
+              <input type="checkbox" value="Monday" class="rounded text-msu-maroon focus:ring-msu-maroon"> Mon
+            </label>
+            <label class="flex items-center gap-1.5 text-xs font-semibold cursor-pointer">
+              <input type="checkbox" value="Tuesday" class="rounded text-msu-maroon focus:ring-msu-maroon"> Tue
+            </label>
+            <label class="flex items-center gap-1.5 text-xs font-semibold cursor-pointer">
+              <input type="checkbox" value="Wednesday" class="rounded text-msu-maroon focus:ring-msu-maroon"> Wed
+            </label>
+            <label class="flex items-center gap-1.5 text-xs font-semibold cursor-pointer">
+              <input type="checkbox" value="Thursday" class="rounded text-msu-maroon focus:ring-msu-maroon"> Thu
+            </label>
+            <label class="flex items-center gap-1.5 text-xs font-semibold cursor-pointer">
+              <input type="checkbox" value="Friday" class="rounded text-msu-maroon focus:ring-msu-maroon"> Fri
+            </label>
+            <label class="flex items-center gap-1.5 text-xs font-semibold cursor-pointer">
+              <input type="checkbox" value="Saturday" class="rounded text-msu-maroon focus:ring-msu-maroon"> Sat
+            </label>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="font-bold text-slate-700 block mb-1">Start Time</label>
+            <input type="time" id="sched-start-time" value="07:30" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs font-mono font-bold focus:ring-2 focus:ring-msu-maroon">
+          </div>
+          <div>
+            <label class="font-bold text-slate-700 block mb-1">End Time</label>
+            <input type="time" id="sched-end-time" value="09:00" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs font-mono font-bold focus:ring-2 focus:ring-msu-maroon">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="font-bold text-slate-700 block mb-1">Room / Laboratory</label>
+            <input type="text" id="sched-room-input" placeholder="e.g. Eng 204 or Lab 3" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs">
+          </div>
+          <div>
+            <label class="font-bold text-slate-700 block mb-1">Type</label>
+            <select id="sched-type-input" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs font-medium">
+              <option value="Lecture">Lecture</option>
+              <option value="Laboratory">Laboratory</option>
+              <option value="Field Work">Field Work</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="font-bold text-slate-700 block mb-1">Google Classroom URL (Optional)</label>
+          <input type="url" id="sched-classroom-url" placeholder="https://classroom.google.com/c/..." class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs font-mono text-slate-800 focus:ring-2 focus:ring-msu-maroon">
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between pt-2 border-t border-slate-200">
+        <button id="sched-delete-btn" type="button" onclick="deleteCurrentScheduleSlot()" class="px-3 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-xl font-semibold text-xs hidden">
+          Delete Slot
+        </button>
+        <div class="flex justify-end gap-2 ml-auto">
+          <button type="button" onclick="closeScheduleEditorModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-semibold text-xs">Cancel</button>
+          <button type="button" onclick="saveScheduleEditorData()" class="px-4 py-2 bg-msu-maroon hover:bg-msu-darkMaroon text-white rounded-xl font-bold text-xs shadow-md">Save Changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. MANAGE COURSES & SECTIONS MODAL -->
+  <div id="manage-courses-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 hidden">
+    <div class="bg-white rounded-2xl max-w-2xl w-full p-5 sm:p-6 shadow-2xl space-y-4 max-h-[88vh] flex flex-col border border-slate-200 relative">
+      <div class="flex items-start justify-between border-b border-slate-200 pb-3">
+        <div>
+          <h3 class="font-bold text-lg text-slate-900">Manage Subjects & Sections</h3>
+          <p class="text-xs text-slate-500">Configure subjects, sections, and class meeting hours.</p>
+        </div>
+        <button aria-label="Close modal" onclick="closeManageCoursesModal()" class="text-slate-400 hover:text-slate-600 p-1">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="flex-1 overflow-y-auto space-y-4 pr-1">
+        <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-2.5">
+          <div class="text-xs font-bold text-slate-700 uppercase tracking-wider">+ Add New Subject</div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            <input type="text" id="new-course-code" placeholder="Code (e.g. CVE120)" class="bg-white border border-slate-300 rounded-lg p-2 text-xs font-bold uppercase sm:col-span-1">
+            <input type="text" id="new-course-title" placeholder="Description (e.g. Fluid Mechanics)" class="bg-white border border-slate-300 rounded-lg p-2 text-xs sm:col-span-2">
+            <input type="hidden" id="new-course-color" value="blue">
+          </div>
+          <!-- Visual Swatch Grid & Live Preview -->
+          <div class="pt-1 space-y-2 border-t border-slate-200">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-bold text-slate-600">Select Palette Swatch:</span>
+              <span id="new-course-color-label" class="text-[11px] font-mono font-bold text-slate-500">Blue</span>
+            </div>
+            <div id="new-course-color-swatches" class="flex flex-wrap gap-1.5 items-center"></div>
+            <div id="new-course-color-preview" class="p-2.5 rounded-lg border text-xs flex items-center justify-between transition-all"></div>
+          </div>
+          <div class="flex justify-end">
+            <button onclick="addNewSubject()" class="px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-bold transition">
+              Add Subject
+            </button>
+          </div>
+        </div>
+
+        <div class="space-y-3" id="manage-courses-list"></div>
+      </div>
+
+      <div class="flex justify-end pt-3 border-t border-slate-200">
+        <button onclick="closeManageCoursesModal()" class="px-5 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-xs font-bold">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. EDIT SUBJECT DETAILS MODAL -->
+  <div id="edit-course-modal" class="fixed inset-0 z-[80] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4 border border-slate-200">
+      <div class="flex items-start justify-between">
+        <div>
+          <h3 class="font-bold text-base text-slate-900">Edit Subject Details</h3>
+          <p class="text-xs text-slate-500">Update subject code, description, or color theme.</p>
+        </div>
+        <button aria-label="Close modal" onclick="closeEditSubjectModal()" class="text-slate-400 hover:text-slate-600 p-1">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <input type="hidden" id="edit-course-original-code">
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="font-bold text-slate-700 block mb-1">Subject Code</label>
+          <input type="text" id="edit-course-code" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs font-bold uppercase">
+        </div>
+        <div>
+          <label class="font-bold text-slate-700 block mb-1">Subject Title / Description</label>
+          <input type="text" id="edit-course-title" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs">
+        </div>
+        <div>
+          <label class="font-bold text-slate-700 block mb-1">Units</label>
+          <input type="number" id="edit-course-units" min="1" max="10" value="3" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs font-bold">
+          <input type="hidden" id="edit-course-color" value="blue">
+        </div>
+        <!-- Visual Swatch Grid & Live Preview for Edit Modal -->
+        <div class="pt-2 border-t border-slate-200 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] font-bold text-slate-600">Select Palette Swatch:</span>
+            <span id="edit-course-color-label" class="text-[11px] font-mono font-bold text-slate-500">Blue</span>
+          </div>
+          <div id="edit-course-color-swatches" class="flex flex-wrap gap-1.5 items-center"></div>
+          <div id="edit-course-color-preview" class="p-2.5 rounded-lg border text-xs flex items-center justify-between transition-all"></div>
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-2">
+        <button onclick="closeEditSubjectModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-semibold text-xs">Cancel</button>
+        <button onclick="saveEditSubject()" class="px-4 py-2 bg-msu-maroon hover:bg-msu-darkMaroon text-white rounded-xl font-bold text-xs shadow-md">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6b. ADD SECTION MODAL -->
+  <div id="add-section-modal" class="fixed inset-0 z-[80] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4 border border-slate-200 animate-in fade-in zoom-in-95 duration-150 max-h-[92vh] overflow-y-auto">
+      <div class="flex items-start justify-between">
+        <div>
+          <h3 class="font-bold text-base text-slate-900">Add Section</h3>
+          <p id="add-section-modal-subtitle" class="text-xs text-slate-500">Configure new section for subject.</p>
+        </div>
+        <button type="button" aria-label="Close modal" onclick="closeAddSectionModal()" class="text-slate-400 hover:text-slate-600 p-1">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <form onsubmit="submitAddSection(event)" class="space-y-3.5 text-xs">
+        <input type="hidden" id="add-section-course-code">
+
+        <div>
+          <label class="font-bold text-slate-700 block mb-1">Section Name <span class="text-rose-600">*</span></label>
+          <input type="text" id="add-section-name" placeholder="e.g. B16 or Sec 2" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs font-bold text-slate-800 focus:ring-2 focus:ring-msu-maroon focus:bg-white transition" autocomplete="off" required>
+          <p class="text-[11px] text-slate-500 mt-1">Section will appear in the Lesson Matrix, Timetable, and Class List.</p>
+        </div>
+
+        <div>
+          <label class="font-bold text-slate-700 block mb-1">Google Classroom URL <span class="text-slate-400 font-normal">(Optional)</span></label>
+          <input type="url" id="add-section-classroom-url" placeholder="https://classroom.google.com/c/..." class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs font-mono text-slate-800 focus:ring-2 focus:ring-emerald-600 focus:bg-white transition" autocomplete="off">
+          <p class="text-[11px] text-slate-500 mt-1">Direct link so clicking the section launches Google Classroom in a new tab.</p>
+        </div>
+
+        <div class="pt-2 border-t border-slate-200">
+          <div class="flex items-center justify-between mb-2">
+            <label class="font-bold text-slate-800 flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              Weekly Schedule <span class="text-slate-400 font-normal text-[11px]">(Optional)</span>
+            </label>
+            <span class="text-[10px] text-slate-400">Select days to assign slot</span>
+          </div>
+
+          <div class="space-y-2.5">
+            <div>
+              <span class="text-[11px] font-semibold text-slate-600 block mb-1">Meeting Days</span>
+              <div class="grid grid-cols-3 gap-2 bg-slate-50 p-2.5 rounded-xl border border-slate-200" id="add-section-days-group">
+                <label class="flex items-center gap-1.5 text-xs font-semibold cursor-pointer">
+                  <input type="checkbox" value="Sunday" class="rounded text-msu-maroon focus:ring-msu-maroon"> Sun
+                </label>
+                <label class="flex items-center gap-1.5 text-xs font-semibold cursor-pointer">
+                  <input type="checkbox" value="Monday" class="rounded text-msu-maroon focus:ring-msu-maroon"> Mon
+                </label>
+                <label class="flex items-center gap-1.5 text-xs font-semibold cursor-pointer">
+                  <input type="checkbox" value="Tuesday" class="rounded text-msu-maroon focus:ring-msu-maroon"> Tue
+                </label>
+                <label class="flex items-center gap-1.5 text-xs font-semibold cursor-pointer">
+                  <input type="checkbox" value="Wednesday" class="rounded text-msu-maroon focus:ring-msu-maroon"> Wed
+                </label>
+                <label class="flex items-center gap-1.5 text-xs font-semibold cursor-pointer">
+                  <input type="checkbox" value="Thursday" class="rounded text-msu-maroon focus:ring-msu-maroon"> Thu
+                </label>
+                <label class="flex items-center gap-1.5 text-xs font-semibold cursor-pointer">
+                  <input type="checkbox" value="Friday" class="rounded text-msu-maroon focus:ring-msu-maroon"> Fri
+                </label>
+                <label class="flex items-center gap-1.5 text-xs font-semibold cursor-pointer">
+                  <input type="checkbox" value="Saturday" class="rounded text-msu-maroon focus:ring-msu-maroon"> Sat
+                </label>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2.5">
+              <div>
+                <label class="text-[11px] font-semibold text-slate-600 block mb-1">Start Time</label>
+                <input type="time" id="add-section-start-time" value="07:30" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs font-mono font-bold focus:ring-2 focus:ring-msu-maroon">
+              </div>
+              <div>
+                <label class="text-[11px] font-semibold text-slate-600 block mb-1">End Time</label>
+                <input type="time" id="add-section-end-time" value="09:00" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs font-mono font-bold focus:ring-2 focus:ring-msu-maroon">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2.5">
+              <div>
+                <label class="text-[11px] font-semibold text-slate-600 block mb-1">Room / Lab</label>
+                <input type="text" id="add-section-room" placeholder="e.g. Eng 201 or Lab 3" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs focus:ring-2 focus:ring-msu-maroon">
+              </div>
+              <div>
+                <label class="text-[11px] font-semibold text-slate-600 block mb-1">Class Type</label>
+                <select id="add-section-type" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs font-medium focus:ring-2 focus:ring-msu-maroon">
+                  <option value="Lecture">Lecture</option>
+                  <option value="Laboratory">Laboratory</option>
+                  <option value="Field Work">Field Work</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-2 border-t border-slate-100">
+          <button type="button" onclick="closeAddSectionModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-semibold text-xs transition">Cancel</button>
+          <button type="submit" class="px-4 py-2 bg-msu-maroon hover:bg-msu-darkMaroon text-white rounded-xl font-bold text-xs shadow-md transition">Add Section</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 6c. EDIT SECTION MODAL (Edit Per Section) -->
+  <div id="edit-section-modal" class="fixed inset-0 z-[85] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4 border border-slate-200 animate-in fade-in zoom-in-95 duration-150 max-h-[92vh] overflow-y-auto">
+      <div class="flex items-start justify-between">
+        <div>
+          <h3 class="font-bold text-base text-slate-900">Edit Section</h3>
+          <p id="edit-section-modal-subtitle" class="text-xs text-slate-500">Update section name and schedule.</p>
+        </div>
+        <button type="button" aria-label="Close modal" onclick="closeEditSectionModal()" class="text-slate-400 hover:text-slate-600 p-1">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <form onsubmit="submitEditSection(event)" class="space-y-3.5 text-xs">
+        <input type="hidden" id="edit-section-course-code">
+        <input type="hidden" id="edit-section-original-name">
+
+        <div>
+          <label class="font-bold text-slate-700 block mb-1">Section Name <span class="text-rose-600">*</span></label>
+          <input type="text" id="edit-section-name" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs font-bold text-slate-800 focus:ring-2 focus:ring-msu-maroon focus:bg-white transition" required>
+        </div>
+
+        <div>
+          <label class="font-bold text-slate-700 block mb-1">Google Classroom URL <span class="text-slate-400 font-normal">(Optional)</span></label>
+          <input type="url" id="edit-section-classroom-url" placeholder="https://classroom.google.com/c/..." class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs font-mono text-slate-800 focus:ring-2 focus:ring-emerald-600 focus:bg-white transition" autocomplete="off">
+          <p class="text-[11px] text-slate-500 mt-1">Direct link to launch Google Classroom for this section from your matrix and timetable.</p>
+        </div>
+
+        <div class="pt-2 border-t border-slate-200">
+          <div class="flex items-center justify-between mb-2">
+            <label class="font-bold text-slate-800 flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              Weekly Schedule
+            </label>
+            <span class="text-[10px] text-slate-400">Select all active meeting days</span>
+          </div>
+
+          <div class="space-y-2.5">
+            <div>
+              <span class="text-[11px] font-semibold text-slate-600 block mb-1">Meeting Days</span>
+              <div class="grid grid-cols-3 gap-2 bg-slate-50 p-2.5 rounded-xl border border-slate-200" id="edit-section-days-group">
+                <label class="flex items-center gap-1.5 text-xs font-semibold cursor-pointer">
+                  <input type="checkbox" value="Sunday" class="rounded text-msu-maroon focus:ring-msu-maroon"> Sun
+                </label>
+                <label class="flex items-center gap-1.5 text-xs font-semibold cursor-pointer">
+                  <input type="checkbox" value="Monday" class="rounded text-msu-maroon focus:ring-msu-maroon"> Mon
+                </label>
+                <label class="flex items-center gap-1.5 text-xs font-semibold cursor-pointer">
+                  <input type="checkbox" value="Tuesday" class="rounded text-msu-maroon focus:ring-msu-maroon"> Tue
+                </label>
+                <label class="flex items-center gap-1.5 text-xs font-semibold cursor-pointer">
+                  <input type="checkbox" value="Wednesday" class="rounded text-msu-maroon focus:ring-msu-maroon"> Wed
+                </label>
+                <label class="flex items-center gap-1.5 text-xs font-semibold cursor-pointer">
+                  <input type="checkbox" value="Thursday" class="rounded text-msu-maroon focus:ring-msu-maroon"> Thu
+                </label>
+                <label class="flex items-center gap-1.5 text-xs font-semibold cursor-pointer">
+                  <input type="checkbox" value="Friday" class="rounded text-msu-maroon focus:ring-msu-maroon"> Fri
+                </label>
+                <label class="flex items-center gap-1.5 text-xs font-semibold cursor-pointer">
+                  <input type="checkbox" value="Saturday" class="rounded text-msu-maroon focus:ring-msu-maroon"> Sat
+                </label>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2.5">
+              <div>
+                <label class="text-[11px] font-semibold text-slate-600 block mb-1">Start Time</label>
+                <input type="time" id="edit-section-start-time" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs font-mono font-bold focus:ring-2 focus:ring-msu-maroon">
+              </div>
+              <div>
+                <label class="text-[11px] font-semibold text-slate-600 block mb-1">End Time</label>
+                <input type="time" id="edit-section-end-time" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs font-mono font-bold focus:ring-2 focus:ring-msu-maroon">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2.5">
+              <div>
+                <label class="text-[11px] font-semibold text-slate-600 block mb-1">Room / Lab</label>
+                <input type="text" id="edit-section-room" placeholder="e.g. Eng 201 or Lab 3" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs focus:ring-2 focus:ring-msu-maroon">
+              </div>
+              <div>
+                <label class="text-[11px] font-semibold text-slate-600 block mb-1">Class Type</label>
+                <select id="edit-section-type" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs font-medium focus:ring-2 focus:ring-msu-maroon">
+                  <option value="Lecture">Lecture</option>
+                  <option value="Laboratory">Laboratory</option>
+                  <option value="Field Work">Field Work</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-2 border-t border-slate-100">
+          <button type="button" onclick="closeEditSectionModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-semibold text-xs transition">Cancel</button>
+          <button type="submit" class="px-4 py-2 bg-msu-maroon hover:bg-msu-darkMaroon text-white rounded-xl font-bold text-xs shadow-md transition">Save Section</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 7. DECLARE NO CLASS MODAL -->
+  <div id="declare-noclass-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4 border border-slate-200">
+      <div class="flex items-start justify-between">
+        <div>
+          <h3 class="font-bold text-base text-rose-800 flex items-center gap-1.5">
+            <svg class="w-5 h-5 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+            Declare University Suspension / No Class
+          </h3>
+          <p class="text-xs text-slate-500">Mark one or multiple dates as No Class across all sections and shift planned lessons forward.</p>
+        </div>
+        <button aria-label="Close modal" onclick="closeDeclareNoClassModal()" class="text-slate-400 hover:text-slate-600 p-1">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="space-y-3.5 text-xs">
+        <div>
+          <label class="font-bold text-slate-700 block mb-1">Selection Mode</label>
+          <div class="grid grid-cols-3 gap-1 bg-slate-100 p-1 rounded-xl">
+            <button type="button" id="noclass-mode-btn-single" onclick="setNoClassMode('single')" class="py-1 px-2 font-bold rounded-lg bg-white shadow-xs text-slate-800 transition">Single Day</button>
+            <button type="button" id="noclass-mode-btn-range" onclick="setNoClassMode('range')" class="py-1 px-2 font-medium rounded-lg text-slate-600 hover:text-slate-900 transition">Date Range</button>
+            <button type="button" id="noclass-mode-btn-multi" onclick="setNoClassMode('multi')" class="py-1 px-2 font-medium rounded-lg text-slate-600 hover:text-slate-900 transition">Multi-Pick</button>
+          </div>
+        </div>
+
+        <div id="noclass-container-single">
+          <label class="font-bold text-slate-700 block mb-1">Select Date</label>
+          <input type="date" id="noclass-date" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-xs font-bold">
+        </div>
+
+        <div id="noclass-container-range" class="hidden space-y-2">
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="font-bold text-slate-700 block mb-1">Start Date</label>
+              <input type="date" id="noclass-start-date" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs font-bold">
+            </div>
+            <div>
+              <label class="font-bold text-slate-700 block mb-1">End Date</label>
+              <input type="date" id="noclass-end-date" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs font-bold">
+            </div>
+          </div>
+        </div>
+
+        <div id="noclass-container-multi" class="hidden space-y-2">
+          <div class="flex items-center gap-2">
+            <input type="date" id="noclass-picker-input" class="flex-1 bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs font-bold">
+            <button type="button" onclick="addSelectedNoClassDay()" class="px-3 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg font-bold text-xs">
+              + Add Day
+            </button>
+          </div>
+          <div id="noclass-chips-list" class="flex flex-wrap gap-1.5 p-2 bg-slate-50 border border-slate-200 rounded-xl min-h-[44px]">
+            <span class="text-slate-400 italic text-[11px] self-center">No additional days selected yet</span>
+          </div>
+        </div>
+
+        <div>
+          <label class="font-bold text-slate-700 block mb-1">Reason / Suspension Details</label>
+          <input type="text" id="noclass-reason" placeholder="e.g. Typhoon / City Holiday / Faculty Assembly" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-xs">
+        </div>
+
+        <div class="flex items-center gap-2 pt-1">
+          <input type="checkbox" id="noclass-shift-checkbox" checked class="rounded text-rose-600 focus:ring-rose-500">
+          <label for="noclass-shift-checkbox" class="font-medium text-slate-700 text-xs">Shift scheduled lessons forward to next available class meetings</label>
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-2 border-t border-slate-100">
+        <button onclick="closeDeclareNoClassModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-semibold text-xs">Cancel</button>
+        <button onclick="submitDeclareNoClass()" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-bold text-xs shadow-md">Apply Suspension</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8. UPLOAD CALENDAR MODAL -->
+  <div id="upload-calendar-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4 border border-slate-200">
+      <div class="flex items-start justify-between">
+        <div>
+          <h3 class="font-bold text-base text-slate-900">Upload Campus Academic Calendar</h3>
+          <p class="text-xs text-slate-500">Directly upload the MSU Academic Calendar PDF or CSV file.</p>
+        </div>
+        <button aria-label="Close modal" onclick="closeUploadCalendarModal()" class="text-slate-400 hover:text-slate-600 p-1">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div class="border-2 border-dashed border-slate-300 hover:border-msu-maroon rounded-2xl p-5 text-center bg-slate-50 transition cursor-pointer" onclick="document.getElementById('calendar-file-input').click()">
+          <svg class="w-8 h-8 text-slate-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+          <div class="font-bold text-slate-800">Click to select PDF or CSV calendar</div>
+          <div class="text-[11px] text-slate-500 mt-1">Accepts MSU Academic Calendar AY 2026-2027</div>
+          <input type="file" id="calendar-file-input" accept=".pdf,.csv,.json,.txt" class="hidden" onchange="handleCalendarFileUpload(event)">
+        </div>
+
+        
+        <!-- Quick 1-Click Load for MSU-GSC Calendar -->
+        <div class="p-3 bg-amber-50/80 border border-amber-200 rounded-xl space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="font-extrabold text-amber-950 text-xs">Official MSU-GSC Academic Calendar (AY 2026–2027)</span>
+            <span class="px-2 py-0.5 rounded text-[10px] font-black bg-msu-maroon text-white">Verified</span>
+          </div>
+          <p class="text-[11px] text-amber-900/80 leading-relaxed">
+            Instantly load all official milestones (First/Second Prelims, Finals, Charter Day, Intramurals, Semestral Break, and Grade Deadlines) verified from the Campus Academic Calendar document.
+          </p>
+          <button type="button" onclick="loadOfficialMsuCalendar()" class="w-full py-2 px-3 bg-gradient-to-r from-msu-maroon to-rose-900 hover:from-msu-darkMaroon hover:to-rose-950 text-amber-200 font-bold rounded-lg text-xs flex items-center justify-center gap-1.5 shadow-sm transition">
+            <svg class="w-4 h-4 text-msu-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span>Load Official MSU-GSC AY 2026–2027 Calendar</span>
+          </button>
+        </div>
+
+        <div id="pdf-processing-status" class="hidden p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 text-xs flex items-center gap-2">
+          <svg class="w-4 h-4 animate-spin text-msu-maroon" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+          <span id="pdf-status-text">Parsing academic calendar PDF...</span>
+        </div>
+
+        <div>
+          <label class="font-bold text-slate-700 block mb-1">Or Paste CSV Calendar Events</label>
+          <textarea id="paste-calendar-raw" rows="4" placeholder="Date(YYYY-MM-DD), Event Title, IsNoClass(true/false)&#10;2026-09-01, MSU Foundation Day, true&#10;2026-09-10, First Preliminary Examinations, false" class="w-full font-mono text-[11px] bg-slate-50 border border-slate-300 rounded-xl p-2.5"></textarea>
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-2">
+        <button onclick="closeUploadCalendarModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-semibold text-xs">Cancel</button>
+        <button onclick="applyPastedCalendar()" class="px-4 py-2 bg-msu-maroon hover:bg-msu-darkMaroon text-white rounded-xl font-bold text-xs shadow-md">Apply Calendar Events</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 9. BULK EXCEL STUDENT IMPORT MODAL -->
+  <div id="bulk-import-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl max-w-xl w-full p-6 shadow-2xl space-y-4 border border-slate-200">
+      <div class="flex items-start justify-between">
+        <div>
+          <h3 class="font-bold text-base text-slate-900">Paste Excel / Sheets Class List</h3>
+          <p class="text-xs text-slate-500">Columns: ID-Number, Last Name, First Name, Email (Tab or Comma separated)</p>
+        </div>
+        <button aria-label="Close modal" onclick="closeBulkImportModal()" class="text-slate-400 hover:text-slate-600 p-1">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="font-bold text-slate-700 block mb-1">Target Section to Enroll In</label>
+          <select id="bulk-target-section" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs font-bold text-slate-800"></select>
+        </div>
+
+        <div>
+          <label class="font-bold text-slate-700 block mb-1">Copy and paste directly from your spreadsheet</label>
+          <textarea id="bulk-paste-area" oninput="previewBulkData()" rows="6" placeholder="2022-0142&#9;Al-Ghazali&#9;Fatima&#9;fatima.alghazali@msugensan.edu.ph&#10;2023-1105&#9;Santos&#9;Juan&#9;juan.santos@msugensan.edu.ph" class="w-full font-mono text-[11px] bg-slate-50 border border-slate-300 rounded-xl p-2.5 focus:ring-2 focus:ring-msu-maroon"></textarea>
+        </div>
+
+        <div id="bulk-preview-summary" class="p-2.5 bg-slate-100 rounded-xl text-slate-600 font-medium text-xs">
+          Ready to parse clipboard data.
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-2">
+        <button onclick="closeBulkImportModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-semibold text-xs">Cancel</button>
+        <button onclick="commitBulkImport()" class="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl font-bold text-xs shadow-md">Add Students to Roster</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 10. ADD SINGLE STUDENT MODAL -->
+  <div id="single-student-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4 border border-slate-200">
+      <div class="flex items-start justify-between">
+        <div>
+          <h3 class="font-bold text-base text-slate-900">Add Student to Roster</h3>
+          <p class="text-xs text-slate-500">Student ID, Last Name, First Name, and Email.</p>
+        </div>
+        <button aria-label="Close modal" onclick="closeSingleStudentModal()" class="text-slate-400 hover:text-slate-600 p-1">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="font-bold text-slate-700 block mb-1">Student ID Number</label>
+          <input type="text" id="stud-id" placeholder="e.g. 2023-0854" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs font-mono font-bold">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="font-bold text-slate-700 block mb-1">Last Name</label>
+            <input type="text" id="stud-last" placeholder="e.g. Pendatun" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs">
+          </div>
+          <div>
+            <label class="font-bold text-slate-700 block mb-1">First Name</label>
+            <input type="text" id="stud-first" placeholder="e.g. Datu Ali" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs">
+          </div>
+        </div>
+        <div>
+          <label class="font-bold text-slate-700 block mb-1">Email Address</label>
+          <input type="email" id="stud-email" placeholder="e.g. ali.pendatun@msugensan.edu.ph" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs">
+        </div>
+        <div>
+          <label class="font-bold text-slate-700 block mb-1">Enrolled Section</label>
+          <select id="stud-section" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs font-bold text-slate-800"></select>
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-2">
+        <button onclick="closeSingleStudentModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-semibold text-xs">Cancel</button>
+        <button onclick="saveSingleStudent()" class="px-4 py-2 bg-msu-maroon hover:bg-msu-darkMaroon text-white rounded-xl font-bold text-xs shadow-md">Add Student</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 11. CONFIRMATION MODAL -->
+  <div id="confirm-modal" class="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-4 text-center border border-slate-200">
+      <div class="w-12 h-12 rounded-2xl bg-rose-100 text-rose-700 flex items-center justify-center mx-auto">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+      </div>
+      <div>
+        <h3 id="confirm-title" class="font-bold text-base text-slate-900">Are you sure?</h3>
+        <p id="confirm-message" class="text-xs text-slate-500 mt-1">This action cannot be undone.</p>
+      </div>
+      <div class="flex justify-center gap-2 pt-2">
+        <button onclick="cancelConfirmation()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-semibold text-xs">Cancel</button>
+        <button id="confirm-action-btn" onclick="executeConfirmation()" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-bold text-xs shadow-md">Confirm Action</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 12. LOST TEACHING DAYS IMPACT MODAL -->
+  <div id="lost-days-modal" class="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden" onclick="if(event.target===this) closeLostDaysModal()">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4 border border-slate-200 animate-in fade-in zoom-in-95 duration-150 flex flex-col max-h-[85vh]">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100 shrink-0">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center shrink-0">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+          </div>
+          <div>
+            <h3 id="lost-days-modal-title" class="font-extrabold text-base text-slate-900">Lost Teaching Days Impact</h3>
+            <p class="text-xs text-slate-500 mt-0.5">Summary of holidays and class suspensions</p>
+          </div>
+        </div>
+        <button type="button" aria-label="Close modal" onclick="closeLostDaysModal()" class="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-100 transition" title="Close">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <div id="lost-days-modal-list" class="space-y-2 overflow-y-auto max-h-[60vh] pr-1">
+      </div>
+
+      <div class="flex justify-end pt-2 border-t border-slate-100 shrink-0">
+        <button type="button" onclick="closeLostDaysModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-xs transition">Close</button>
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- ================= GRADING SCALE CONFIGURATION MODAL ================= -->
+  <div id="grading-scale-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl max-w-xl w-full shadow-2xl border border-slate-200 overflow-hidden animate-in fade-in zoom-in-95 duration-150 flex flex-col max-h-[90vh]">
+      <div class="bg-gradient-to-r from-amber-700 to-amber-900 px-5 py-4 text-white flex items-center justify-between shrink-0">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center border border-white/20">
+            <svg class="w-4 h-4 text-amber-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+          </div>
+          <div>
+            <h3 class="font-extrabold text-sm sm:text-base">Configure Grading Scale</h3>
+            <p class="text-xs text-amber-100">Set default or section-specific grade equivalence thresholds</p>
+          </div>
+        </div>
+        <button type="button" aria-label="Close modal" onclick="closeGradingScaleModal()" class="text-amber-200 hover:text-white p-1 rounded-lg hover:bg-white/10 transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="p-5 overflow-y-auto space-y-4 flex-1 text-xs">
+        <!-- Target Scope Selection -->
+        <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <label class="font-bold text-slate-800">Target Configuration Scope:</label>
+            <select id="grading-scale-scope-select" onchange="onGradingScaleScopeChange()" class="bg-white border border-slate-300 rounded-lg px-3 py-1.5 font-bold text-slate-800 focus:ring-2 focus:ring-amber-500 text-xs">
+              <!-- Dynamically populated: __default__ and all sections -->
+            </select>
+          </div>
+
+          <!-- Section Inheritance Toggle (hidden when scope is __default__) -->
+          <div id="grading-scale-section-toggle-container" class="hidden pt-2 border-t border-slate-200 flex items-center justify-between flex-wrap gap-2">
+            <div class="flex items-center gap-3">
+              <label class="flex items-center gap-1.5 cursor-pointer">
+                <input type="radio" name="grading-scale-mode" id="grading-scale-mode-default" value="default" onchange="onGradingScaleModeChange('default')" class="text-amber-600 focus:ring-amber-500">
+                <span class="font-bold text-slate-700">Use Default Grading Scale</span>
+              </label>
+              <label class="flex items-center gap-1.5 cursor-pointer">
+                <input type="radio" name="grading-scale-mode" id="grading-scale-mode-custom" value="custom" onchange="onGradingScaleModeChange('custom')" class="text-amber-600 focus:ring-amber-500">
+                <span class="font-bold text-slate-700">Customize for this Section</span>
+              </label>
+            </div>
+            <button type="button" id="grading-scale-reset-section-btn" onclick="resetSectionScaleToDefault()" class="px-2.5 py-1 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 rounded-lg font-bold text-[11px] transition shadow-2xs">
+              ↺ Sync with Default
+            </button>
+          </div>
+
+          <p id="grading-scale-scope-hint" class="text-[11px] text-slate-500 leading-relaxed"></p>
+        </div>
+
+        <!-- Grade Cutoff Thresholds Grid -->
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <span class="font-bold text-slate-800">Minimum Percentage (%) Required for Each Grade:</span>
+            <span class="text-[11px] text-slate-500">Scores &lt; INC threshold evaluate to 5.00 (Failed)</span>
+          </div>
+          <div id="grading-scale-inputs-container" class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 font-mono">
+            <!-- Inputs dynamically rendered -->
+          </div>
+          <div id="grading-scale-error-msg" class="hidden mt-2 p-2 bg-rose-50 text-rose-700 border border-rose-200 rounded-lg text-xs font-semibold"></div>
+        </div>
+      </div>
+
+      <div class="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between shrink-0 flex-wrap gap-2">
+        <button type="button" onclick="restoreOfficialMsuScale()" class="px-3 py-1.5 bg-white hover:bg-amber-50 text-amber-900 border border-amber-300 rounded-lg font-bold text-xs transition">
+          ↺ Reset to Default Scale
+        </button>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="closeGradingScaleModal()" class="px-3.5 py-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 rounded-lg font-semibold text-xs transition">
+            Cancel
+          </button>
+          <button type="button" onclick="saveGradingScaleModal()" class="px-4 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-lg font-bold text-xs shadow-xs transition">
+            Save Scale
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= GRADING CRITERIA & SUB-ACTIVITIES MODAL ================= -->
+  <div id="grading-criteria-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl max-w-2xl w-full shadow-2xl border border-slate-200 overflow-hidden animate-in fade-in zoom-in-95 duration-150 flex flex-col max-h-[90vh]">
+      <div class="bg-gradient-to-r from-indigo-800 to-indigo-950 px-5 py-4 text-white flex items-center justify-between shrink-0">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center border border-white/20">
+            <svg class="w-4 h-4 text-indigo-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+          </div>
+          <div>
+            <h3 class="font-extrabold text-sm sm:text-base">Grading Criteria & Activities</h3>
+            <p id="grading-criteria-modal-subtitle" class="text-xs text-indigo-200">Customize categories, weights, and sub-activities</p>
+          </div>
+        </div>
+        <button type="button" aria-label="Close modal" onclick="closeGradingCriteriaModal()" class="text-indigo-200 hover:text-white p-1 rounded-lg hover:bg-white/10 transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <!-- Scope and Weight Summary Header -->
+      <div class="bg-slate-50 px-5 py-3 border-b border-slate-200 flex items-center justify-between flex-wrap gap-2 shrink-0 text-xs">
+        <div class="flex items-center gap-2">
+          <span class="font-bold text-slate-700">Apply Changes To:</span>
+          <select id="grading-criteria-scope" class="bg-white border border-slate-300 rounded-lg px-2.5 py-1 text-xs font-bold text-slate-800 focus:ring-2 focus:ring-indigo-500">
+            <!-- Dynamically populated: Course level or section level -->
+          </select>
+        </div>
+        <div id="grading-criteria-weight-indicator" class="flex items-center gap-1.5 px-3 py-1 rounded-full font-bold text-xs bg-emerald-100 text-emerald-800">
+          <span>Total Weight:</span>
+          <span id="grading-criteria-total-weight" class="font-black">100%</span>
+        </div>
+      </div>
+
+      <!-- Categories & Sub-activities Body -->
+      <div id="grading-criteria-categories-list" class="p-5 overflow-y-auto space-y-4 flex-1 text-xs divide-y divide-slate-100">
+        <!-- Rendered dynamically by renderGradingCriteriaModal() -->
+      </div>
+
+      <!-- Error / Validation Alert Banner -->
+      <div id="grading-criteria-error-msg" class="hidden mx-5 my-2 p-3 bg-rose-50 border-2 border-rose-300 text-rose-900 rounded-xl font-bold text-xs flex items-center gap-2.5">
+        <svg class="w-5 h-5 text-rose-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+        <span id="grading-criteria-error-text">Error message</span>
+      </div>
+
+      <div class="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between shrink-0 flex-wrap gap-2">
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="addGradingCategory()" class="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-900 border border-indigo-300 rounded-lg font-bold text-xs flex items-center gap-1 transition shadow-2xs">
+            <span>+ Add Category</span>
+          </button>
+          <button type="button" onclick="resetGradingCriteriaToDefault()" class="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 rounded-lg font-semibold text-xs transition">
+            ↺ Reset Template
+          </button>
+        </div>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="closeGradingCriteriaModal()" class="px-3.5 py-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 rounded-lg font-semibold text-xs transition">
+            Cancel
+          </button>
+          <button type="button" onclick="saveGradingCriteriaModal()" class="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-bold text-xs shadow-xs transition">
+            Save Criteria
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= GOOGLE CLASSROOM LINK MODAL ================= -->
+  <div id="google-classroom-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-200 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+      <div class="bg-gradient-to-r from-emerald-800 to-teal-700 px-5 py-4 text-white flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center border border-white/20">
+            <svg class="w-4 h-4 text-emerald-200" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/></svg>
+          </div>
+          <div>
+            <h3 class="font-extrabold text-sm sm:text-base">Google Classroom Link</h3>
+            <p id="classroom-modal-subtitle" class="text-xs text-emerald-100">Configure class link for section</p>
+          </div>
+        </div>
+        <button type="button" aria-label="Close modal" onclick="closeClassroomModal()" class="text-emerald-200 hover:text-white p-1 rounded-lg hover:bg-white/10 transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <form onsubmit="saveClassroomLink(event)" class="p-5 space-y-4">
+        <input type="hidden" id="classroom-modal-course">
+        <input type="hidden" id="classroom-modal-section">
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Google Classroom URL</label>
+          <input type="url" id="classroom-modal-url" placeholder="https://classroom.google.com/c/..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 text-xs font-mono text-slate-800 focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 focus:bg-white transition" autocomplete="off">
+          <p class="text-[11px] text-slate-500 mt-1">Paste the invite link or class URL from your Google Classroom stream.</p>
+        </div>
+
+        <div class="p-3 bg-emerald-50/70 rounded-xl border border-emerald-200/80 flex items-start gap-2.5 text-xs text-emerald-900">
+          <svg class="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <p class="text-[11px] leading-relaxed">Once linked, you and students can launch Google Classroom with a single click from the Lesson Matrix, Manage Subjects, Roster, and Gradebook.</p>
+        </div>
+
+        <div class="pt-2 border-t border-slate-100 flex items-center justify-between gap-2">
+          <div>
+            <button type="button" id="classroom-modal-test-btn" onclick="testClassroomLink()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold flex items-center gap-1 transition">
+              <span>Test Link ↗</span>
+            </button>
+          </div>
+          <div class="flex items-center gap-2">
+            <button type="button" id="classroom-modal-remove-btn" onclick="removeClassroomLink()" class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-lg text-xs font-bold transition">
+              Remove
+            </button>
+            <button type="button" onclick="closeClassroomModal()" class="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold transition">
+              Cancel
+            </button>
+            <button type="submit" class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold shadow-xs transition">
+              Save Link
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- ================= 17. COMPREHENSIVE EXPORT & IMPORT CENTER MODAL ================= -->
+  <div id="export-import-modal" class="fixed inset-0 z-[85] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl max-w-3xl w-full p-6 shadow-2xl space-y-4 border border-slate-200 max-h-[92vh] flex flex-col animate-in fade-in zoom-in-95 duration-150">
+      <div class="flex items-start justify-between pb-3 border-b border-slate-200">
+        <div>
+          <h3 class="font-black text-base text-slate-900">Data Management & Export / Import Center</h3>
+          <p class="text-xs text-slate-500 mt-0.5">Export and import individual module datasets or full system backups in CSV and JSON formats.</p>
+        </div>
+        <button aria-label="Close modal" onclick="closeExportImportModal()" class="text-slate-400 hover:text-slate-600 p-1">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <!-- Navigation Sub-tabs -->
+      <div class="flex gap-2 border-b border-slate-200 overflow-x-auto pb-1 text-xs font-bold no-scrollbar">
+        <button onclick="switchExportImportTab('planner')" id="ei-tab-planner" class="ei-tab px-3 py-1.5 rounded-lg border border-transparent bg-slate-100 text-slate-800 font-bold hover:bg-slate-200 transition">📅 Lesson Matrix</button>
+        <button onclick="switchExportImportTab('courses')" id="ei-tab-courses" class="ei-tab px-3 py-1.5 rounded-lg border border-transparent text-slate-500 hover:bg-slate-100 transition">📚 Subjects & Sections</button>
+        <button onclick="switchExportImportTab('roster')" id="ei-tab-roster" class="ei-tab px-3 py-1.5 rounded-lg border border-transparent text-slate-500 hover:bg-slate-100 transition">👥 Student Roster</button>
+        <button onclick="switchExportImportTab('grades')" id="ei-tab-grades" class="ei-tab px-3 py-1.5 rounded-lg border border-transparent text-slate-500 hover:bg-slate-100 transition">📊 Class Record & Grades</button>
+        <button onclick="switchExportImportTab('backup')" id="ei-tab-backup" class="ei-tab px-3 py-1.5 rounded-lg border border-transparent text-slate-500 hover:bg-slate-100 transition">💾 Complete Backup</button>
+      </div>
+
+      <!-- Modal Body Panels -->
+      <div class="flex-1 overflow-y-auto space-y-4 pr-1 text-xs">
+        <!-- PANEL 1: LESSON PLANNER MATRIX -->
+        <div id="ei-panel-planner" class="ei-panel space-y-4">
+          <div class="p-3.5 bg-blue-50/70 border border-blue-200 rounded-xl space-y-1.5">
+            <h4 class="font-extrabold text-blue-950 text-xs flex items-center gap-1.5">
+              <span>📅</span> Lesson Planner Matrix Schedule
+            </h4>
+            <p class="text-blue-900 leading-relaxed text-[11px]">
+              Export your planned topics, activity types, sub-exams, and room allocations. You can also import previously exported schedule files to populate or restore matrix entries.
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3 flex flex-col justify-between">
+              <div>
+                <div class="font-bold text-slate-800 text-xs">Export Planner Schedule</div>
+                <p class="text-slate-500 text-[11px] mt-1">Download schedule containing date, subject, section, topic, activity, and notes.</p>
+              </div>
+              <div class="flex gap-2">
+                <button onclick="exportPlannerScheduleCSV()" class="flex-1 px-3 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg font-bold text-xs flex items-center justify-center gap-1 transition">
+                  <span>Export CSV</span>
+                </button>
+                <button onclick="exportPlannerScheduleJSON()" class="flex-1 px-3 py-2 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 rounded-lg font-bold text-xs flex items-center justify-center gap-1 transition">
+                  <span>Export JSON</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3 flex flex-col justify-between">
+              <div>
+                <div class="font-bold text-slate-800 text-xs">Import Planner Schedule</div>
+                <p class="text-slate-500 text-[11px] mt-1">Upload a CSV or JSON schedule file to merge into the Lesson Planner.</p>
+              </div>
+              <div>
+                <input type="file" id="ei-planner-file" accept=".csv,.json" onchange="importPlannerScheduleFile(event)" class="hidden">
+                <button onclick="document.getElementById('ei-planner-file').click()" class="w-full px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-xs flex items-center justify-center gap-1.5 transition">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                  <span>Select CSV / JSON File</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PANEL 2: SUBJECTS & SECTIONS -->
+        <div id="ei-panel-courses" class="ei-panel space-y-4 hidden">
+          <div class="p-3.5 bg-purple-50/70 border border-purple-200 rounded-xl space-y-1.5">
+            <h4 class="font-extrabold text-purple-950 text-xs flex items-center gap-1.5">
+              <span>📚</span> Subjects, Sections & Timetable Schedules
+            </h4>
+            <p class="text-purple-900 leading-relaxed text-[11px]">
+              Export your course catalog, section offerings, color palettes, and weekly class times. Restoring from a backup will recreate your subjects and timetable.
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3 flex flex-col justify-between">
+              <div>
+                <div class="font-bold text-slate-800 text-xs">Export Subjects Catalog</div>
+                <p class="text-slate-500 text-[11px] mt-1">Save course codes, titles, units, color schemes, and weekly period allocations.</p>
+              </div>
+              <button onclick="exportSubjectsJSON()" class="w-full px-3 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg font-bold text-xs flex items-center justify-center gap-1 transition">
+                <span>Export Subjects (JSON)</span>
+              </button>
+            </div>
+
+            <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3 flex flex-col justify-between">
+              <div>
+                <div class="font-bold text-slate-800 text-xs">Import Subjects Catalog</div>
+                <p class="text-slate-500 text-[11px] mt-1">Upload a subjects JSON backup to restore course definitions and weekly timetable.</p>
+              </div>
+              <div>
+                <input type="file" id="ei-courses-file" accept=".json" onchange="importSubjectsJSON(event)" class="hidden">
+                <button onclick="document.getElementById('ei-courses-file').click()" class="w-full px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-bold text-xs flex items-center justify-center gap-1.5 transition">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                  <span>Select Subjects JSON File</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PANEL 3: STUDENT ROSTER -->
+        <div id="ei-panel-roster" class="ei-panel space-y-4 hidden">
+          <div class="p-3.5 bg-emerald-50/70 border border-emerald-200 rounded-xl space-y-1.5">
+            <h4 class="font-extrabold text-emerald-950 text-xs flex items-center gap-1.5">
+              <span>👥</span> Student Roster & Class Lists
+            </h4>
+            <p class="text-emerald-900 leading-relaxed text-[11px]">
+              Export student demographics across all sections or filter by active section. Import rosters using standard CSV spreadsheets.
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3 flex flex-col justify-between">
+              <div>
+                <div class="font-bold text-slate-800 text-xs">Export Class List (CSV)</div>
+                <p class="text-slate-500 text-[11px] mt-1">Includes Student ID, Last Name, First Name, Email, and Section.</p>
+              </div>
+              <div class="space-y-2">
+                <select id="ei-roster-export-section" class="w-full bg-white border border-slate-300 rounded-lg p-1.5 text-xs font-bold text-slate-800"></select>
+                <button onclick="exportRosterCSV()" class="w-full px-3 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg font-bold text-xs flex items-center justify-center gap-1 transition">
+                  <span>Export Roster CSV</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3 flex flex-col justify-between">
+              <div>
+                <div class="font-bold text-slate-800 text-xs">Import Class List (CSV)</div>
+                <p class="text-slate-500 text-[11px] mt-1">Upload CSV or paste directly from Excel or Google Sheets into the roster.</p>
+              </div>
+              <div class="space-y-2">
+                <input type="file" id="ei-roster-file" accept=".csv,.tsv,.txt" onchange="importRosterCSVFile(event)" class="hidden">
+                <button onclick="document.getElementById('ei-roster-file').click()" class="w-full px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold text-xs flex items-center justify-center gap-1.5 transition">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                  <span>Upload CSV File</span>
+                </button>
+                <button onclick="closeExportImportModal(); openBulkImportModal();" class="w-full px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 rounded-lg font-bold text-xs transition">
+                  <span>Or Paste Roster Rows</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PANEL 4: CLASS RECORD & GRADES -->
+        <div id="ei-panel-grades" class="ei-panel space-y-4 hidden">
+          <div class="p-3.5 bg-amber-50/70 border border-amber-200 rounded-xl space-y-1.5">
+            <h4 class="font-extrabold text-amber-950 text-xs flex items-center gap-1.5">
+              <span>📊</span> MSU Class Record & Offline Gradebook Sync
+            </h4>
+            <p class="text-amber-900 leading-relaxed text-[11px]">
+              Export full grading sheets for Excel editing. When you're ready, upload the modified CSV to import updated student scores back into the system automatically.
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3 flex flex-col justify-between">
+              <div>
+                <div class="font-bold text-slate-800 text-xs">Export Class Record (CSV)</div>
+                <p class="text-slate-500 text-[11px] mt-1">Export raw scores, weights, totals, and official MSU grades for the active section.</p>
+              </div>
+              <button onclick="exportGradebookCSV()" class="w-full px-3 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg font-bold text-xs flex items-center justify-center gap-1 transition">
+                <span>Export Active Section CSV</span>
+              </button>
+            </div>
+
+            <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3 flex flex-col justify-between">
+              <div>
+                <div class="font-bold text-slate-800 text-xs">Import Scores from CSV</div>
+                <p class="text-slate-500 text-[11px] mt-1">Upload a CSV file containing updated student scores. Columns will be auto-matched to sub-activities by Student ID.</p>
+              </div>
+              <div>
+                <input type="file" id="ei-grades-file" accept=".csv" onchange="importGradebookScoresCSV(event)" class="hidden">
+                <button onclick="document.getElementById('ei-grades-file').click()" class="w-full px-3 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg font-bold text-xs flex items-center justify-center gap-1.5 transition">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                  <span>Import Scores CSV</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PANEL 5: COMPLETE SYSTEM BACKUP -->
+        <div id="ei-panel-backup" class="ei-panel space-y-4 hidden">
+          <div class="p-3.5 bg-slate-100 border border-slate-200 rounded-xl space-y-1.5">
+            <h4 class="font-extrabold text-slate-900 text-xs flex items-center gap-1.5">
+              <span>💾</span> Complete Full System Backup
+            </h4>
+            <p class="text-slate-600 leading-relaxed text-[11px]">
+              Create an all-in-one JSON backup file containing your entire workspace: semester setup, subjects, weekly timetable, academic calendar, lesson planner entries, student rosters, notes, and column sizes.
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3 flex flex-col justify-between">
+              <div>
+                <div class="font-bold text-slate-800 text-xs">Download Full JSON Backup</div>
+                <p class="text-slate-500 text-[11px] mt-1">Preserves 100% of your current data. Safe to transfer across different computers or browsers.</p>
+              </div>
+              <button onclick="exportBackupJSON()" class="w-full px-3 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg font-bold text-xs flex items-center justify-center gap-1 transition">
+                <span>Download Backup JSON</span>
+              </button>
+            </div>
+
+            <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3 flex flex-col justify-between">
+              <div>
+                <div class="font-bold text-slate-800 text-xs">Restore from Backup JSON</div>
+                <p class="text-slate-500 text-[11px] mt-1">Upload a previously downloaded JSON backup file to overwrite and restore data.</p>
+              </div>
+              <div>
+                <input type="file" id="ei-backup-file" accept=".json" onchange="importBackupJSON(event); closeExportImportModal();" class="hidden">
+                <button onclick="document.getElementById('ei-backup-file').click()" class="w-full px-3 py-2 bg-rose-700 hover:bg-rose-800 text-white rounded-lg font-bold text-xs flex items-center justify-center gap-1.5 transition">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                  <span>Select Backup JSON to Restore</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-end pt-3 border-t border-slate-200">
+        <button onclick="closeExportImportModal()" class="px-5 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-xs font-bold transition">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="user-guide-modal" class="fixed bottom-5 right-5 z-[95] pointer-events-none hidden transition-all duration-200">
+    <div id="user-guide-card" class="pointer-events-auto bg-white rounded-2xl w-[94vw] sm:w-[390px] shadow-2xl border-2 border-amber-400/80 overflow-hidden flex flex-col max-h-[85vh] animate-in fade-in slide-in-from-bottom-5 duration-150">
+      <div class="bg-gradient-to-r from-msu-darkMaroon via-msu-maroon to-slate-900 px-4 py-3 text-white flex items-center justify-between shrink-0 border-b border-msu-gold cursor-default select-none">
+        <div class="flex items-center gap-2 min-w-0">
+          <span class="text-base shrink-0">📖</span>
+          <div class="truncate">
+            <h3 class="font-extrabold text-xs sm:text-sm leading-tight truncate">Portal Walkthrough</h3>
+            <p class="text-[10px] text-amber-200/90 font-medium leading-tight">Step-by-Step Setup Guide</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-1 shrink-0 ml-2">
+          <button type="button" id="btn-guide-minimize" onclick="toggleGuideMinimize()" class="text-amber-200 hover:text-white px-2 py-0.5 rounded-lg hover:bg-white/10 text-xs font-black transition" title="Minimize/Expand Guide">
+            –
+          </button>
+          <button type="button" aria-label="Close user guide" onclick="closeUserGuideModal()" class="text-amber-200 hover:text-white p-1 rounded-lg hover:bg-white/10 transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div id="user-guide-content-area" class="flex flex-col flex-1 overflow-hidden">
+        <!-- Top Dropdown Bar (Buttons removed for compact layout) -->
+        <div class="px-3.5 py-2 border-b border-slate-200 bg-slate-50 shrink-0 text-xs">
+          <select id="guide-step-select" onchange="switchGuideTab(this.value)" class="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs font-bold text-slate-800 shadow-2xs focus:ring-2 focus:ring-msu-maroon cursor-pointer">
+            <option value="setup">Step 1 of 6: Term Setup</option>
+            <option value="courses">Step 2 of 6: Courses & Sections</option>
+            <option value="roster">Step 3 of 6: Class Roster</option>
+            <option value="planner">Step 4 of 6: Lesson Matrix</option>
+            <option value="gradebook">Step 5 of 6: Weighted Grades</option>
+            <option value="backup">Step 6 of 6: Offline Backup</option>
+          </select>
+        </div>
+
+        <!-- Vertically Middle-Aligned Container with Justified Text -->
+        <div class="p-4 overflow-y-auto flex-1 text-sm text-slate-700 leading-relaxed flex flex-col justify-center min-h-[220px]">
+          <!-- Step 1 -->
+          <div id="guide-panel-setup" class="guide-panel space-y-3 my-auto">
+            <div class="p-3.5 bg-amber-50 rounded-xl border border-amber-200 space-y-1.5">
+              <span class="font-extrabold text-slate-900 text-sm">1. Configure Semester Dates</span>
+              <p class="text-xs sm:text-[13px] text-slate-700 guide-text-justify">Click <strong>Semester Settings</strong> in the header. Set your Term Title, Start Date, and End Date. The engine automatically creates your entire 18-week grid and date rows.</p>
+            </div>
+            <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5">
+              <span class="font-extrabold text-slate-900 text-sm">2. Institutional Calendar</span>
+              <p class="text-xs sm:text-[13px] text-slate-700 guide-text-justify">Go to <strong>Academic Calendar Events</strong> (Tab 3) and click <strong>Upload / Replace Calendar &rarr; Load Official MSU-GSC AY 2026–2027 Calendar</strong> to sync verified examination periods and holidays.</p>
+            </div>
+          </div>
+
+          <!-- Step 2 -->
+          <div id="guide-panel-courses" class="guide-panel space-y-3 my-auto hidden">
+            <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+              <span class="font-extrabold text-slate-900 text-sm">Courses, Sections & Meeting Hours</span>
+              <p class="text-xs sm:text-[13px] text-slate-700 guide-text-justify">Open <strong>Manage Subjects</strong> from the top bar. Enter Course Code (e.g., <code>CVE112</code>), Title, and select a color theme.</p>
+              <p class="text-xs sm:text-[13px] text-slate-700 guide-text-justify">Under each course, click <strong>+ Add Section</strong> to configure section codes (e.g., <code>E15.1</code>), meeting days, class hours, and room assignments. These synchronize immediately with your Weekly Timetable.</p>
+            </div>
+          </div>
+
+          <!-- Step 3 -->
+          <div id="guide-panel-roster" class="guide-panel space-y-3 my-auto hidden">
+            <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+              <span class="font-extrabold text-slate-900 text-sm">Student Roster Enrollment</span>
+              <p class="text-xs sm:text-[13px] text-slate-700 guide-text-justify">Go to <strong>Class List (Roster)</strong> (Tab 4), choose your target section, and click <strong>Paste Class List</strong>.</p>
+              <p class="text-xs sm:text-[13px] text-slate-700 guide-text-justify">Copy your student columns directly from Excel or Google Sheets (<code>ID</code>, <code>Last Name</code>, <code>First Name</code>, <code>Email</code>) and paste them in. You can also broadcast emails to the active section from the sidebar.</p>
+            </div>
+          </div>
+
+          <!-- Step 4 -->
+          <div id="guide-panel-planner" class="guide-panel space-y-3 my-auto hidden">
+            <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+              <span class="font-extrabold text-slate-900 text-sm">Lesson Pacing & Schedule Shifting</span>
+              <p class="text-xs sm:text-[13px] text-slate-700 guide-text-justify">In the <strong>Lesson Planner Matrix</strong> (Tab 1), click any empty slot (<code>+ Click to plan</code>) to log topics and activity types (Lecture, Lab, Quiz, Exam).</p>
+              <p class="text-xs sm:text-[13px] text-slate-700 guide-text-justify">If a class is suspended, open the slot and click <strong>🚫 Mark "No Class" & Push Forward</strong>. All subsequent planned activities automatically shift forward by one meeting slot, preserving your syllabus sequence.</p>
+            </div>
+          </div>
+
+          <!-- Step 5 -->
+          <div id="guide-panel-gradebook" class="guide-panel space-y-3 my-auto hidden">
+            <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+              <span class="font-extrabold text-slate-900 text-sm">Real-Time Weighted Grading</span>
+              <p class="text-xs sm:text-[13px] text-slate-700 guide-text-justify">In <strong>Class Record & Grades</strong> (Tab 5), click <strong>Grading Criteria</strong> to define categories and weight percentages (e.g., Quizzes 20%, Exams 20%). Weights must sum to 100%.</p>
+              <p class="text-xs sm:text-[13px] text-slate-700 guide-text-justify">Enter student marks directly in the grid using arrow keys or Enter. The engine computes weighted totals, official MSU grades (1.00–5.00), and flags students on the <strong>At-Risk Student Radar</strong>.</p>
+            </div>
+          </div>
+
+          <!-- Step 6 -->
+          <div id="guide-panel-backup" class="guide-panel space-y-3 my-auto hidden">
+            <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+              <span class="font-extrabold text-slate-900 text-sm">Offline Local Storage & Backups</span>
+              <p class="text-xs sm:text-[13px] text-slate-700 guide-text-justify">All data automatically saves to your browser's local storage.</p>
+              <p class="text-xs sm:text-[13px] text-slate-700 guide-text-justify">To migrate data to another computer or safeguard your work, open <strong>Export / Import Hub &rarr; Complete Backup &rarr; Download Backup JSON</strong>. You can restore this file anytime.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom Navigation with "<- Prev" and "Next ->" -->
+        <div class="p-3 bg-slate-50 border-t border-slate-200 flex items-center justify-between shrink-0 text-xs">
+          <div class="flex items-center gap-1.5">
+            <button type="button" onclick="navigateGuideStep(-1)" class="px-2.5 py-1 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 rounded-lg font-bold text-xs transition shadow-2xs">
+              &larr; Prev
+            </button>
+            <button type="button" onclick="navigateGuideStep(1)" class="px-2.5 py-1 bg-msu-maroon hover:bg-msu-darkMaroon text-white rounded-lg font-bold text-xs transition shadow-2xs">
+              Next &rarr;
+            </button>
+          </div>
+          <button type="button" onclick="closeUserGuideModal()" class="px-3.5 py-1 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-xs font-bold transition">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating Feedback & Bug Report Button (Lower Left) -->
+  <button type="button" id="btn-feedback-floating" onclick="openFeedbackModal()" class="fixed bottom-6 left-6 z-40 flex items-center h-10 w-10 hover:w-32 px-2.5 rounded-full shadow-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 hover:text-amber-600 hover:border-amber-400 transition-all duration-300 ease-out group overflow-hidden backdrop-blur-xs" title="Report a bug or suggest a feature">
+    <span class="text-base shrink-0 flex items-center justify-center group-hover:rotate-12 transition-transform duration-200">💡</span>
+    <span class="max-w-0 opacity-0 group-hover:max-w-xs group-hover:opacity-100 group-hover:ml-2 transition-all duration-300 ease-out whitespace-nowrap text-xs font-extrabold overflow-hidden">Feedback</span>
+  </button>
+
+  <!-- Feedback & Bug Report Modal -->
+  <div id="feedback-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 hidden" onclick="if(event.target===this) closeFeedbackModal()">
+    <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-200 overflow-hidden animate-in fade-in zoom-in-95 duration-150 flex flex-col">
+      <div class="bg-gradient-to-r from-msu-darkMaroon via-msu-maroon to-slate-900 px-5 py-4 text-white flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <span class="text-lg">💡</span>
+          <div>
+            <h3 class="font-extrabold text-sm sm:text-base">Report Bug or Suggest Feature</h3>
+            <p class="text-xs text-amber-200/90">Send feedback directly to the development team</p>
+          </div>
+        </div>
+        <button type="button" aria-label="Close modal" onclick="closeFeedbackModal()" class="text-amber-200 hover:text-white p-1 rounded-lg hover:bg-white/10 transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <form onsubmit="submitFeedbackForm(event)" class="p-5 space-y-3.5 text-xs">
+        <div>
+          <label class="font-bold text-slate-700 block mb-1">Feedback Type</label>
+          <div class="grid grid-cols-2 gap-2">
+            <label class="flex items-center justify-center gap-2 p-2 rounded-xl border border-slate-200 bg-slate-50 cursor-pointer font-bold text-slate-700 hover:bg-rose-50 hover:border-rose-300 transition has-[:checked]:bg-rose-50 has-[:checked]:border-rose-400 has-[:checked]:text-rose-900">
+              <input type="radio" name="feedback-type" value="Bug Report" checked class="text-rose-600 focus:ring-rose-500">
+              <span>🐛 Bug Report</span>
+            </label>
+            <label class="flex items-center justify-center gap-2 p-2 rounded-xl border border-slate-200 bg-slate-50 cursor-pointer font-bold text-slate-700 hover:bg-amber-50 hover:border-amber-300 transition has-[:checked]:bg-amber-50 has-[:checked]:border-amber-400 has-[:checked]:text-amber-900">
+              <input type="radio" name="feedback-type" value="Feature Request" class="text-amber-600 focus:ring-amber-500">
+              <span>✨ Feature Request</span>
+            </label>
+          </div>
+        </div>
+
+        <div>
+          <label class="font-bold text-slate-700 block mb-1">Subject / Summary <span class="text-rose-600">*</span></label>
+          <input type="text" id="feedback-title" placeholder="Brief summary of the issue or idea" required class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-xs font-semibold focus:ring-2 focus:ring-msu-maroon">
+        </div>
+
+        <div>
+          <label class="font-bold text-slate-700 block mb-1">Details & Steps to Reproduce <span class="text-rose-600">*</span></label>
+          <textarea id="feedback-desc" rows="4" placeholder="Describe what happened, what you expected, or the feature you would like to see..." required class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-xs focus:ring-2 focus:ring-msu-maroon"></textarea>
+        </div>
+
+        <div>
+          <label class="font-bold text-slate-700 block mb-1">Your Email (Optional, for follow-ups)</label>
+          <input type="email" id="feedback-sender-email" placeholder="youremail@msugensan.edu.ph" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs">
+        </div>
+
+        <div class="flex justify-end gap-2 pt-2 border-t border-slate-100">
+          <button type="button" onclick="closeFeedbackModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-semibold text-xs transition">Cancel</button>
+          <button type="submit" id="feedback-submit-btn" class="px-4 py-2 bg-msu-maroon hover:bg-msu-darkMaroon text-white rounded-xl font-bold text-xs shadow-md transition flex items-center gap-1.5">
+            <span>Send Feedback</span>
+            <span>✉️</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= JAVASCRIPT LOGIC ================= -->
+  <script src="app.js"></script>
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./sw.js").catch((err) => {
+          console.warn("Offline cache registration failed:", err);
+        });
+      });
+    }
+  </script>
+</body>
+</html>

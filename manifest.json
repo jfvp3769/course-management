@@ -1,0 +1,16 @@
+{
+  "name": "MSU-GSC Course & Lesson Manager",
+  "short_name": "MSU Manager",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#800000",
+  "icons": [
+    {
+      "src": "msu-logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
+
