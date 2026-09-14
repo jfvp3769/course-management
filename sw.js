@@ -1,4 +1,4 @@
-const CACHE_NAME = "msu-gsc-manager-v1";
+const CACHE_NAME = "msu-gsc-manager-v1.01";
 const ASSETS_TO_CACHE = [
   "./",
   "./index.html",
