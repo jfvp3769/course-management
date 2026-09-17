@@ -471,6 +471,7 @@ function getNextRandomTip(currentIndex = -1) {
       saveAppState();
       renderMatrixTable();
       updateSemesterProgressBar();
+      if (typeof updateTimetableSidebar === 'function') updateTimetableSidebar();
       showToast(`Pasted activity to ${course} (${section}) on ${dateKey}!`, "✓");
     }
 
@@ -952,6 +953,14 @@ function getNextRandomTip(currentIndex = -1) {
       if (typeof initAllDualScrollbars === 'function') {
         setTimeout(initAllDualScrollbars, 60);
       }
+      if (typeof initMainWindowResizers === 'function') {
+        initMainWindowResizers();
+      }
+      if (typeof autoResizeContentWindows === 'function') {
+        autoResizeContentWindows();
+        requestAnimationFrame(autoResizeContentWindows);
+        setTimeout(autoResizeContentWindows, 60);
+      }
     }
 
     // ================= SEMESTER TIMELINE & ACADEMIC DATE LOGIC =================
@@ -1162,7 +1171,7 @@ function getNextRandomTip(currentIndex = -1) {
       const wrapper = document.getElementById('matrix-scroll-wrapper');
       if (!wrapper || !targetCell) return;
 
-      const stickyLeftWidth = 204; // 54px Day + 84px Date sticky columns
+      const stickyLeftWidth = 110; // 42px Day + 68px Date sticky columns
       const cellLeft = targetCell.offsetLeft;
       const cellWidth = targetCell.offsetWidth;
       const cellRight = cellLeft + cellWidth;
@@ -1185,7 +1194,7 @@ function getNextRandomTip(currentIndex = -1) {
       const wrapper = document.getElementById('matrix-scroll-wrapper');
       const thead = document.getElementById('matrix-head');
       if (!targetRow || !wrapper) return;
-      const theadHeight = (thead && typeof thead.offsetHeight === 'number' && !isNaN(thead.offsetHeight)) ? thead.offsetHeight : 86;
+      const theadHeight = (thead && typeof thead.offsetHeight === 'number' && !isNaN(thead.offsetHeight)) ? thead.offsetHeight : 68;
       const targetTop = Math.max(0, targetRow.offsetTop - theadHeight);
       wrapper.scrollTo({ top: targetTop, left: wrapper.scrollLeft, behavior });
     }
@@ -1557,8 +1566,8 @@ function getNextRandomTip(currentIndex = -1) {
 
       // Build Colgroup for direct column-width resizing
       let colgroupHtml = `
-        <col class="col-day" style="width: 54px; min-width: 54px; max-width: 54px;">
-        <col class="col-date" style="width: 84px; min-width: 84px; max-width: 84px;">
+        <col class="col-day" style="width: 42px; min-width: 42px; max-width: 42px;">
+        <col class="col-date" style="width: 68px; min-width: 68px; max-width: 68px;">
       `;
 
       courseData.subjects.forEach(sub => {
@@ -1584,23 +1593,24 @@ function getNextRandomTip(currentIndex = -1) {
       // ROW 1: Sticky Top Subjects with Rowspan for Day/Date/Notes
       let row1 = `
         <tr class="bg-slate-800 text-white divide-x divide-slate-700">
-          <th rowspan="2" class="sticky-header-day p-2 text-center font-bold text-slate-200 bg-slate-900 border-b border-slate-700 select-none">
+          <th rowspan="2" class="sticky-header-day p-1 text-center font-bold text-slate-200 bg-slate-900 border-b border-slate-700 select-none text-[11px]">
             Day
           </th>
-          <th rowspan="2" class="sticky-header-date p-2 text-center font-bold text-slate-200 bg-slate-900 border-b border-slate-700 select-none">
+          <th rowspan="2" class="sticky-header-date p-1 text-center font-bold text-slate-200 bg-slate-900 border-b border-slate-700 select-none text-[11px]">
             Date
           </th>
       `;
 
       courseData.subjects.forEach(sub => {
         const span = sub.sections.length || 1;
+        const unitsText = sub.units ? `(${sub.units} units)` : '';
         row1 += `
-          <th colspan="${span}" class="p-2 text-center font-extrabold tracking-wide ${sub.headerBg} border-b border-slate-900 shadow-2xs">
-            <div class="flex items-center justify-center gap-2">
-              <span class="text-xs sm:text-sm font-black tracking-tight">${escapeHtml(sub.code)}</span>
-              <span class="text-[10px] font-bold opacity-90 px-1.5 py-0.5 rounded bg-black/25">${sub.units} Units</span>
+          <th colspan="${span}" class="py-1.5 px-2 text-center font-extrabold tracking-wide ${sub.headerBg} border-b border-slate-900 shadow-2xs">
+            <div class="flex items-center justify-center gap-1.5 whitespace-nowrap overflow-hidden text-xs sm:text-sm font-bold" title="${escapeHtml(sub.code)} - ${escapeHtml(sub.title || '')} ${unitsText}">
+              <span class="font-black tracking-tight shrink-0">${escapeHtml(sub.code)}</span>
+              ${sub.title ? `<span class="opacity-70 font-normal shrink-0">-</span><span class="truncate font-semibold opacity-95 text-xs">${escapeHtml(sub.title)}</span>` : ''}
+              ${unitsText ? `<span class="text-[10.5px] font-medium opacity-85 shrink-0">${unitsText}</span>` : ''}
             </div>
-            <div class="text-[10px] font-medium opacity-90 truncate max-w-[210px] mx-auto">${escapeHtml(sub.title)}</div>
           </th>
         `;
       });
@@ -1677,11 +1687,11 @@ function getNextRandomTip(currentIndex = -1) {
 
         let dateRowHtml = `
           <tr id="row-${d.dateKey}" class="transition border-b border-slate-200 matrix-row-height ${weekendClass} ${isToday ? 'row-today-active' : 'hover:bg-slate-50/80'}">
-            <td class="sticky-col-day p-2 text-center font-bold border-r border-slate-200 ${d.isWeekend ? 'bg-slate-300' : 'bg-slate-50'}">
-              <span class="inline-block px-1.5 py-0.5 rounded text-[11px] ${dayWeekendBadge}">${d.dayOfWeek}</span>
+            <td class="sticky-col-day p-1 text-center font-bold border-r border-slate-200 ${d.isWeekend ? 'bg-slate-300' : 'bg-slate-50'}">
+              <span class="inline-block px-1 py-0.5 rounded text-[10px] sm:text-[10.5px] ${dayWeekendBadge}">${d.dayOfWeek}</span>
             </td>
 
-            <td class="sticky-col-date p-2 text-center font-semibold font-mono text-xs border-r border-slate-200 ${d.isWeekend ? 'bg-slate-300 text-slate-800' : 'bg-slate-50 text-slate-700'}">
+            <td class="sticky-col-date p-1 text-center font-semibold font-mono text-[11px] border-r border-slate-200 ${d.isWeekend ? 'bg-slate-300 text-slate-800' : 'bg-slate-50 text-slate-700'}">
               ${d.displayDate}
             </td>
         `;
@@ -1700,23 +1710,52 @@ function getNextRandomTip(currentIndex = -1) {
             if (d.isWeekend) {
               const weekendEntry = plannerEntries[cellKey];
               if (weekendEntry) {
+                const isEntryCompleted = (weekendEntry.status === 'Completed') || (d.dateKey < todayKey);
                 let badgeColor = sub.badgeBg;
                 if (weekendEntry.type === 'Exam') badgeColor = 'bg-amber-100 text-amber-900 border-amber-300';
-                if (weekendEntry.type === 'No Class') badgeColor = 'bg-rose-100 text-rose-800 border-rose-300';
+                else if (weekendEntry.type === 'No Class') badgeColor = 'bg-rose-100 text-rose-800 border-rose-300';
+                else if (weekendEntry.type === 'Makeup Class') badgeColor = 'bg-amber-50 text-amber-950 border-amber-300';
+                else if (weekendEntry.type === 'Special Session') badgeColor = 'bg-violet-50 text-violet-950 border-violet-300';
+
                 dateRowHtml += `
-                  <td id="cell-${cellKey}" data-cell-key="${cellKey}" data-col="${colKey}" style="width: ${currentW}px; min-width: ${currentW}px; max-width: ${currentW}px;" class="p-1 border-r border-slate-300 bg-slate-300/80 cursor-pointer hover:bg-slate-200/90 transition align-middle overflow-hidden" onclick="openLessonModal('${d.dateKey}', '${escapeHtml(sub.code)}', '${escapeHtml(sec)}', ${d.isWeekend})">
-                    <div id="card-${cellKey}" class="p-1.5 rounded-lg border ${badgeColor} ${accentBarClass} shadow-xs space-y-0.5 overflow-hidden max-w-full min-w-0">
+                  <td id="cell-${cellKey}" data-cell-key="${cellKey}" data-col="${colKey}" style="width: ${currentW}px; min-width: ${currentW}px; max-width: ${currentW}px;" class="p-1 border-r border-slate-300 bg-slate-200/60 cursor-pointer transition align-top relative group/card-cell matrix-cell-slot" onclick="openLessonModal('${d.dateKey}', '${escapeHtml(sub.code)}', '${escapeHtml(sec)}', ${d.isWeekend})">
+                    <div id="card-${cellKey}" class="p-1 rounded-lg border ${badgeColor} ${accentBarClass} shadow-xs space-y-0.5 overflow-hidden max-w-full min-w-0 transition-all duration-200 ease-out group-hover/card-cell:absolute group-hover/card-cell:left-1 group-hover/card-cell:right-1 group-hover/card-cell:top-1 group-hover/card-cell:z-22 group-hover/card-cell:shadow-xl group-hover/card-cell:scale-[1.02] ${badgeColor}">
                       <div class="flex items-center justify-between gap-1 overflow-hidden">
-                        <span class="font-extrabold text-[9px] uppercase tracking-tight truncate">Weekend</span>
-                        <span class="text-[8px] px-1 py-0.2 rounded font-bold bg-white/80 shrink-0">${escapeHtml(weekendEntry.type)}</span>
+                        <span class="font-extrabold text-[8.5px] uppercase tracking-tight text-amber-800 truncate">⚡ ${escapeHtml(weekendEntry.type || 'Weekend')}</span>
+                        <div class="flex items-center gap-1 shrink-0">
+                          ${isEntryCompleted ? '<span class="text-[7.5px] px-1 py-0.2 rounded font-black bg-emerald-600 text-white shrink-0">✓ Done</span>' : ''}
+                          <span class="text-[7.5px] px-1 py-0.2 rounded font-bold bg-white/80 shrink-0 border border-black/10">${escapeHtml(weekendEntry.type || 'Weekend')}</span>
+                        </div>
                       </div>
-                      <div class="font-bold text-[11px] leading-tight truncate max-w-full" title="${escapeHtml(weekendEntry.topic || 'Planned Activity')}">${escapeHtml(weekendEntry.topic || 'Planned Activity')}</div>
-                      ${weekendEntry.activity ? `<div class="text-[9px] opacity-80 truncate max-w-full" title="${escapeHtml(weekendEntry.activity)}">${escapeHtml(weekendEntry.activity)}</div>` : ''}
+                      <div class="font-bold text-[10.5px] leading-tight truncate group-hover/card-cell:whitespace-normal group-hover/card-cell:overflow-visible transition-all max-w-full" title="${escapeHtml(weekendEntry.topic || 'Planned Activity')}">${escapeHtml(weekendEntry.topic || 'Planned Activity')}</div>
+                      ${weekendEntry.activity ? `<div class="text-[8.5px] opacity-80 truncate group-hover/card-cell:whitespace-normal group-hover/card-cell:overflow-visible transition-all max-w-full leading-tight" title="${escapeHtml(weekendEntry.activity)}">${escapeHtml(weekendEntry.activity)}</div>` : ''}
+                      <div class="hidden group-hover/card-cell:flex items-center justify-between text-[8.5px] font-mono font-semibold pt-1 mt-1 border-t border-black/10 text-slate-600">
+                        <span>⚡ Weekend Session</span>
+                        <span class="px-1 py-0.2 rounded bg-white/80 border border-slate-300/60 font-sans font-semibold">${escapeHtml(weekendEntry.status || 'Planned')}</span>
+                      </div>
+                      <div class="hidden group-hover/card-cell:flex items-center justify-end gap-1 pt-1 mt-1 border-t border-black/10">
+                        <button type="button" onclick="copyMatrixActivity('${d.dateKey}', '${escapeHtml(sub.code)}', '${escapeHtml(sec)}', event)" class="p-1 rounded bg-white/90 hover:bg-white text-slate-700 text-[10px] font-bold border border-slate-300 shadow-2xs" title="Copy Activity">📋 Copy</button>
+                        <button type="button" onclick="pasteMatrixActivity('${d.dateKey}', '${escapeHtml(sub.code)}', '${escapeHtml(sec)}', event)" class="p-1 rounded bg-white/90 hover:bg-white text-slate-700 text-[10px] font-bold border border-slate-300 shadow-2xs" title="Paste Copied Activity">📥 Paste</button>
+                        <button type="button" onclick="event.stopPropagation(); openLessonModal('${d.dateKey}', '${escapeHtml(sub.code)}', '${escapeHtml(sec)}', ${d.isWeekend})" class="p-1 rounded bg-white/90 hover:bg-white text-slate-700 text-[10px] font-bold border border-slate-300 shadow-2xs" title="Edit Activity">✏️ Edit</button>
+                      </div>
                     </div>
                   </td>
                 `;
               } else {
-                dateRowHtml += `<td id="cell-${cellKey}" data-cell-key="${cellKey}" data-col="${colKey}" style="width: ${currentW}px; min-width: ${currentW}px; max-width: ${currentW}px;" class="p-1 border-r border-slate-300 bg-slate-300/80 cursor-pointer hover:bg-slate-200/90 transition align-middle overflow-hidden" onclick="openLessonModal('${d.dateKey}', '${escapeHtml(sub.code)}', '${escapeHtml(sec)}', ${d.isWeekend})"></td>`;
+                dateRowHtml += `
+                  <td id="cell-${cellKey}" data-cell-key="${cellKey}" data-col="${colKey}" style="width: ${currentW}px; min-width: ${currentW}px; max-width: ${currentW}px;" class="p-1 border-r border-slate-300 bg-slate-200/50 cursor-pointer hover:bg-slate-200/80 transition align-top relative group/card-cell matrix-cell-slot" onclick="openLessonModal('${d.dateKey}', '${escapeHtml(sub.code)}', '${escapeHtml(sec)}', ${d.isWeekend})">
+                    <div id="card-${cellKey}" class="p-1 rounded-lg border border-dashed border-slate-400/30 hover:border-amber-400 text-slate-500 hover:text-amber-800 bg-slate-200/40 hover:bg-white text-center transition-all duration-200 group-hover/card-cell:absolute group-hover/card-cell:left-1 group-hover/card-cell:right-1 group-hover/card-cell:top-1 group-hover/card-cell:z-22 group-hover/card-cell:shadow-lg group-hover/card-cell:scale-[1.02] group-hover/card-cell:bg-white group-hover/card-cell:border-amber-400">
+                      <div class="text-[8.5px] font-medium py-0.5 opacity-30 group-hover/card-cell:opacity-100 transition-opacity flex items-center justify-center gap-1 text-slate-600 group-hover/card-cell:text-amber-700">
+                        <span class="font-bold">+</span>
+                        <span class="truncate">Weekend Session</span>
+                      </div>
+                      <div class="hidden group-hover/card-cell:flex items-center justify-end gap-1 pt-1 mt-0.5 border-t border-slate-200">
+                        <button type="button" onclick="pasteMatrixActivity('${d.dateKey}', '${escapeHtml(sub.code)}', '${escapeHtml(sec)}', event)" class="p-1 rounded bg-white hover:bg-slate-100 text-slate-700 text-[10px] font-bold border border-slate-300 shadow-2xs" title="Paste Copied Activity">📥 Paste</button>
+                        <button type="button" onclick="event.stopPropagation(); openLessonModal('${d.dateKey}', '${escapeHtml(sub.code)}', '${escapeHtml(sec)}', ${d.isWeekend})" class="p-1 rounded bg-amber-50 hover:bg-amber-100 text-amber-900 text-[10px] font-bold border border-amber-300 shadow-2xs" title="Plan Weekend Session">✏️ Plan</button>
+                      </div>
+                    </div>
+                  </td>
+                `;
               }
               return;
             }
@@ -1724,7 +1763,7 @@ function getNextRandomTip(currentIndex = -1) {
             if (d.isNoClassDate) {
               dateRowHtml += `
                 <td id="cell-${cellKey}" data-cell-key="${cellKey}" data-col="${colKey}" style="width: ${currentW}px; min-width: ${currentW}px; max-width: ${currentW}px;" class="p-1 border-r border-slate-200 bg-rose-50/50 text-center align-middle overflow-hidden">
-                  <span id="card-${cellKey}" class="inline-block px-2 py-0.5 rounded bg-rose-100 text-rose-800 text-[10px] font-bold border border-rose-300">
+                  <span id="card-${cellKey}" class="inline-block px-1.5 py-0.5 rounded bg-rose-100 text-rose-800 text-[9.5px] font-bold border border-rose-300">
                     No Class
                   </span>
                 </td>
@@ -1747,16 +1786,16 @@ function getNextRandomTip(currentIndex = -1) {
 
                 dateRowHtml += `
                   <td id="cell-${cellKey}" data-cell-key="${cellKey}" data-col="${colKey}" style="width: ${currentW}px; min-width: ${currentW}px; max-width: ${currentW}px;" class="p-1 border-r border-slate-200 cursor-pointer transition align-top relative group/card-cell matrix-cell-slot" onclick="openLessonModal('${d.dateKey}', '${escapeHtml(sub.code)}', '${escapeHtml(sec)}', ${d.isWeekend})">
-                    <div id="card-${cellKey}" class="p-1.5 rounded-lg border ${badgeColor} ${accentBarClass} shadow-xs space-y-0.5 overflow-hidden max-w-full min-w-0 transition-all duration-200 ease-out group-hover/card-cell:absolute group-hover/card-cell:left-1 group-hover/card-cell:right-1 group-hover/card-cell:top-1 group-hover/card-cell:z-22 group-hover/card-cell:shadow-xl group-hover/card-cell:scale-[1.02] ${badgeColor}">
+                    <div id="card-${cellKey}" class="p-1 rounded-lg border ${badgeColor} ${accentBarClass} shadow-xs space-y-0.5 overflow-hidden max-w-full min-w-0 transition-all duration-200 ease-out group-hover/card-cell:absolute group-hover/card-cell:left-1 group-hover/card-cell:right-1 group-hover/card-cell:top-1 group-hover/card-cell:z-22 group-hover/card-cell:shadow-xl group-hover/card-cell:scale-[1.02] ${badgeColor}">
                       <div class="flex items-center justify-between gap-1 overflow-hidden">
-                        ${!isNoClass ? `<span class="font-extrabold text-[9px] uppercase tracking-tight truncate">Mtg #${meetingNum}</span>` : `<span class="font-extrabold text-[9px] uppercase tracking-tight text-rose-700 truncate">${escapeHtml(entry.type || 'No Class')}</span>`}
+                        ${!isNoClass ? `<span class="font-extrabold text-[8.5px] uppercase tracking-tight truncate">Mtg #${meetingNum}</span>` : `<span class="font-extrabold text-[8.5px] uppercase tracking-tight text-rose-700 truncate">${escapeHtml(entry.type || 'No Class')}</span>`}
                         <div class="flex items-center gap-1 shrink-0">
-                          ${isEntryCompleted ? '<span class="text-[8px] px-1 py-0.2 rounded font-black bg-emerald-600 text-white shrink-0">✓ Done</span>' : ''}
-                          <span class="text-[8px] px-1 py-0.2 rounded font-bold bg-white/80 shrink-0">${escapeHtml(entry.type)}</span>
+                          ${isEntryCompleted ? '<span class="text-[7.5px] px-1 py-0.2 rounded font-black bg-emerald-600 text-white shrink-0">✓ Done</span>' : ''}
+                          <span class="text-[7.5px] px-1 py-0.2 rounded font-bold bg-white/80 shrink-0">${escapeHtml(entry.type)}</span>
                         </div>
                       </div>
-                      <div class="font-bold text-[11px] leading-tight truncate group-hover/card-cell:whitespace-normal group-hover/card-cell:overflow-visible transition-all max-w-full" title="${escapeHtml(entry.topic || 'Planned Activity')}">${escapeHtml(entry.topic || 'Planned Activity')}</div>
-                      ${entry.activity ? `<div class="text-[9px] opacity-80 truncate group-hover/card-cell:whitespace-normal group-hover/card-cell:overflow-visible transition-all max-w-full" title="${escapeHtml(entry.activity)}">${escapeHtml(entry.activity)}</div>` : ''}
+                      <div class="font-bold text-[10.5px] leading-tight truncate group-hover/card-cell:whitespace-normal group-hover/card-cell:overflow-visible transition-all max-w-full" title="${escapeHtml(entry.topic || 'Planned Activity')}">${escapeHtml(entry.topic || 'Planned Activity')}</div>
+                      ${entry.activity ? `<div class="text-[8.5px] opacity-80 truncate group-hover/card-cell:whitespace-normal group-hover/card-cell:overflow-visible transition-all max-w-full leading-tight" title="${escapeHtml(entry.activity)}">${escapeHtml(entry.activity)}</div>` : ''}
                       <div class="hidden group-hover/card-cell:flex items-center justify-between text-[8.5px] font-mono font-bold pt-1 mt-1 border-t border-black/10 text-slate-700">
                         <span>🕒 ${formatTime12(scheduledSlot.startTime)} – ${formatTime12(scheduledSlot.endTime)}</span>
                         <span class="px-1 py-0.2 rounded bg-white/80 border border-slate-300/60 font-sans font-semibold">${escapeHtml(scheduledSlot.room || 'TBA')}</span>
@@ -1772,8 +1811,8 @@ function getNextRandomTip(currentIndex = -1) {
               } else {
                 dateRowHtml += `
                   <td id="cell-${cellKey}" data-cell-key="${cellKey}" data-col="${colKey}" style="width: ${currentW}px; min-width: ${currentW}px; max-width: ${currentW}px;" class="p-1 border-r border-slate-200 cursor-pointer hover:bg-slate-100 transition align-top relative group/card-cell matrix-cell-slot" onclick="openLessonModal('${d.dateKey}', '${escapeHtml(sub.code)}', '${escapeHtml(sec)}', ${d.isWeekend})">
-                    <div id="card-${cellKey}" class="p-1.5 rounded-lg border border-dashed border-slate-300 hover:border-msu-maroon text-slate-500 hover:text-slate-800 bg-slate-50/60 hover:bg-white text-center ${accentBarClass} transition-all duration-200 group-hover/card-cell:absolute group-hover/card-cell:left-1 group-hover/card-cell:right-1 group-hover/card-cell:top-1 group-hover/card-cell:z-22 group-hover/card-cell:shadow-lg group-hover/card-cell:scale-[1.02] group-hover/card-cell:bg-white">
-                      <div class="text-[10px] text-slate-500 font-semibold py-1">+ Click to plan</div>
+                    <div id="card-${cellKey}" class="p-1 rounded-lg border border-dashed border-slate-300 hover:border-msu-maroon text-slate-500 hover:text-slate-800 bg-slate-50/60 hover:bg-white text-center ${accentBarClass} transition-all duration-200 group-hover/card-cell:absolute group-hover/card-cell:left-1 group-hover/card-cell:right-1 group-hover/card-cell:top-1 group-hover/card-cell:z-22 group-hover/card-cell:shadow-lg group-hover/card-cell:scale-[1.02] group-hover/card-cell:bg-white">
+                      <div class="text-[9.5px] text-slate-500 font-semibold py-0.5">+ Click to plan</div>
                       <div class="hidden group-hover/card-cell:flex items-center justify-center text-[8.5px] font-mono text-slate-500 pt-0.5 mt-0.5 border-t border-slate-200">
                         🕒 ${formatTime12(scheduledSlot.startTime)} – ${formatTime12(scheduledSlot.endTime)} • ${escapeHtml(scheduledSlot.room || 'TBA')}
                       </div>
@@ -1787,18 +1826,56 @@ function getNextRandomTip(currentIndex = -1) {
               }
             } else {
               if (entry) {
+                const isNoClass = (entry.type === 'No Class') || (entry.topic && entry.topic.toLowerCase().includes('no class'));
+                const isEntryCompleted = (entry.status === 'Completed') || (d.dateKey < todayKey);
+                let badgeColor = sub.badgeBg;
+                if (entry.type === 'Exam') badgeColor = 'bg-amber-100 text-amber-900 border-amber-300';
+                else if (entry.type === 'No Class') badgeColor = 'bg-rose-100 text-rose-800 border-rose-300';
+                else if (entry.type === 'Makeup Class') badgeColor = 'bg-amber-50/90 text-amber-950 border-amber-300';
+                else if (entry.type === 'Special Session') badgeColor = 'bg-violet-50/90 text-violet-950 border-violet-300';
+
+                const displayType = entry.type || 'Special Session';
+
                 dateRowHtml += `
-                  <td id="cell-${cellKey}" data-cell-key="${cellKey}" data-col="${colKey}" style="width: ${currentW}px; min-width: ${currentW}px; max-width: ${currentW}px;" class="p-1 border-r border-slate-200 cursor-pointer hover:bg-amber-50/40 transition align-middle overflow-hidden" onclick="openLessonModal('${d.dateKey}', '${escapeHtml(sub.code)}', '${escapeHtml(sec)}', ${d.isWeekend})">
-                    <div id="card-${cellKey}" class="p-1.5 rounded-lg border bg-slate-50 border-slate-200 text-slate-800 ${accentBarClass} overflow-hidden max-w-full min-w-0">
-                      <div class="font-bold text-[9px] text-slate-600 truncate">Special Session</div>
-                      <div class="font-bold text-[11px] truncate max-w-full" title="${escapeHtml(entry.topic)}">${escapeHtml(entry.topic)}</div>
+                  <td id="cell-${cellKey}" data-cell-key="${cellKey}" data-col="${colKey}" style="width: ${currentW}px; min-width: ${currentW}px; max-width: ${currentW}px;" class="p-1 border-r border-slate-200 cursor-pointer transition align-top relative group/card-cell matrix-cell-slot" onclick="openLessonModal('${d.dateKey}', '${escapeHtml(sub.code)}', '${escapeHtml(sec)}', ${d.isWeekend})">
+                    <div id="card-${cellKey}" class="p-1 rounded-lg border ${badgeColor} ${accentBarClass} shadow-xs space-y-0.5 overflow-hidden max-w-full min-w-0 transition-all duration-200 ease-out group-hover/card-cell:absolute group-hover/card-cell:left-1 group-hover/card-cell:right-1 group-hover/card-cell:top-1 group-hover/card-cell:z-22 group-hover/card-cell:shadow-xl group-hover/card-cell:scale-[1.02] ${badgeColor}">
+                      <div class="flex items-center justify-between gap-1 overflow-hidden">
+                        <span class="font-extrabold text-[8.5px] uppercase tracking-tight text-amber-800 truncate">⚡ ${escapeHtml(displayType)}</span>
+                        <div class="flex items-center gap-1 shrink-0">
+                          ${isEntryCompleted ? '<span class="text-[7.5px] px-1 py-0.2 rounded font-black bg-emerald-600 text-white shrink-0">✓ Done</span>' : ''}
+                          <span class="text-[7.5px] px-1 py-0.2 rounded font-bold bg-white/80 shrink-0 border border-black/10">${escapeHtml(entry.type || 'Special')}</span>
+                        </div>
+                      </div>
+                      <div class="font-bold text-[10.5px] leading-tight truncate group-hover/card-cell:whitespace-normal group-hover/card-cell:overflow-visible transition-all max-w-full" title="${escapeHtml(entry.topic || 'Planned Activity')}">${escapeHtml(entry.topic || 'Planned Activity')}</div>
+                      ${entry.activity ? `<div class="text-[8.5px] opacity-80 truncate group-hover/card-cell:whitespace-normal group-hover/card-cell:overflow-visible transition-all max-w-full leading-tight" title="${escapeHtml(entry.activity)}">${escapeHtml(entry.activity)}</div>` : ''}
+                      <div class="hidden group-hover/card-cell:flex items-center justify-between text-[8.5px] font-mono font-semibold pt-1 mt-1 border-t border-black/10 text-slate-600">
+                        <span>⚡ Out-of-Schedule</span>
+                        <span class="px-1 py-0.2 rounded bg-white/80 border border-slate-300/60 font-sans font-semibold">${escapeHtml(entry.status || 'Planned')}</span>
+                      </div>
+                      <div class="hidden group-hover/card-cell:flex items-center justify-end gap-1 pt-1 mt-1 border-t border-black/10">
+                        <button type="button" onclick="copyMatrixActivity('${d.dateKey}', '${escapeHtml(sub.code)}', '${escapeHtml(sec)}', event)" class="p-1 rounded bg-white/90 hover:bg-white text-slate-700 text-[10px] font-bold border border-slate-300 shadow-2xs" title="Copy Activity">📋 Copy</button>
+                        <button type="button" onclick="pasteMatrixActivity('${d.dateKey}', '${escapeHtml(sub.code)}', '${escapeHtml(sec)}', event)" class="p-1 rounded bg-white/90 hover:bg-white text-slate-700 text-[10px] font-bold border border-slate-300 shadow-2xs" title="Paste Copied Activity">📥 Paste</button>
+                        <button type="button" onclick="event.stopPropagation(); openLessonModal('${d.dateKey}', '${escapeHtml(sub.code)}', '${escapeHtml(sec)}', ${d.isWeekend})" class="p-1 rounded bg-white/90 hover:bg-white text-slate-700 text-[10px] font-bold border border-slate-300 shadow-2xs" title="Edit Activity">✏️ Edit</button>
+                      </div>
                     </div>
                   </td>
                 `;
               } else {
                 dateRowHtml += `
-                  <td id="cell-${cellKey}" data-cell-key="${cellKey}" data-col="${colKey}" style="width: ${currentW}px; min-width: ${currentW}px; max-width: ${currentW}px;" class="p-1 border-r border-slate-200 text-center text-slate-300 text-[11px] cursor-pointer hover:bg-slate-50 align-middle overflow-hidden" onclick="openLessonModal('${d.dateKey}', '${escapeHtml(sub.code)}', '${escapeHtml(sec)}', ${d.isWeekend})">
-                    —
+                  <td id="cell-${cellKey}" data-cell-key="${cellKey}" data-col="${colKey}" style="width: ${currentW}px; min-width: ${currentW}px; max-width: ${currentW}px;" class="p-1 border-r border-slate-200 cursor-pointer hover:bg-amber-50/20 transition align-top relative group/card-cell matrix-cell-slot" onclick="openLessonModal('${d.dateKey}', '${escapeHtml(sub.code)}', '${escapeHtml(sec)}', ${d.isWeekend})">
+                    <div id="card-${cellKey}" class="p-1 rounded-lg border border-dashed border-slate-200 hover:border-amber-400 text-slate-400 hover:text-amber-800 bg-slate-50/30 hover:bg-white text-center transition-all duration-200 group-hover/card-cell:absolute group-hover/card-cell:left-1 group-hover/card-cell:right-1 group-hover/card-cell:top-1 group-hover/card-cell:z-22 group-hover/card-cell:shadow-lg group-hover/card-cell:scale-[1.02] group-hover/card-cell:bg-white group-hover/card-cell:border-amber-400">
+                      <div class="text-[8.5px] font-medium py-0.5 opacity-30 group-hover/card-cell:opacity-100 transition-opacity flex items-center justify-center gap-1 text-slate-500 group-hover/card-cell:text-amber-700">
+                        <span class="font-bold">+</span>
+                        <span class="truncate">Special / Makeup</span>
+                      </div>
+                      <div class="hidden group-hover/card-cell:flex items-center justify-center text-[8px] font-mono text-amber-700/80 pt-0.5 mt-0.5 border-t border-slate-200">
+                        ⚡ Out-of-schedule day
+                      </div>
+                      <div class="hidden group-hover/card-cell:flex items-center justify-end gap-1 pt-1 mt-1 border-t border-slate-200">
+                        <button type="button" onclick="pasteMatrixActivity('${d.dateKey}', '${escapeHtml(sub.code)}', '${escapeHtml(sec)}', event)" class="p-1 rounded bg-white hover:bg-slate-100 text-slate-700 text-[10px] font-bold border border-slate-300 shadow-2xs" title="Paste Copied Activity">📥 Paste</button>
+                        <button type="button" onclick="event.stopPropagation(); openLessonModal('${d.dateKey}', '${escapeHtml(sub.code)}', '${escapeHtml(sec)}', ${d.isWeekend})" class="p-1 rounded bg-amber-50 hover:bg-amber-100 text-amber-900 text-[10px] font-bold border border-amber-300 shadow-2xs" title="Plan Special Session / Makeup Class">✏️ Plan</button>
+                      </div>
+                    </div>
                   </td>
                 `;
               }
@@ -1807,6 +1884,7 @@ function getNextRandomTip(currentIndex = -1) {
         });
 
         const customNote = dailyNotes[d.dateKey] || '';
+        // ROW NOTES / ACADEMIC EVENTS CELL
         let eventContent = '';
         if (d.event || customNote) {
           let badgeTheme = 'bg-blue-100 text-blue-900 border-blue-300';
@@ -1815,21 +1893,21 @@ function getNextRandomTip(currentIndex = -1) {
           else if (d.event && d.event.type === 'milestone') badgeTheme = 'bg-emerald-100 text-emerald-900 border-emerald-300';
 
           eventContent = `
-            <div id="card-${d.dateKey}__notes" class="p-1.5 rounded-lg border bg-slate-50 border-slate-200 shadow-xs space-y-1">
+            <div id="card-${d.dateKey}__notes" class="p-1 rounded-lg border bg-slate-50 border-slate-200 shadow-xs space-y-0.5">
               ${d.event ? `
                 <div class="flex items-center gap-1.5 flex-wrap">
-                  <span class="px-2 py-0.5 rounded text-[10px] font-extrabold border ${badgeTheme}">
+                  <span class="px-1.5 py-0.5 rounded text-[9.5px] font-extrabold border ${badgeTheme}">
                     ${escapeHtml(d.event.activity)}
                   </span>
-                  ${d.event.isNoClass ? `<span class="px-1.5 py-0.2 rounded text-[9px] font-bold bg-rose-100 text-rose-700 border border-rose-200">No Class</span>` : ''}
+                  ${d.event.isNoClass ? `<span class="px-1.5 py-0.2 rounded text-[8.5px] font-bold bg-rose-100 text-rose-700 border border-rose-200">No Class</span>` : ''}
                 </div>
               ` : ''}
-              ${customNote ? `<div class="text-[11px] text-slate-700 font-medium italic">${escapeHtml(customNote)}</div>` : ''}
+              ${customNote ? `<div class="text-[10.5px] text-slate-700 font-medium italic leading-tight">${escapeHtml(customNote)}</div>` : ''}
             </div>
           `;
         } else {
           eventContent = `
-            <div id="card-${d.dateKey}__notes" class="text-center text-slate-300 text-[11px] select-none py-1">—</div>
+            <div id="card-${d.dateKey}__notes" class="text-center text-slate-300 text-[10.5px] select-none py-0.5">—</div>
           `;
         }
 
@@ -1851,6 +1929,9 @@ function getNextRandomTip(currentIndex = -1) {
       if (typeof updatePlannerSidebar === 'function') {
         updatePlannerSidebar();
       }
+      if (typeof autoResizeContentWindows === 'function') {
+        autoResizeContentWindows();
+      }
     }
 
     // High Performance Smooth Drag-Resizing via Colgroup, Th & Table Cells
@@ -1862,7 +1943,7 @@ function getNextRandomTip(currentIndex = -1) {
     function updateMatrixTableWidth() {
       const table = document.getElementById('matrix-table');
       if (!table) return;
-      let totalW = 54 + 84 + 66 + 300; // day + date + progress + notes
+      let totalW = 42 + 68 + 300; // 42px day + 68px date + 300px notes
       courseData.subjects.forEach(sub => {
         sub.sections.forEach(sec => {
           const k = sub.code + '__' + sec;
@@ -2668,7 +2749,8 @@ function getNextRandomTip(currentIndex = -1) {
       switchTab('planner');
 
       if (selectedMonthFilter !== 'all' && selectedMonthFilter !== month) {
-        document.getElementById('filter-month').value = 'all';
+        const fm = document.getElementById('filter-month');
+        if (fm) fm.value = 'all';
         selectedMonthFilter = 'all';
         renderMatrixTable();
       }
@@ -2742,9 +2824,12 @@ function getNextRandomTip(currentIndex = -1) {
     }
 
     function filterMatrixByMonth() {
-      selectedMonthFilter = document.getElementById('filter-month').value;
-      renderMatrixTable();
-      saveAppState();
+      const fm = document.getElementById('filter-month');
+      if (fm) {
+        selectedMonthFilter = fm.value;
+        renderMatrixTable();
+        saveAppState();
+      }
     }
 
     // ================= SEMESTER & BRANDING SETTINGS =================
@@ -3849,14 +3934,39 @@ function getNextRandomTip(currentIndex = -1) {
       const cellKey = dateKey + '__' + subject + '__' + section;
       const entry = plannerEntries[cellKey] || {};
 
+      const dObj = (typeof semesterDates !== 'undefined' && Array.isArray(semesterDates))
+        ? semesterDates.find(d => d.dateKey === dateKey)
+        : null;
+      const fullDay = dObj ? (FULL_DAY_NAMES[dObj.dayOfWeek] || dObj.dayOfWeek) : '';
+      const scheduledSlot = (typeof weeklyTimetable !== 'undefined' && Array.isArray(weeklyTimetable))
+        ? weeklyTimetable.find(t => t.course === subject && t.section === section && t.day === fullDay)
+        : null;
+      const isOutOfSchedule = !scheduledSlot;
+
       document.getElementById('modal-title').innerText = 'Plan Activity: ' + subject + ' (' + section + ')';
-      document.getElementById('modal-subtitle').innerText = 'Date: ' + dateKey;
+      let subtitle = 'Date: ' + dateKey;
+      if (isOutOfSchedule) {
+        subtitle += isWeekend ? ' • Weekend Session' : ' • Special / Makeup Session';
+      }
+      document.getElementById('modal-subtitle').innerText = subtitle;
 
       document.getElementById('modal-topic').value = entry.topic || '';
       document.getElementById('modal-activity').value = entry.activity || '';
-      document.getElementById('modal-type').value = entry.type || 'Lecture';
+      const defaultType = isOutOfSchedule ? 'Makeup Class' : 'Lecture';
+      document.getElementById('modal-type').value = entry.type || defaultType;
       document.getElementById('modal-status').value = entry.status || 'Planned';
       document.getElementById('modal-notes').value = entry.notes || '';
+
+      const fallbackSlot = (typeof weeklyTimetable !== 'undefined' && Array.isArray(weeklyTimetable))
+        ? weeklyTimetable.find(t => t.course === subject && t.section === section)
+        : null;
+
+      const startTimeEl = document.getElementById('modal-start-time');
+      const endTimeEl = document.getElementById('modal-end-time');
+      const roomEl = document.getElementById('modal-room');
+      if (startTimeEl) startTimeEl.value = entry.startTime || (scheduledSlot ? scheduledSlot.startTime : (fallbackSlot ? fallbackSlot.startTime : ''));
+      if (endTimeEl) endTimeEl.value = entry.endTime || (scheduledSlot ? scheduledSlot.endTime : (fallbackSlot ? fallbackSlot.endTime : ''));
+      if (roomEl) roomEl.value = entry.room || (scheduledSlot ? (scheduledSlot.room || '') : (fallbackSlot ? (fallbackSlot.room || '') : ''));
 
       const isNoClass = entry && (entry.type === 'No Class' || (entry.topic && entry.topic.toLowerCase().includes('no class')));
       const hasExistingActivity = !isNoClass && entry && (
@@ -3866,7 +3976,14 @@ function getNextRandomTip(currentIndex = -1) {
 
       const shiftContainer = document.getElementById('modal-shift-actions');
       if (shiftContainer) {
-        if (isNoClass) {
+        if (isOutOfSchedule) {
+          shiftContainer.innerHTML = `
+            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-50 text-amber-800 border border-amber-200 text-xs font-semibold">
+              <span>⚡</span>
+              <span>${isWeekend ? 'Weekend Session' : 'Special / Makeup Session'} (Out-of-Schedule)</span>
+            </span>
+          `;
+        } else if (isNoClass) {
           const wasPushed = entry ? (entry.pushedForward !== false) : true;
           shiftContainer.innerHTML = `
             <button type="button" id="btn-remove-noclass-shift" onclick="removeNoClassFromModal()" class="h-9 px-3.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white rounded-lg font-bold text-xs inline-flex items-center gap-1.5 shadow-sm transition" title="${wasPushed ? "Remove 'No Class' on this day and revert all subsequent planned meetings back to their original schedule" : "Remove 'No Class' marker on this day"}">
@@ -3923,17 +4040,25 @@ function getNextRandomTip(currentIndex = -1) {
       const type = document.getElementById('modal-type').value;
       const status = document.getElementById('modal-status').value;
       const notes = document.getElementById('modal-notes').value.trim();
+      const startTime = document.getElementById('modal-start-time') ? document.getElementById('modal-start-time').value : '';
+      const endTime = document.getElementById('modal-end-time') ? document.getElementById('modal-end-time').value : '';
+      const room = document.getElementById('modal-room') ? document.getElementById('modal-room').value.trim() : '';
 
       if (!topic && !activity) {
         delete plannerEntries[cellKey];
       } else {
-        plannerEntries[cellKey] = { topic, activity, type, status, notes };
+        const savedData = { topic, activity, type, status, notes };
+        if (startTime) savedData.startTime = startTime;
+        if (endTime) savedData.endTime = endTime;
+        if (room) savedData.room = room;
+        plannerEntries[cellKey] = savedData;
       }
 
       saveAppState();
       closeLessonModal();
       renderMatrixTable();
       updateSemesterProgressBar();
+      if (typeof updateTimetableSidebar === 'function') updateTimetableSidebar();
       showToast('Lesson saved for ' + subject + ' (' + section + ') on ' + dateKey);
     }
 
@@ -3943,10 +4068,14 @@ function getNextRandomTip(currentIndex = -1) {
       const { dateKey, subject, section } = currentEditingCell;
       const cellKey = dateKey + '__' + subject + '__' + section;
       delete plannerEntries[cellKey];
+      if (document.getElementById('modal-start-time')) document.getElementById('modal-start-time').value = '';
+      if (document.getElementById('modal-end-time')) document.getElementById('modal-end-time').value = '';
+      if (document.getElementById('modal-room')) document.getElementById('modal-room').value = '';
       saveAppState();
       closeLessonModal();
       renderMatrixTable();
       updateSemesterProgressBar();
+      if (typeof updateTimetableSidebar === 'function') updateTimetableSidebar();
       showToast("Lesson details cleared.");
     }
 
@@ -4223,6 +4352,7 @@ function getNextRandomTip(currentIndex = -1) {
       closeLessonModal();
       renderMatrixTable();
       updateSemesterProgressBar();
+      if (typeof updateTimetableSidebar === 'function') updateTimetableSidebar();
 
       if (hasExistingActivity) {
         showToast('Marked ' + dateKey + ' as No Class & pushed planned meetings forward. (Click Undo to revert)', '🚫');
@@ -4252,6 +4382,7 @@ function getNextRandomTip(currentIndex = -1) {
       closeLessonModal();
       renderMatrixTable();
       updateSemesterProgressBar();
+      if (typeof updateTimetableSidebar === 'function') updateTimetableSidebar();
     }
 
     function pullBackScheduleFromModal() {
@@ -4659,11 +4790,6 @@ function getNextRandomTip(currentIndex = -1) {
             <td class="py-2.5 px-4 font-bold text-slate-900">${escapeHtml(s.last)}</td>
             <td class="py-2.5 px-4 text-slate-700 font-medium">${escapeHtml(s.first)}</td>
             <td class="py-2.5 px-4 text-slate-500 font-mono text-[11px]">${escapeHtml(s.email)}</td>
-            <td class="py-2.5 px-4">
-              <span class="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-slate-100 border border-slate-300 text-slate-800">
-                ${escapeHtml(s.section)}
-              </span>
-            </td>
             <td class="py-2.5 px-3 text-center whitespace-nowrap">
               <span class="grade-msu-cell inline-block px-2 py-0.5 rounded font-mono font-black text-xs border ${gradeBadgeClass}" title="Weighted Score: ${res.total.toFixed(2)}% • Status: ${escapeHtml(res.msu.status)}">
                 ${escapeHtml(gradeText)}
@@ -5324,273 +5450,26 @@ function getNextRandomTip(currentIndex = -1) {
     }
 
     function toggleGradebookStatsDrawer() {
-      const statsDrawer = document.getElementById('gradebook-stats-drawer');
-      const scaleDrawer = document.getElementById('grading-scale-drawer');
-      const statsBtn = document.getElementById('gradebook-stats-toggle-btn');
-      const scaleBtn = document.getElementById('gradebook-scale-toggle-btn');
-      if (!statsDrawer) return;
-
-      const willOpen = statsDrawer.classList.contains('hidden');
-      if (willOpen) {
-        if (scaleDrawer) scaleDrawer.classList.add('hidden');
-        if (scaleBtn) {
-          scaleBtn.classList.remove('ring-2', 'ring-amber-500', 'bg-amber-100', 'shadow-inner');
-          scaleBtn.classList.add('bg-amber-50');
-        }
+      const sidebar = document.getElementById('sidebar-gradebook');
+      if (sidebar && sidebar.classList.contains('tab-sidebar-collapsed')) {
+        toggleTabSidebar('gradebook');
       }
-      statsDrawer.classList.toggle('hidden');
-      const isOpen = !statsDrawer.classList.contains('hidden');
-      if (statsBtn) {
-        if (isOpen) {
-          statsBtn.classList.add('ring-2', 'ring-emerald-500', 'bg-emerald-100', 'shadow-inner');
-          statsBtn.classList.remove('bg-emerald-50');
-        } else {
-          statsBtn.classList.remove('ring-2', 'ring-emerald-500', 'bg-emerald-100', 'shadow-inner');
-          statsBtn.classList.add('bg-emerald-50');
-        }
+      const widget = document.getElementById('gradebook-widget-stats');
+      if (widget) {
+        widget.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        widget.classList.add('ring-2', 'ring-emerald-500');
+        setTimeout(() => widget.classList.remove('ring-2', 'ring-emerald-500'), 1500);
       }
-      renderGradebook();
     }
 
     function setGradebookStatsView(viewMode) {
-      gradebookStatsView = viewMode;
-      renderGradebook();
+      if (typeof updateGradebookSidebar === 'function') updateGradebookSidebar();
     }
 
     function renderGradebookStats(selectedSec, studentsList, config) {
-      const drawer = document.getElementById('gradebook-stats-drawer');
-      if (!drawer) return;
-      if (drawer.classList && typeof drawer.classList.contains === 'function' && drawer.classList.contains('hidden')) return;
-
-      if (!studentsList || studentsList.length === 0) {
-        drawer.innerHTML = `
-          <div class="flex items-center justify-between text-slate-500 italic py-2">
-            <span>No students enrolled in section ${escapeHtml(selectedSec)} to calculate statistics.</span>
-            <button onclick="document.getElementById('gradebook-stats-drawer').classList.add('hidden')" class="text-slate-400 hover:text-slate-600 font-bold">&times;</button>
-          </div>
-        `;
-        return;
+      if (typeof updateGradebookSidebar === 'function') {
+        updateGradebookSidebar();
       }
-
-      const count = studentsList.length;
-      let sumTotal = 0;
-      let passCount = 0;
-      let failCount = 0;
-      let otherCount = 0;
-      const totals = [];
-      const studentMetrics = [];
-
-      // MSU Grade distribution brackets
-      const gradeBrackets = {
-        '1.00-1.25': { label: '1.00 - 1.25 (Superior)', count: 0, color: 'bg-emerald-500', bg: 'bg-emerald-50 text-emerald-900 border-emerald-200' },
-        '1.50-1.75': { label: '1.50 - 1.75 (Very Good)', count: 0, color: 'bg-teal-500', bg: 'bg-teal-50 text-teal-900 border-teal-200' },
-        '2.00-2.25': { label: '2.00 - 2.25 (Good)', count: 0, color: 'bg-sky-500', bg: 'bg-sky-50 text-sky-900 border-sky-200' },
-        '2.50-2.75': { label: '2.50 - 2.75 (Fair)', count: 0, color: 'bg-indigo-500', bg: 'bg-indigo-50 text-indigo-900 border-indigo-200' },
-        '3.00':      { label: '3.00 (Passing)', count: 0, color: 'bg-amber-500', bg: 'bg-amber-50 text-amber-900 border-amber-200' },
-        '5.00':      { label: '5.00 (Failed)', count: 0, color: 'bg-rose-500', bg: 'bg-rose-50 text-rose-900 border-rose-200' },
-        'other':     { label: 'INC / Dropped', count: 0, color: 'bg-slate-400', bg: 'bg-slate-50 text-slate-800 border-slate-200' }
-      };
-
-      studentsList.forEach(s => {
-        const gradeResult = calculateStudentGrade(s, config, selectedSec);
-        const tot = gradeResult.total;
-        sumTotal += tot;
-        totals.push(tot);
-        studentMetrics.push({ student: s, gradeResult });
-
-        const msuGrade = gradeResult.msu.grade;
-        if (msuGrade === '1.00' || msuGrade === '1.25') gradeBrackets['1.00-1.25'].count++;
-        else if (msuGrade === '1.50' || msuGrade === '1.75') gradeBrackets['1.50-1.75'].count++;
-        else if (msuGrade === '2.00' || msuGrade === '2.25') gradeBrackets['2.00-2.25'].count++;
-        else if (msuGrade === '2.50' || msuGrade === '2.75') gradeBrackets['2.50-2.75'].count++;
-        else if (msuGrade === '3.00') gradeBrackets['3.00'].count++;
-        else if (msuGrade === '5.00') gradeBrackets['5.00'].count++;
-        else gradeBrackets['other'].count++;
-
-        if (gradeResult.msu.status === 'Passed') passCount++;
-        else if (gradeResult.msu.status === 'Failed') failCount++;
-        else otherCount++;
-      });
-
-      totals.sort((a, b) => a - b);
-      const avgTotal = sumTotal / count;
-      const medianTotal = (count % 2 === 0) ? (totals[count / 2 - 1] + totals[count / 2]) / 2 : totals[Math.floor(count / 2)];
-      const passRate = (count > 0) ? (passCount / count) * 100 : 0;
-      const avgMsu = getMsuGrade(avgTotal, null, selectedSec);
-
-      studentMetrics.sort((a, b) => b.gradeResult.total - a.gradeResult.total);
-      const topStudent = studentMetrics[0];
-      const lowStudent = studentMetrics[studentMetrics.length - 1];
-
-      // Sub-activity item analysis
-      const subAnalytics = [];
-      config.categories.forEach(cat => {
-        if (cat.subActivities && cat.subActivities.length > 0) {
-          cat.subActivities.forEach(sub => {
-            let subScoreSum = 0;
-            studentsList.forEach(s => {
-              subScoreSum += parseFloat(getStudentScore(s, sub.id, cat.id, sub.maxScore)) || 0;
-            });
-            const maxScore = (sub.maxScore && sub.maxScore > 0) ? sub.maxScore : 100;
-            const avgScore = subScoreSum / count;
-            const avgPct = (avgScore / maxScore) * 100;
-            subAnalytics.push({
-              id: sub.id,
-              name: sub.name,
-              catName: cat.name,
-              maxScore,
-              weight: sub.weight,
-              avgScore: Math.round(avgScore * 100) / 100,
-              avgPct: Math.round(avgPct * 100) / 100
-            });
-          });
-        }
-      });
-
-      subAnalytics.sort((a, b) => b.avgPct - a.avgPct);
-      const topActivity = subAnalytics.length > 0 ? subAnalytics[0] : null;
-      const lowActivity = subAnalytics.length > 0 ? subAnalytics[subAnalytics.length - 1] : null;
-
-      // Drawer Header with View Mode Switchers
-      let html = `
-        <div class="flex items-center justify-between pb-2 border-b border-slate-200 flex-wrap gap-2">
-          <div class="flex items-center gap-2">
-            <span class="p-1.5 bg-emerald-100 text-emerald-800 rounded-lg flex items-center justify-center">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-            </span>
-            <div>
-              <span class="font-extrabold text-slate-900 text-sm">Class Performance & Intelligent Analytics</span>
-              <span class="ml-2 px-2 py-0.5 rounded-full text-[10.5px] font-bold bg-slate-100 text-slate-700 border border-slate-300">${escapeHtml(selectedSec)} • ${count} Students</span>
-            </div>
-          </div>
-          <div class="flex items-center gap-1.5">
-            <div class="inline-flex rounded-lg bg-slate-100 p-0.5 border border-slate-200 text-xs font-bold">
-              <button onclick="setGradebookStatsView('overview')" class="px-2.5 py-1 rounded-md transition ${gradebookStatsView === 'overview' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-600 hover:text-slate-900'}">Overview</button>
-              <button onclick="setGradebookStatsView('distribution')" class="px-2.5 py-1 rounded-md transition ${gradebookStatsView === 'distribution' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-600 hover:text-slate-900'}">Grade Distribution</button>
-              <button onclick="setGradebookStatsView('activities')" class="px-2.5 py-1 rounded-md transition ${gradebookStatsView === 'activities' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-600 hover:text-slate-900'}">Activity Rankings</button>
-            </div>
-            <button onclick="document.getElementById('gradebook-stats-drawer').classList.add('hidden')" class="p-1 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-slate-700 text-base leading-none transition" title="Close Statistics">&times;</button>
-          </div>
-        </div>
-      `;
-
-      // VIEW MODE 1: OVERVIEW & KPIS
-      if (gradebookStatsView === 'overview') {
-        html += `
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <!-- Card 1: Class Average -->
-            <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
-              <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Class Average</div>
-              <div class="flex items-baseline gap-2 mt-1">
-                <span class="text-xl font-black text-slate-900 font-mono">${avgTotal.toFixed(2)}%</span>
-                <span class="px-1.5 py-0.5 rounded text-[11px] font-bold ${avgMsu.class}">${avgMsu.grade}</span>
-              </div>
-              <div class="text-[10.5px] text-slate-500 mt-1">Status: <strong class="${avgMsu.status === 'Passed' ? 'text-emerald-700' : 'text-rose-700'}">${avgMsu.status}</strong></div>
-            </div>
-
-            <!-- Card 2: Passing Rate -->
-            <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
-              <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Passing Rate</div>
-              <div class="flex items-baseline gap-2 mt-1">
-                <span class="text-xl font-black font-mono ${passRate >= 75 ? 'text-emerald-700' : 'text-rose-700'}">${passRate.toFixed(2)}%</span>
-                <span class="text-xs text-slate-600 font-bold">${passCount}/${count}</span>
-              </div>
-              <div class="text-[10.5px] text-slate-500 mt-1">${failCount} Failed ${otherCount > 0 ? '• ' + otherCount + ' INC/DRP' : ''}</div>
-            </div>
-
-            <!-- Card 3: Median & Spread -->
-            <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
-              <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Median Score</div>
-              <div class="text-xl font-black text-slate-900 font-mono mt-1">${medianTotal.toFixed(2)}%</div>
-              <div class="text-[10.5px] text-slate-500 mt-1">Spread: <span class="font-mono font-semibold">${(topStudent.gradeResult.total - lowStudent.gradeResult.total).toFixed(2)}%</span></div>
-            </div>
-
-            <!-- Card 4: High / Low -->
-            <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
-              <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Performance Range</div>
-              <div class="text-[11.5px] font-bold text-emerald-800 truncate mt-1">▲ High: <span class="font-mono">${topStudent.gradeResult.total.toFixed(2)}%</span> <span class="font-normal text-slate-600">(${escapeHtml(topStudent.student.last)})</span></div>
-              <div class="text-[11.5px] font-bold text-rose-800 truncate mt-1">▼ Low: <span class="font-mono">${lowStudent.gradeResult.total.toFixed(2)}%</span> <span class="font-normal text-slate-600">(${escapeHtml(lowStudent.student.last)})</span></div>
-            </div>
-          </div>
-
-          <!-- Pedagogical Insights -->
-          <div class="p-3 bg-amber-50/70 border border-amber-200/80 rounded-xl flex items-start gap-2.5 text-xs text-amber-950">
-            <span class="text-base">💡</span>
-            <div class="flex-1 leading-relaxed">
-              <strong>Curricular Insight:</strong>
-              ${topActivity ? `Students excelled most in <strong>${escapeHtml(topActivity.name)}</strong> (${escapeHtml(topActivity.catName)}) with a class average of <strong class="text-emerald-800 font-mono">${topActivity.avgPct.toFixed(2)}%</strong>.` : ''}
-              ${lowActivity && lowActivity.id !== topActivity?.id ? ` The most challenging activity was <strong>${escapeHtml(lowActivity.name)}</strong> with a class average of <strong class="text-rose-800 font-mono">${lowActivity.avgPct.toFixed(2)}%</strong>. Consider a brief review session for this topic.` : ''}
-            </div>
-          </div>
-        `;
-      }
-
-      // VIEW MODE 2: GRADE DISTRIBUTION
-      else if (gradebookStatsView === 'distribution') {
-        html += `
-          <div class="space-y-3">
-            <div class="text-xs font-bold text-slate-700">MSU Scale Grade Distribution Breakdown:</div>
-
-            <!-- Proportional Segmented Progress Bar -->
-            <div class="h-5 w-full bg-slate-100 rounded-lg overflow-hidden flex border border-slate-300">
-              ${Object.entries(gradeBrackets).map(([key, item]) => {
-                const pct = (item.count / count) * 100;
-                if (pct === 0) return '';
-                return `<div class="${item.color} h-full transition-all" style="width: ${pct}%" title="${item.label}: ${item.count} (${pct.toFixed(1)}%)"></div>`;
-              }).join('')}
-            </div>
-
-            <!-- Distribution Cards Grid -->
-            <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-2 text-center">
-              ${Object.entries(gradeBrackets).map(([key, item]) => {
-                const pct = (item.count / count) * 100;
-                return `
-                  <div class="p-2 rounded-lg border ${item.bg}">
-                    <div class="text-[10px] font-bold text-slate-600 uppercase tracking-tighter truncate" title="${item.label}">${key}</div>
-                    <div class="text-base font-black font-mono my-0.5">${item.count}</div>
-                    <div class="text-[10px] font-semibold text-slate-500">${pct.toFixed(1)}%</div>
-                  </div>
-                `;
-              }).join('')}
-            </div>
-          </div>
-        `;
-      }
-
-      // VIEW MODE 3: ACTIVITY RANKINGS
-      else if (gradebookStatsView === 'activities') {
-        html += `
-          <div class="space-y-2">
-            <div class="text-xs font-bold text-slate-700">Class Performance by Graded Activity (Highest to Lowest):</div>
-            <div class="max-h-56 overflow-y-auto space-y-1.5 pr-1">
-              ${subAnalytics.map((sub, idx) => {
-                const barColor = sub.avgPct >= 80 ? 'bg-emerald-500' : (sub.avgPct >= 75 ? 'bg-amber-500' : 'bg-rose-500');
-                const badgeColor = sub.avgPct >= 80 ? 'bg-emerald-100 text-emerald-900 border-emerald-300' : (sub.avgPct >= 75 ? 'bg-amber-100 text-amber-900 border-amber-300' : 'bg-rose-100 text-rose-900 border-rose-300');
-                return `
-                  <div class="flex items-center justify-between p-2 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 transition gap-3">
-                    <div class="flex items-center gap-2 min-w-[160px] truncate">
-                      <span class="font-mono text-slate-400 font-bold text-xs w-5">#${idx + 1}</span>
-                      <div>
-                        <div class="font-bold text-slate-900 text-xs truncate">${escapeHtml(sub.name)}</div>
-                        <div class="text-[10px] text-slate-500 font-semibold">${escapeHtml(sub.catName)} • Max ${sub.maxScore} pts</div>
-                      </div>
-                    </div>
-                    <div class="flex-1 max-w-xs bg-slate-200 rounded-full h-2 overflow-hidden hidden sm:block">
-                      <div class="${barColor} h-full rounded-full" style="width: ${Math.min(100, Math.max(0, sub.avgPct))}%"></div>
-                    </div>
-                    <div class="flex items-center gap-2 shrink-0 font-mono">
-                      <span class="text-xs text-slate-700 font-semibold">${sub.avgScore.toFixed(1)} / ${sub.maxScore}</span>
-                      <span class="px-2 py-0.5 rounded-full text-xs font-black border ${badgeColor}">${sub.avgPct.toFixed(2)}%</span>
-                    </div>
-                  </div>
-                `;
-              }).join('')}
-            </div>
-          </div>
-        `;
-      }
-
-      drawer.innerHTML = html;
     }
 
     function renderGradebook() {
@@ -5617,6 +5496,11 @@ function getNextRandomTip(currentIndex = -1) {
       }
 
       const selectedSec = secSelect ? secSelect.value : (allSections[0] || '');
+
+      if (typeof lastRenderedGradebookSection !== 'undefined' && lastRenderedGradebookSection && lastRenderedGradebookSection !== selectedSec) {
+        if (typeof gradebookCohortFilter !== 'undefined') gradebookCohortFilter = null;
+      }
+      if (typeof lastRenderedGradebookSection !== 'undefined') lastRenderedGradebookSection = selectedSec;
 
       // Icon-only Google Classroom link container
       const gradebookClassroomContainer = document.getElementById('gradebook-classroom-btn-container');
@@ -5852,11 +5736,18 @@ function getNextRandomTip(currentIndex = -1) {
       // Update statistics drawer with all enrolled students in section
       renderGradebookStats(selectedSec, sectionStudents, config);
 
-      // Apply Grade and Status dropdown filters
+      // Apply Grade and Status dropdown filters + Cohort filter
       const gradeFilter = document.getElementById('gradebook-grade-filter')?.value || 'all';
       const statusFilter = document.getElementById('gradebook-status-filter')?.value || 'all';
 
+      if ((gradeFilter !== 'all' || statusFilter !== 'all') && typeof gradebookCohortFilter !== 'undefined') {
+        gradebookCohortFilter = null;
+      }
+
       let filtered = sectionStudents.filter(s => {
+        if (typeof gradebookCohortFilter !== 'undefined' && gradebookCohortFilter && Array.isArray(gradebookCohortFilter.studentIds)) {
+          if (!gradebookCohortFilter.studentIds.includes(s.id)) return false;
+        }
         const res = gradeCache.get(s.id) || calculateStudentGrade(s, config, selectedSec);
         const matchesGrade = (gradeFilter === 'all') || (res.msu.grade === gradeFilter);
         const matchesStatus = (statusFilter === 'all') || (res.msu.status.toLowerCase() === statusFilter.toLowerCase());
@@ -5914,8 +5805,8 @@ function getNextRandomTip(currentIndex = -1) {
         });
       }
 
-      // Update statistics drawer
-      renderGradebookStats(selectedSec, filtered, config);
+      // Update statistics drawer with all enrolled students
+      renderGradebookStats(selectedSec, sectionStudents, config);
 
       const tfoot = document.getElementById('gradebook-table-foot');
 
@@ -5923,17 +5814,23 @@ function getNextRandomTip(currentIndex = -1) {
         if (tfoot) tfoot.innerHTML = '';
         const gradeFilter = document.getElementById('gradebook-grade-filter')?.value || 'all';
         const statusFilter = document.getElementById('gradebook-status-filter')?.value || 'all';
-        const isFilteredOut = (gradeFilter !== 'all' || statusFilter !== 'all') && sectionStudents.length > 0;
+        const isFilteredOut = (gradeFilter !== 'all' || statusFilter !== 'all' || (typeof gradebookCohortFilter !== 'undefined' && gradebookCohortFilter !== null)) && sectionStudents.length > 0;
 
         tbody.innerHTML = `
           <tr>
             <td colspan="30" class="py-8 text-center text-slate-400 italic">
               ${isFilteredOut
-                ? `No students in ${escapeHtml(selectedSec)} match the selected Grade (${escapeHtml(gradeFilter)}) or Status (${escapeHtml(statusFilter)}) filter.`
+                ? `<div class="space-y-2.5 py-4">
+                     <p class="text-slate-600 dark:text-slate-300 font-medium">No students in ${escapeHtml(selectedSec)} match the current filter ${gradebookCohortFilter ? `(<strong>${escapeHtml(gradebookCohortFilter.label)}</strong>)` : ''}.</p>
+                     <button type="button" onclick="resetGradebookFilters()" class="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-600 font-bold rounded-lg text-xs shadow-2xs transition inline-flex items-center gap-1.5 active:scale-95">
+                       <span>✕</span><span>Reset Filters</span>
+                     </button>
+                   </div>`
                 : `No students enrolled in section ${escapeHtml(selectedSec)}. Use the Class List tab to enroll students.`}
             </td>
           </tr>
         `;
+        if (typeof updateGradebookResetFilterButton === 'function') updateGradebookResetFilterButton();
         return;
       }
 
@@ -6020,12 +5917,6 @@ function getNextRandomTip(currentIndex = -1) {
 
       // Render Class Average Summary Footer (tfoot)
       if (tfoot) {
-        const isFiltered = (gradeFilter !== 'all' || statusFilter !== 'all');
-        if (isFiltered) {
-          tfoot.innerHTML = '';
-          return;
-        }
-
         let footCellsHtml = '';
         let classSumTotal = 0;
         let passCount = 0;
@@ -6102,6 +5993,9 @@ function getNextRandomTip(currentIndex = -1) {
             </td>
           </tr>
         `;
+      }
+      if (typeof updateGradebookResetFilterButton === 'function') {
+        updateGradebookResetFilterButton();
       }
       if (typeof updateGradebookSidebar === 'function') {
         updateGradebookSidebar();
@@ -6746,6 +6640,7 @@ function getNextRandomTip(currentIndex = -1) {
 
     // ================= WINDOW EVENT LISTENERS & BOOTSTRAP =================
     window.addEventListener('resize', () => {
+      if (typeof autoResizeContentWindows === 'function') autoResizeContentWindows();
       setupSynchronizedScrollbars();
       renderWeeklyTimetable();
     });
@@ -6872,6 +6767,7 @@ function getNextRandomTip(currentIndex = -1) {
         localStorage.setItem('sidebar_collapsed_' + tabId, '1');
         updateSidebarToggleButton(tabId, true);
       }
+      if (typeof autoResizeContentWindows === 'function') setTimeout(autoResizeContentWindows, 50);
     }
 
     function closeAllSidebars() {
@@ -6935,31 +6831,60 @@ function getNextRandomTip(currentIndex = -1) {
       if (!sidebar) return;
       const widgets = Array.from(sidebar.querySelectorAll(':scope > div[id]'));
 
-      // 1. Restore widget vertical ordering
-      const savedOrder = JSON.parse(localStorage.getItem(`widget_order_${sidebarId}`) || '[]');
-      if (savedOrder.length > 0) {
-        savedOrder.forEach(id => {
-          const el = document.getElementById(id);
-          if (el && el.parentElement === sidebar) sidebar.appendChild(el);
-        });
-      }
+      // 1. Restore widget vertical ordering with stale ID cleanup
+      try {
+        const savedOrder = JSON.parse(localStorage.getItem(`widget_order_${sidebarId}`) || '[]');
+        if (Array.isArray(savedOrder) && savedOrder.length > 0) {
+          const currentValidIds = widgets.map(el => el.id);
+          savedOrder.forEach(id => {
+            const el = document.getElementById(id);
+            if (el && el.parentElement === sidebar) sidebar.appendChild(el);
+          });
+          const sanitized = savedOrder.filter(id => currentValidIds.includes(id));
+          if (sanitized.length !== savedOrder.length) {
+            localStorage.setItem(`widget_order_${sidebarId}`, JSON.stringify(sanitized));
+          }
+        }
+      } catch (err) {}
 
       // 2. Restore saved user-resized heights
       widgets.forEach(w => {
         const savedHeight = localStorage.getItem(`widget_height_${w.id}`);
         if (savedHeight) {
-          w.style.height = savedHeight;
+          const numH = parseInt(savedHeight, 10);
+          if ((w.id === 'planner-widget-next-activities' && numH < 120) || numH < 70) {
+            w.style.height = '';
+            localStorage.removeItem(`widget_height_${w.id}`);
+          } else {
+            w.style.height = savedHeight;
+          }
         }
       });
 
       // 3. Attach drag-reorder and double-click height reset
+      if (!sidebar.dataset.dragOverInit) {
+        sidebar.dataset.dragOverInit = 'true';
+        sidebar.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          const draggingEl = sidebar.querySelector('.is-being-dragged');
+          if (draggingEl && e.target === sidebar) {
+            sidebar.appendChild(draggingEl);
+          }
+        });
+      }
+
       widgets.forEach(w => {
         const handle = w.querySelector('.widget-drag-handle') || w.firstElementChild;
         if (handle) {
           handle.classList.add('widget-drag-handle');
           handle.setAttribute('draggable', 'true');
           handle.setAttribute('title', 'Drag to rearrange • Double-click header to reset height');
+        }
 
+        if (w.dataset.dragInit === 'true') return;
+        w.dataset.dragInit = 'true';
+
+        if (handle) {
           // Double-click header to reset custom height back to default
           handle.addEventListener('dblclick', (e) => {
             e.stopPropagation();
@@ -6979,13 +6904,16 @@ function getNextRandomTip(currentIndex = -1) {
             setTimeout(() => w.classList.add('is-being-dragged'), 0);
           });
 
-          handle.addEventListener('dragend', () => {
+          const onDragEnd = () => {
             sidebar.classList.remove('is-dragging');
             w.classList.remove('is-being-dragged');
             sidebar.querySelectorAll('.widget-drag-over').forEach(el => el.classList.remove('widget-drag-over'));
             const currentIds = Array.from(sidebar.querySelectorAll(':scope > div[id]')).map(el => el.id);
             localStorage.setItem(`widget_order_${sidebarId}`, JSON.stringify(currentIds));
-          });
+          };
+
+          handle.addEventListener('dragend', onDragEnd);
+          w.addEventListener('dragend', onDragEnd);
         }
 
         w.addEventListener('dragover', (e) => {
@@ -7000,6 +6928,89 @@ function getNextRandomTip(currentIndex = -1) {
             }
           }
         });
+      });
+
+      // 4. Attach Full-Width Bottom Resizer to each widget card for effortless vertical height adjustment
+      widgets.forEach(w => {
+        if (!w.querySelector('.widget-bottom-resizer')) {
+          const resizer = document.createElement('div');
+          resizer.className = 'widget-bottom-resizer';
+          resizer.title = 'Drag bottom edge to adjust height • Double-click to reset';
+          resizer.innerHTML = '<div class="widget-resizer-grip"></div>';
+
+          resizer.addEventListener('pointerdown', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const startY = e.clientY;
+            const startH = w.getBoundingClientRect().height;
+            const minH = (w.id === 'planner-widget-next-activities') ? 110 : 70;
+            const maxH = Math.max(minH, Math.floor(window.innerHeight * 0.88));
+
+            try {
+              resizer.setPointerCapture(e.pointerId);
+            } catch (err) {}
+
+            document.body.classList.add('resizing-widget-active');
+            w.classList.add('widget-resizing');
+
+            let targetH = startH;
+            let rafId = null;
+
+            const applyHeight = () => {
+              rafId = null;
+              w.style.height = targetH + 'px';
+            };
+
+            const onPointerMove = (moveEv) => {
+              const deltaY = moveEv.clientY - startY;
+              targetH = Math.min(maxH, Math.max(minH, Math.round(startH + deltaY)));
+              if (!rafId) {
+                rafId = requestAnimationFrame(applyHeight);
+              }
+            };
+
+            const onPointerUp = () => {
+              if (rafId) {
+                cancelAnimationFrame(rafId);
+                applyHeight();
+              }
+              try {
+                if (resizer.hasPointerCapture(e.pointerId)) {
+                  resizer.releasePointerCapture(e.pointerId);
+                }
+              } catch (err) {}
+              window.removeEventListener('pointermove', onPointerMove);
+              window.removeEventListener('pointerup', onPointerUp);
+              window.removeEventListener('pointercancel', onPointerUp);
+              resizer.removeEventListener('pointermove', onPointerMove);
+              resizer.removeEventListener('pointerup', onPointerUp);
+              resizer.removeEventListener('lostpointercapture', onPointerUp);
+              document.body.classList.remove('resizing-widget-active');
+              w.classList.remove('widget-resizing');
+              if (w.style.height) {
+                localStorage.setItem(`widget_height_${w.id}`, w.style.height);
+              }
+            };
+
+            window.addEventListener('pointermove', onPointerMove, { passive: true });
+            window.addEventListener('pointerup', onPointerUp);
+            window.addEventListener('pointercancel', onPointerUp);
+            resizer.addEventListener('pointermove', onPointerMove, { passive: true });
+            resizer.addEventListener('pointerup', onPointerUp);
+            resizer.addEventListener('lostpointercapture', onPointerUp);
+          });
+
+          resizer.addEventListener('dblclick', (e) => {
+            e.stopPropagation();
+            if (w.style.height) {
+              w.style.height = '';
+              localStorage.removeItem(`widget_height_${w.id}`);
+              showToast('Reset widget height to default.');
+            }
+          });
+
+          w.appendChild(resizer);
+        }
       });
     }
 
@@ -7023,17 +7034,6 @@ function getNextRandomTip(currentIndex = -1) {
       ['sidebar-planner', 'sidebar-timetable', 'sidebar-calendar', 'sidebar-roster', 'sidebar-gradebook'].forEach(sId => {
         initDraggableSidebarWidgets(sId);
       });
-
-      // Global resize monitor: Save height when user finishes dragging resize grip
-      const saveResizedWidgetHeights = () => {
-        document.querySelectorAll('.tab-sidebar > div[id]').forEach(w => {
-          if (w.style.height) {
-            localStorage.setItem(`widget_height_${w.id}`, w.style.height);
-          }
-        });
-      };
-      window.addEventListener('pointerup', saveResizedWidgetHeights);
-      window.addEventListener('mouseup', saveResizedWidgetHeights);
     }
 
     function updateTabSidebar(tabId) {
@@ -7042,6 +7042,7 @@ function getNextRandomTip(currentIndex = -1) {
       if (tabId === 'calendar') updateCalendarSidebar();
       if (tabId === 'roster') updateRosterSidebar();
       if (tabId === 'gradebook') updateGradebookSidebar();
+      initDraggableSidebarWidgets('sidebar-' + tabId);
     }
 
     function updateAllSidebars() {
@@ -7122,7 +7123,7 @@ function getNextRandomTip(currentIndex = -1) {
         }
 
         if (targetCell && wrapper) {
-          const stickyLeftWidth = 204; // 54px Day + 84px Date sticky columns
+          const stickyLeftWidth = 110; // 42px Day + 68px Date sticky columns
           const cellLeft = targetCell.offsetLeft;
           const cellWidth = targetCell.offsetWidth;
           const cellRight = cellLeft + cellWidth;
@@ -7187,6 +7188,14 @@ function getNextRandomTip(currentIndex = -1) {
 
     window.jumpToMatrixDate = jumpToMatrixDate;
 
+    let currentRadarFilter = 'all';
+
+    function setRadarFilter(filter) {
+      currentRadarFilter = filter;
+      updatePlannerSidebar();
+    }
+    if (typeof window !== 'undefined') window.setRadarFilter = setRadarFilter;
+
     function updatePlannerSidebar() {
       const actualNow = (typeof window !== 'undefined' && window._overrideCurrentDate)
         ? new Date(window._overrideCurrentDate)
@@ -7201,21 +7210,383 @@ function getNextRandomTip(currentIndex = -1) {
       const nowDay = String(now.getDate()).padStart(2, '0');
       const todayStr = `${nowYear}-${nowMonth}-${nowDay}`;
       const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      const currentSystemDay = dayNames[actualNow.getDay()];
 
       // =========================================================
-      // 1. NEXT ACTIVITIES (Matrix Planned Entries + School Calendar Milestones)
+      // 1. TEACHING RADAR (Live Dispatch, Lookahead & Upcoming Horizon)
       // =========================================================
+      const todaySemesterDate = (typeof semesterDates !== 'undefined' && Array.isArray(semesterDates))
+        ? semesterDates.find(d => d.dateKey === todayStr)
+        : null;
+      const isCampusSuspended = todaySemesterDate ? todaySemesterDate.isNoClassDate : false;
+
+      const activeTodaySlots = [];
+      const seenSlotKeys = new Set();
+
+      // A. Evaluate regularly scheduled timetable slots for today
+      if (Array.isArray(weeklyTimetable)) {
+        const regularSlots = weeklyTimetable.filter(t => t.day === currentSystemDay);
+        regularSlots.forEach(s => {
+          const cellKey = `${todayStr}__${s.course}__${s.section}`;
+          seenSlotKeys.add(cellKey);
+
+          if (isCampusSuspended) return; // Campus holiday / university suspension
+
+          const entry = (typeof plannerEntries === 'object' && plannerEntries !== null)
+            ? plannerEntries[cellKey]
+            : null;
+
+          if (!entry) return; // Unplanned / no activity scheduled
+
+          const rawTopic = (entry.topic || '').trim();
+          const rawActivity = (entry.activity || '').trim();
+          const rawType = (entry.type || '').trim();
+          const rawStatus = (entry.status || '').trim();
+          const topicLower = rawTopic.toLowerCase();
+          const actLower = rawActivity.toLowerCase();
+
+          // Exclude cancelled / suspended
+          const isNoClass = (rawType === 'No Class') ||
+            (rawStatus === 'Cancelled') ||
+            topicLower.includes('no class') ||
+            actLower.includes('no class') ||
+            topicLower.includes('class suspended') ||
+            actLower.includes('class suspended') ||
+            topicLower.includes('session suspended');
+
+          if (isNoClass) return;
+
+          const hasContent = (rawTopic.length > 0) || (rawActivity.length > 0);
+          if (!hasContent) return;
+
+          const isNoActivity = topicLower.includes('no planned activity') ||
+            actLower.includes('no planned activity') ||
+            topicLower.includes('no activity') ||
+            actLower.includes('no activity') ||
+            topicLower === 'unplanned';
+
+          if (isNoActivity) return;
+
+          activeTodaySlots.push({
+            course: s.course,
+            section: s.section,
+            startTime: entry.startTime || s.startTime,
+            endTime: entry.endTime || s.endTime,
+            room: entry.room || s.room || 'TBA',
+            type: entry.type || s.type || 'Lecture',
+            topic: rawTopic,
+            activity: rawActivity,
+            notes: entry.notes || '',
+            isSpecialSession: false,
+            dateKey: todayStr
+          });
+        });
+      }
+
+      // B. Special sessions / makeup classes planned for today in plannerEntries
+      if (typeof plannerEntries === 'object' && plannerEntries !== null) {
+        Object.entries(plannerEntries).forEach(([cellKey, entry]) => {
+          if (!entry) return;
+          if (!cellKey.startsWith(todayStr + '__')) return;
+
+          const parts = cellKey.split('__');
+          if (parts.length < 3) return;
+          const [, course, section] = parts;
+
+          const isRegularSlot = Array.isArray(weeklyTimetable) && weeklyTimetable.some(t => t.day === currentSystemDay && t.course === course && t.section === section);
+          if (seenSlotKeys.has(cellKey) || isRegularSlot) return;
+
+          const rawTopic = (entry.topic || '').trim();
+          const rawActivity = (entry.activity || '').trim();
+          const rawType = (entry.type || '').trim();
+          const rawStatus = (entry.status || '').trim();
+          const topicLower = rawTopic.toLowerCase();
+          const actLower = rawActivity.toLowerCase();
+
+          const isNoClass = (rawType === 'No Class') ||
+            (rawStatus === 'Cancelled') ||
+            topicLower.includes('no class') ||
+            actLower.includes('no class') ||
+            topicLower.includes('class suspended') ||
+            actLower.includes('class suspended') ||
+            topicLower.includes('session suspended');
+
+          if (isNoClass) return;
+
+          const hasContent = (rawTopic.length > 0) || (rawActivity.length > 0);
+          if (!hasContent) return;
+
+          const isNoActivity = topicLower.includes('no planned activity') ||
+            actLower.includes('no planned activity') ||
+            topicLower.includes('no activity') ||
+            actLower.includes('no activity');
+
+          if (isNoActivity) return;
+
+          const fallbackSlot = Array.isArray(weeklyTimetable) ? weeklyTimetable.find(t => t.course === course && t.section === section) : null;
+          activeTodaySlots.push({
+            course,
+            section,
+            startTime: entry.startTime || (fallbackSlot ? fallbackSlot.startTime : '08:00'),
+            endTime: entry.endTime || (fallbackSlot ? fallbackSlot.endTime : '09:30'),
+            room: entry.room || (fallbackSlot ? fallbackSlot.room : 'TBA'),
+            type: entry.type || (fallbackSlot ? fallbackSlot.type : 'Special Session'),
+            topic: rawTopic,
+            activity: rawActivity,
+            notes: entry.notes || '',
+            isSpecialSession: true,
+            dateKey: todayStr
+          });
+        });
+      }
+
+      // Sort today's active classes
+      activeTodaySlots.sort((a, b) => timeToMinutes(a.startTime) - timeToMinutes(b.startTime));
+      const remainingToday = activeTodaySlots.filter(s => timeToMinutes(s.endTime) > currentTotalMinutes);
+      const upcomingToday = remainingToday[0] || null;
+
+      // C. Lookahead Engine: If classes today have ended or off-day, locate next scheduled meeting across future dates
+      let lookaheadClass = null;
+      if (!upcomingToday && Array.isArray(semesterDates)) {
+        const todayIdx = semesterDates.findIndex(d => d.dateKey === todayStr);
+        const startScanIdx = todayIdx >= 0 ? todayIdx + 1 : 0;
+
+        for (let i = startScanIdx; i < semesterDates.length; i++) {
+          const fDateObj = semesterDates[i];
+          if (!fDateObj) continue;
+          const fDateKey = fDateObj.dateKey;
+          const fDayName = FULL_DAY_NAMES[fDateObj.dayOfWeek] || fDateObj.dayOfWeek;
+          const fIsSuspended = fDateObj.isNoClassDate;
+
+          const candidatesOnDate = [];
+
+          // Check future regular timetable slots
+          if (!fIsSuspended && Array.isArray(weeklyTimetable)) {
+            const fRegSlots = weeklyTimetable.filter(t => t.day === fDayName);
+            fRegSlots.forEach(s => {
+              const cellKey = `${fDateKey}__${s.course}__${s.section}`;
+              const entry = (typeof plannerEntries === 'object' && plannerEntries !== null) ? plannerEntries[cellKey] : null;
+              if (!entry) return;
+              const topic = (entry.topic || '').trim();
+              const activity = (entry.activity || '').trim();
+              const type = (entry.type || '').trim();
+              const status = (entry.status || '').trim();
+              if (type === 'No Class' || status === 'Cancelled' || topic.toLowerCase().includes('no class') || topic.toLowerCase().includes('class suspended')) return;
+              if (!topic && !activity) return;
+              if (topic.toLowerCase().includes('no planned activity') || topic.toLowerCase().includes('no activity')) return;
+
+              candidatesOnDate.push({
+                course: s.course,
+                section: s.section,
+                startTime: entry.startTime || s.startTime,
+                endTime: entry.endTime || s.endTime,
+                room: entry.room || s.room || 'TBA',
+                type: entry.type || s.type || 'Lecture',
+                topic,
+                activity,
+                dateKey: fDateKey,
+                dayName: fDayName,
+                isSpecialSession: false
+              });
+            });
+          }
+
+          // Check future special sessions / makeups
+          if (typeof plannerEntries === 'object' && plannerEntries !== null) {
+            Object.entries(plannerEntries).forEach(([cellKey, entry]) => {
+              if (!entry || !cellKey.startsWith(fDateKey + '__')) return;
+              const parts = cellKey.split('__');
+              if (parts.length < 3) return;
+              const [, cCode, sec] = parts;
+              const isRegular = Array.isArray(weeklyTimetable) && weeklyTimetable.some(t => t.day === fDayName && t.course === cCode && t.section === sec);
+              if (isRegular) return;
+
+              const topic = (entry.topic || '').trim();
+              const activity = (entry.activity || '').trim();
+              const type = (entry.type || '').trim();
+              const status = (entry.status || '').trim();
+              if (type === 'No Class' || status === 'Cancelled' || topic.toLowerCase().includes('no class')) return;
+              if (!topic && !activity) return;
+
+              const fallback = Array.isArray(weeklyTimetable) ? weeklyTimetable.find(t => t.course === cCode && t.section === sec) : null;
+              candidatesOnDate.push({
+                course: cCode,
+                section: sec,
+                startTime: entry.startTime || (fallback ? fallback.startTime : '08:00'),
+                endTime: entry.endTime || (fallback ? fallback.endTime : '09:30'),
+                room: entry.room || (fallback ? fallback.room : 'TBA'),
+                type: entry.type || (fallback ? fallback.type : 'Special Session'),
+                topic,
+                activity,
+                dateKey: fDateKey,
+                dayName: fDayName,
+                isSpecialSession: true
+              });
+            });
+          }
+
+          if (candidatesOnDate.length > 0) {
+            candidatesOnDate.sort((a, b) => timeToMinutes(a.startTime) - timeToMinutes(b.startTime));
+            lookaheadClass = candidatesOnDate[0];
+            const fParts = fDateKey.split('-').map(Number);
+            const fDate = new Date(fParts[0], fParts[1] - 1, fParts[2]);
+            lookaheadClass.diffDays = Math.round((fDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+            break;
+          }
+        }
+      }
+
+      // D. Render Tier 1: Live Dispatch Card & Radar Badge
+      const dispatchCardEl = document.getElementById('planner-radar-dispatch-card');
+      const radarStatusBadge = document.getElementById('planner-radar-status-badge');
+
+      if (dispatchCardEl) {
+        if (upcomingToday) {
+          const startMin = timeToMinutes(upcomingToday.startTime);
+          const isOngoing = currentTotalMinutes >= startMin;
+          const diffMin = startMin - currentTotalMinutes;
+
+          let countdownText = `${diffMin}m`;
+          if (diffMin >= 60) {
+            const hrs = Math.floor(diffMin / 60);
+            const mins = diffMin % 60;
+            countdownText = mins > 0 ? `${hrs}h ${mins}m` : `${hrs}h`;
+          }
+
+          if (radarStatusBadge) {
+            radarStatusBadge.className = isOngoing
+              ? 'text-[10px] font-black px-1.5 py-0.5 rounded bg-emerald-500 text-white animate-pulse shadow-2xs'
+              : 'text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-50 text-amber-900 border border-amber-300 shadow-2xs';
+            radarStatusBadge.innerText = isOngoing
+              ? (upcomingToday.isSpecialSession ? '⚡ Special In Progress' : 'Class In Progress')
+              : (upcomingToday.isSpecialSession ? `⚡ Special in ${countdownText}` : `Starts in ${countdownText}`);
+          }
+
+          const classroomLink = (typeof getClassroomLink === 'function') ? getClassroomLink(upcomingToday.course, upcomingToday.section) : '';
+          dispatchCardEl.innerHTML = `
+            <div id="planner-radar-active-card"
+              class="p-2.5 rounded-xl border ${isOngoing ? 'bg-emerald-50 border-emerald-300 text-emerald-950' : (upcomingToday.isSpecialSession ? 'bg-amber-50/70 border-amber-300 text-amber-950' : 'bg-slate-50 border-slate-200 text-slate-900')} space-y-1.5 cursor-pointer transition hover:border-emerald-400 hover:shadow-xs group"
+              title="${classroomLink ? `Open Google Classroom for ${escapeHtml(upcomingToday.course)} ${escapeHtml(upcomingToday.section)} in new tab` : 'Click to jump to today in matrix'}">
+              <div class="flex items-center justify-between gap-1.5">
+                <span class="font-black text-xs flex items-center gap-1.5 min-w-0">
+                  <span class="truncate">${escapeHtml(upcomingToday.course)} (${escapeHtml(upcomingToday.section)})</span>
+                  ${upcomingToday.isSpecialSession ? '<span class="text-[8px] font-extrabold px-1.5 py-0.2 rounded bg-amber-200 text-amber-900 border border-amber-300 uppercase tracking-tight shrink-0">⚡ Special</span>' : ''}
+                  <svg class="w-3.5 h-3.5 ${classroomLink ? 'text-emerald-700' : 'text-slate-400'} shrink-0 group-hover:scale-110 transition" viewBox="0 0 24 24" fill="currentColor" title="${classroomLink ? 'Google Classroom Linked' : 'Google Classroom Not Configured'}">
+                    <path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/>
+                  </svg>
+                </span>
+                <span class="font-mono font-bold text-[10px] shrink-0">${formatTime12(upcomingToday.startTime)} - ${formatTime12(upcomingToday.endTime)}</span>
+              </div>
+              ${upcomingToday.topic ? `
+                <div class="text-[11px] font-semibold text-slate-700 leading-tight break-words" title="${escapeHtml(upcomingToday.topic)}">
+                  ${escapeHtml(upcomingToday.topic)}
+                </div>
+              ` : ''}
+              ${upcomingToday.activity && upcomingToday.activity !== upcomingToday.topic ? `
+                <div class="text-[10px] text-slate-500 truncate" title="${escapeHtml(upcomingToday.activity)}">
+                  🎯 ${escapeHtml(upcomingToday.activity)}
+                </div>
+              ` : ''}
+              <div class="flex items-center justify-between text-[11px] text-slate-600">
+                <span class="truncate">${escapeHtml(upcomingToday.room || 'TBA')} • ${escapeHtml(upcomingToday.type || 'Lecture')}</span>
+                ${classroomLink ? `<span class="text-[10px] font-bold text-emerald-700 group-hover:underline shrink-0 ml-1">Classroom ↗</span>` : ''}
+              </div>
+            </div>
+          `;
+
+          const activeCardEl = document.getElementById('planner-radar-active-card');
+          if (activeCardEl) {
+            activeCardEl.onclick = () => {
+              if (classroomLink) {
+                window.open(classroomLink, '_blank');
+              } else {
+                jumpToMatrixDate(todayStr, upcomingToday.course, upcomingToday.section);
+              }
+            };
+          }
+        } else if (lookaheadClass) {
+          const isTmrw = lookaheadClass.diffDays === 1;
+          const dayBadgeText = isTmrw ? 'Tomorrow' : (lookaheadClass.diffDays <= 6 ? lookaheadClass.dayName : lookaheadClass.dateKey);
+
+          if (radarStatusBadge) {
+            radarStatusBadge.className = 'text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-50 text-blue-800 border border-blue-200';
+            radarStatusBadge.innerText = isTmrw ? 'Next: Tomorrow' : `Next: ${lookaheadClass.dayName.substring(0, 3)}`;
+          }
+
+          const classroomLink = (typeof getClassroomLink === 'function') ? getClassroomLink(lookaheadClass.course, lookaheadClass.section) : '';
+          dispatchCardEl.innerHTML = `
+            <div id="planner-radar-lookahead-card"
+              class="p-2.5 rounded-xl border bg-blue-50/60 border-blue-200/90 text-slate-900 space-y-1.5 cursor-pointer transition hover:border-blue-400 hover:shadow-xs group"
+              title="Click to jump to ${lookaheadClass.dateKey} in matrix">
+              <div class="flex items-center justify-between gap-1.5">
+                <span class="font-black text-xs flex items-center gap-1.5 min-w-0">
+                  <span class="text-[9px] font-black px-1.5 py-0.2 rounded bg-blue-200 text-blue-900 border border-blue-300 uppercase tracking-tight shrink-0">Next Up</span>
+                  <span class="truncate">${escapeHtml(lookaheadClass.course)} (${escapeHtml(lookaheadClass.section)})</span>
+                  ${lookaheadClass.isSpecialSession ? '<span class="text-[8px] font-extrabold px-1 rounded bg-amber-200 text-amber-900 border border-amber-300 uppercase shrink-0">⚡ Special</span>' : ''}
+                </span>
+                <span class="font-mono font-bold text-[10px] text-blue-900 shrink-0">${formatTime12(lookaheadClass.startTime)}</span>
+              </div>
+              <div class="text-[10px] text-slate-500 font-semibold flex items-center gap-1">
+                <span>📅 ${dayBadgeText} (${lookaheadClass.dateKey})</span>
+                <span>• Rm ${escapeHtml(lookaheadClass.room || 'TBA')}</span>
+              </div>
+              ${lookaheadClass.topic ? `
+                <div class="text-[11px] font-semibold text-slate-700 leading-tight truncate" title="${escapeHtml(lookaheadClass.topic)}">
+                  ${escapeHtml(lookaheadClass.topic)}
+                </div>
+              ` : ''}
+              <div class="flex items-center justify-between text-[10px] text-slate-600 pt-0.5">
+                <span class="text-blue-700 font-semibold group-hover:underline">View in Matrix ➔</span>
+                ${classroomLink ? `<a href="${classroomLink}" target="_blank" onclick="event.stopPropagation()" class="font-bold text-emerald-700 hover:underline">Classroom ↗</a>` : ''}
+              </div>
+            </div>
+          `;
+
+          const lookaheadCardEl = document.getElementById('planner-radar-lookahead-card');
+          if (lookaheadCardEl) {
+            lookaheadCardEl.onclick = () => {
+              jumpToMatrixDate(lookaheadClass.dateKey, lookaheadClass.course, lookaheadClass.section);
+            };
+          }
+        } else {
+          if (radarStatusBadge) {
+            radarStatusBadge.className = 'text-[10px] font-semibold px-1.5 py-0.5 rounded bg-slate-100 text-slate-600';
+            radarStatusBadge.innerText = 'Term Done';
+          }
+          dispatchCardEl.innerHTML = `
+            <div class="p-3 bg-slate-50 border border-dashed border-slate-200 rounded-xl text-center text-slate-500 text-[11px] space-y-1">
+              <div class="font-bold text-slate-700">🎉 No more scheduled classes</div>
+              <div class="text-[10px] text-slate-400">All planned classes for this term have concluded.</div>
+            </div>
+          `;
+        }
+      }
+
+      // E. Update Filter Pills Strip UI
+      const pillsContainer = document.getElementById('planner-radar-filter-pills');
+      if (pillsContainer) {
+        const pillButtons = pillsContainer.querySelectorAll('button[data-radar-filter]');
+        pillButtons.forEach(btn => {
+          const f = btn.getAttribute('data-radar-filter');
+          const isSelected = (f === currentRadarFilter);
+          if (isSelected) {
+            btn.className = 'radar-filter-pill px-2 py-0.5 text-[10px] font-bold rounded-md bg-msu-maroon text-white transition shadow-2xs';
+          } else {
+            btn.className = 'radar-filter-pill px-2 py-0.5 text-[10px] font-medium rounded-md bg-slate-100 text-slate-600 hover:bg-slate-200 transition';
+          }
+        });
+      }
+
+      // F. Tier 2: Scrollable Horizon Timeline (Matrix Planned Entries + University Milestones)
       const nextActivitiesList = document.getElementById('planner-milestones-list');
-      const nextBadge = document.getElementById('planner-next-activities-badge');
 
       if (nextActivitiesList) {
         const upcomingItems = [];
 
-        // A. Planned activities from Schedule & Activity Matrix
+        // 1. Planned activities from Schedule & Activity Matrix
         if (typeof plannerEntries === 'object' && plannerEntries !== null) {
           Object.entries(plannerEntries).forEach(([cellKey, entry]) => {
             if (!entry) return;
-            // Requirement: Remove activities/milestones that are completed or cancelled
             if (entry.status === 'Completed' || entry.status === 'Cancelled') return;
 
             const parts = cellKey.split('__');
@@ -7226,7 +7597,6 @@ function getNextRandomTip(currentIndex = -1) {
             const activity = (entry.activity || '').trim();
             const type = entry.type || entry.activityType || 'Lecture';
 
-            // Skip entries that are completely blank unless explicitly marked No Class
             if (!topic && !activity && type !== 'No Class') return;
 
             const dateParts = dateKey.split('-').map(Number);
@@ -7234,11 +7604,8 @@ function getNextRandomTip(currentIndex = -1) {
             if (isNaN(targetDate.getTime())) return;
 
             const diffDays = Math.round((targetDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-
-            // Only upcoming or today's activities within up to 1 month (30 days) in advance
             if (diffDays < 0 || diffDays > 30) return;
 
-            // Day of week for timetable lookup
             const targetDayName = dayNames[targetDate.getDay()];
             let slot = null;
             if (Array.isArray(weeklyTimetable)) {
@@ -7252,11 +7619,11 @@ function getNextRandomTip(currentIndex = -1) {
             const endTime = entry.endTime || (slot ? slot.endTime : '');
             const room = entry.room || (slot ? slot.room : '');
 
-            // Requirement: Consider class time! Remove class once its end time has passed (e.g. remove 9:00-11:30 class at 11:31)
+            // Remove if class on today has already passed
             if (diffDays === 0 && endTime) {
               const endMin = timeToMinutes(endTime);
               if (endMin > 0 && currentTotalMinutes > endMin) {
-                return; // Class has already concluded
+                return;
               }
             }
 
@@ -7280,7 +7647,7 @@ function getNextRandomTip(currentIndex = -1) {
           });
         }
 
-        // B. School Calendar Milestones & Major University Events
+        // 2. School Calendar Milestones & Major University Events
         if (Array.isArray(msuCalendarEvents)) {
           msuCalendarEvents.forEach(evt => {
             if (!evt) return;
@@ -7308,21 +7675,16 @@ function getNextRandomTip(currentIndex = -1) {
             targetDate.setHours(0, 0, 0, 0);
 
             const diffDays = Math.round((targetDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-
-            // Requirement: Remove activities/milestones that are completed (past dates)
-            // or farther than 1 month (30 days) in advance
             if (diffDays < 0 || diffDays > 30) return;
 
             const evtStartTime = evt.startTime || '';
             const evtEndTime = evt.endTime || '';
 
-            // If milestone has an explicit end time today, remove it once passed
             if (diffDays === 0 && evtEndTime) {
               const endMin = timeToMinutes(evtEndTime);
               if (endMin > 0 && currentTotalMinutes > endMin) return;
             }
 
-            // Include university milestones, exams, holidays, and campus events
             const isMilestone = (evt.type === 'milestone' || evt.type === 'exam' || evt.type === 'holiday' || evt.isNoClass);
             if (!isMilestone) return;
 
@@ -7342,35 +7704,42 @@ function getNextRandomTip(currentIndex = -1) {
           });
         }
 
-        // Sort upcoming items chronologically by date and startTime
+        // Sort chronologically
         upcomingItems.sort((a, b) => {
           if (a.dateKey !== b.dateKey) {
             return a.dateKey.localeCompare(b.dateKey);
           }
-          // On the same date, order chronologically by startTime
           const aTime = a.startTime ? timeToMinutes(a.startTime) : (a.isSchoolMilestone ? -1 : 9999);
           const bTime = b.startTime ? timeToMinutes(b.startTime) : (b.isSchoolMilestone ? -1 : 9999);
           if (aTime !== bTime) {
             return aTime - bTime;
           }
-          // Prioritize School Calendar Milestones first on same date if times are equal
           if (a.isSchoolMilestone && !b.isSchoolMilestone) return -1;
           if (!a.isSchoolMilestone && b.isSchoolMilestone) return 1;
           return (a.course || '').localeCompare(b.course || '');
         });
 
-        // Limit to upcoming 10 items within next 30 days
-        const displayList = upcomingItems.slice(0, 10);
-
-        if (nextBadge) {
-          nextBadge.textContent = upcomingItems.length + (upcomingItems.length === 1 ? ' Activity' : ' Activities');
-          nextBadge.title = 'Activities scheduled in the next 30 days';
+        // Filter items according to currentRadarFilter
+        let filteredItems = upcomingItems;
+        if (currentRadarFilter === 'today') {
+          filteredItems = upcomingItems.filter(item => item.diffDays === 0);
+        } else if (currentRadarFilter === 'week') {
+          filteredItems = upcomingItems.filter(item => item.diffDays >= 0 && item.diffDays <= 7);
+        } else if (currentRadarFilter === 'milestones') {
+          filteredItems = upcomingItems.filter(item => item.isSchoolMilestone || item.type === 'Exam' || item.type === 'Quiz' || item.type === 'No Class');
         }
 
+        const displayList = filteredItems.slice(0, 15);
+
         if (displayList.length === 0) {
+          let emptyText = 'No activities scheduled in the next 30 days.';
+          if (currentRadarFilter === 'today') emptyText = 'No remaining classes or activities scheduled for today.';
+          else if (currentRadarFilter === 'week') emptyText = 'No more activities scheduled for this week.';
+          else if (currentRadarFilter === 'milestones') emptyText = 'No upcoming exams or university milestones.';
+
           nextActivitiesList.innerHTML = `
             <div class="text-slate-400 italic text-[11px] py-4 text-center bg-slate-50 rounded-lg border border-dashed border-slate-200">
-              No activities scheduled in the next 30 days.<br><span class="text-[10px] text-slate-400">Add lessons, quizzes, or exams in the matrix.</span>
+              ${emptyText}<br><span class="text-[10px] text-slate-400">Add lessons, quizzes, or exams in the matrix.</span>
             </div>
           `;
         } else {
@@ -7394,7 +7763,7 @@ function getNextRandomTip(currentIndex = -1) {
 
             const cursorClass = item.dateKey ? 'cursor-pointer hover:shadow-xs transition' : '';
 
-            // Render School Calendar Milestone with prominent highlight (Gold/Amber theme, Star icon)
+            // School Calendar Milestone card
             if (item.isSchoolMilestone) {
               const clickAttr = item.dateKey ? `onclick="jumpToMatrixDate('${item.dateKey}', '', '', true)"` : '';
               let milestoneTypeLabel = 'School Milestone';
@@ -7424,7 +7793,7 @@ function getNextRandomTip(currentIndex = -1) {
               `;
             }
 
-            // Render Planned Matrix Activity
+            // Planned Matrix Activity card
             const clickAttr = item.dateKey ? `onclick="jumpToMatrixDate('${item.dateKey}', '${escapeHtml(item.course || '')}', '${escapeHtml(item.section || '')}')"` : '';
             let typeColor = 'bg-blue-100 text-blue-800 border-blue-200';
             if (item.type === 'Quiz') {
@@ -7435,6 +7804,8 @@ function getNextRandomTip(currentIndex = -1) {
               typeColor = 'bg-emerald-100 text-emerald-800 border-emerald-200';
             } else if (item.type === 'No Class') {
               typeColor = 'bg-rose-100 text-rose-800 border-rose-200';
+            } else if (item.type === 'Makeup Class' || item.type === 'Special Session') {
+              typeColor = 'bg-amber-100 text-amber-900 border-amber-300';
             }
 
             const typeBadge = `<span class="text-[9px] font-black px-1.5 py-0.5 rounded ${typeColor} border shrink-0">${escapeHtml(item.type)}</span>`;
@@ -7474,6 +7845,8 @@ function getNextRandomTip(currentIndex = -1) {
           }).join('');
         }
       }
+
+      initDraggableSidebarWidgets('sidebar-planner');
 
       // =========================================================
       // 2. TEACHING DAYS DISTRIBUTION (Unified Single Source of Truth)
@@ -7613,6 +7986,10 @@ function getNextRandomTip(currentIndex = -1) {
       const now = (typeof window !== 'undefined' && window._overrideCurrentDate) ? new Date(window._overrideCurrentDate) : new Date();
       const currentSystemDay = allDays[now.getDay()];
       const currentTotalMinutes = now.getHours() * 60 + now.getMinutes();
+      const nowYear = now.getFullYear();
+      const nowMonth = String(now.getMonth() + 1).padStart(2, '0');
+      const nowDay = String(now.getDate()).padStart(2, '0');
+      const todayDateKey = `${nowYear}-${nowMonth}-${nowDay}`;
 
       // Contact hours calculation
       let totalMinutes = 0;
@@ -7638,71 +8015,7 @@ function getNextRandomTip(currentIndex = -1) {
         `;
       }
 
-      // Next Upcoming Class Countdown Widget
-      const nextClassCard = document.getElementById('timetable-next-class-card');
-      const nextClassStatus = document.getElementById('timetable-next-class-status');
-      if (nextClassCard) {
-        const todaySlots = weeklyTimetable.filter(t => t.day === currentSystemDay).sort((a, b) => timeToMinutes(a.startTime) - timeToMinutes(b.startTime));
-        const upcomingToday = todaySlots.find(s => timeToMinutes(s.endTime) > currentTotalMinutes);
 
-        if (upcomingToday) {
-          const startMin = timeToMinutes(upcomingToday.startTime);
-          const isOngoing = currentTotalMinutes >= startMin;
-          const diffMin = startMin - currentTotalMinutes;
-
-          // Format countdown into human-readable hours and minutes (e.g., 7h 58m)
-          let countdownText = `${diffMin}m`;
-          if (diffMin >= 60) {
-            const hrs = Math.floor(diffMin / 60);
-            const mins = diffMin % 60;
-            countdownText = mins > 0 ? `${hrs}h ${mins}m` : `${hrs}h`;
-          }
-
-          if (nextClassStatus) {
-            nextClassStatus.className = isOngoing 
-              ? 'text-[10px] font-black px-1.5 py-0.5 rounded bg-emerald-500 text-white animate-pulse' 
-              : 'text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-50 text-amber-900 border border-amber-300';
-            nextClassStatus.innerText = isOngoing ? 'Class In Progress' : `Starts in ${countdownText}`;
-          }
-          const classroomLink = (typeof getClassroomLink === 'function') ? getClassroomLink(upcomingToday.course, upcomingToday.section) : '';
-          nextClassCard.innerHTML = `
-            <div id="timetable-upcoming-active-card"
-              class="p-2.5 rounded-xl border ${isOngoing ? 'bg-emerald-50 border-emerald-300 text-emerald-950' : 'bg-slate-50 border-slate-200 text-slate-900'} space-y-1 cursor-pointer transition hover:border-emerald-400 hover:shadow-sm group"
-              title="${classroomLink ? `Open Google Classroom for ${escapeHtml(upcomingToday.course)} ${escapeHtml(upcomingToday.section)} in new tab` : 'No Google Classroom link configured'}">
-              <div class="flex items-center justify-between">
-                <span class="font-black text-xs flex items-center gap-1.5 min-w-0">
-                  <span class="truncate">${escapeHtml(upcomingToday.course)} (${escapeHtml(upcomingToday.section)})</span>
-                  <svg class="w-3.5 h-3.5 ${classroomLink ? 'text-emerald-700' : 'text-slate-400'} shrink-0 group-hover:scale-110 transition" viewBox="0 0 24 24" fill="currentColor" title="${classroomLink ? 'Google Classroom Linked' : 'Google Classroom Not Configured'}">
-                    <path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/>
-                  </svg>
-                </span>
-                <span class="font-mono font-bold text-[10px] shrink-0">${formatTime12(upcomingToday.startTime)} - ${formatTime12(upcomingToday.endTime)}</span>
-              </div>
-              <div class="flex items-center justify-between text-[11px] text-slate-600">
-                <span class="truncate">${escapeHtml(upcomingToday.room || 'TBA')} • ${escapeHtml(upcomingToday.type || 'Lecture')}</span>
-                ${classroomLink ? `<span class="text-[10px] font-bold text-emerald-700 group-hover:underline shrink-0 ml-1">Classroom ↗</span>` : ''}
-              </div>
-            </div>
-          `;
-
-          const activeCardEl = document.getElementById('timetable-upcoming-active-card');
-          if (activeCardEl) {
-            activeCardEl.onclick = () => {
-              if (classroomLink) {
-                window.open(classroomLink, '_blank');
-              } else {
-                showToast(`No Google Classroom link configured for ${upcomingToday.course} (${upcomingToday.section}).`, '⚠️');
-              }
-            };
-          }
-        } else {
-          if (nextClassStatus) {
-            nextClassStatus.className = 'text-[10px] font-semibold px-1.5 py-0.5 rounded bg-slate-100 text-slate-600';
-            nextClassStatus.innerText = 'Done for Today';
-          }
-          nextClassCard.innerHTML = `<div class="text-slate-400 italic text-[11px] py-2 text-center">No more classes scheduled today.</div>`;
-        }
-      }
 
       // Peak Teaching Hours / Daily Distribution Meter
       const distEl = document.getElementById('timetable-daily-distribution');
@@ -7770,8 +8083,6 @@ function getNextRandomTip(currentIndex = -1) {
       const dayPillsCont = document.getElementById('timetable-agenda-day-pills');
 
       if (todayAgenda && weeklyTimetable) {
-        const weekDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-        const allDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
         const currentSystemDay = allDays[new Date().getDay()];
         const displayDay = activeAgendaDay || currentSystemDay;
 
@@ -7796,35 +8107,94 @@ function getNextRandomTip(currentIndex = -1) {
           }).join('');
         }
 
-        const daySlots = weeklyTimetable
+        let daySlots = weeklyTimetable
           .filter(t => t.day === displayDay)
+          .map(s => ({ ...s, isSpecialSession: false }))
           .sort((a, b) => timeToMinutes(a.startTime) - timeToMinutes(b.startTime));
+
+        // When viewing today's agenda, also append any special classes planned for today
+        if (displayDay === currentSystemDay && typeof plannerEntries === 'object' && plannerEntries !== null) {
+          Object.entries(plannerEntries).forEach(([cellKey, entry]) => {
+            if (!entry || !cellKey.startsWith(todayDateKey + '__')) return;
+            const parts = cellKey.split('__');
+            if (parts.length < 3) return;
+            const [dateKey, course, section] = parts;
+
+            const isRegular = weeklyTimetable.some(t => t.day === currentSystemDay && t.course === course && t.section === section);
+            if (isRegular) return;
+
+            const rawTopic = (entry.topic || '').trim();
+            const rawActivity = (entry.activity || '').trim();
+            const rawType = (entry.type || '').trim();
+            const rawStatus = (entry.status || '').trim();
+            const topicLower = rawTopic.toLowerCase();
+            const actLower = rawActivity.toLowerCase();
+
+            const isNoClass = (rawType === 'No Class') ||
+              (rawStatus === 'Cancelled') ||
+              topicLower.includes('no class') ||
+              actLower.includes('no class') ||
+              topicLower.includes('class suspended') ||
+              actLower.includes('class suspended');
+
+            if (isNoClass) return;
+
+            const hasContent = (rawTopic.length > 0) || (rawActivity.length > 0);
+            if (!hasContent) return;
+
+            const fallbackSlot = weeklyTimetable.find(t => t.course === course && t.section === section);
+            daySlots.push({
+              course,
+              section,
+              day: displayDay,
+              startTime: entry.startTime || (fallbackSlot ? fallbackSlot.startTime : '08:00'),
+              endTime: entry.endTime || (fallbackSlot ? fallbackSlot.endTime : '09:30'),
+              room: entry.room || (fallbackSlot ? fallbackSlot.room : 'TBA'),
+              type: entry.type || (fallbackSlot ? fallbackSlot.type : 'Special Session'),
+              topic: rawTopic,
+              isSpecialSession: true
+            });
+          });
+          daySlots.sort((a, b) => timeToMinutes(a.startTime) - timeToMinutes(b.startTime));
+        }
 
         if (daySlots.length === 0) {
           todayAgenda.innerHTML = `<div class="text-slate-400 italic text-[11px] py-3 text-center">No classes scheduled for ${displayDay}.</div>`;
         } else {
-          todayAgenda.innerHTML = daySlots.map(s => `
-            <div onclick="highlightTimetableClass('${s.course}', '${s.section}', '${s.day}')"
-              class="p-2 bg-slate-50 hover:bg-blue-50/60 border border-slate-200 rounded-lg flex items-center justify-between gap-2 text-xs transition cursor-pointer group">
-              <div class="min-w-0">
-                <div class="font-extrabold text-slate-800 text-[11px] group-hover:text-blue-900 transition">
-                  <span>${escapeHtml(s.course)} - ${escapeHtml(s.section)}</span>
+          todayAgenda.innerHTML = daySlots.map(s => {
+            const cellKey = `${todayDateKey}__${s.course}__${s.section}`;
+            const entry = (displayDay === currentSystemDay && typeof plannerEntries === 'object' && plannerEntries !== null) ? plannerEntries[cellKey] : null;
+            const isNoClass = entry && (entry.type === 'No Class' || entry.status === 'Cancelled' || (entry.topic && entry.topic.toLowerCase().includes('no class')));
+            const hasPlannedTopic = entry && entry.topic && !isNoClass;
+
+            return `
+              <div onclick="highlightTimetableClass('${s.course}', '${s.section}', '${s.day}')"
+                class="p-2 ${isNoClass ? 'bg-rose-50/70 border-rose-200 opacity-80' : (s.isSpecialSession ? 'bg-amber-50/70 border-amber-200' : 'bg-slate-50 hover:bg-blue-50/60 border-slate-200')} border rounded-lg flex items-center justify-between gap-2 text-xs transition cursor-pointer group">
+                <div class="min-w-0">
+                  <div class="font-extrabold text-slate-800 text-[11px] group-hover:text-blue-900 transition flex items-center gap-1.5 flex-wrap">
+                    <span class="${isNoClass ? 'line-through text-rose-800' : ''}">${escapeHtml(s.course)} - ${escapeHtml(s.section)}</span>
+                    ${isNoClass ? '<span class="text-[8px] font-bold px-1.5 py-0.2 rounded bg-rose-100 text-rose-700 border border-rose-200">No Class</span>' : ''}
+                    ${s.isSpecialSession ? '<span class="text-[8px] font-bold px-1.5 py-0.2 rounded bg-amber-100 text-amber-800 border border-amber-200">⚡ Special</span>' : ''}
+                  </div>
+                  <div class="text-[10px] text-slate-500 font-mono">${formatTime12(s.startTime)} - ${formatTime12(s.endTime)} • Rm ${escapeHtml(s.room)}</div>
+                  ${hasPlannedTopic ? `<div class="text-[10px] text-slate-600 truncate italic mt-0.5">${escapeHtml(entry.topic)}</div>` : ''}
                 </div>
-                <div class="text-[10px] text-slate-500 font-mono">${formatTime12(s.startTime)} - ${formatTime12(s.endTime)} • Rm ${escapeHtml(s.room)}</div>
+                <div class="shrink-0" onclick="event.stopPropagation()">
+                  ${getClassroomLink(s.course, s.section) 
+                    ? `<a href="${escapeHtml(getClassroomLink(s.course, s.section))}" target="_blank" rel="noopener noreferrer" class="p-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-lg flex items-center justify-center transition shadow-2xs group/btn" title="Open Google Classroom for ${escapeHtml(s.course)} (${escapeHtml(s.section)})">
+                        <svg class="w-3.5 h-3.5 text-emerald-700 group-hover/btn:scale-110 transition" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/>
+                        </svg>
+                      </a>`
+                    : ''}
+                </div>
               </div>
-              <div class="shrink-0" onclick="event.stopPropagation()">
-                ${getClassroomLink(s.course, s.section) 
-                  ? `<a href="${escapeHtml(getClassroomLink(s.course, s.section))}" target="_blank" rel="noopener noreferrer" class="p-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-lg flex items-center justify-center transition shadow-2xs group/btn" title="Open Google Classroom for ${escapeHtml(s.course)} (${escapeHtml(s.section)})">
-                      <svg class="w-3.5 h-3.5 text-emerald-700 group-hover/btn:scale-110 transition" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/>
-                      </svg>
-                    </a>`
-                  : ''}
-              </div>
-            </div>
-          `).join('');
+            `;
+          }).join('');
         }
       }
+
+      initDraggableSidebarWidgets('sidebar-timetable');
     }
 
     // 3. Calendar Sidebar Updates & Navigation
@@ -8305,14 +8675,143 @@ function getNextRandomTip(currentIndex = -1) {
       }
     }
 
-    // 5. Gradebook Sidebar Updates
+    // 5. Gradebook Sidebar Updates & Cohort Filtering
+    let gradeDistScaleMode = 'grouped'; // 'grouped' or 'full'
+    let gradebookCohortFilter = null; // { label: string, studentIds: string[] }
+    let lastRenderedGradebookSection = '';
+
+    function setGradeDistScaleMode(mode) {
+      gradeDistScaleMode = mode;
+      if (typeof updateGradebookSidebar === 'function') {
+        updateGradebookSidebar();
+      }
+    }
+
+    function onGradebookDropdownFilterChange() {
+      gradebookCohortFilter = null;
+      renderGradebook();
+      if (typeof updateGradebookSidebar === 'function') {
+        updateGradebookSidebar();
+      }
+    }
+
+    function resetGradebookFilters() {
+      gradebookCohortFilter = null;
+      const gradeFilterEl = document.getElementById('gradebook-grade-filter');
+      const statusFilterEl = document.getElementById('gradebook-status-filter');
+      if (gradeFilterEl) gradeFilterEl.value = 'all';
+      if (statusFilterEl) statusFilterEl.value = 'all';
+      renderGradebook();
+      if (typeof updateGradebookSidebar === 'function') {
+        updateGradebookSidebar();
+      }
+      if (typeof showToast === 'function') {
+        showToast('Filter reset — showing all enrolled students', '✓');
+      }
+    }
+
+    function updateGradebookResetFilterButton() {
+      const btn = document.getElementById('gradebook-reset-filter-btn');
+      if (!btn) return;
+      const gradeFilter = document.getElementById('gradebook-grade-filter')?.value || 'all';
+      const statusFilter = document.getElementById('gradebook-status-filter')?.value || 'all';
+      const isFiltered = (gradebookCohortFilter !== null) || (gradeFilter !== 'all') || (statusFilter !== 'all');
+
+      if (isFiltered) {
+        btn.classList.remove('hidden');
+        const label = document.getElementById('gradebook-reset-filter-label');
+        if (label) {
+          if (gradeFilter !== 'all' && statusFilter !== 'all') {
+            label.innerText = `Reset (${gradeFilter}, ${statusFilter})`;
+          } else if (gradeFilter !== 'all') {
+            label.innerText = `Reset (${gradeFilter})`;
+          } else if (statusFilter !== 'all') {
+            label.innerText = `Reset (${statusFilter})`;
+          } else if (gradebookCohortFilter) {
+            label.innerText = `Reset (${gradebookCohortFilter.label})`;
+          } else {
+            label.innerText = 'Reset Filter';
+          }
+        }
+      } else {
+        btn.classList.add('hidden');
+      }
+    }
+
+    function filterGradebookByCohort(studentIds, cohortLabel = '') {
+      if (!studentIds || studentIds.length === 0) {
+        if (typeof showToast === 'function') showToast(`No students in ${cohortLabel || 'selected group'}.`, 'ℹ️');
+        return;
+      }
+
+      // Toggle behavior: if clicking the already active cohort, reset filter
+      if (gradebookCohortFilter && gradebookCohortFilter.label === cohortLabel) {
+        resetGradebookFilters();
+        return;
+      }
+
+      gradebookCohortFilter = {
+        label: cohortLabel,
+        studentIds: studentIds
+      };
+
+      // Reset dropdown selects so cohort filter is exclusive
+      const gradeFilterEl = document.getElementById('gradebook-grade-filter');
+      const statusFilterEl = document.getElementById('gradebook-status-filter');
+      if (gradeFilterEl) gradeFilterEl.value = 'all';
+      if (statusFilterEl) statusFilterEl.value = 'all';
+
+      renderGradebook();
+      if (typeof updateGradebookSidebar === 'function') {
+        updateGradebookSidebar();
+      }
+
+      const wrapper = document.getElementById('gradebook-scroll-wrapper');
+      if (wrapper) wrapper.scrollTo({ top: 0, behavior: 'smooth' });
+
+      if (typeof showToast === 'function') {
+        showToast(`Filtered: showing ${studentIds.length} student${studentIds.length === 1 ? '' : 's'} (${cohortLabel})`, '🔍');
+      }
+    }
+
+    function highlightCohortInGradebook(studentIds, cohortLabel = '') {
+      if (!studentIds || studentIds.length === 0) {
+        if (typeof showToast === 'function') showToast(`No students in ${cohortLabel || 'selected group'}.`, 'ℹ️');
+        return;
+      }
+      const wrapper = document.getElementById('gradebook-scroll-wrapper');
+      let firstRow = null;
+
+      studentIds.forEach(id => {
+        const row = document.getElementById('grade-row-' + id) || document.querySelector(`tr[data-student-id="${id}"]`);
+        if (row) {
+          if (!firstRow) firstRow = row;
+          row.classList.remove('row-flash-highlight');
+          void row.offsetWidth; // trigger reflow
+          row.classList.add('row-flash-highlight');
+          setTimeout(() => row.classList.remove('row-flash-highlight'), 3000);
+        }
+      });
+
+      if (firstRow && wrapper) {
+        const thead = document.getElementById('gradebook-table-head');
+        const theadHeight = thead ? thead.offsetHeight : 72;
+        const targetTop = Math.max(0, firstRow.offsetTop - theadHeight);
+        wrapper.scrollTo({ top: targetTop, behavior: 'smooth' });
+      }
+
+      if (typeof showToast === 'function') {
+        showToast(`Highlighting ${studentIds.length} student${studentIds.length === 1 ? '' : 's'}${cohortLabel ? ` (${cohortLabel})` : ''}`, '🎯');
+      }
+    }
+
     function updateGradebookSidebar() {
       const errorsList = document.getElementById('gradebook-errors-list');
       const errorsBadge = document.getElementById('gradebook-errors-badge');
       const atRiskList = document.getElementById('gradebook-atrisk-list');
       const atRiskBadge = document.getElementById('gradebook-atrisk-badge');
-      const weightsList = document.getElementById('gradebook-weights-list');
-      const weightsBadge = document.getElementById('gradebook-weights-sum-badge');
+      const statsContent = document.getElementById('gradebook-stats-content');
+      const statsBadge = document.getElementById('gradebook-stats-badge');
       const distCont = document.getElementById('gradebook-grade-distribution');
 
       const secSelect = document.getElementById('gradebook-section-select');
@@ -8427,75 +8926,299 @@ function getNextRandomTip(currentIndex = -1) {
         }
       }
 
-      // Weights & 100% Validator
-      if (weightsList && config && config.categories) {
-        const sum = config.categories.reduce((acc, c) => acc + (parseFloat(c.weight) || 0), 0);
-        if (weightsBadge) {
-          if (Math.abs(sum - 100) < 0.01) {
-            weightsBadge.className = 'text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800';
-            weightsBadge.innerText = '100% Valid';
-          } else {
-            weightsBadge.className = 'text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-800';
-            weightsBadge.innerText = sum + '% (Must be 100%)';
-          }
-        }
-
-        weightsList.innerHTML = config.categories.map(c => `
-          <div class="flex items-center justify-between text-xs">
-            <span class="font-medium text-slate-700">${escapeHtml(c.name)}</span>
-            <span class="font-mono font-bold text-indigo-700">${c.weight}%</span>
-          </div>
-        `).join('');
-      }
-
-      // Grade Distribution Histogram
-      if (distCont && studentRoster) {
+      // Card 2: Class Performance Widget
+      if (statsContent && studentRoster) {
         const filteredStudents = studentRoster.filter(s => !selectedSec || s.section === selectedSec);
-        const brackets = {
-          '1.00 - 1.25': { count: 0, color: 'bg-emerald-600', label: 'Superior' },
-          '1.50 - 2.00': { count: 0, color: 'bg-blue-600', label: 'Very Good' },
-          '2.25 - 3.00': { count: 0, color: 'bg-amber-500', label: 'Passing' },
-          'INC': { count: 0, color: 'bg-slate-400', label: 'Incomplete' },
-          '5.00': { count: 0, color: 'bg-rose-600', label: 'Failed' }
-        };
-
-        filteredStudents.forEach(s => {
-          const res = calculateStudentGrade(s, config, selectedSec);
-          const g = parseFloat(res.msu.grade);
-          if (isNaN(g)) {
-            brackets['INC'].count++;
-          } else if (g >= 1.00 && g <= 1.25) {
-            brackets['1.00 - 1.25'].count++;
-          } else if (g > 1.25 && g <= 2.00) {
-            brackets['1.50 - 2.00'].count++;
-          } else if (g > 2.00 && g <= 3.00) {
-            brackets['2.25 - 3.00'].count++;
-          } else {
-            brackets['5.00'].count++;
+        if (filteredStudents.length === 0) {
+          if (statsBadge) {
+            statsBadge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 border border-slate-200 dark:border-slate-700 flex items-center gap-1 shrink-0';
+            statsBadge.innerHTML = '<span>0 Enrolled</span>';
           }
-        });
+          statsContent.innerHTML = '<div class="text-slate-400 italic text-[11px] py-1 text-center">No students enrolled in this section.</div>';
+        } else {
+          const count = filteredStudents.length;
+          let sumTotal = 0;
+          let passCount = 0;
+          let failCount = 0;
+          let otherCount = 0;
+          const passedStudents = [];
+          const failedStudents = [];
+          const otherStudents = [];
+          const totals = [];
+          const studentMetrics = [];
 
-        const totalStudents = Math.max(1, filteredStudents.length);
+          filteredStudents.forEach(s => {
+            const gradeResult = calculateStudentGrade(s, config, selectedSec);
+            const tot = gradeResult.total;
+            sumTotal += tot;
+            totals.push(tot);
+            studentMetrics.push({ student: s, gradeResult });
 
-        distCont.innerHTML = Object.keys(brackets).map(k => {
-          const b = brackets[k];
-          const pct = Math.round((b.count / totalStudents) * 100);
-          return `
-            <div class="space-y-0.5">
-              <div class="flex justify-between text-[11px]">
-                <span class="font-bold text-slate-700">${k} <span class="font-normal text-slate-400 text-[10px]">(${b.label})</span></span>
-                <span class="font-mono font-bold text-slate-800">${b.count} (${pct}%)</span>
+            if (gradeResult.msu.status === 'Passed') {
+              passCount++;
+              passedStudents.push(s);
+            } else if (gradeResult.msu.status === 'Failed') {
+              failCount++;
+              failedStudents.push(s);
+            } else {
+              otherCount++;
+              otherStudents.push(s);
+            }
+          });
+
+          totals.sort((a, b) => a - b);
+          const avgTotal = sumTotal / count;
+          const medianTotal = (count % 2 === 0) ? (totals[count / 2 - 1] + totals[count / 2]) / 2 : totals[Math.floor(count / 2)];
+          const passRate = (count > 0) ? (passCount / count) * 100 : 0;
+          const avgMsu = getMsuGrade(avgTotal, null, selectedSec);
+          const medianMsu = getMsuGrade(medianTotal, null, selectedSec);
+
+          studentMetrics.sort((a, b) => b.gradeResult.total - a.gradeResult.total);
+          const topStudent = studentMetrics[0];
+          const lowStudent = studentMetrics[studentMetrics.length - 1];
+
+          // Score Variance & Standard Deviation (sigma)
+          const variance = totals.reduce((acc, val) => acc + Math.pow(val - avgTotal, 2), 0) / count;
+          const stdDev = Math.sqrt(variance);
+          const scoreSpread = (topStudent.gradeResult.total - lowStudent.gradeResult.total).toFixed(1);
+
+          // Top Header Badge: Class Enrollment
+          if (statsBadge) {
+            statsBadge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200/90 dark:border-slate-700 flex items-center gap-1 shrink-0';
+            statsBadge.innerHTML = `<svg class="w-3 h-3 text-slate-500 dark:text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg><span>${count} Enrolled</span>`;
+          }
+
+          statsContent.innerHTML = `
+            <div class="grid grid-cols-3 gap-1.5 text-center">
+              <div class="py-1 px-1 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
+                <div class="text-[8px] font-extrabold text-slate-400 uppercase tracking-wider">Average</div>
+                <div class="text-xs font-extrabold text-slate-900 dark:text-slate-100 leading-tight my-0.5 font-mono">${avgTotal.toFixed(1)}%</div>
+                <div class="inline-block px-1 py-0.2 rounded text-[8.5px] font-bold font-mono bg-amber-100 dark:bg-amber-900/40 text-amber-900 dark:text-amber-200 border border-amber-200/80 dark:border-amber-700/60 mx-auto" title="MSU Equivalent: ${escapeHtml(avgMsu.status)}">${escapeHtml(avgMsu.grade)}</div>
               </div>
-              <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
-                <div class="${b.color} h-full rounded-full" style="width: ${pct}%"></div>
+              <div class="py-1 px-1 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
+                <div class="text-[8px] font-extrabold text-slate-400 uppercase tracking-wider">Median</div>
+                <div class="text-xs font-extrabold text-slate-900 dark:text-slate-100 leading-tight my-0.5 font-mono">${medianTotal.toFixed(1)}%</div>
+                <div class="inline-block px-1 py-0.2 rounded text-[8.5px] font-bold font-mono bg-sky-100 dark:bg-sky-900/40 text-sky-900 dark:text-sky-200 border border-sky-200/80 dark:border-sky-700/60 mx-auto" title="MSU Equivalent: ${escapeHtml(medianMsu.status)}">${escapeHtml(medianMsu.grade)}</div>
+              </div>
+              <div class="py-1 px-1 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
+                <div class="text-[8px] font-extrabold text-slate-400 uppercase tracking-wider">Pass Rate</div>
+                <div class="text-xs font-extrabold ${passRate >= 75 ? 'text-emerald-700 dark:text-emerald-400' : (passRate >= 50 ? 'text-amber-600 dark:text-amber-400' : 'text-rose-600 dark:text-rose-400')} leading-tight my-0.5 font-mono">${Math.round(passRate)}%</div>
+                <div class="inline-block px-1 py-0.2 rounded text-[8.5px] font-bold font-mono ${passRate >= 75 ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-300' : (passRate >= 50 ? 'bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300' : 'bg-rose-100 dark:bg-rose-900/40 text-rose-800 dark:text-rose-300')} mx-auto">${passCount}/${count}</div>
               </div>
             </div>
+
+            <!-- Class Standing / Outcome Card with Complete 3-Way Legend -->
+            <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1.5">
+              <div class="flex items-center justify-between text-[11px] font-bold">
+                <span class="text-slate-700 dark:text-slate-300">Class Standing</span>
+                <div class="flex items-center gap-1.5 font-mono text-[10px]">
+                  <span onclick="filterGradebookByCohort([${passedStudents.map(s => `'${escapeJsString(s.id)}'`).join(',')}], 'Passed')"
+                        class="px-1.5 py-0.5 rounded cursor-pointer hover:opacity-80 transition ${gradebookCohortFilter?.label === 'Passed' ? 'bg-emerald-600 text-white font-black' : 'bg-emerald-100/90 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-300 font-bold border border-emerald-200/80 dark:border-emerald-800/60'}"
+                        title="Click to filter passed students">${passCount} Pass</span>
+                  <span onclick="filterGradebookByCohort([${failedStudents.map(s => `'${escapeJsString(s.id)}'`).join(',')}], 'Failed')"
+                        class="px-1.5 py-0.5 rounded cursor-pointer hover:opacity-80 transition ${gradebookCohortFilter?.label === 'Failed' ? 'bg-rose-600 text-white font-black' : 'bg-rose-100/90 dark:bg-rose-950/70 text-rose-800 dark:text-rose-300 font-bold border border-rose-200/80 dark:border-rose-800/60'}"
+                        title="Click to filter failed students">${failCount} Fail</span>
+                  ${otherCount > 0 ? `
+                  <span onclick="filterGradebookByCohort([${otherStudents.map(s => `'${escapeJsString(s.id)}'`).join(',')}], 'Incomplete / Other')"
+                        class="px-1.5 py-0.5 rounded cursor-pointer hover:opacity-80 transition ${gradebookCohortFilter?.label === 'Incomplete / Other' ? 'bg-slate-600 text-white font-black' : 'bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold border border-slate-300 dark:border-slate-700'}"
+                        title="Click to filter incomplete students">${otherCount} INC</span>
+                  ` : ''}
+                </div>
+              </div>
+              <div class="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-2 overflow-hidden flex cursor-pointer" title="Click segments to filter cohort in table">
+                <div onclick="filterGradebookByCohort([${passedStudents.map(s => `'${escapeJsString(s.id)}'`).join(',')}], 'Passed')"
+                     class="bg-emerald-500 hover:bg-emerald-600 h-full transition-all duration-300 ${gradebookCohortFilter?.label === 'Passed' ? 'ring-2 ring-emerald-700' : ''}"
+                     style="width: ${passRate}%"
+                     title="${passCount} Passed (${passRate.toFixed(1)}%) • Click to filter"></div>
+                <div onclick="filterGradebookByCohort([${failedStudents.map(s => `'${escapeJsString(s.id)}'`).join(',')}], 'Failed')"
+                     class="bg-rose-500 hover:bg-rose-600 h-full transition-all duration-300 ${gradebookCohortFilter?.label === 'Failed' ? 'ring-2 ring-rose-700' : ''}"
+                     style="width: ${count > 0 ? (failCount / count) * 100 : 0}%"
+                     title="${failCount} Failed (${((failCount / count) * 100).toFixed(1)}%) • Click to filter"></div>
+                ${otherCount > 0 ? `
+                <div onclick="filterGradebookByCohort([${otherStudents.map(s => `'${escapeJsString(s.id)}'`).join(',')}], 'Incomplete / Other')"
+                     class="bg-slate-400 hover:bg-slate-500 h-full transition-all duration-300 ${gradebookCohortFilter?.label === 'Incomplete / Other' ? 'ring-2 ring-slate-600' : ''}"
+                     style="width: ${(otherCount / count) * 100}%"
+                     title="${otherCount} Incomplete / Other (${((otherCount / count) * 100).toFixed(1)}%) • Click to filter"></div>
+                ` : ''}
+              </div>
+              <div class="flex items-center justify-between text-[10px] text-slate-500 pt-0.5 font-medium">
+                <span onclick="filterGradebookByCohort([${passedStudents.map(s => `'${escapeJsString(s.id)}'`).join(',')}], 'Passed')"
+                      class="inline-flex items-center gap-1 font-semibold ${gradebookCohortFilter?.label === 'Passed' ? 'text-emerald-800 dark:text-emerald-300 font-black underline' : 'text-emerald-700 dark:text-emerald-400 hover:underline'} cursor-pointer transition"
+                      title="Click to filter passed students">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>${passRate.toFixed(1)}% Passed
+                </span>
+                <span onclick="filterGradebookByCohort([${failedStudents.map(s => `'${escapeJsString(s.id)}'`).join(',')}], 'Failed')"
+                      class="inline-flex items-center gap-1 font-semibold ${gradebookCohortFilter?.label === 'Failed' ? 'text-rose-800 dark:text-rose-300 font-black underline' : 'text-rose-600 dark:text-rose-400 hover:underline'} cursor-pointer transition"
+                      title="Click to filter failed students">
+                  <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>${count > 0 ? ((failCount / count) * 100).toFixed(1) : 0}% Failed
+                </span>
+                <span onclick="filterGradebookByCohort([${otherStudents.map(s => `'${escapeJsString(s.id)}'`).join(',')}], 'Incomplete / Other')"
+                      class="inline-flex items-center gap-1 font-semibold ${gradebookCohortFilter?.label === 'Incomplete / Other' ? 'text-slate-800 dark:text-slate-200 font-black underline' : 'text-slate-500 dark:text-slate-400 hover:underline'} cursor-pointer transition"
+                      title="Click to filter incomplete students">
+                  <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>${count > 0 ? ((otherCount / count) * 100).toFixed(1) : 0}% INC
+                </span>
+              </div>
+            </div>
+
+            <!-- Performer Cards + Score Spread & Standard Deviation Strip -->
+            ${topStudent ? `
+              <div class="space-y-1.5">
+                <div class="grid grid-cols-2 gap-2 text-[11px]">
+                  <div onclick="filterGradebookByCohort(['${escapeJsString(topStudent.student.id)}'], 'Top Score: ${escapeJsString(topStudent.student.last)}')"
+                       class="p-2 rounded-xl cursor-pointer transition flex items-center gap-1.5 group shadow-2xs min-w-0 ${gradebookCohortFilter?.label === 'Top Score: ' + topStudent.student.last ? 'bg-emerald-100 dark:bg-emerald-950/80 ring-2 ring-emerald-500' : 'bg-emerald-50/70 dark:bg-emerald-950/30 hover:bg-emerald-100 dark:hover:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800/60'}"
+                       title="Click to filter to top performer: ${escapeHtml(topStudent.student.last)}, ${escapeHtml(topStudent.student.first)}">
+                    <span class="text-sm shrink-0 group-hover:scale-110 transition-transform">🏆</span>
+                    <div class="min-w-0 flex-1">
+                      <div class="text-[9px] font-extrabold text-emerald-800 dark:text-emerald-400 uppercase tracking-wider whitespace-nowrap">High Score</div>
+                      <div class="font-bold text-slate-800 dark:text-slate-200 truncate group-hover:text-emerald-950 dark:group-hover:text-emerald-300 text-[11px]">${escapeHtml(topStudent.student.last)}</div>
+                    </div>
+                    <span class="font-mono font-extrabold text-emerald-700 dark:text-emerald-400 text-xs shrink-0">${topStudent.gradeResult.total}%</span>
+                  </div>
+
+                  ${lowStudent ? `
+                  <div onclick="filterGradebookByCohort(['${escapeJsString(lowStudent.student.id)}'], 'Low Score: ${escapeJsString(lowStudent.student.last)}')"
+                       class="p-2 rounded-xl cursor-pointer transition flex items-center gap-1.5 group shadow-2xs min-w-0 ${gradebookCohortFilter?.label === 'Low Score: ' + lowStudent.student.last ? 'bg-amber-100 dark:bg-amber-950/80 ring-2 ring-amber-500' : 'bg-amber-50/70 dark:bg-amber-950/30 hover:bg-amber-100 dark:hover:bg-amber-950/50 border border-amber-200 dark:border-amber-800/60'}"
+                       title="Click to filter to lowest performer: ${escapeHtml(lowStudent.student.last)}, ${escapeHtml(lowStudent.student.first)}">
+                    <span class="text-sm shrink-0 group-hover:scale-110 transition-transform">${lowStudent.gradeResult.total < 75 ? '⚠️' : '🎯'}</span>
+                    <div class="min-w-0 flex-1">
+                      <div class="text-[9px] font-extrabold text-amber-800 dark:text-amber-400 uppercase tracking-wider whitespace-nowrap">Low Score</div>
+                      <div class="font-bold text-slate-800 dark:text-slate-200 truncate group-hover:text-amber-950 dark:group-hover:text-amber-300 text-[11px]">${escapeHtml(lowStudent.student.last)}</div>
+                    </div>
+                    <span class="font-mono font-extrabold ${lowStudent.gradeResult.total < 75 ? 'text-rose-700 dark:text-rose-400' : 'text-amber-700 dark:text-amber-400'} text-xs shrink-0">${lowStudent.gradeResult.total}%</span>
+                  </div>
+                  ` : ''}
+                </div>
+
+                <!-- Score Spread & Standard Deviation Strip -->
+                <div class="flex items-center justify-between text-xs px-2.5 py-1 bg-slate-50 dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-lg text-slate-600 dark:text-slate-400 font-mono">
+                  <span title="Score range between lowest and top performers">Range: <strong class="text-slate-800 dark:text-slate-200">${lowStudent ? lowStudent.gradeResult.total : 0}% – ${topStudent.gradeResult.total}%</strong> <span class="text-slate-400 dark:text-slate-500 text-[10px]">(Δ${scoreSpread}%)</span></span>
+                  <span title="Standard Deviation (σ) of section final percentage scores">σ = <strong class="text-slate-800 dark:text-slate-200">±${stdDev.toFixed(1)}%</strong></span>
+                </div>
+              </div>
+            ` : ''}
           `;
-        }).join('');
+        }
+      }
+
+      // Grade Distribution Histogram (Interactive Micro-Bars with Tiers vs Full Scale Toggle)
+      if (distCont && studentRoster) {
+        const filteredStudents = studentRoster.filter(s => !selectedSec || s.section === selectedSec);
+        if (filteredStudents.length === 0) {
+          distCont.innerHTML = '<div class="text-slate-400 italic text-[11px] py-1 text-center">No grade distribution records.</div>';
+        } else {
+          // Synchronize mode toggle button states
+          const btnGrouped = document.getElementById('btn-grade-dist-grouped');
+          const btnFull = document.getElementById('btn-grade-dist-full');
+          if (btnGrouped && btnFull) {
+            if (gradeDistScaleMode === 'full') {
+              btnFull.className = 'px-1.5 py-0.5 rounded text-[9px] font-bold transition bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 shadow-2xs';
+              btnGrouped.className = 'px-1.5 py-0.5 rounded text-[9px] font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition';
+            } else {
+              btnGrouped.className = 'px-1.5 py-0.5 rounded text-[9px] font-bold transition bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 shadow-2xs';
+              btnFull.className = 'px-1.5 py-0.5 rounded text-[9px] font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition';
+            }
+          }
+
+          let buckets = {};
+          if (gradeDistScaleMode === 'full') {
+            // Full 11-grade institutional MSU grading scale
+            const { scale } = getActiveGradingScale(selectedSec);
+            scale.forEach(item => {
+              let color = 'bg-slate-400';
+              const gNum = parseFloat(item.grade);
+              if (item.grade === '1.00') color = 'bg-emerald-600';
+              else if (!isNaN(gNum) && gNum <= 1.75) color = 'bg-emerald-500';
+              else if (!isNaN(gNum) && gNum <= 2.50) color = 'bg-blue-600';
+              else if (!isNaN(gNum) && gNum <= 3.00) color = 'bg-amber-500';
+              else if (item.grade === 'INC') color = 'bg-slate-400';
+              else if (item.grade === '5.00') color = 'bg-rose-600';
+              buckets[item.grade] = {
+                count: 0,
+                color: color,
+                label: item.desc || item.status,
+                students: []
+              };
+            });
+
+            filteredStudents.forEach(s => {
+              const res = calculateStudentGrade(s, config, selectedSec);
+              const g = res.msu.grade;
+              if (buckets[g]) {
+                buckets[g].count++;
+                buckets[g].students.push(s);
+              } else if (g === 'INC' && buckets['INC']) {
+                buckets['INC'].count++;
+                buckets['INC'].students.push(s);
+              } else if (buckets['5.00']) {
+                buckets['5.00'].count++;
+                buckets['5.00'].students.push(s);
+              }
+            });
+          } else {
+            // Grouped 5 summary tiers
+            buckets = {
+              '1.00 - 1.25': { count: 0, color: 'bg-emerald-600', label: 'Superior', students: [] },
+              '1.50 - 2.00': { count: 0, color: 'bg-blue-600', label: 'Very Good', students: [] },
+              '2.25 - 3.00': { count: 0, color: 'bg-amber-500', label: 'Passing', students: [] },
+              'INC': { count: 0, color: 'bg-slate-400', label: 'Incomplete', students: [] },
+              '5.00': { count: 0, color: 'bg-rose-600', label: 'Failed', students: [] }
+            };
+
+            filteredStudents.forEach(s => {
+              const res = calculateStudentGrade(s, config, selectedSec);
+              const g = parseFloat(res.msu.grade);
+              if (isNaN(g) || res.msu.grade === 'INC') {
+                buckets['INC'].count++;
+                buckets['INC'].students.push(s);
+              } else if (g >= 1.00 && g <= 1.25) {
+                buckets['1.00 - 1.25'].count++;
+                buckets['1.00 - 1.25'].students.push(s);
+              } else if (g > 1.25 && g <= 2.00) {
+                buckets['1.50 - 2.00'].count++;
+                buckets['1.50 - 2.00'].students.push(s);
+              } else if (g > 2.00 && g <= 3.00) {
+                buckets['2.25 - 3.00'].count++;
+                buckets['2.25 - 3.00'].students.push(s);
+              } else {
+                buckets['5.00'].count++;
+                buckets['5.00'].students.push(s);
+              }
+            });
+          }
+
+          const totalStudents = Math.max(1, filteredStudents.length);
+
+          distCont.innerHTML = Object.keys(buckets).map(k => {
+            const b = buckets[k];
+            const pct = Math.round((b.count / totalStudents) * 100);
+            const studentNames = b.students.map(st => st.last).join(', ');
+            const hasStudents = b.students.length > 0;
+            const studentIdsParam = b.students.map(st => `'${escapeJsString(st.id)}'`).join(',');
+            const isCohortActive = (gradebookCohortFilter && gradebookCohortFilter.label === k);
+
+            return `
+              <div ${hasStudents ? `onclick="filterGradebookByCohort([${studentIdsParam}], '${escapeJsString(k)}')"` : ''}
+                   class="flex items-center gap-2 text-[11px] py-1 px-1.5 rounded-lg ${isCohortActive ? 'bg-amber-100/90 dark:bg-amber-950/70 ring-1.5 ring-amber-500 font-bold' : (hasStudents ? 'hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer group' : 'opacity-50 cursor-default')} transition"
+                   title="${hasStudents ? (isCohortActive ? `Active Filter (${k}): Click to reset` : `Click to filter ${b.students.length} student${b.students.length === 1 ? '' : 's'} (${k}): ${escapeHtml(studentNames)}`) : `No students in grade bracket ${k}`}">
+                <span class="w-20 font-bold ${isCohortActive ? 'text-amber-900 dark:text-amber-200' : 'text-slate-700 dark:text-slate-300'} shrink-0 font-mono text-[10.5px] flex items-center justify-between">
+                  <span>${escapeHtml(k)}</span>
+                  ${isCohortActive ? `<span class="text-[9px] text-amber-700 dark:text-amber-400 font-extrabold" title="Filtered (click to reset)">✕</span>` : (hasStudents ? `<span class="text-[8px] opacity-0 group-hover:opacity-100 text-slate-500 transition-opacity">🔍</span>` : '')}
+                </span>
+                <div class="flex-1 bg-slate-100 dark:bg-slate-800 rounded-full h-1.5 overflow-hidden">
+                  <div class="${b.color} h-full rounded-full transition-all duration-300" style="width: ${pct}%"></div>
+                </div>
+                <div class="w-14 text-right font-mono shrink-0">
+                  <span class="font-bold ${isCohortActive ? 'text-amber-900 dark:text-amber-100' : 'text-slate-800 dark:text-slate-200'}">${b.count}</span>
+                  <span class="text-[9.5px] ${isCohortActive ? 'text-amber-700 dark:text-amber-300' : 'text-slate-400'}">(${pct}%)</span>
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
       }
     }
 
-    function highlightStudentInGradebook(studentId, section = null) {
+  function highlightStudentInGradebook(studentId, section = null) {
       const secSelect = document.getElementById('gradebook-section-select');
       const activeSec = secSelect ? secSelect.value : '';
       const targetSection = section || activeSec;
@@ -8509,7 +9232,14 @@ function getNextRandomTip(currentIndex = -1) {
       let switchedSection = false;
       if (student && secSelect && student.section && secSelect.value !== student.section) {
         secSelect.value = student.section;
+        gradebookCohortFilter = null;
         renderGradebook();
+        if (typeof updateGradebookSidebar === 'function') updateGradebookSidebar();
+        switchedSection = true;
+      } else if (gradebookCohortFilter !== null && (!gradebookCohortFilter.studentIds || !gradebookCohortFilter.studentIds.includes(studentId))) {
+        gradebookCohortFilter = null;
+        renderGradebook();
+        if (typeof updateGradebookSidebar === 'function') updateGradebookSidebar();
         switchedSection = true;
       }
       setTimeout(() => {
@@ -9568,6 +10298,152 @@ function nextGuideStep() {
   if (typeof navigateGuideStep === 'function') navigateGuideStep(1);
 }
 
+// ================= DYNAMIC VIEWPORT AUTO-RESIZING & MANUAL RESIZERS =================
+const MAIN_WINDOW_CONFIGS = [
+  { wrapperId: 'matrix-scroll-wrapper', tabId: 'planner' },
+  { wrapperId: 'timetable-scroll-wrapper', tabId: 'timetable' },
+  { wrapperId: 'calendar-scroll-wrapper', tabId: 'calendar' },
+  { wrapperId: 'roster-scroll-wrapper', tabId: 'roster' },
+  { wrapperId: 'gradebook-scroll-wrapper', tabId: 'gradebook' }
+];
+
+function autoResizeContentWindows() {
+  MAIN_WINDOW_CONFIGS.forEach(({ wrapperId, tabId }) => {
+    const el = document.getElementById(wrapperId);
+    if (!el) return;
+
+    // Check if user set a manual height override for this tab
+    const savedH = localStorage.getItem('msu_main_win_h_' + tabId);
+    if (savedH) {
+      const numH = parseInt(savedH, 10);
+      if (!isNaN(numH) && numH >= 240) {
+        el.style.height = numH + 'px';
+        el.style.maxHeight = 'none';
+        return;
+      }
+    }
+
+    // Only compute viewport-fit if the tab is currently visible
+    const tabSection = document.getElementById('tab-content-' + tabId);
+    if (tabSection && tabSection.classList.contains('hidden')) {
+      return;
+    }
+
+    const rect = el.getBoundingClientRect();
+    if (rect.top > 0) {
+      // 36px breathing room for bottom margin, 14px resizer bar, and page padding
+      const bottomBuffer = 36;
+      const targetH = Math.max(280, Math.floor(window.innerHeight - rect.top - bottomBuffer));
+      el.style.height = targetH + 'px';
+      el.style.maxHeight = 'none';
+    }
+  });
+
+  if (typeof initAllDualScrollbars === 'function') {
+    initAllDualScrollbars();
+  }
+}
+
+function initMainWindowResizers() {
+  const resizers = document.querySelectorAll('.main-table-bottom-resizer');
+  resizers.forEach(resizer => {
+    if (resizer._initialized) return;
+    resizer._initialized = true;
+
+    const targetId = resizer.getAttribute('data-target');
+    const tabId = resizer.getAttribute('data-tab') || 'planner';
+    const targetEl = document.getElementById(targetId);
+    if (!targetEl) return;
+
+    // Apply saved custom height on initialization if present
+    const savedH = localStorage.getItem('msu_main_win_h_' + tabId);
+    if (savedH) {
+      const numH = parseInt(savedH, 10);
+      if (!isNaN(numH) && numH >= 240) {
+        targetEl.style.height = numH + 'px';
+        targetEl.style.maxHeight = 'none';
+      }
+    }
+
+    resizer.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const startY = e.clientY;
+      const startH = targetEl.getBoundingClientRect().height;
+      const minH = 240;
+      const maxH = Math.max(minH, Math.floor(window.innerHeight * 0.94));
+
+      try {
+        resizer.setPointerCapture(e.pointerId);
+      } catch (err) {}
+
+      document.body.classList.add('resizing-main-window-active');
+      resizer.parentElement?.classList.add('main-window-resizing');
+
+      let targetH = startH;
+      let rafId = null;
+
+      const applyHeight = () => {
+        rafId = null;
+        targetEl.style.height = targetH + 'px';
+        targetEl.style.maxHeight = 'none';
+        if (typeof initAllDualScrollbars === 'function') {
+          initAllDualScrollbars();
+        }
+      };
+
+      const onPointerMove = (moveEv) => {
+        const deltaY = moveEv.clientY - startY;
+        targetH = Math.min(maxH, Math.max(minH, Math.round(startH + deltaY)));
+        if (!rafId) {
+          rafId = requestAnimationFrame(applyHeight);
+        }
+      };
+
+      const onPointerUp = () => {
+        if (rafId) {
+          cancelAnimationFrame(rafId);
+          applyHeight();
+        }
+        try {
+          if (resizer.hasPointerCapture(e.pointerId)) {
+            resizer.releasePointerCapture(e.pointerId);
+          }
+        } catch (err) {}
+
+        window.removeEventListener('pointermove', onPointerMove);
+        window.removeEventListener('pointerup', onPointerUp);
+        window.removeEventListener('pointercancel', onPointerUp);
+        resizer.removeEventListener('lostpointercapture', onPointerUp);
+
+        document.body.classList.remove('resizing-main-window-active');
+        resizer.parentElement?.classList.remove('main-window-resizing');
+
+        if (targetEl.style.height) {
+          localStorage.setItem('msu_main_win_h_' + tabId, parseInt(targetEl.style.height, 10));
+        }
+      };
+
+      window.addEventListener('pointermove', onPointerMove, { passive: true });
+      window.addEventListener('pointerup', onPointerUp);
+      window.addEventListener('pointercancel', onPointerUp);
+      resizer.addEventListener('lostpointercapture', onPointerUp);
+    });
+
+    // Double-click resets to automatic responsive viewport-fit
+    resizer.addEventListener('dblclick', (e) => {
+      e.stopPropagation();
+      localStorage.removeItem('msu_main_win_h_' + tabId);
+      targetEl.style.height = '';
+      autoResizeContentWindows();
+      if (typeof showToast === 'function') {
+        showToast('Reset window to auto-fit viewport height.', '✓');
+      }
+    });
+  });
+}
+
 // Reset activity list scroll to top on render to avoid chopped cards
 function fixNextActivitiesScroll() {
   const list = document.getElementById("planner-milestones-list") || document.getElementById("next-activities-list") || document.querySelector(".next-activities-scroll-area");
@@ -9577,8 +10453,18 @@ function fixNextActivitiesScroll() {
 }
 
 window.addEventListener("DOMContentLoaded", () => {
+  initMainWindowResizers();
+  autoResizeContentWindows();
+  setTimeout(autoResizeContentWindows, 100);
+  window.addEventListener('resize', () => {
+    autoResizeContentWindows();
+  });
   initAllDualScrollbars();
   fixNextActivitiesScroll();
+  const gradeFilterEl = document.getElementById('gradebook-grade-filter');
+  const statusFilterEl = document.getElementById('gradebook-status-filter');
+  if (gradeFilterEl) gradeFilterEl.addEventListener('change', onGradebookDropdownFilterChange);
+  if (statusFilterEl) statusFilterEl.addEventListener('change', onGradebookDropdownFilterChange);
   setTimeout(checkBackupReminder, 3500);
   setInterval(checkBackupReminder, 30 * 60 * 1000);
 });

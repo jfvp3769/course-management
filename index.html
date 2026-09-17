@@ -186,33 +186,48 @@
                 <h2 id="planner-term-label" class="text-base sm:text-lg font-extrabold text-slate-900 tracking-tight">1st Semester Schedule & Activity Matrix</h2>
                 <span id="planner-total-weeks-badge" class="px-2 py-0.5 bg-msu-maroon/10 text-msu-maroon font-bold text-xs rounded-md border border-msu-maroon/20">18 Weeks</span>
               </div>
-              <p class="text-xs text-slate-500 mt-0.5">Map weekly lecture topics, schedule daily activities, and manage class suspensions across the term.</p>
+              <p class="text-xs text-slate-500 mt-0.5">Schedule lecture topics, activities, and class suspensions.</p>
             </div>
 
-            <!-- Controls: Month Filter & Action Buttons -->
-            <div class="flex items-center gap-2 flex-wrap text-xs">
-              <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1 shadow-xs">
-                <span class="font-semibold text-slate-500 text-[11px]">Filter Month:</span>
-                <select id="filter-month" onchange="filterMatrixByMonth()" class="bg-transparent border-0 text-xs font-semibold text-slate-700 focus:ring-0 p-0 cursor-pointer">
-                  <option value="all">Full Semester</option>
-                </select>
-              </div>
-
-              <button onclick="openDeclareNoClassModal()" class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-300 rounded-lg font-bold flex items-center gap-1.5 transition active:scale-95 shadow-xs" title="Declare holiday or suspension">
-                <svg class="w-3.5 h-3.5 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
-                <span>Declare "No Class" Day(s)</span>
+            <!-- Controls: Action Buttons & Week Navigator (Ordered: Declare No Class, Undo, Redo, Week Navigator, Jump to Today) -->
+            <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap text-xs">
+              <!-- 1. Declare No Class -->
+              <button type="button" onclick="openDeclareNoClassModal()" class="planner-action-btn planner-btn-noclass bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-300 shadow-2xs" title="Declare 'No Class' Day(s)">
+                <svg class="w-3.5 h-3.5 text-rose-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+                <span class="planner-btn-label">Declare "No Class" Day(s)</span>
               </button>
 
-              <div class="inline-flex items-center gap-1.5">
-                <button id="btn-planner-undo" onclick="undoPlannerAction()" class="px-2.5 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 rounded-lg font-bold flex items-center gap-1.5 transition active:scale-95 opacity-60 cursor-not-allowed text-xs shadow-xs" disabled title="Undo last action in Lesson Matrix (Ctrl+Z)">
-                  <span class="font-black">↺</span>
-                  <span>Undo</span>
+              <!-- 2. Undo -->
+              <button type="button" id="btn-planner-undo" onclick="undoPlannerAction()" class="planner-action-btn planner-btn-undo bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 opacity-60 cursor-not-allowed shadow-2xs" disabled title="Undo last action in Lesson Matrix (Ctrl+Z)">
+                <span class="font-black text-sm leading-none shrink-0">↺</span>
+                <span class="planner-btn-label">Undo</span>
+              </button>
+
+              <!-- 3. Redo -->
+              <button type="button" id="btn-planner-redo" onclick="redoPlannerAction()" class="planner-action-btn planner-btn-redo bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 opacity-60 cursor-not-allowed shadow-2xs" disabled title="Redo last undone action in Lesson Matrix (Ctrl+Y or Ctrl+Shift+Z)">
+                <span class="font-black text-sm leading-none shrink-0">↻</span>
+                <span class="planner-btn-label">Redo</span>
+              </button>
+
+              <!-- 4. Week Navigator -->
+              <div class="flex items-center gap-1 bg-slate-50 border border-slate-200 rounded-lg p-0.5 shadow-2xs">
+                <button type="button" onclick="navigateWeek(-1)" class="p-1 rounded bg-white hover:bg-slate-200 border border-slate-200 text-slate-700 shadow-2xs transition active:scale-95" title="Previous Week">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
                 </button>
-                <button id="btn-planner-redo" onclick="redoPlannerAction()" class="px-2.5 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 rounded-lg font-bold flex items-center gap-1.5 transition active:scale-95 opacity-60 cursor-not-allowed text-xs shadow-xs" disabled title="Redo last undone action in Lesson Matrix (Ctrl+Y or Ctrl+Shift+Z)">
-                  <span class="font-black">↻</span>
-                  <span>Redo</span>
+                <span id="current-week-nav-label" class="text-xs font-bold text-slate-800 px-2 min-w-[72px] text-center select-none">Week 1</span>
+                <button type="button" onclick="navigateWeek(1)" class="p-1 rounded bg-white hover:bg-slate-200 border border-slate-200 text-slate-700 shadow-2xs transition active:scale-95" title="Next Week">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                 </button>
               </div>
+
+              <!-- 5. Jump to Today -->
+              <button type="button" onclick="scrollToToday()" class="planner-action-btn planner-btn-today bg-amber-400 hover:bg-amber-300 text-slate-900 border border-amber-500/30 shadow-2xs" title="Jump to today's date in matrix">
+                <svg class="w-3.5 h-3.5 text-msu-maroon shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                  <circle cx="12" cy="15" r="1.5" fill="currentColor" stroke="none"/>
+                </svg>
+                <span class="planner-btn-label">Jump to Today</span>
+              </button>
             </div>
 
             <!-- Sidebar Docked Ear Tag Outside Top Window -->
@@ -240,60 +255,45 @@
 
           <!-- Scrollable Table Body -->
 
-          <div id="matrix-scroll-wrapper" class="overflow-x-auto h-[592px] overflow-y-auto relative">
+          <div id="matrix-scroll-wrapper" class="overflow-x-auto overflow-y-auto relative main-table-scroll-wrapper">
 
             <table id="matrix-table" class="w-full border-collapse text-left text-xs min-w-[1050px]">
             <thead id="matrix-head" class="bg-slate-100 sticky top-0 z-30 shadow-sm select-none"></thead>
             <tbody id="matrix-body" class="divide-y divide-slate-200"></tbody>
           </table>
         </div>
+        <div class="main-table-bottom-resizer" data-target="matrix-scroll-wrapper" data-tab="planner" title="Drag to adjust window height • Double-click to reset to auto-fit">
+          <div class="main-resizer-grip"></div>
         </div>
-
-        <!-- LEGEND & WEEK NAVIGATOR / HORIZONTAL SCROLLBAR CONTROLS BELOW MATRIX TABLE -->
-        <div class="flex flex-wrap items-center justify-between text-xs text-slate-600 bg-white px-4 py-2.5 rounded-xl border border-slate-200 gap-3">
-          <div class="flex items-center gap-4 flex-wrap">
-            <span class="font-bold text-slate-700">Legend:</span>
-            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-blue-100 border border-blue-400"></span> Class Meeting</span>
-            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-amber-100 border border-amber-400"></span> Exam Period</span>
-            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-rose-100 border border-rose-400"></span> No Class</span>
-            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-slate-300"></span> Weekend</span>
-            <span class="text-slate-500 font-medium">↔ Drag headers edge to resize columns. Display fits exactly 7 days.</span>
-          </div>
-
-          <div class="flex items-center gap-2.5 flex-wrap ml-auto shrink-0">
-            <!-- Jump to Today Button (Moved beside Week Navigator) -->
-            <button onclick="scrollToToday()" class="px-3 py-1.5 bg-amber-400 hover:bg-amber-300 text-slate-900 font-bold rounded-lg text-xs flex items-center gap-1.5 shadow-xs border border-amber-500/30 transition hover:shadow active:scale-95" title="Jump directly to today's date in matrix">
-              <svg class="w-3.5 h-3.5 text-msu-maroon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-              <span>Jump to Today</span>
-            </button>
-
-            <!-- Week Navigator Controls -->
-            <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-lg p-1">
-              <button onclick="navigateWeek(-1)" class="p-1 rounded bg-white hover:bg-slate-200 border border-slate-200 text-slate-700 shadow-xs" title="Previous Week">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-              </button>
-              <span id="current-week-nav-label" class="text-xs font-bold text-slate-800 px-2 min-w-[75px] text-center">Week 1</span>
-              <button onclick="navigateWeek(1)" class="p-1 rounded bg-white hover:bg-slate-200 border border-slate-200 text-slate-700 shadow-xs" title="Next Week">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-              </button>
-            </div>
-          </div>
         </div>
       </div>
     </div>
 
         <aside id="sidebar-planner" class="tab-sidebar tab-sidebar-expanded w-full xl:w-80 shrink-0 space-y-3" aria-label="Planner Sidebar Widgets">
 
-          <!-- Card 1: Next Activities (from Matrix & Calendar) -->
-          <div id="planner-widget-next-activities" class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs space-y-2.5">
-            <div class="flex items-center justify-between">
+          <!-- Card 1: Teaching Radar (Live Dispatch & Next Activities) -->
+          <div id="planner-widget-next-activities" class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs flex flex-col space-y-2.5">
+            <div class="flex items-center justify-between shrink-0">
               <span class="text-[11px] font-extrabold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
-                <svg class="w-3.5 h-3.5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                Next Activities
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+                Teaching Radar
               </span>
-              <span id="planner-next-activities-badge" class="text-[10px] text-slate-500 font-bold px-1.5 py-0.5 rounded bg-slate-100">Upcoming</span>
+              <span id="planner-radar-status-badge" class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200">Live</span>
             </div>
-            <div id="planner-milestones-list" class="space-y-2 max-h-[380px] overflow-y-auto pr-0.5 no-scrollbar"></div>
+
+            <!-- Tier 1: Live Dispatch / Next Class Card -->
+            <div id="planner-radar-dispatch-card" class="text-xs shrink-0"></div>
+
+            <!-- Tier 2: Filter Pills Strip -->
+            <div id="planner-radar-filter-pills" class="flex items-center gap-1 shrink-0 pt-1 border-t border-slate-100">
+              <button type="button" onclick="setRadarFilter('all')" data-radar-filter="all" class="radar-filter-pill px-2 py-0.5 text-[10px] font-bold rounded-md bg-msu-maroon text-white transition shadow-2xs">All</button>
+              <button type="button" onclick="setRadarFilter('today')" data-radar-filter="today" class="radar-filter-pill px-2 py-0.5 text-[10px] font-medium rounded-md bg-slate-100 text-slate-600 hover:bg-slate-200 transition">Today</button>
+              <button type="button" onclick="setRadarFilter('week')" data-radar-filter="week" class="radar-filter-pill px-2 py-0.5 text-[10px] font-medium rounded-md bg-slate-100 text-slate-600 hover:bg-slate-200 transition">This Week</button>
+              <button type="button" onclick="setRadarFilter('milestones')" data-radar-filter="milestones" class="radar-filter-pill px-2 py-0.5 text-[10px] font-medium rounded-md bg-slate-100 text-slate-600 hover:bg-slate-200 transition">Milestones</button>
+            </div>
+
+            <!-- Tier 2: Scrollable Horizon Timeline -->
+            <div id="planner-milestones-list" class="space-y-2 flex-1 min-h-0 overflow-y-auto pr-0.5 no-scrollbar"></div>
           </div>
 
           <!-- Card 2: Teaching Days & Activity Distribution -->
@@ -333,8 +333,8 @@
           <p class="text-xs text-slate-500 mt-0.5">Class meeting hours (7:00 AM – 6:00 PM) with automated room and schedule conflict detection.</p>
         </div>
         <div class="flex items-center gap-2 flex-wrap">
-          <button onclick="openAddScheduleModal()" class="px-3.5 py-1.5 bg-msu-maroon hover:bg-msu-darkMaroon text-white font-bold rounded-lg text-xs flex items-center gap-2 shadow-xs transition">
-            <svg class="w-4 h-4 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          <button type="button" onclick="openAddScheduleModal()" class="px-3 py-1.5 bg-msu-maroon hover:bg-msu-darkMaroon text-white font-bold rounded-lg text-xs flex items-center gap-1.5 border border-rose-900/30 shadow-2xs transition active:scale-95 shrink-0 whitespace-nowrap" title="Add a new class meeting to weekly timetable">
+            <svg class="w-3.5 h-3.5 text-amber-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
             <span>Add Section Schedule</span>
           </button>
         </div>
@@ -353,9 +353,9 @@
 
       <!-- Main Timetable Grid (Permanent 100% Full Width - Zero Resizing) -->
       <div class="w-full space-y-3">
-        <div class="bg-white rounded-xl shadow-md border border-slate-200 overflow-hidden flex flex-col">
+        <div class="bg-white main-table-card rounded-xl shadow-md border border-slate-200 overflow-hidden flex flex-col">
           <!-- Single scroll container so headers and columns are 100% aligned -->
-          <div class="overflow-x-auto overflow-y-hidden relative" id="timetable-scroll-wrapper">
+          <div class="overflow-x-auto overflow-y-auto relative main-table-scroll-wrapper" id="timetable-scroll-wrapper">
             <div class="w-full relative">
               <!-- Header Grid (Sticky Top) -->
               <div class="min-w-[850px] grid grid-cols-[90px_repeat(7,1fr)] bg-slate-100 border-b border-slate-300 text-xs font-bold text-slate-700 select-none sticky top-0 z-30 shadow-xs">
@@ -411,38 +411,32 @@
             </div>
           </div>
         </div>
+        <div class="main-table-bottom-resizer" data-target="timetable-scroll-wrapper" data-tab="timetable" title="Drag to adjust window height • Double-click to reset to auto-fit">
+          <div class="main-resizer-grip"></div>
+        </div>
+        </div>
       </div>
     </div>
-  </div>
 
       <aside id="sidebar-timetable" class="tab-sidebar tab-sidebar-expanded w-full xl:w-80 shrink-0 space-y-3" aria-label="Timetable Sidebar Widgets">
-          <div id="timetable-widget-next-class" class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs space-y-2">
-            <div class="flex items-center justify-between">
-              <span class="text-[11px] font-extrabold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
-                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
-                Next Upcoming Class
-              </span>
-              <span id="timetable-next-class-status" class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200">Upcoming</span>
-            </div>
-            <div id="timetable-next-class-card" class="text-xs"></div>
-          </div>
-
           <!-- Card 1: Faculty Teaching Load Summary -->
           <div id="timetable-widget-load" class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs space-y-2.5">
-            <div class="flex items-center justify-between">
+            <div class="flex items-center justify-between widget-drag-handle cursor-grab select-none">
               <span class="text-[11px] font-extrabold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
                 <svg class="w-3.5 h-3.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 Teaching Load Summary
               </span>
               <span id="timetable-load-badge" class="text-[10px] font-bold px-1.5 py-0.5 bg-blue-50 text-blue-700 rounded border border-blue-200">Load</span>
             </div>
-            <div id="timetable-load-stats" class="space-y-2 text-xs"></div>
-            <div id="timetable-daily-distribution" class="pt-2 border-t border-slate-100 space-y-1.5 text-[11px]"></div>
+            <div id="timetable-load-scroll-container" class="space-y-2.5 flex-1 min-h-0 overflow-y-auto no-scrollbar py-0.5 pr-0.5">
+              <div id="timetable-load-stats" class="space-y-2 text-xs"></div>
+              <div id="timetable-daily-distribution" class="pt-2 border-t border-slate-100 space-y-1.5 text-[11px]"></div>
+            </div>
           </div>
 
           <!-- Card 2: Room Utilization & Conflict Checker -->
           <div id="timetable-widget-conflicts" class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs space-y-2.5">
-            <div class="flex items-center justify-between">
+            <div class="flex items-center justify-between widget-drag-handle cursor-grab select-none">
               <span class="text-[11px] font-extrabold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
                 <svg class="w-3.5 h-3.5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                 Conflict Auditor
@@ -453,7 +447,7 @@
 
           <!-- Card 3: Today's Pocket Agenda -->
           <div id="timetable-widget-today" class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs space-y-2.5">
-            <div class="flex items-center justify-between">
+            <div class="flex items-center justify-between widget-drag-handle cursor-grab select-none">
               <span class="text-[11px] font-extrabold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
                 <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                 Today's Schedule
@@ -475,19 +469,18 @@
           <div class="relative bg-white p-3.5 sm:p-4 rounded-xl rounded-tr-none shadow-xs border border-slate-200 flex flex-wrap items-center justify-between gap-4 mr-9 sm:mr-0">
         <div>
           <div class="flex items-center gap-2">
-            <h2 class="text-base sm:text-lg font-extrabold text-slate-900">Mindanao State University - General Santos</h2>
-            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300">Official Calendar</span>
+            <h2 class="text-base sm:text-lg font-extrabold text-slate-900">Calendar Events</h2>
           </div>
           <p class="text-xs text-slate-500 mt-0.5">Official academic calendar milestones, examination dates, and scheduled university suspensions.</p>
         </div>
         <div class="flex items-center gap-2 flex-wrap">
-          <button onclick="openAddCalendarEventModal()" class="px-3.5 py-1.5 bg-msu-maroon hover:bg-msu-darkMaroon text-white font-bold rounded-lg text-xs flex items-center gap-1.5 shadow-xs transition">
-            <svg class="w-4 h-4 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-            Add Event
+          <button type="button" onclick="openAddCalendarEventModal()" class="px-3 py-1.5 bg-msu-maroon hover:bg-msu-darkMaroon text-white font-bold rounded-lg text-xs flex items-center gap-1.5 border border-rose-900/30 shadow-2xs transition active:scale-95 shrink-0 whitespace-nowrap" title="Add academic milestone, deadline, or suspension">
+            <svg class="w-3.5 h-3.5 text-amber-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            <span>Add Event</span>
           </button>
-          <button onclick="openUploadCalendarModal()" class="px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-lg text-xs flex items-center gap-1.5 transition">
-            <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
-            Upload / Replace Calendar
+          <button type="button" onclick="openUploadCalendarModal()" class="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-700 font-bold rounded-lg text-xs border border-slate-300 flex items-center gap-1.5 shadow-2xs transition active:scale-95 shrink-0 whitespace-nowrap" title="Upload official university calendar PDF or JSON file">
+            <svg class="w-3.5 h-3.5 text-slate-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+            <span>Upload / Replace Calendar</span>
           </button>
         </div>
 
@@ -505,8 +498,9 @@
 
       <!-- Main Calendar Table (Permanent 100% Full Width - Zero Resizing) -->
       <div class="w-full space-y-3">
-        <div id="calendar-scroll-wrapper" class="bg-white rounded-xl shadow-md border border-slate-200 overflow-auto max-h-[640px]">
-        <table class="w-full text-left text-xs border-collapse min-w-[850px]">
+        <div class="bg-white main-table-card rounded-xl shadow-md border border-slate-200 overflow-hidden flex flex-col">
+          <div id="calendar-scroll-wrapper" class="overflow-auto main-table-scroll-wrapper">
+          <table class="w-full text-left text-xs border-collapse min-w-[850px]">
           <thead class="sticky top-0 bg-slate-100 z-10 shadow-xs">
             <tr class="border-b border-slate-300 text-slate-700 font-bold">
               <th class="py-2.5 px-3 w-44 text-center relative select-none">
@@ -554,6 +548,10 @@
           <tbody id="calendar-table-body" class="divide-y divide-slate-200"></tbody>
         </table>
         </div>
+        <div class="main-table-bottom-resizer" data-target="calendar-scroll-wrapper" data-tab="calendar" title="Drag to adjust window height • Double-click to reset to auto-fit">
+          <div class="main-resizer-grip"></div>
+        </div>
+        </div>
       </div>
     </div>
 
@@ -582,7 +580,12 @@
 
         <!-- Card 3: Event Classification Breakdown -->
         <div id="calendar-widget-distribution" class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs space-y-2.5">
-          <div class="text-[11px] font-extrabold text-slate-800 uppercase tracking-wider">Event Distribution</div>
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] font-extrabold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5 text-indigo-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"/></svg>
+              Event Distribution
+            </span>
+          </div>
           <div id="calendar-events-distribution" class="grid grid-cols-2 gap-2 text-xs text-center"></div>
         </div>
       </aside>
@@ -656,8 +659,6 @@
                     <option value="DRP">DRP</option>
                   </select>
                 </div>
-
-                <div class="text-slate-600 font-bold whitespace-nowrap text-xs px-2.5 py-1 bg-slate-100 rounded-lg border border-slate-200 shadow-2xs" id="roster-count-badge">Section Count: 0 Students</div>
               </div>
             </div>
 
@@ -686,7 +687,7 @@
 
           <!-- Scrollable Table Body -->
 
-          <div id="roster-scroll-wrapper" class="overflow-x-auto max-h-[620px]">
+          <div id="roster-scroll-wrapper" class="overflow-x-auto overflow-y-auto main-table-scroll-wrapper">
 
             <table id="roster-table" class="w-full text-left text-xs border-collapse">
             <thead class="sticky top-0 bg-slate-100 z-10 shadow-xs">
@@ -705,7 +706,6 @@
                 </th>
                 <th class="py-3 px-4">First Name</th>
                 <th class="py-3 px-4">Email Address</th>
-                <th class="py-3 px-4">Enrolled Section</th>
                 <th onclick="toggleRosterSort('grade')" class="py-3 px-3 text-center cursor-pointer select-none hover:bg-slate-200 transition whitespace-nowrap">
                   <div class="flex items-center justify-center gap-1">
                     <span>Final Grade</span>
@@ -723,6 +723,9 @@
             </thead>
             <tbody id="student-table-body" class="divide-y divide-slate-200"></tbody>
           </table>
+        </div>
+        <div class="main-table-bottom-resizer" data-target="roster-scroll-wrapper" data-tab="roster" title="Drag to adjust window height • Double-click to reset to auto-fit">
+          <div class="main-resizer-grip"></div>
         </div>
         </div>
       </div>
@@ -775,7 +778,12 @@
 
         <!-- Card 3: Roster Data Health -->
         <div id="roster-widget-health" class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs space-y-2">
-          <div class="text-[11px] font-extrabold text-slate-800 uppercase tracking-wider">Roster Health</div>
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] font-extrabold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+              Roster Health
+            </span>
+          </div>
           <div id="roster-health-status" class="text-xs"></div>
         </div>
       </aside>
@@ -804,11 +812,6 @@
               <select id="gradebook-section-select" onchange="renderGradebook()" class="bg-white border border-slate-300 rounded-md px-2.5 py-1 text-xs font-bold text-slate-800 shadow-2xs focus:ring-2 focus:ring-msu-maroon focus:outline-none"></select>
               <div id="gradebook-classroom-btn-container" class="inline-flex items-center"></div>
             </div>
-
-            <button onclick="openExportImportModal('grades')" class="px-3 py-2 bg-emerald-50 hover:bg-emerald-100 active:bg-emerald-200 text-emerald-900 font-bold rounded-lg text-xs border border-emerald-300 flex items-center gap-1.5 transition active:scale-95 shadow-2xs" title="Import Scores or Export Class Record CSV">
-              <svg class="w-3.5 h-3.5 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
-              <span>Export / Import Grades</span>
-            </button>
           </div>
         </div>
 
@@ -828,17 +831,18 @@
               <svg class="w-3.5 h-3.5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
               <span>Grading Scale</span>
             </button>
-            <button id="gradebook-stats-toggle-btn" onclick="toggleGradebookStatsDrawer()" class="px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-300 font-bold rounded-lg text-xs flex items-center gap-1.5 transition shadow-2xs active:scale-95" title="Toggle Class Statistics & Performance Analytics">
-              <svg class="w-3.5 h-3.5 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-              <span>Class Statistics</span>
-            </button>
           </div>
 
-          <!-- Right: Data Filtering Dropdowns -->
+          <!-- Right: Data Filtering Dropdowns & Reset Filter -->
           <div class="flex items-center gap-2 flex-wrap ml-auto">
+            <button id="gradebook-reset-filter-btn" type="button" onclick="resetGradebookFilters()" class="hidden px-2.5 py-1 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/50 text-rose-700 dark:text-rose-300 border border-rose-300 dark:border-rose-700/60 font-bold rounded-lg text-xs flex items-center gap-1.5 transition shadow-2xs active:scale-95" title="Reset active filters and show all students">
+              <svg class="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+              <span id="gradebook-reset-filter-label">Reset Filter</span>
+            </button>
+
             <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1 shadow-2xs">
               <span class="text-[11px] font-bold text-slate-500 uppercase">Grade:</span>
-              <select id="gradebook-grade-filter" onchange="renderGradebook()" class="bg-transparent border-0 text-xs font-bold text-slate-700 focus:ring-0 p-0 cursor-pointer">
+              <select id="gradebook-grade-filter" onchange="onGradebookDropdownFilterChange()" class="bg-transparent border-0 text-xs font-bold text-slate-700 focus:ring-0 p-0 cursor-pointer">
                 <option value="all">All Grades</option>
                 <option value="1.00">1.00</option>
                 <option value="1.25">1.25</option>
@@ -858,7 +862,7 @@
 
             <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1 shadow-2xs">
               <span class="text-[11px] font-bold text-slate-500 uppercase">Status:</span>
-              <select id="gradebook-status-filter" onchange="renderGradebook()" class="bg-transparent border-0 text-xs font-bold text-slate-700 focus:ring-0 p-0 cursor-pointer">
+              <select id="gradebook-status-filter" onchange="onGradebookDropdownFilterChange()" class="bg-transparent border-0 text-xs font-bold text-slate-700 focus:ring-0 p-0 cursor-pointer">
                 <option value="all">All Status</option>
                 <option value="Passed">Passed</option>
                 <option value="Failed">Failed</option>
@@ -904,10 +908,6 @@
           <!-- Dynamic cards injected via renderGradingScaleDrawer() -->
         </div>
       </div>
-      <!-- Intelligent Class Statistics & Analytics Drawer -->
-      <div id="gradebook-stats-drawer" class="hidden bg-white p-4 rounded-xl border border-slate-200 text-xs shadow-xs space-y-3.5 animate-in fade-in duration-200">
-        <!-- Dynamically rendered by renderGradebookStats() -->
-      </div>
 
       <!-- Warning / Error Banner for Unbalanced Criteria (when total != 100%) -->
       <div id="gradebook-weight-alert" class="hidden bg-rose-50 border-2 border-rose-300 text-rose-900 px-4 py-3 rounded-xl flex items-center justify-between gap-3 text-xs shadow-xs animate-in fade-in duration-200">
@@ -943,7 +943,7 @@
 
           <!-- Scrollable Table Body -->
 
-          <div id="gradebook-scroll-wrapper" class="overflow-auto max-h-[620px]">
+          <div id="gradebook-scroll-wrapper" class="overflow-auto main-table-scroll-wrapper">
 
             <table class="w-full text-left text-xs border-collapse min-w-[850px]">
             <thead id="gradebook-table-head" class="sticky top-0 bg-slate-100 z-35 shadow-xs">
@@ -952,6 +952,9 @@
             <tbody id="gradebook-table-body" class="divide-y divide-slate-200"></tbody>
             <tfoot id="gradebook-table-foot" class="sticky bottom-0 bg-slate-100 z-30 shadow-xs border-t-2 border-slate-300 font-bold text-xs"></tfoot>
           </table>
+        </div>
+        <div class="main-table-bottom-resizer" data-target="gradebook-scroll-wrapper" data-tab="gradebook" title="Drag to adjust window height • Double-click to reset to auto-fit">
+          <div class="main-resizer-grip"></div>
         </div>
         </div>
       </div>
@@ -980,26 +983,32 @@
               </span>
               <span id="gradebook-atrisk-badge" class="text-[10px] font-bold px-1.5 py-0.5 rounded"></span>
             </div>
-            <p class="text-[11px] text-slate-500 shrink-0">Students with non-passing final grade (MSU grade > 3.00, INC, or Failed). Click to inspect in gradebook.</p>
+            <p class="text-[11px] text-slate-500 shrink-0">Students with non-passing final grade (final grade > 3.00, INC, or Failed). Click to inspect in gradebook.</p>
             <div id="gradebook-atrisk-list" class="space-y-1.5 flex-1 min-h-[90px] overflow-y-auto no-scrollbar py-0.5"></div>
           </div>
 
-          <!-- Card 2: Criteria Weights & 100% Validation -->
-          <div id="gradebook-widget-weights" class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs space-y-2.5">
-            <div class="flex items-center justify-between">
+          <!-- Card 2: Class Performance -->
+          <div id="gradebook-widget-stats" class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs flex flex-col space-y-2.5">
+            <div class="flex items-center justify-between shrink-0">
               <span class="text-[11px] font-extrabold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
-                <svg class="w-3.5 h-3.5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-                Weight Distribution
+                <svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                Class Performance
               </span>
-              <span id="gradebook-weights-sum-badge" class="text-[10px] font-bold px-1.5 py-0.5 rounded"></span>
+              <span id="gradebook-stats-badge" class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800">—</span>
             </div>
-            <div id="gradebook-weights-list" class="space-y-1.5 text-xs"></div>
-          </div>
-
-          <!-- Card 3: MSU Grade Curve Distribution -->
-          <div id="gradebook-widget-distribution" class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs space-y-2.5">
-            <div class="text-[11px] font-extrabold text-slate-800 uppercase tracking-wider">Grade Distribution</div>
-            <div id="gradebook-grade-distribution" class="space-y-1 text-xs"></div>
+            <div id="gradebook-stats-scroll-container" class="space-y-3 flex-1 min-h-0 overflow-y-auto no-scrollbar py-0.5 pr-0.5">
+              <div id="gradebook-stats-content" class="space-y-2 text-xs"></div>
+              <div class="pt-2.5 border-t border-slate-100 dark:border-slate-800 space-y-1.5">
+                <div class="flex items-center justify-between text-[10px] font-extrabold text-slate-600 uppercase tracking-wider">
+                  <span>Grade Curve Distribution</span>
+                  <div class="flex items-center gap-0.5 bg-slate-100 dark:bg-slate-800 p-0.5 rounded-lg border border-slate-200 dark:border-slate-700 select-none">
+                    <button type="button" id="btn-grade-dist-grouped" onclick="setGradeDistScaleMode('grouped')" class="px-1.5 py-0.5 rounded text-[9px] font-bold transition bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 shadow-2xs" title="Grouped into 5 summary tiers">Tiers</button>
+                    <button type="button" id="btn-grade-dist-full" onclick="setGradeDistScaleMode('full')" class="px-1.5 py-0.5 rounded text-[9px] font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition" title="Show full 11-grade MSU institutional scale">Full Scale</button>
+                  </div>
+                </div>
+                <div id="gradebook-grade-distribution" class="space-y-0.5 text-xs"></div>
+              </div>
+            </div>
           </div>
         </aside>
       </div>
@@ -1125,6 +1134,8 @@
               <option value="Quiz">Quiz / Evaluation</option>
               <option value="Exam">Major Examination</option>
               <option value="Field Work">Field Work / Surveying</option>
+              <option value="Makeup Class">Makeup Class</option>
+              <option value="Special Session">Special Session</option>
               <option value="No Class">No Class / Suspended</option>
             </select>
           </div>
@@ -1147,6 +1158,21 @@
         <div>
           <label class="font-bold text-slate-700 block mb-1">Special Notes / Homework / Reminders</label>
           <input type="text" id="modal-notes" placeholder="e.g. Remind students to bring scientific calculators" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs">
+        </div>
+
+        <div id="modal-time-room-container" class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-0.5">
+          <div>
+            <label class="font-bold text-slate-700 block mb-1">Start Time</label>
+            <input type="time" id="modal-start-time" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs font-mono">
+          </div>
+          <div>
+            <label class="font-bold text-slate-700 block mb-1">End Time</label>
+            <input type="time" id="modal-end-time" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs font-mono">
+          </div>
+          <div>
+            <label class="font-bold text-slate-700 block mb-1">Room / Venue</label>
+            <input type="text" id="modal-room" placeholder="e.g. Eng 201" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs">
+          </div>
         </div>
       </div>
 
@@ -2314,7 +2340,7 @@
             <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3 flex flex-col justify-between">
               <div>
                 <div class="font-bold text-slate-800 text-xs">Export Class Record (CSV)</div>
-                <p class="text-slate-500 text-[11px] mt-1">Export raw scores, weights, totals, and official MSU grades for the active section.</p>
+                <p class="text-slate-500 text-[11px] mt-1">Export raw scores, weights, totals, and final grades for the active section.</p>
               </div>
               <button onclick="exportGradebookCSV()" class="w-full px-3 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg font-bold text-xs flex items-center justify-center gap-1 transition">
                 <span>Export Active Section CSV</span>
