@@ -31,22 +31,7 @@ function pasteMatrixActivity(dateKey, course, section, e) {
 }
 
 
-function renderMatrixTable() {
-  const table = document.getElementById('matrix-table');
-  const thead = document.getElementById('matrix-head');
-  const tbody = document.getElementById('matrix-body');
-  if (!table || !thead || !tbody) return;
-
-  // Enforce fixed layout for perfect pixel-controlled resizing
-  table.style.tableLayout = 'fixed';
-  updateMatrixTableWidth();
-
-  let filteredDates = semesterDates;
-  if (selectedMonthFilter !== 'all') {
-    filteredDates = semesterDates.filter(d => d.monthNum === selectedMonthFilter);
-  }
-
-  // Build Colgroup for direct column-width resizing
+function _setupMatrixColgroup(table) {
   let colgroupHtml = `
         <col class="col-day" style="width: 42px; min-width: 42px; max-width: 42px;">
         <col class="col-date" style="width: 68px; min-width: 68px; max-width: 68px;">
@@ -71,7 +56,9 @@ function renderMatrixTable() {
     cg.innerHTML = colgroupHtml;
     table.insertBefore(cg, table.firstChild);
   }
+}
 
+function _renderMatrixHeader(thead) {
   // ROW 1: Sticky Top Subjects with Rowspan for Day/Date/Notes
   let row1 = `
         <tr class="bg-slate-800 text-white divide-x divide-slate-700">
@@ -142,6 +129,246 @@ function renderMatrixTable() {
   row2 += `</tr>`;
 
   thead.innerHTML = row1 + row2;
+}
+
+function _renderMatrixCell(d, sub, sec, secIdx, timetableMap, meetingCounters, todayKey) {
+  const cellKey = d.dateKey + '__' + sub.code + '__' + sec;
+  const colKey = sub.code + '__' + sec;
+  const currentW = columnWidths[colKey] || 205;
+  const entry = plannerEntries[cellKey];
+
+  const fullDay = FULL_DAY_NAMES[d.dayOfWeek] || d.dayOfWeek;
+  const scheduledSlot = timetableMap.get(`${sub.code}__${sec}__${fullDay}`);
+  const accentBarClass = getSectionAccent(secIdx);
+
+  if (d.isWeekend) {
+    const weekendEntry = plannerEntries[cellKey];
+    if (weekendEntry) {
+      const isEntryCompleted = (weekendEntry.status === 'Completed') || (d.dateKey < todayKey);
+      let badgeColor = sub.badgeBg;
+      if (weekendEntry.type === 'Exam') badgeColor = 'bg-amber-100 text-amber-900 border-amber-300';
+      else if (weekendEntry.type === 'No Class') badgeColor = 'bg-rose-100 text-rose-800 border-rose-300';
+      else if (weekendEntry.type === 'Makeup Class') badgeColor = 'bg-amber-50 text-amber-950 border-amber-300';
+      else if (weekendEntry.type === 'Special Session') badgeColor = 'bg-violet-50 text-violet-950 border-violet-300';
+
+      return `
+            <td id="cell-${cellKey}" data-cell-key="${cellKey}" data-col="${colKey}" style="width: ${currentW}px; min-width: ${currentW}px; max-width: ${currentW}px;" class="p-1 border-r border-slate-300 bg-slate-200/60 cursor-pointer transition align-top relative group/card-cell matrix-cell-slot" onclick="openLessonModal('${jsAttr(d.dateKey)}', '${jsAttr(sub.code)}', '${jsAttr(sec)}', ${d.isWeekend})">
+              <div id="card-${cellKey}" class="p-1 rounded-lg border ${badgeColor} ${accentBarClass} shadow-xs space-y-0.5 overflow-hidden max-w-full min-w-0 transition-all duration-200 ease-out group-hover/card-cell:absolute group-hover/card-cell:left-1 group-hover/card-cell:right-1 group-hover/card-cell:top-1 group-hover/card-cell:z-22 group-hover/card-cell:shadow-xl group-hover/card-cell:scale-[1.02] ${badgeColor}">
+                <div class="flex items-center justify-between gap-1 overflow-hidden">
+                  <span class="font-extrabold text-[8.5px] uppercase tracking-tight text-amber-800 truncate">⚡ ${escapeHtml(weekendEntry.type || 'Weekend')}</span>
+                  <div class="flex items-center gap-1 shrink-0">
+                    ${isEntryCompleted ? '<span class="text-[7.5px] px-1 py-0.2 rounded font-black bg-emerald-600 text-white shrink-0">✓ Done</span>' : ''}
+                    <span class="text-[7.5px] px-1 py-0.2 rounded font-bold bg-white/80 shrink-0 border border-black/10">${escapeHtml(weekendEntry.type || 'Weekend')}</span>
+                  </div>
+                </div>
+                <div class="font-bold text-[10.5px] leading-tight truncate group-hover/card-cell:whitespace-normal group-hover/card-cell:overflow-visible transition-all max-w-full" title="${escapeHtml(weekendEntry.topic || 'Planned Activity')}">${escapeHtml(weekendEntry.topic || 'Planned Activity')}</div>
+                ${weekendEntry.activity ? `<div class="text-[8.5px] opacity-80 truncate group-hover/card-cell:whitespace-normal group-hover/card-cell:overflow-visible transition-all max-w-full leading-tight" title="${escapeHtml(weekendEntry.activity)}">${escapeHtml(weekendEntry.activity)}</div>` : ''}
+                <div class="hidden group-hover/card-cell:flex items-center justify-between text-[8.5px] font-mono font-semibold pt-1 mt-1 border-t border-black/10 text-slate-600">
+                  <span>⚡ Weekend Session</span>
+                  <span class="px-1 py-0.2 rounded bg-white/80 border border-slate-300/60 font-sans font-semibold">${escapeHtml(weekendEntry.status || 'Planned')}</span>
+                </div>
+                <div class="hidden group-hover/card-cell:flex items-center justify-end gap-1 pt-1 mt-1 border-t border-black/10">
+                  <button type="button" onclick="copyMatrixActivity('${jsAttr(d.dateKey)}', '${jsAttr(sub.code)}', '${jsAttr(sec)}', event)" class="p-1 rounded bg-white/90 hover:bg-white text-slate-700 text-[10px] font-bold border border-slate-300 shadow-2xs" title="Copy Activity">📋 Copy</button>
+                  <button type="button" onclick="pasteMatrixActivity('${jsAttr(d.dateKey)}', '${jsAttr(sub.code)}', '${jsAttr(sec)}', event)" class="p-1 rounded bg-white/90 hover:bg-white text-slate-700 text-[10px] font-bold border border-slate-300 shadow-2xs" title="Paste Copied Activity">📥 Paste</button>
+                  <button type="button" onclick="event.stopPropagation(); openLessonModal('${jsAttr(d.dateKey)}', '${jsAttr(sub.code)}', '${jsAttr(sec)}', ${d.isWeekend})" class="p-1 rounded bg-white/90 hover:bg-white text-slate-700 text-[10px] font-bold border border-slate-300 shadow-2xs" title="Edit Activity">✏️ Edit</button>
+                </div>
+              </div>
+            </td>
+          `;
+    } else {
+      return `
+            <td id="cell-${cellKey}" data-cell-key="${cellKey}" data-col="${colKey}" style="width: ${currentW}px; min-width: ${currentW}px; max-width: ${currentW}px;" class="p-1 border-r border-slate-300 bg-slate-200/50 cursor-pointer hover:bg-slate-200/80 transition align-top relative group/card-cell matrix-cell-slot" onclick="openLessonModal('${jsAttr(d.dateKey)}', '${jsAttr(sub.code)}', '${jsAttr(sec)}', ${d.isWeekend})">
+              <div id="card-${cellKey}" class="p-1 rounded-lg border border-dashed border-slate-400/30 hover:border-amber-400 text-slate-500 hover:text-amber-800 bg-slate-200/40 hover:bg-white text-center transition-all duration-200 group-hover/card-cell:absolute group-hover/card-cell:left-1 group-hover/card-cell:right-1 group-hover/card-cell:top-1 group-hover/card-cell:z-22 group-hover/card-cell:shadow-lg group-hover/card-cell:scale-[1.02] group-hover/card-cell:bg-white group-hover/card-cell:border-amber-400">
+                <div class="text-[8.5px] font-medium py-0.5 opacity-30 group-hover/card-cell:opacity-100 transition-opacity flex items-center justify-center gap-1 text-slate-600 group-hover/card-cell:text-amber-700">
+                  <span class="font-bold">+</span>
+                  <span class="truncate">Weekend Session</span>
+                </div>
+                <div class="hidden group-hover/card-cell:flex items-center justify-end gap-1 pt-1 mt-0.5 border-t border-slate-200">
+                  <button type="button" onclick="pasteMatrixActivity('${jsAttr(d.dateKey)}', '${jsAttr(sub.code)}', '${jsAttr(sec)}', event)" class="p-1 rounded bg-white hover:bg-slate-100 text-slate-700 text-[10px] font-bold border border-slate-300 shadow-2xs" title="Paste Copied Activity">📥 Paste</button>
+                  <button type="button" onclick="event.stopPropagation(); openLessonModal('${jsAttr(d.dateKey)}', '${jsAttr(sub.code)}', '${jsAttr(sec)}', ${d.isWeekend})" class="p-1 rounded bg-amber-50 hover:bg-amber-100 text-amber-900 text-[10px] font-bold border border-amber-300 shadow-2xs" title="Plan Weekend Session">✏️ Plan</button>
+                </div>
+              </div>
+            </td>
+          `;
+    }
+  }
+
+  if (d.isNoClassDate) {
+    return `
+          <td id="cell-${cellKey}" data-cell-key="${cellKey}" data-col="${colKey}" style="width: ${currentW}px; min-width: ${currentW}px; max-width: ${currentW}px;" class="p-1 border-r border-slate-200 bg-rose-50/50 text-center align-middle overflow-hidden">
+            <span id="card-${cellKey}" class="inline-block px-1.5 py-0.5 rounded bg-rose-100 text-rose-800 text-[9.5px] font-bold border border-rose-300">
+              No Class
+            </span>
+          </td>
+        `;
+  }
+
+  if (scheduledSlot) {
+    if (entry) {
+      const isNoClass = (entry.type === 'No Class') || (entry.topic && entry.topic.toLowerCase().includes('no class'));
+      if (!isNoClass) {
+        meetingCounters[sub.code + '__' + sec]++;
+      }
+      const meetingNum = meetingCounters[sub.code + '__' + sec];
+
+      const isEntryCompleted = (entry.status === 'Completed') || (d.dateKey < todayKey);
+      let badgeColor = sub.badgeBg;
+      if (entry.type === 'Exam') badgeColor = 'bg-amber-100 text-amber-900 border-amber-300';
+      if (entry.type === 'No Class') badgeColor = 'bg-rose-100 text-rose-800 border-rose-300';
+
+      return `
+            <td id="cell-${cellKey}" data-cell-key="${cellKey}" data-col="${colKey}" style="width: ${currentW}px; min-width: ${currentW}px; max-width: ${currentW}px;" class="p-1 border-r border-slate-200 cursor-pointer transition align-top relative group/card-cell matrix-cell-slot" onclick="openLessonModal('${jsAttr(d.dateKey)}', '${jsAttr(sub.code)}', '${jsAttr(sec)}', ${d.isWeekend})">
+              <div id="card-${cellKey}" class="p-1 rounded-lg border ${badgeColor} ${accentBarClass} shadow-xs space-y-0.5 overflow-hidden max-w-full min-w-0 transition-all duration-200 ease-out group-hover/card-cell:absolute group-hover/card-cell:left-1 group-hover/card-cell:right-1 group-hover/card-cell:top-1 group-hover/card-cell:z-22 group-hover/card-cell:shadow-xl group-hover/card-cell:scale-[1.02] ${badgeColor}">
+                <div class="flex items-center justify-between gap-1 overflow-hidden">
+                  ${!isNoClass ? `<span class="font-extrabold text-[8.5px] uppercase tracking-tight truncate">Mtg #${meetingNum}</span>` : `<span class="font-extrabold text-[8.5px] uppercase tracking-tight text-rose-700 truncate">${escapeHtml(entry.type || 'No Class')}</span>`}
+                  <div class="flex items-center gap-1 shrink-0">
+                    ${isEntryCompleted ? '<span class="text-[7.5px] px-1 py-0.2 rounded font-black bg-emerald-600 text-white shrink-0">✓ Done</span>' : ''}
+                    <span class="text-[7.5px] px-1 py-0.2 rounded font-bold bg-white/80 shrink-0">${escapeHtml(entry.type)}</span>
+                  </div>
+                </div>
+                <div class="font-bold text-[10.5px] leading-tight truncate group-hover/card-cell:whitespace-normal group-hover/card-cell:overflow-visible transition-all max-w-full" title="${escapeHtml(entry.topic || 'Planned Activity')}">${escapeHtml(entry.topic || 'Planned Activity')}</div>
+                ${entry.activity ? `<div class="text-[8.5px] opacity-80 truncate group-hover/card-cell:whitespace-normal group-hover/card-cell:overflow-visible transition-all max-w-full leading-tight" title="${escapeHtml(entry.activity)}">${escapeHtml(entry.activity)}</div>` : ''}
+                <div class="hidden group-hover/card-cell:flex items-center justify-between text-[8.5px] font-mono font-bold pt-1 mt-1 border-t border-black/10 text-slate-700">
+                  <span>🕒 ${formatTime12(scheduledSlot.startTime)} – ${formatTime12(scheduledSlot.endTime)}</span>
+                  <span class="px-1 py-0.2 rounded bg-white/80 border border-slate-300/60 font-sans font-semibold">${escapeHtml(scheduledSlot.room || 'TBA')}</span>
+                </div>
+                <div class="hidden group-hover/card-cell:flex items-center justify-end gap-1 pt-1 mt-1 border-t border-black/10">
+                  <button type="button" onclick="copyMatrixActivity('${jsAttr(d.dateKey)}', '${jsAttr(sub.code)}', '${jsAttr(sec)}', event)" class="p-1 rounded bg-white/90 hover:bg-white text-slate-700 text-[10px] font-bold border border-slate-300 shadow-2xs" title="Copy Activity">📋 Copy</button>
+                  <button type="button" onclick="pasteMatrixActivity('${jsAttr(d.dateKey)}', '${jsAttr(sub.code)}', '${jsAttr(sec)}', event)" class="p-1 rounded bg-white/90 hover:bg-white text-slate-700 text-[10px] font-bold border border-slate-300 shadow-2xs" title="Paste Copied Activity">📥 Paste</button>
+                  <button type="button" onclick="event.stopPropagation(); openLessonModal('${jsAttr(d.dateKey)}', '${jsAttr(sub.code)}', '${jsAttr(sec)}', ${d.isWeekend})" class="p-1 rounded bg-white/90 hover:bg-white text-slate-700 text-[10px] font-bold border border-slate-300 shadow-2xs" title="Edit Activity">✏️ Edit</button>
+                </div>
+              </div>
+            </td>
+          `;
+    } else {
+      return `
+            <td id="cell-${cellKey}" data-cell-key="${cellKey}" data-col="${colKey}" style="width: ${currentW}px; min-width: ${currentW}px; max-width: ${currentW}px;" class="p-1 border-r border-slate-200 cursor-pointer hover:bg-slate-100 transition align-top relative group/card-cell matrix-cell-slot" onclick="openLessonModal('${jsAttr(d.dateKey)}', '${jsAttr(sub.code)}', '${jsAttr(sec)}', ${d.isWeekend})">
+              <div id="card-${cellKey}" class="p-1 rounded-lg border border-dashed border-slate-300 hover:border-msu-maroon text-slate-500 hover:text-slate-800 bg-slate-50/60 hover:bg-white text-center ${accentBarClass} transition-all duration-200 group-hover/card-cell:absolute group-hover/card-cell:left-1 group-hover/card-cell:right-1 group-hover/card-cell:top-1 group-hover/card-cell:z-22 group-hover/card-cell:shadow-lg group-hover/card-cell:scale-[1.02] group-hover/card-cell:bg-white">
+                <div class="text-[9.5px] text-slate-500 font-semibold py-0.5">+ Click to plan</div>
+                <div class="hidden group-hover/card-cell:flex items-center justify-center text-[8.5px] font-mono text-slate-500 pt-0.5 mt-0.5 border-t border-slate-200">
+                  🕒 ${formatTime12(scheduledSlot.startTime)} – ${formatTime12(scheduledSlot.endTime)} • ${escapeHtml(scheduledSlot.room || 'TBA')}
+                </div>
+                <div class="hidden group-hover/card-cell:flex items-center justify-end gap-1 pt-1 mt-1 border-t border-slate-200">
+                  <button type="button" onclick="pasteMatrixActivity('${jsAttr(d.dateKey)}', '${jsAttr(sub.code)}', '${jsAttr(sec)}', event)" class="p-1 rounded bg-white hover:bg-slate-100 text-slate-700 text-[10px] font-bold border border-slate-300 shadow-2xs" title="Paste Copied Activity">📥 Paste</button>
+                  <button type="button" onclick="event.stopPropagation(); openLessonModal('${jsAttr(d.dateKey)}', '${jsAttr(sub.code)}', '${jsAttr(sec)}', ${d.isWeekend})" class="p-1 rounded bg-white hover:bg-slate-100 text-slate-700 text-[10px] font-bold border border-slate-300 shadow-2xs" title="Open Planner">✏️ Edit</button>
+                </div>
+              </div>
+            </td>
+          `;
+    }
+  } else {
+    if (entry) {
+      const isNoClass = (entry.type === 'No Class') || (entry.topic && entry.topic.toLowerCase().includes('no class'));
+      const isEntryCompleted = (entry.status === 'Completed') || (d.dateKey < todayKey);
+      let badgeColor = sub.badgeBg;
+      if (entry.type === 'Exam') badgeColor = 'bg-amber-100 text-amber-900 border-amber-300';
+      else if (entry.type === 'No Class') badgeColor = 'bg-rose-100 text-rose-800 border-rose-300';
+      else if (entry.type === 'Makeup Class') badgeColor = 'bg-amber-50/90 text-amber-950 border-amber-300';
+      else if (entry.type === 'Special Session') badgeColor = 'bg-violet-50/90 text-violet-950 border-violet-300';
+
+      const displayType = entry.type || 'Special Session';
+
+      return `
+            <td id="cell-${cellKey}" data-cell-key="${cellKey}" data-col="${colKey}" style="width: ${currentW}px; min-width: ${currentW}px; max-width: ${currentW}px;" class="p-1 border-r border-slate-200 cursor-pointer transition align-top relative group/card-cell matrix-cell-slot" onclick="openLessonModal('${jsAttr(d.dateKey)}', '${jsAttr(sub.code)}', '${jsAttr(sec)}', ${d.isWeekend})">
+              <div id="card-${cellKey}" class="p-1 rounded-lg border ${badgeColor} ${accentBarClass} shadow-xs space-y-0.5 overflow-hidden max-w-full min-w-0 transition-all duration-200 ease-out group-hover/card-cell:absolute group-hover/card-cell:left-1 group-hover/card-cell:right-1 group-hover/card-cell:top-1 group-hover/card-cell:z-22 group-hover/card-cell:shadow-xl group-hover/card-cell:scale-[1.02] ${badgeColor}">
+                <div class="flex items-center justify-between gap-1 overflow-hidden">
+                  <span class="font-extrabold text-[8.5px] uppercase tracking-tight text-amber-800 truncate">⚡ ${escapeHtml(displayType)}</span>
+                  <div class="flex items-center gap-1 shrink-0">
+                    ${isEntryCompleted ? '<span class="text-[7.5px] px-1 py-0.2 rounded font-black bg-emerald-600 text-white shrink-0">✓ Done</span>' : ''}
+                    <span class="text-[7.5px] px-1 py-0.2 rounded font-bold bg-white/80 shrink-0 border border-black/10">${escapeHtml(entry.type || 'Special')}</span>
+                  </div>
+                </div>
+                <div class="font-bold text-[10.5px] leading-tight truncate group-hover/card-cell:whitespace-normal group-hover/card-cell:overflow-visible transition-all max-w-full" title="${escapeHtml(entry.topic || 'Planned Activity')}">${escapeHtml(entry.topic || 'Planned Activity')}</div>
+                ${entry.activity ? `<div class="text-[8.5px] opacity-80 truncate group-hover/card-cell:whitespace-normal group-hover/card-cell:overflow-visible transition-all max-w-full leading-tight" title="${escapeHtml(entry.activity)}">${escapeHtml(entry.activity)}</div>` : ''}
+                <div class="hidden group-hover/card-cell:flex items-center justify-between text-[8.5px] font-mono font-semibold pt-1 mt-1 border-t border-black/10 text-slate-600">
+                  <span>⚡ Out-of-Schedule</span>
+                  <span class="px-1 py-0.2 rounded bg-white/80 border border-slate-300/60 font-sans font-semibold">${escapeHtml(entry.status || 'Planned')}</span>
+                </div>
+                <div class="hidden group-hover/card-cell:flex items-center justify-end gap-1 pt-1 mt-1 border-t border-black/10">
+                  <button type="button" onclick="copyMatrixActivity('${jsAttr(d.dateKey)}', '${jsAttr(sub.code)}', '${jsAttr(sec)}', event)" class="p-1 rounded bg-white/90 hover:bg-white text-slate-700 text-[10px] font-bold border border-slate-300 shadow-2xs" title="Copy Activity">📋 Copy</button>
+                  <button type="button" onclick="pasteMatrixActivity('${jsAttr(d.dateKey)}', '${jsAttr(sub.code)}', '${jsAttr(sec)}', event)" class="p-1 rounded bg-white/90 hover:bg-white text-slate-700 text-[10px] font-bold border border-slate-300 shadow-2xs" title="Paste Copied Activity">📥 Paste</button>
+                  <button type="button" onclick="event.stopPropagation(); openLessonModal('${jsAttr(d.dateKey)}', '${jsAttr(sub.code)}', '${jsAttr(sec)}', ${d.isWeekend})" class="p-1 rounded bg-white/90 hover:bg-white text-slate-700 text-[10px] font-bold border border-slate-300 shadow-2xs" title="Edit Activity">✏️ Edit</button>
+                </div>
+              </div>
+            </td>
+          `;
+    } else {
+      return `
+            <td id="cell-${cellKey}" data-cell-key="${cellKey}" data-col="${colKey}" style="width: ${currentW}px; min-width: ${currentW}px; max-width: ${currentW}px;" class="p-1 border-r border-slate-200 cursor-pointer hover:bg-amber-50/20 transition align-top relative group/card-cell matrix-cell-slot" onclick="openLessonModal('${jsAttr(d.dateKey)}', '${jsAttr(sub.code)}', '${jsAttr(sec)}', ${d.isWeekend})">
+              <div id="card-${cellKey}" class="p-1 rounded-lg border border-dashed border-slate-200 hover:border-amber-400 text-slate-400 hover:text-amber-800 bg-slate-50/30 hover:bg-white text-center transition-all duration-200 group-hover/card-cell:absolute group-hover/card-cell:left-1 group-hover/card-cell:right-1 group-hover/card-cell:top-1 group-hover/card-cell:z-22 group-hover/card-cell:shadow-lg group-hover/card-cell:scale-[1.02] group-hover/card-cell:bg-white group-hover/card-cell:border-amber-400">
+                <div class="text-[8.5px] font-medium py-0.5 opacity-30 group-hover/card-cell:opacity-100 transition-opacity flex items-center justify-center gap-1 text-slate-500 group-hover/card-cell:text-amber-700">
+                  <span class="font-bold">+</span>
+                  <span class="truncate">Special / Makeup</span>
+                </div>
+                <div class="hidden group-hover/card-cell:flex items-center justify-center text-[8px] font-mono text-amber-700/80 pt-0.5 mt-0.5 border-t border-slate-200">
+                  ⚡ Out-of-schedule day
+                </div>
+                <div class="hidden group-hover/card-cell:flex items-center justify-end gap-1 pt-1 mt-1 border-t border-slate-200">
+                  <button type="button" onclick="pasteMatrixActivity('${jsAttr(d.dateKey)}', '${jsAttr(sub.code)}', '${jsAttr(sec)}', event)" class="p-1 rounded bg-white hover:bg-slate-100 text-slate-700 text-[10px] font-bold border border-slate-300 shadow-2xs" title="Paste Copied Activity">📥 Paste</button>
+                  <button type="button" onclick="event.stopPropagation(); openLessonModal('${jsAttr(d.dateKey)}', '${jsAttr(sub.code)}', '${jsAttr(sec)}', ${d.isWeekend})" class="p-1 rounded bg-amber-50 hover:bg-amber-100 text-amber-900 text-[10px] font-bold border border-amber-300 shadow-2xs" title="Plan Special Session / Makeup Class">✏️ Plan</button>
+                </div>
+              </div>
+            </td>
+          `;
+    }
+  }
+}
+
+function _renderMatrixNotesCell(d) {
+  const customNote = dailyNotes[d.dateKey] || '';
+  let eventContent = '';
+  if (d.event || customNote) {
+    let badgeTheme = 'bg-blue-100 text-blue-900 border-blue-300';
+    if (d.event && d.event.isNoClass) badgeTheme = 'bg-rose-100 text-rose-900 border-rose-300';
+    else if (d.event && d.event.type === 'exam') badgeTheme = 'bg-amber-100 text-amber-900 border-amber-400';
+    else if (d.event && d.event.type === 'milestone') badgeTheme = 'bg-emerald-100 text-emerald-900 border-emerald-300';
+
+    eventContent = `
+          <div id="card-${d.dateKey}__notes" class="p-1 rounded-lg border bg-slate-50 border-slate-200 shadow-xs space-y-0.5">
+            ${d.event ? `
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <span class="px-1.5 py-0.5 rounded text-[9.5px] font-extrabold border ${badgeTheme}">
+                  ${escapeHtml(d.event.activity)}
+                </span>
+                ${d.event.isNoClass ? `<span class="px-1.5 py-0.2 rounded text-[8.5px] font-bold bg-rose-100 text-rose-700 border border-rose-200">No Class</span>` : ''}
+              </div>
+            ` : ''}
+            ${customNote ? `<div class="text-[10.5px] text-slate-700 font-medium italic leading-tight">${escapeHtml(customNote)}</div>` : ''}
+          </div>
+        `;
+  } else {
+    eventContent = `
+          <div id="card-${d.dateKey}__notes" class="text-center text-slate-300 text-[10.5px] select-none py-0.5">—</div>
+        `;
+  }
+
+  return `
+          <td id="cell-${d.dateKey}__notes" data-cell-key="${d.dateKey}__notes" class="p-1 border-r border-slate-200 cursor-pointer hover:bg-slate-100 transition align-middle" onclick="openEventEditorModal('${jsAttr(d.dateKey)}')">
+            ${eventContent}
+          </td>
+      `;
+}
+
+function renderMatrixTable() {
+  const table = document.getElementById('matrix-table');
+  const thead = document.getElementById('matrix-head');
+  const tbody = document.getElementById('matrix-body');
+  if (!table || !thead || !tbody) return;
+
+  // Enforce fixed layout for perfect pixel-controlled resizing
+  table.style.tableLayout = 'fixed';
+  updateMatrixTableWidth();
+
+  let filteredDates = semesterDates;
+  if (selectedMonthFilter !== 'all') {
+    filteredDates = semesterDates.filter(d => d.monthNum === selectedMonthFilter);
+  }
+
+  // 1. Build Colgroup for direct column-width resizing
+  _setupMatrixColgroup(table);
+
+  // 2. Render 2-tier sticky headers
+  _renderMatrixHeader(thead);
 
   const meetingCounters = {};
   courseData.subjects.forEach(s => {
@@ -162,6 +389,7 @@ function renderMatrixTable() {
     timetableMap.set(`${t.course}__${t.section}__${t.day}`, t);
   });
 
+  // 3. Render Table Body
   tbody.innerHTML = filteredDates.map(d => {
     const isToday = (d.dateKey === todayKey);
     const weekendClass = d.isWeekend ? 'bg-slate-300 text-slate-700 font-semibold' : 'bg-white text-slate-800';
@@ -180,226 +408,12 @@ function renderMatrixTable() {
 
     courseData.subjects.forEach(sub => {
       sub.sections.forEach((sec, secIdx) => {
-        const cellKey = d.dateKey + '__' + sub.code + '__' + sec;
-        const colKey = sub.code + '__' + sec;
-        const currentW = columnWidths[colKey] || 205;
-        const entry = plannerEntries[cellKey];
-
-        const fullDay = FULL_DAY_NAMES[d.dayOfWeek] || d.dayOfWeek;
-        const scheduledSlot = timetableMap.get(`${sub.code}__${sec}__${fullDay}`);
-        const accentBarClass = getSectionAccent(secIdx);
-
-        if (d.isWeekend) {
-          const weekendEntry = plannerEntries[cellKey];
-          if (weekendEntry) {
-            const isEntryCompleted = (weekendEntry.status === 'Completed') || (d.dateKey < todayKey);
-            let badgeColor = sub.badgeBg;
-            if (weekendEntry.type === 'Exam') badgeColor = 'bg-amber-100 text-amber-900 border-amber-300';
-            else if (weekendEntry.type === 'No Class') badgeColor = 'bg-rose-100 text-rose-800 border-rose-300';
-            else if (weekendEntry.type === 'Makeup Class') badgeColor = 'bg-amber-50 text-amber-950 border-amber-300';
-            else if (weekendEntry.type === 'Special Session') badgeColor = 'bg-violet-50 text-violet-950 border-violet-300';
-
-            dateRowHtml += `
-                  <td id="cell-${cellKey}" data-cell-key="${cellKey}" data-col="${colKey}" style="width: ${currentW}px; min-width: ${currentW}px; max-width: ${currentW}px;" class="p-1 border-r border-slate-300 bg-slate-200/60 cursor-pointer transition align-top relative group/card-cell matrix-cell-slot" onclick="openLessonModal('${jsAttr(d.dateKey)}', '${jsAttr(sub.code)}', '${jsAttr(sec)}', ${d.isWeekend})">
-                    <div id="card-${cellKey}" class="p-1 rounded-lg border ${badgeColor} ${accentBarClass} shadow-xs space-y-0.5 overflow-hidden max-w-full min-w-0 transition-all duration-200 ease-out group-hover/card-cell:absolute group-hover/card-cell:left-1 group-hover/card-cell:right-1 group-hover/card-cell:top-1 group-hover/card-cell:z-22 group-hover/card-cell:shadow-xl group-hover/card-cell:scale-[1.02] ${badgeColor}">
-                      <div class="flex items-center justify-between gap-1 overflow-hidden">
-                        <span class="font-extrabold text-[8.5px] uppercase tracking-tight text-amber-800 truncate">⚡ ${escapeHtml(weekendEntry.type || 'Weekend')}</span>
-                        <div class="flex items-center gap-1 shrink-0">
-                          ${isEntryCompleted ? '<span class="text-[7.5px] px-1 py-0.2 rounded font-black bg-emerald-600 text-white shrink-0">✓ Done</span>' : ''}
-                          <span class="text-[7.5px] px-1 py-0.2 rounded font-bold bg-white/80 shrink-0 border border-black/10">${escapeHtml(weekendEntry.type || 'Weekend')}</span>
-                        </div>
-                      </div>
-                      <div class="font-bold text-[10.5px] leading-tight truncate group-hover/card-cell:whitespace-normal group-hover/card-cell:overflow-visible transition-all max-w-full" title="${escapeHtml(weekendEntry.topic || 'Planned Activity')}">${escapeHtml(weekendEntry.topic || 'Planned Activity')}</div>
-                      ${weekendEntry.activity ? `<div class="text-[8.5px] opacity-80 truncate group-hover/card-cell:whitespace-normal group-hover/card-cell:overflow-visible transition-all max-w-full leading-tight" title="${escapeHtml(weekendEntry.activity)}">${escapeHtml(weekendEntry.activity)}</div>` : ''}
-                      <div class="hidden group-hover/card-cell:flex items-center justify-between text-[8.5px] font-mono font-semibold pt-1 mt-1 border-t border-black/10 text-slate-600">
-                        <span>⚡ Weekend Session</span>
-                        <span class="px-1 py-0.2 rounded bg-white/80 border border-slate-300/60 font-sans font-semibold">${escapeHtml(weekendEntry.status || 'Planned')}</span>
-                      </div>
-                      <div class="hidden group-hover/card-cell:flex items-center justify-end gap-1 pt-1 mt-1 border-t border-black/10">
-                        <button type="button" onclick="copyMatrixActivity('${jsAttr(d.dateKey)}', '${jsAttr(sub.code)}', '${jsAttr(sec)}', event)" class="p-1 rounded bg-white/90 hover:bg-white text-slate-700 text-[10px] font-bold border border-slate-300 shadow-2xs" title="Copy Activity">📋 Copy</button>
-                        <button type="button" onclick="pasteMatrixActivity('${jsAttr(d.dateKey)}', '${jsAttr(sub.code)}', '${jsAttr(sec)}', event)" class="p-1 rounded bg-white/90 hover:bg-white text-slate-700 text-[10px] font-bold border border-slate-300 shadow-2xs" title="Paste Copied Activity">📥 Paste</button>
-                        <button type="button" onclick="event.stopPropagation(); openLessonModal('${jsAttr(d.dateKey)}', '${jsAttr(sub.code)}', '${jsAttr(sec)}', ${d.isWeekend})" class="p-1 rounded bg-white/90 hover:bg-white text-slate-700 text-[10px] font-bold border border-slate-300 shadow-2xs" title="Edit Activity">✏️ Edit</button>
-                      </div>
-                    </div>
-                  </td>
-                `;
-          } else {
-            dateRowHtml += `
-                  <td id="cell-${cellKey}" data-cell-key="${cellKey}" data-col="${colKey}" style="width: ${currentW}px; min-width: ${currentW}px; max-width: ${currentW}px;" class="p-1 border-r border-slate-300 bg-slate-200/50 cursor-pointer hover:bg-slate-200/80 transition align-top relative group/card-cell matrix-cell-slot" onclick="openLessonModal('${jsAttr(d.dateKey)}', '${jsAttr(sub.code)}', '${jsAttr(sec)}', ${d.isWeekend})">
-                    <div id="card-${cellKey}" class="p-1 rounded-lg border border-dashed border-slate-400/30 hover:border-amber-400 text-slate-500 hover:text-amber-800 bg-slate-200/40 hover:bg-white text-center transition-all duration-200 group-hover/card-cell:absolute group-hover/card-cell:left-1 group-hover/card-cell:right-1 group-hover/card-cell:top-1 group-hover/card-cell:z-22 group-hover/card-cell:shadow-lg group-hover/card-cell:scale-[1.02] group-hover/card-cell:bg-white group-hover/card-cell:border-amber-400">
-                      <div class="text-[8.5px] font-medium py-0.5 opacity-30 group-hover/card-cell:opacity-100 transition-opacity flex items-center justify-center gap-1 text-slate-600 group-hover/card-cell:text-amber-700">
-                        <span class="font-bold">+</span>
-                        <span class="truncate">Weekend Session</span>
-                      </div>
-                      <div class="hidden group-hover/card-cell:flex items-center justify-end gap-1 pt-1 mt-0.5 border-t border-slate-200">
-                        <button type="button" onclick="pasteMatrixActivity('${jsAttr(d.dateKey)}', '${jsAttr(sub.code)}', '${jsAttr(sec)}', event)" class="p-1 rounded bg-white hover:bg-slate-100 text-slate-700 text-[10px] font-bold border border-slate-300 shadow-2xs" title="Paste Copied Activity">📥 Paste</button>
-                        <button type="button" onclick="event.stopPropagation(); openLessonModal('${jsAttr(d.dateKey)}', '${jsAttr(sub.code)}', '${jsAttr(sec)}', ${d.isWeekend})" class="p-1 rounded bg-amber-50 hover:bg-amber-100 text-amber-900 text-[10px] font-bold border border-amber-300 shadow-2xs" title="Plan Weekend Session">✏️ Plan</button>
-                      </div>
-                    </div>
-                  </td>
-                `;
-          }
-          return;
-        }
-
-        if (d.isNoClassDate) {
-          dateRowHtml += `
-                <td id="cell-${cellKey}" data-cell-key="${cellKey}" data-col="${colKey}" style="width: ${currentW}px; min-width: ${currentW}px; max-width: ${currentW}px;" class="p-1 border-r border-slate-200 bg-rose-50/50 text-center align-middle overflow-hidden">
-                  <span id="card-${cellKey}" class="inline-block px-1.5 py-0.5 rounded bg-rose-100 text-rose-800 text-[9.5px] font-bold border border-rose-300">
-                    No Class
-                  </span>
-                </td>
-              `;
-          return;
-        }
-
-        if (scheduledSlot) {
-          if (entry) {
-            const isNoClass = (entry.type === 'No Class') || (entry.topic && entry.topic.toLowerCase().includes('no class'));
-            if (!isNoClass) {
-              meetingCounters[sub.code + '__' + sec]++;
-            }
-            const meetingNum = meetingCounters[sub.code + '__' + sec];
-
-            const isEntryCompleted = (entry.status === 'Completed') || (d.dateKey < todayKey);
-            let badgeColor = sub.badgeBg;
-            if (entry.type === 'Exam') badgeColor = 'bg-amber-100 text-amber-900 border-amber-300';
-            if (entry.type === 'No Class') badgeColor = 'bg-rose-100 text-rose-800 border-rose-300';
-
-            dateRowHtml += `
-                  <td id="cell-${cellKey}" data-cell-key="${cellKey}" data-col="${colKey}" style="width: ${currentW}px; min-width: ${currentW}px; max-width: ${currentW}px;" class="p-1 border-r border-slate-200 cursor-pointer transition align-top relative group/card-cell matrix-cell-slot" onclick="openLessonModal('${jsAttr(d.dateKey)}', '${jsAttr(sub.code)}', '${jsAttr(sec)}', ${d.isWeekend})">
-                    <div id="card-${cellKey}" class="p-1 rounded-lg border ${badgeColor} ${accentBarClass} shadow-xs space-y-0.5 overflow-hidden max-w-full min-w-0 transition-all duration-200 ease-out group-hover/card-cell:absolute group-hover/card-cell:left-1 group-hover/card-cell:right-1 group-hover/card-cell:top-1 group-hover/card-cell:z-22 group-hover/card-cell:shadow-xl group-hover/card-cell:scale-[1.02] ${badgeColor}">
-                      <div class="flex items-center justify-between gap-1 overflow-hidden">
-                        ${!isNoClass ? `<span class="font-extrabold text-[8.5px] uppercase tracking-tight truncate">Mtg #${meetingNum}</span>` : `<span class="font-extrabold text-[8.5px] uppercase tracking-tight text-rose-700 truncate">${escapeHtml(entry.type || 'No Class')}</span>`}
-                        <div class="flex items-center gap-1 shrink-0">
-                          ${isEntryCompleted ? '<span class="text-[7.5px] px-1 py-0.2 rounded font-black bg-emerald-600 text-white shrink-0">✓ Done</span>' : ''}
-                          <span class="text-[7.5px] px-1 py-0.2 rounded font-bold bg-white/80 shrink-0">${escapeHtml(entry.type)}</span>
-                        </div>
-                      </div>
-                      <div class="font-bold text-[10.5px] leading-tight truncate group-hover/card-cell:whitespace-normal group-hover/card-cell:overflow-visible transition-all max-w-full" title="${escapeHtml(entry.topic || 'Planned Activity')}">${escapeHtml(entry.topic || 'Planned Activity')}</div>
-                      ${entry.activity ? `<div class="text-[8.5px] opacity-80 truncate group-hover/card-cell:whitespace-normal group-hover/card-cell:overflow-visible transition-all max-w-full leading-tight" title="${escapeHtml(entry.activity)}">${escapeHtml(entry.activity)}</div>` : ''}
-                      <div class="hidden group-hover/card-cell:flex items-center justify-between text-[8.5px] font-mono font-bold pt-1 mt-1 border-t border-black/10 text-slate-700">
-                        <span>🕒 ${formatTime12(scheduledSlot.startTime)} – ${formatTime12(scheduledSlot.endTime)}</span>
-                        <span class="px-1 py-0.2 rounded bg-white/80 border border-slate-300/60 font-sans font-semibold">${escapeHtml(scheduledSlot.room || 'TBA')}</span>
-                      </div>
-                      <div class="hidden group-hover/card-cell:flex items-center justify-end gap-1 pt-1 mt-1 border-t border-black/10">
-                        <button type="button" onclick="copyMatrixActivity('${jsAttr(d.dateKey)}', '${jsAttr(sub.code)}', '${jsAttr(sec)}', event)" class="p-1 rounded bg-white/90 hover:bg-white text-slate-700 text-[10px] font-bold border border-slate-300 shadow-2xs" title="Copy Activity">📋 Copy</button>
-                        <button type="button" onclick="pasteMatrixActivity('${jsAttr(d.dateKey)}', '${jsAttr(sub.code)}', '${jsAttr(sec)}', event)" class="p-1 rounded bg-white/90 hover:bg-white text-slate-700 text-[10px] font-bold border border-slate-300 shadow-2xs" title="Paste Copied Activity">📥 Paste</button>
-                        <button type="button" onclick="event.stopPropagation(); openLessonModal('${jsAttr(d.dateKey)}', '${jsAttr(sub.code)}', '${jsAttr(sec)}', ${d.isWeekend})" class="p-1 rounded bg-white/90 hover:bg-white text-slate-700 text-[10px] font-bold border border-slate-300 shadow-2xs" title="Edit Activity">✏️ Edit</button>
-                      </div>
-                    </div>
-                  </td>
-                `;
-          } else {
-            dateRowHtml += `
-                  <td id="cell-${cellKey}" data-cell-key="${cellKey}" data-col="${colKey}" style="width: ${currentW}px; min-width: ${currentW}px; max-width: ${currentW}px;" class="p-1 border-r border-slate-200 cursor-pointer hover:bg-slate-100 transition align-top relative group/card-cell matrix-cell-slot" onclick="openLessonModal('${jsAttr(d.dateKey)}', '${jsAttr(sub.code)}', '${jsAttr(sec)}', ${d.isWeekend})">
-                    <div id="card-${cellKey}" class="p-1 rounded-lg border border-dashed border-slate-300 hover:border-msu-maroon text-slate-500 hover:text-slate-800 bg-slate-50/60 hover:bg-white text-center ${accentBarClass} transition-all duration-200 group-hover/card-cell:absolute group-hover/card-cell:left-1 group-hover/card-cell:right-1 group-hover/card-cell:top-1 group-hover/card-cell:z-22 group-hover/card-cell:shadow-lg group-hover/card-cell:scale-[1.02] group-hover/card-cell:bg-white">
-                      <div class="text-[9.5px] text-slate-500 font-semibold py-0.5">+ Click to plan</div>
-                      <div class="hidden group-hover/card-cell:flex items-center justify-center text-[8.5px] font-mono text-slate-500 pt-0.5 mt-0.5 border-t border-slate-200">
-                        🕒 ${formatTime12(scheduledSlot.startTime)} – ${formatTime12(scheduledSlot.endTime)} • ${escapeHtml(scheduledSlot.room || 'TBA')}
-                      </div>
-                      <div class="hidden group-hover/card-cell:flex items-center justify-end gap-1 pt-1 mt-1 border-t border-slate-200">
-                        <button type="button" onclick="pasteMatrixActivity('${jsAttr(d.dateKey)}', '${jsAttr(sub.code)}', '${jsAttr(sec)}', event)" class="p-1 rounded bg-white hover:bg-slate-100 text-slate-700 text-[10px] font-bold border border-slate-300 shadow-2xs" title="Paste Copied Activity">📥 Paste</button>
-                        <button type="button" onclick="event.stopPropagation(); openLessonModal('${jsAttr(d.dateKey)}', '${jsAttr(sub.code)}', '${jsAttr(sec)}', ${d.isWeekend})" class="p-1 rounded bg-white hover:bg-slate-100 text-slate-700 text-[10px] font-bold border border-slate-300 shadow-2xs" title="Open Planner">✏️ Edit</button>
-                      </div>
-                    </div>
-                  </td>
-                `;
-          }
-        } else {
-          if (entry) {
-            const isNoClass = (entry.type === 'No Class') || (entry.topic && entry.topic.toLowerCase().includes('no class'));
-            const isEntryCompleted = (entry.status === 'Completed') || (d.dateKey < todayKey);
-            let badgeColor = sub.badgeBg;
-            if (entry.type === 'Exam') badgeColor = 'bg-amber-100 text-amber-900 border-amber-300';
-            else if (entry.type === 'No Class') badgeColor = 'bg-rose-100 text-rose-800 border-rose-300';
-            else if (entry.type === 'Makeup Class') badgeColor = 'bg-amber-50/90 text-amber-950 border-amber-300';
-            else if (entry.type === 'Special Session') badgeColor = 'bg-violet-50/90 text-violet-950 border-violet-300';
-
-            const displayType = entry.type || 'Special Session';
-
-            dateRowHtml += `
-                  <td id="cell-${cellKey}" data-cell-key="${cellKey}" data-col="${colKey}" style="width: ${currentW}px; min-width: ${currentW}px; max-width: ${currentW}px;" class="p-1 border-r border-slate-200 cursor-pointer transition align-top relative group/card-cell matrix-cell-slot" onclick="openLessonModal('${jsAttr(d.dateKey)}', '${jsAttr(sub.code)}', '${jsAttr(sec)}', ${d.isWeekend})">
-                    <div id="card-${cellKey}" class="p-1 rounded-lg border ${badgeColor} ${accentBarClass} shadow-xs space-y-0.5 overflow-hidden max-w-full min-w-0 transition-all duration-200 ease-out group-hover/card-cell:absolute group-hover/card-cell:left-1 group-hover/card-cell:right-1 group-hover/card-cell:top-1 group-hover/card-cell:z-22 group-hover/card-cell:shadow-xl group-hover/card-cell:scale-[1.02] ${badgeColor}">
-                      <div class="flex items-center justify-between gap-1 overflow-hidden">
-                        <span class="font-extrabold text-[8.5px] uppercase tracking-tight text-amber-800 truncate">⚡ ${escapeHtml(displayType)}</span>
-                        <div class="flex items-center gap-1 shrink-0">
-                          ${isEntryCompleted ? '<span class="text-[7.5px] px-1 py-0.2 rounded font-black bg-emerald-600 text-white shrink-0">✓ Done</span>' : ''}
-                          <span class="text-[7.5px] px-1 py-0.2 rounded font-bold bg-white/80 shrink-0 border border-black/10">${escapeHtml(entry.type || 'Special')}</span>
-                        </div>
-                      </div>
-                      <div class="font-bold text-[10.5px] leading-tight truncate group-hover/card-cell:whitespace-normal group-hover/card-cell:overflow-visible transition-all max-w-full" title="${escapeHtml(entry.topic || 'Planned Activity')}">${escapeHtml(entry.topic || 'Planned Activity')}</div>
-                      ${entry.activity ? `<div class="text-[8.5px] opacity-80 truncate group-hover/card-cell:whitespace-normal group-hover/card-cell:overflow-visible transition-all max-w-full leading-tight" title="${escapeHtml(entry.activity)}">${escapeHtml(entry.activity)}</div>` : ''}
-                      <div class="hidden group-hover/card-cell:flex items-center justify-between text-[8.5px] font-mono font-semibold pt-1 mt-1 border-t border-black/10 text-slate-600">
-                        <span>⚡ Out-of-Schedule</span>
-                        <span class="px-1 py-0.2 rounded bg-white/80 border border-slate-300/60 font-sans font-semibold">${escapeHtml(entry.status || 'Planned')}</span>
-                      </div>
-                      <div class="hidden group-hover/card-cell:flex items-center justify-end gap-1 pt-1 mt-1 border-t border-black/10">
-                        <button type="button" onclick="copyMatrixActivity('${jsAttr(d.dateKey)}', '${jsAttr(sub.code)}', '${jsAttr(sec)}', event)" class="p-1 rounded bg-white/90 hover:bg-white text-slate-700 text-[10px] font-bold border border-slate-300 shadow-2xs" title="Copy Activity">📋 Copy</button>
-                        <button type="button" onclick="pasteMatrixActivity('${jsAttr(d.dateKey)}', '${jsAttr(sub.code)}', '${jsAttr(sec)}', event)" class="p-1 rounded bg-white/90 hover:bg-white text-slate-700 text-[10px] font-bold border border-slate-300 shadow-2xs" title="Paste Copied Activity">📥 Paste</button>
-                        <button type="button" onclick="event.stopPropagation(); openLessonModal('${jsAttr(d.dateKey)}', '${jsAttr(sub.code)}', '${jsAttr(sec)}', ${d.isWeekend})" class="p-1 rounded bg-white/90 hover:bg-white text-slate-700 text-[10px] font-bold border border-slate-300 shadow-2xs" title="Edit Activity">✏️ Edit</button>
-                      </div>
-                    </div>
-                  </td>
-                `;
-          } else {
-            dateRowHtml += `
-                  <td id="cell-${cellKey}" data-cell-key="${cellKey}" data-col="${colKey}" style="width: ${currentW}px; min-width: ${currentW}px; max-width: ${currentW}px;" class="p-1 border-r border-slate-200 cursor-pointer hover:bg-amber-50/20 transition align-top relative group/card-cell matrix-cell-slot" onclick="openLessonModal('${jsAttr(d.dateKey)}', '${jsAttr(sub.code)}', '${jsAttr(sec)}', ${d.isWeekend})">
-                    <div id="card-${cellKey}" class="p-1 rounded-lg border border-dashed border-slate-200 hover:border-amber-400 text-slate-400 hover:text-amber-800 bg-slate-50/30 hover:bg-white text-center transition-all duration-200 group-hover/card-cell:absolute group-hover/card-cell:left-1 group-hover/card-cell:right-1 group-hover/card-cell:top-1 group-hover/card-cell:z-22 group-hover/card-cell:shadow-lg group-hover/card-cell:scale-[1.02] group-hover/card-cell:bg-white group-hover/card-cell:border-amber-400">
-                      <div class="text-[8.5px] font-medium py-0.5 opacity-30 group-hover/card-cell:opacity-100 transition-opacity flex items-center justify-center gap-1 text-slate-500 group-hover/card-cell:text-amber-700">
-                        <span class="font-bold">+</span>
-                        <span class="truncate">Special / Makeup</span>
-                      </div>
-                      <div class="hidden group-hover/card-cell:flex items-center justify-center text-[8px] font-mono text-amber-700/80 pt-0.5 mt-0.5 border-t border-slate-200">
-                        ⚡ Out-of-schedule day
-                      </div>
-                      <div class="hidden group-hover/card-cell:flex items-center justify-end gap-1 pt-1 mt-1 border-t border-slate-200">
-                        <button type="button" onclick="pasteMatrixActivity('${jsAttr(d.dateKey)}', '${jsAttr(sub.code)}', '${jsAttr(sec)}', event)" class="p-1 rounded bg-white hover:bg-slate-100 text-slate-700 text-[10px] font-bold border border-slate-300 shadow-2xs" title="Paste Copied Activity">📥 Paste</button>
-                        <button type="button" onclick="event.stopPropagation(); openLessonModal('${jsAttr(d.dateKey)}', '${jsAttr(sub.code)}', '${jsAttr(sec)}', ${d.isWeekend})" class="p-1 rounded bg-amber-50 hover:bg-amber-100 text-amber-900 text-[10px] font-bold border border-amber-300 shadow-2xs" title="Plan Special Session / Makeup Class">✏️ Plan</button>
-                      </div>
-                    </div>
-                  </td>
-                `;
-          }
-        }
+        dateRowHtml += _renderMatrixCell(d, sub, sec, secIdx, timetableMap, meetingCounters, todayKey);
       });
     });
 
-    const customNote = dailyNotes[d.dateKey] || '';
-    // ROW NOTES / ACADEMIC EVENTS CELL
-    let eventContent = '';
-    if (d.event || customNote) {
-      let badgeTheme = 'bg-blue-100 text-blue-900 border-blue-300';
-      if (d.event && d.event.isNoClass) badgeTheme = 'bg-rose-100 text-rose-900 border-rose-300';
-      else if (d.event && d.event.type === 'exam') badgeTheme = 'bg-amber-100 text-amber-900 border-amber-400';
-      else if (d.event && d.event.type === 'milestone') badgeTheme = 'bg-emerald-100 text-emerald-900 border-emerald-300';
-
-      eventContent = `
-            <div id="card-${d.dateKey}__notes" class="p-1 rounded-lg border bg-slate-50 border-slate-200 shadow-xs space-y-0.5">
-              ${d.event ? `
-                <div class="flex items-center gap-1.5 flex-wrap">
-                  <span class="px-1.5 py-0.5 rounded text-[9.5px] font-extrabold border ${badgeTheme}">
-                    ${escapeHtml(d.event.activity)}
-                  </span>
-                  ${d.event.isNoClass ? `<span class="px-1.5 py-0.2 rounded text-[8.5px] font-bold bg-rose-100 text-rose-700 border border-rose-200">No Class</span>` : ''}
-                </div>
-              ` : ''}
-              ${customNote ? `<div class="text-[10.5px] text-slate-700 font-medium italic leading-tight">${escapeHtml(customNote)}</div>` : ''}
-            </div>
-          `;
-    } else {
-      eventContent = `
-            <div id="card-${d.dateKey}__notes" class="text-center text-slate-300 text-[10.5px] select-none py-0.5">—</div>
-          `;
-    }
-
-    dateRowHtml += `
-            <td id="cell-${d.dateKey}__notes" data-cell-key="${d.dateKey}__notes" class="p-1 border-r border-slate-200 cursor-pointer hover:bg-slate-100 transition align-middle" onclick="openEventEditorModal('${jsAttr(d.dateKey)}')">
-              ${eventContent}
-            </td>
-          </tr>
-        `;
-
+    dateRowHtml += _renderMatrixNotesCell(d);
+    dateRowHtml += `</tr>`;
     return dateRowHtml;
   }).join('');
 
@@ -407,9 +421,6 @@ function renderMatrixTable() {
     requestAnimationFrame(() => setupSynchronizedScrollbars());
   } else {
     setupSynchronizedScrollbars();
-  }
-  if (typeof updatePlannerSidebar === 'function') {
-    updatePlannerSidebar();
   }
   if (typeof autoResizeContentWindows === 'function') {
     autoResizeContentWindows();

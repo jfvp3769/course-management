@@ -300,6 +300,355 @@ function renderGradebookStats(selectedSec, studentsList, config) {
   }
 }
 
+function _renderGradebookHeader(thead, config, categoryPalette, isUnbalanced, totalCatWeight) {
+  if (!thead) return;
+
+  let tier1Html = `
+        <tr class="border-b border-slate-300 text-slate-700 font-bold bg-slate-100">
+          <th rowspan="2" onclick="toggleGradebookSort('default')" class="sticky-grade-head-1 py-2.5 px-2 text-center border-r border-slate-200 bg-slate-100 cursor-pointer select-none hover:bg-slate-200 transition" title="Click to reset to default student roster order">
+            <div class="flex items-center justify-center gap-0.5">
+              <span>#</span>
+              ${getGradebookSortIndicator('default')}
+            </div>
+          </th>
+          <th rowspan="2" onclick="toggleGradebookSort('id')" class="sticky-grade-head-2 py-2.5 px-2.5 border-r border-slate-200 whitespace-nowrap bg-slate-100 cursor-pointer select-none hover:bg-slate-200 transition" title="Click to sort by Student ID (Ascending/Descending)">
+            <div class="flex items-center justify-center gap-1">
+              <span>Student ID</span>
+              ${getGradebookSortIndicator('id')}
+            </div>
+          </th>
+          <th rowspan="2" onclick="toggleGradebookSort('name')" class="sticky-grade-head-3 py-2.5 px-3 border-r border-slate-200 whitespace-nowrap bg-slate-100 cursor-pointer select-none hover:bg-slate-200 transition" title="Click to sort by Student Name (A-Z / Z-A)">
+            <div class="flex items-center justify-center gap-1">
+              <span>Student Name</span>
+              ${getGradebookSortIndicator('name')}
+            </div>
+          </th>
+      `;
+
+  let tier2Html = `
+        <tr class="border-b border-slate-300 text-slate-600 font-medium bg-slate-50 text-[11px]">
+      `;
+
+  config.categories.forEach((cat, catIdx) => {
+    const catTheme = categoryPalette[catIdx % categoryPalette.length];
+    const isCollapsed = !!gradebookCollapsedCats[cat.id];
+
+    if (isCollapsed) {
+      tier1Html += `
+            <th colspan="1" draggable="true" ondragstart="handleCategoryDragStart(event, ${catIdx})" ondragover="event.preventDefault(); this.classList.add('grade-cat-drag-over')" ondragleave="this.classList.remove('grade-cat-drag-over')" ondrop="handleCategoryDrop(event, ${catIdx})" onclick="toggleGradebookCategoryCollapse('${jsAttr(cat.id)}')" class="cursor-grab active:cursor-grabbing py-2.5 px-2 text-center font-extrabold ${catTheme.tier1} ${catTheme.groupBorder} select-none hover:brightness-95 transition-all" title="Click to expand ${escapeHtml(cat.name)} sub-activities (or drag to reorder)">
+              <div class="flex items-center justify-center gap-1.5">
+                <span class="text-xs tracking-tight">${escapeHtml(cat.name)} (${cat.weight}%)</span>
+                <span class="text-[11px] font-bold text-slate-500">▸</span>
+              </div>
+            </th>
+          `;
+      tier2Html += `
+            <th onclick="toggleGradebookSort('cat_${cat.id}')" class="py-1.5 px-2 text-center whitespace-nowrap text-slate-700 font-bold text-[10.5px] ${catTheme.tier2} ${catTheme.groupBorder} cursor-pointer select-none hover:brightness-95 transition" title="Click to sort by ${escapeHtml(cat.name)} Subtotal %">
+              <div class="flex items-center justify-center gap-0.5">
+                <span>Subtotal %</span>
+                ${getGradebookSortIndicator('cat_' + cat.id)}
+              </div>
+            </th>
+          `;
+    } else {
+      const subCount = (cat.subActivities && cat.subActivities.length > 0) ? cat.subActivities.length : 1;
+      tier1Html += `
+            <th colspan="${subCount}" draggable="true" ondragstart="handleCategoryDragStart(event, ${catIdx})" ondragover="event.preventDefault(); this.classList.add('grade-cat-drag-over')" ondragleave="this.classList.remove('grade-cat-drag-over')" ondrop="handleCategoryDrop(event, ${catIdx})" onclick="toggleGradebookCategoryCollapse('${jsAttr(cat.id)}')" class="cursor-grab active:cursor-grabbing py-2.5 px-2 text-center font-extrabold ${catTheme.tier1} ${catTheme.groupBorder} select-none hover:brightness-95 transition-all" title="Click to collapse ${escapeHtml(cat.name)} sub-activities (or drag to reorder)">
+              <div class="flex items-center justify-center gap-1.5">
+                <span class="text-xs tracking-tight">${escapeHtml(cat.name)} (${cat.weight}%)</span>
+                ${(cat.subActivities && cat.subActivities.length > 0) ? `<span class="text-[11px] font-bold text-slate-500">▾</span>` : ''}
+              </div>
+            </th>
+          `;
+      if (cat.subActivities && cat.subActivities.length > 0) {
+        cat.subActivities.forEach((sub, subIdx) => {
+          const isLast = (subIdx === cat.subActivities.length - 1);
+          const borderClass = isLast ? catTheme.groupBorder : 'border-r border-slate-200';
+          tier2Html += `
+                <th onclick="toggleGradebookSort('sub_${sub.id}')" class="py-1.5 px-1.5 text-center whitespace-nowrap ${catTheme.tier2} ${borderClass} cursor-pointer select-none hover:brightness-95 transition" title="Click to sort by ${escapeHtml(sub.name)} score (Highest/Lowest)">
+                  <div class="flex items-center justify-center gap-0.5">
+                    <span class="font-bold text-slate-800 text-[11px]">${escapeHtml(sub.name)}</span>
+                    ${getGradebookSortIndicator('sub_' + sub.id)}
+                  </div>
+                  <div class="text-[9.5px] text-slate-500 font-mono font-normal">${sub.maxScore} pts • ${sub.weight}%</div>
+                </th>
+              `;
+        });
+      } else {
+        tier2Html += `
+              <th class="py-1.5 px-1.5 text-center italic text-slate-400 ${catTheme.tier2} ${catTheme.groupBorder}">No items</th>
+            `;
+      }
+    }
+  });
+
+  if (isUnbalanced) {
+    tier1Html += `
+          <th class="py-2 px-2 text-center border-r border-rose-300 bg-rose-100/90 text-rose-950 font-extrabold whitespace-nowrap" title="Total activity percentage must equal 100%">
+            <span class="inline-flex items-center gap-1 text-[11px] bg-rose-600 text-white px-2 py-0.5 rounded-full font-black animate-pulse shadow-2xs">
+              ⚠️ Sum: ${totalCatWeight}% (≠ 100%)
+            </span>
+          </th>
+        `;
+    tier2Html += `
+          <th class="py-1.5 px-1.5 text-center border-r border-rose-200 bg-rose-50 text-[10px] text-rose-700 font-bold whitespace-nowrap">
+            Weight Error
+          </th>
+        `;
+  }
+
+  tier1Html += `
+          <th rowspan="2" onclick="toggleGradebookSort('total')" class="py-2.5 px-2 text-center bg-slate-200 font-black border-r border-slate-300 min-w-[85px] cursor-pointer select-none hover:bg-slate-300 transition" title="Click to sort by Total Percentage (Highest/Lowest)">
+            <div class="flex items-center justify-center gap-1">
+              <span>Total %</span>
+              ${getGradebookSortIndicator('total')}
+            </div>
+          </th>
+          <th rowspan="2" class="py-2.5 px-2 text-center bg-slate-200 font-black border-r border-slate-300 min-w-[85px]">Final Grade</th>
+          <th rowspan="2" class="py-2.5 px-2 text-center bg-slate-100 border-l border-slate-200 font-bold min-w-[105px]">Status</th>
+        </tr>
+      `;
+  tier2Html += `</tr>`;
+
+  thead.innerHTML = tier1Html + tier2Html;
+}
+
+function _filterAndSortGradebookStudents(sectionStudents, config, selectedSec, gradeCache) {
+  // Apply Grade and Status dropdown filters + Cohort filter
+  const gradeFilter = document.getElementById('gradebook-grade-filter')?.value || 'all';
+  const statusFilter = document.getElementById('gradebook-status-filter')?.value || 'all';
+
+  if ((gradeFilter !== 'all' || statusFilter !== 'all') && typeof gradebookCohortFilter !== 'undefined') {
+    gradebookCohortFilter = null;
+  }
+
+  let filtered = sectionStudents.filter(s => {
+    if (typeof gradebookCohortFilter !== 'undefined' && gradebookCohortFilter && Array.isArray(gradebookCohortFilter.studentIds)) {
+      if (!gradebookCohortFilter.studentIds.includes(s.id)) return false;
+    }
+    const res = gradeCache.get(s.id) || calculateStudentGrade(s, config, selectedSec);
+    const matchesGrade = (gradeFilter === 'all') || (res.msu.grade === gradeFilter);
+    const matchesStatus = (statusFilter === 'all') || (res.msu.status.toLowerCase() === statusFilter.toLowerCase());
+    return matchesGrade && matchesStatus;
+  });
+
+  // Apply intelligent column sorting
+  if (gradebookSortState.col === 'id') {
+    filtered.sort((a, b) => {
+      const cmp = (a.id || '').localeCompare(b.id || '', undefined, { numeric: true, sensitivity: 'base' });
+      return gradebookSortState.direction === 'asc' ? cmp : -cmp;
+    });
+  } else if (gradebookSortState.col === 'name') {
+    filtered.sort((a, b) => {
+      const nameA = `${a.last || ''}, ${a.first || ''}`.trim().toLowerCase();
+      const nameB = `${b.last || ''}, ${b.first || ''}`.trim().toLowerCase();
+      const cmp = nameA.localeCompare(nameB, undefined, { sensitivity: 'base' });
+      return gradebookSortState.direction === 'asc' ? cmp : -cmp;
+    });
+  } else if (gradebookSortState.col === 'total') {
+    filtered.sort((a, b) => {
+      const gradeA = (gradeCache.get(a.id) || calculateStudentGrade(a, config, selectedSec)).total || 0;
+      const gradeB = (gradeCache.get(b.id) || calculateStudentGrade(b, config, selectedSec)).total || 0;
+      return gradebookSortState.direction === 'asc' ? (gradeA - gradeB) : (gradeB - gradeA);
+    });
+  } else if (gradebookSortState.col.startsWith('sub_')) {
+    const subCol = gradebookSortState.col;
+    let targetCat = null;
+    let targetSub = null;
+    config.categories.forEach(cat => {
+      if (cat.subActivities) {
+        const found = cat.subActivities.find(sub => sub.id === subCol || 'sub_' + sub.id === subCol);
+        if (found) { targetCat = cat; targetSub = found; }
+      }
+    });
+    const actualSubId = targetSub ? targetSub.id : subCol.replace(/^sub_sub_/, 'sub_');
+    const catId = targetCat ? targetCat.id : '';
+    const maxScore = targetSub ? targetSub.maxScore : 100;
+
+    filtered.sort((a, b) => {
+      const valA = parseFloat(getStudentScore(a, actualSubId, catId, maxScore)) || 0;
+      const valB = parseFloat(getStudentScore(b, actualSubId, catId, maxScore)) || 0;
+      return gradebookSortState.direction === 'asc' ? (valA - valB) : (valB - valA);
+    });
+  } else if (gradebookSortState.col.startsWith('cat_')) {
+    const catCol = gradebookSortState.col;
+    let targetCat = config.categories.find(c => c.id === catCol || 'cat_' + c.id === catCol);
+    const actualCatId = targetCat ? targetCat.id : catCol.replace(/^cat_cat_/, 'cat_');
+    filtered.sort((a, b) => {
+      const gradeA = gradeCache.get(a.id) || calculateStudentGrade(a, config, selectedSec);
+      const gradeB = gradeCache.get(b.id) || calculateStudentGrade(b, config, selectedSec);
+      const valA = (gradeA.categoryTotals && gradeA.categoryTotals[actualCatId] !== undefined) ? gradeA.categoryTotals[actualCatId] : 0;
+      const valB = (gradeB.categoryTotals && gradeB.categoryTotals[actualCatId] !== undefined) ? gradeB.categoryTotals[actualCatId] : 0;
+      return gradebookSortState.direction === 'asc' ? (valA - valB) : (valB - valA);
+    });
+  }
+
+  return filtered;
+}
+
+function _renderGradebookStudentRows(tbody, filtered, config, selectedSec, gradeCache, categoryPalette, isUnbalanced) {
+  tbody.innerHTML = filtered.map((s, rowIdx) => {
+    const gradeResult = gradeCache.get(s.id) || calculateStudentGrade(s, config, selectedSec);
+    let colIdx = 0;
+    const isEven = (rowIdx % 2 === 0);
+    const rowClass = isEven ? 'grade-row-even bg-white' : 'grade-row-odd bg-slate-50/70';
+    const stickyCellBg = isEven ? 'bg-white' : 'bg-slate-50';
+
+    let cellsHtml = '';
+    config.categories.forEach((cat, catIdx) => {
+      const catTheme = categoryPalette[catIdx % categoryPalette.length];
+      const isCollapsed = !!gradebookCollapsedCats[cat.id];
+      if (isCollapsed) {
+        const catScore = (gradeResult.categoryTotals && gradeResult.categoryTotals[cat.id] !== undefined) ? gradeResult.categoryTotals[cat.id] : 0;
+        cellsHtml += `
+              <td class="py-2 px-2 text-center ${catTheme.groupBorder} font-mono font-black text-xs" data-cat-summary="${cat.id}">
+                <span class="inline-block px-2 py-0.5 rounded-full text-xs font-bold ${catTheme.badge}">${(parseFloat(catScore) || 0).toFixed(2)}%</span>
+              </td>
+            `;
+      } else {
+        if (cat.subActivities && cat.subActivities.length > 0) {
+          cat.subActivities.forEach((sub, subIdx) => {
+            const maxScore = (sub.maxScore && sub.maxScore > 0) ? sub.maxScore : 100;
+            const val = getStudentScore(s, sub.id, cat.id, maxScore);
+            const numVal = parseFloat(val);
+            const isOverMax = !isNaN(numVal) && numVal > maxScore;
+            const inputClass = isOverMax ? 'border-rose-500 bg-rose-50 text-rose-700 ring-2 ring-rose-400 font-black' : 'bg-white border-slate-300';
+            const inputTitle = isOverMax ? `⚠️ Warning: Score (${val}) exceeds maximum possible items (${maxScore})!` : `Score (max ${maxScore})`;
+            const isLast = (subIdx === cat.subActivities.length - 1);
+            const cellBorder = isLast ? catTheme.groupBorder : 'border-r border-slate-100';
+
+            cellsHtml += `
+                  <td class="py-2 px-1 text-center ${cellBorder}">
+                    <input type="number" min="0" max="${maxScore}" step="any"
+                      data-student="${escapeHtml(s.id)}"
+                      data-sub="${escapeHtml(sub.id)}"
+                      data-row="${rowIdx}"
+                      data-col="${colIdx}"
+                      value="${val}"
+                      title="${inputTitle}"
+                      onfocus="this.select()"
+                      onkeydown="handleGradeGridKey(event, ${rowIdx}, ${colIdx})"
+                      oninput="updateDynamicScore('${jsAttr(s.id)}', '${jsAttr(sub.id)}', this.value)"
+                      onchange="updateDynamicScore('${jsAttr(s.id)}', '${jsAttr(sub.id)}', this.value, true)"
+                      onblur="updateDynamicScore('${jsAttr(s.id)}', '${jsAttr(sub.id)}', this.value, true)"
+                      class="grade-cell-input w-14 text-center font-mono font-bold rounded py-1 text-xs focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition border ${inputClass}">
+                  </td>
+                `;
+            colIdx++;
+          });
+        } else {
+          cellsHtml += `<td class="py-2 px-1 text-center text-slate-300 ${catTheme.groupBorder}">—</td>`;
+        }
+      }
+    });
+
+    return `
+          <tr id="grade-row-${escapeHtml(s.id)}" data-student-id="${escapeHtml(s.id)}" class="${rowClass} hover:bg-blue-50/40 transition border-b border-slate-200 group">
+            <td class="sticky-grade-col-1 py-2.5 px-2 font-mono text-slate-400 text-center border-r border-slate-200 ${stickyCellBg}">${rowIdx + 1}</td>
+            <td class="sticky-grade-col-2 py-2.5 px-2.5 font-mono font-bold text-slate-800 border-r border-slate-200 whitespace-nowrap ${stickyCellBg}">${escapeHtml(s.id)}</td>
+            <td class="sticky-grade-col-3 py-2.5 px-3 font-bold text-slate-900 border-r border-slate-200 whitespace-nowrap ${stickyCellBg} overflow-hidden" title="${escapeHtml(s.last)}, ${escapeHtml(s.first)}">
+              <div class="truncate max-w-[216px]">${escapeHtml(s.last)}, ${escapeHtml(s.first)}</div>
+            </td>
+            ${cellsHtml}
+            ${isUnbalanced ? '<td class="py-2 px-1 text-center border-r border-rose-200 bg-rose-50/40 text-rose-600 font-bold text-xs" title="Total weight does not equal 100%">⚠️</td>' : ''}
+            <td class="py-2.5 px-2 text-center font-extrabold text-xs font-mono text-slate-800 bg-slate-100/90 border-r border-slate-200 grade-total-cell">${(parseFloat(gradeResult.total) || 0).toFixed(2)}%</td>
+            <td class="py-2.5 px-2 text-center border-r border-slate-200 bg-amber-50/70">
+              <span class="grade-msu-cell inline-block px-2 py-0.5 rounded font-mono font-black text-xs border ${gradeResult.msu.class}">${gradeResult.msu.grade}</span>
+            </td>
+            <td class="py-2.5 px-2 text-center ${stickyCellBg} border-l border-slate-200">
+              <select onchange="updateGradeStatusOverride('${jsAttr(s.id)}', this.value)" class="grade-status-select text-[11px] font-bold rounded border border-slate-300 px-1 py-1 bg-white focus:ring-1 focus:ring-msu-maroon ${gradeResult.msu.status === 'Passed' ? 'text-emerald-700' : (gradeResult.msu.status === 'Incomplete' ? 'text-orange-700' : (gradeResult.msu.status === 'Withdrawn' || gradeResult.msu.status === 'Dropped' ? 'text-slate-600' : 'text-rose-700'))}">
+                <option value="" ${!s.statusOverride ? 'selected' : ''}>Auto (${gradeResult.msu.status})</option>
+                <option value="INC" ${s.statusOverride === 'INC' ? 'selected' : ''}>INC</option>
+                <option value="WDRW" ${s.statusOverride === 'WDRW' ? 'selected' : ''}>WDRW</option>
+                <option value="DRP" ${s.statusOverride === 'DRP' ? 'selected' : ''}>DRP</option>
+              </select>
+            </td>
+          </tr>
+        `;
+  }).join('');
+}
+
+function _renderGradebookFooter(tfoot, filtered, config, selectedSec, gradeCache, categoryPalette, isUnbalanced) {
+  if (!tfoot) return;
+
+  let footCellsHtml = '';
+  let classSumTotal = 0;
+  let passCount = 0;
+
+  filtered.forEach(s => {
+    const res = gradeCache.get(s.id) || calculateStudentGrade(s, config, selectedSec);
+    classSumTotal += res.total;
+    if (res.msu.status === 'Passed') passCount++;
+  });
+
+  const classAvgTotal = filtered.length > 0 ? (classSumTotal / filtered.length) : 0;
+  const classAvgMsu = getMsuGrade(classAvgTotal, null, selectedSec);
+  const passRate = filtered.length > 0 ? ((passCount / filtered.length) * 100) : 0;
+
+  config.categories.forEach((cat, catIdx) => {
+    const catTheme = categoryPalette[catIdx % categoryPalette.length];
+    const isCollapsed = !!gradebookCollapsedCats[cat.id];
+
+    if (isCollapsed) {
+      let catSum = 0;
+      filtered.forEach(s => {
+        const res = calculateStudentGrade(s, config, selectedSec);
+        catSum += (res.categoryTotals && res.categoryTotals[cat.id]) ? res.categoryTotals[cat.id] : 0;
+      });
+      const catAvg = filtered.length > 0 ? (catSum / filtered.length) : 0;
+      footCellsHtml += `
+            <td class="py-2.5 px-2 text-center font-mono font-black text-xs ${catTheme.groupBorder} bg-slate-100" title="Class Average for ${escapeHtml(cat.name)}">
+              <span class="inline-block px-2 py-0.5 rounded-full text-xs font-bold ${catTheme.badge}">${catAvg.toFixed(2)}%</span>
+            </td>
+          `;
+    } else {
+      if (cat.subActivities && cat.subActivities.length > 0) {
+        cat.subActivities.forEach((sub, subIdx) => {
+          let subScoreSum = 0;
+          filtered.forEach(s => {
+            subScoreSum += parseFloat(getStudentScore(s, sub.id, cat.id, sub.maxScore)) || 0;
+          });
+          const maxScore = (sub.maxScore && sub.maxScore > 0) ? sub.maxScore : 100;
+          const avgScore = filtered.length > 0 ? (subScoreSum / filtered.length) : 0;
+          const avgPct = (avgScore / maxScore) * 100;
+          const isLast = (subIdx === cat.subActivities.length - 1);
+          const cellBorder = isLast ? catTheme.groupBorder : 'border-r border-slate-200';
+
+          footCellsHtml += `
+                <td class="py-2 px-1 text-center font-mono text-[11px] ${cellBorder} bg-slate-100" title="${escapeHtml(sub.name)}: Avg ${avgScore.toFixed(1)} / ${maxScore} (${avgPct.toFixed(2)}%)">
+                  <div class="font-bold text-slate-800">${avgScore.toFixed(1)}</div>
+                  <div class="text-[9.5px] text-slate-500 font-normal">${avgPct.toFixed(2)}%</div>
+                </td>
+              `;
+        });
+      } else {
+        footCellsHtml += `<td class="py-2 px-1 text-center text-slate-400 ${catTheme.groupBorder} bg-slate-100">—</td>`;
+      }
+    }
+  });
+
+  tfoot.innerHTML = `
+        <tr class="border-t-2 border-slate-300 bg-slate-100 text-slate-800">
+          <td class="sticky-grade-foot-1 py-2.5 px-2 text-center font-mono font-bold text-slate-400 border-r border-slate-200 bg-slate-100">—</td>
+          <td class="sticky-grade-foot-2 py-2.5 px-2.5 font-mono font-black text-slate-800 border-r border-slate-200 whitespace-nowrap bg-slate-100 uppercase tracking-wider text-[11px]">AVERAGE</td>
+          <td class="sticky-grade-foot-3 py-2.5 px-3 font-bold text-slate-800 border-r border-slate-200 whitespace-nowrap bg-slate-100 text-xs">
+            Class Mean (${filtered.length} Students)
+          </td>
+          ${footCellsHtml}
+          ${isUnbalanced ? '<td class="py-2 px-1 text-center border-r border-rose-200 bg-rose-50 text-rose-600 font-bold text-xs">—</td>' : ''}
+          <td class="py-2.5 px-2 text-center font-black text-xs font-mono text-slate-900 bg-slate-200 border-r border-slate-300">
+            ${classAvgTotal.toFixed(2)}%
+          </td>
+          <td class="py-2.5 px-2 text-center border-r border-slate-200 bg-amber-100/80">
+            <span class="grade-msu-cell inline-block px-2 py-0.5 rounded font-mono font-black text-xs border ${classAvgMsu.class}">${classAvgMsu.grade}</span>
+          </td>
+          <td class="py-2.5 px-2 text-center bg-slate-100 border-l border-slate-200 whitespace-nowrap">
+            <span class="text-[11px] font-black ${passRate >= 75 ? 'text-emerald-700' : 'text-rose-700'}">${passRate.toFixed(2)}% Pass</span>
+          </td>
+        </tr>
+      `;
+}
+
 function renderGradebook() {
   const secSelect = document.getElementById('gradebook-section-select');
   const tbody = document.getElementById('gradebook-table-body');
@@ -439,117 +788,8 @@ function renderGradebook() {
     }
   ];
 
-  // Render 2-tier spreadsheet thead with interactive column sorting
-  if (thead) {
-    let tier1Html = `
-          <tr class="border-b border-slate-300 text-slate-700 font-bold bg-slate-100">
-            <th rowspan="2" onclick="toggleGradebookSort('default')" class="sticky-grade-head-1 py-2.5 px-2 text-center border-r border-slate-200 bg-slate-100 cursor-pointer select-none hover:bg-slate-200 transition" title="Click to reset to default student roster order">
-              <div class="flex items-center justify-center gap-0.5">
-                <span>#</span>
-                ${getGradebookSortIndicator('default')}
-              </div>
-            </th>
-            <th rowspan="2" onclick="toggleGradebookSort('id')" class="sticky-grade-head-2 py-2.5 px-2.5 border-r border-slate-200 whitespace-nowrap bg-slate-100 cursor-pointer select-none hover:bg-slate-200 transition" title="Click to sort by Student ID (Ascending/Descending)">
-              <div class="flex items-center justify-center gap-1">
-                <span>Student ID</span>
-                ${getGradebookSortIndicator('id')}
-              </div>
-            </th>
-            <th rowspan="2" onclick="toggleGradebookSort('name')" class="sticky-grade-head-3 py-2.5 px-3 border-r border-slate-200 whitespace-nowrap bg-slate-100 cursor-pointer select-none hover:bg-slate-200 transition" title="Click to sort by Student Name (A-Z / Z-A)">
-              <div class="flex items-center justify-center gap-1">
-                <span>Student Name</span>
-                ${getGradebookSortIndicator('name')}
-              </div>
-            </th>
-        `;
-
-    let tier2Html = `
-          <tr class="border-b border-slate-300 text-slate-600 font-medium bg-slate-50 text-[11px]">
-        `;
-
-    config.categories.forEach((cat, catIdx) => {
-      const catTheme = categoryPalette[catIdx % categoryPalette.length];
-      const isCollapsed = !!gradebookCollapsedCats[cat.id];
-
-      if (isCollapsed) {
-        tier1Html += `
-              <th colspan="1" draggable="true" ondragstart="handleCategoryDragStart(event, ${catIdx})" ondragover="event.preventDefault(); this.classList.add('grade-cat-drag-over')" ondragleave="this.classList.remove('grade-cat-drag-over')" ondrop="handleCategoryDrop(event, ${catIdx})" onclick="toggleGradebookCategoryCollapse('${jsAttr(cat.id)}')" class="cursor-grab active:cursor-grabbing py-2.5 px-2 text-center font-extrabold ${catTheme.tier1} ${catTheme.groupBorder} select-none hover:brightness-95 transition-all" title="Click to expand ${escapeHtml(cat.name)} sub-activities (or drag to reorder)">
-                <div class="flex items-center justify-center gap-1.5">
-                  <span class="text-xs tracking-tight">${escapeHtml(cat.name)} (${cat.weight}%)</span>
-                  <span class="text-[11px] font-bold text-slate-500">▸</span>
-                </div>
-              </th>
-            `;
-        tier2Html += `
-              <th onclick="toggleGradebookSort('cat_${cat.id}')" class="py-1.5 px-2 text-center whitespace-nowrap text-slate-700 font-bold text-[10.5px] ${catTheme.tier2} ${catTheme.groupBorder} cursor-pointer select-none hover:brightness-95 transition" title="Click to sort by ${escapeHtml(cat.name)} Subtotal %">
-                <div class="flex items-center justify-center gap-0.5">
-                  <span>Subtotal %</span>
-                  ${getGradebookSortIndicator('cat_' + cat.id)}
-                </div>
-              </th>
-            `;
-      } else {
-        const subCount = (cat.subActivities && cat.subActivities.length > 0) ? cat.subActivities.length : 1;
-        tier1Html += `
-              <th colspan="${subCount}" draggable="true" ondragstart="handleCategoryDragStart(event, ${catIdx})" ondragover="event.preventDefault(); this.classList.add('grade-cat-drag-over')" ondragleave="this.classList.remove('grade-cat-drag-over')" ondrop="handleCategoryDrop(event, ${catIdx})" onclick="toggleGradebookCategoryCollapse('${jsAttr(cat.id)}')" class="cursor-grab active:cursor-grabbing py-2.5 px-2 text-center font-extrabold ${catTheme.tier1} ${catTheme.groupBorder} select-none hover:brightness-95 transition-all" title="Click to collapse ${escapeHtml(cat.name)} sub-activities (or drag to reorder)">
-                <div class="flex items-center justify-center gap-1.5">
-                  <span class="text-xs tracking-tight">${escapeHtml(cat.name)} (${cat.weight}%)</span>
-                  ${(cat.subActivities && cat.subActivities.length > 0) ? `<span class="text-[11px] font-bold text-slate-500">▾</span>` : ''}
-                </div>
-              </th>
-            `;
-        if (cat.subActivities && cat.subActivities.length > 0) {
-          cat.subActivities.forEach((sub, subIdx) => {
-            const isLast = (subIdx === cat.subActivities.length - 1);
-            const borderClass = isLast ? catTheme.groupBorder : 'border-r border-slate-200';
-            tier2Html += `
-                  <th onclick="toggleGradebookSort('sub_${sub.id}')" class="py-1.5 px-1.5 text-center whitespace-nowrap ${catTheme.tier2} ${borderClass} cursor-pointer select-none hover:brightness-95 transition" title="Click to sort by ${escapeHtml(sub.name)} score (Highest/Lowest)">
-                    <div class="flex items-center justify-center gap-0.5">
-                      <span class="font-bold text-slate-800 text-[11px]">${escapeHtml(sub.name)}</span>
-                      ${getGradebookSortIndicator('sub_' + sub.id)}
-                    </div>
-                    <div class="text-[9.5px] text-slate-500 font-mono font-normal">${sub.maxScore} pts • ${sub.weight}%</div>
-                  </th>
-                `;
-          });
-        } else {
-          tier2Html += `
-                <th class="py-1.5 px-1.5 text-center italic text-slate-400 ${catTheme.tier2} ${catTheme.groupBorder}">No items</th>
-              `;
-        }
-      }
-    });
-
-    if (isUnbalanced) {
-      tier1Html += `
-            <th class="py-2 px-2 text-center border-r border-rose-300 bg-rose-100/90 text-rose-950 font-extrabold whitespace-nowrap" title="Total activity percentage must equal 100%">
-              <span class="inline-flex items-center gap-1 text-[11px] bg-rose-600 text-white px-2 py-0.5 rounded-full font-black animate-pulse shadow-2xs">
-                ⚠️ Sum: ${totalCatWeight}% (≠ 100%)
-              </span>
-            </th>
-          `;
-      tier2Html += `
-            <th class="py-1.5 px-1.5 text-center border-r border-rose-200 bg-rose-50 text-[10px] text-rose-700 font-bold whitespace-nowrap">
-              Weight Error
-            </th>
-          `;
-    }
-
-    tier1Html += `
-            <th rowspan="2" onclick="toggleGradebookSort('total')" class="py-2.5 px-2 text-center bg-slate-200 font-black border-r border-slate-300 min-w-[85px] cursor-pointer select-none hover:bg-slate-300 transition" title="Click to sort by Total Percentage (Highest/Lowest)">
-              <div class="flex items-center justify-center gap-1">
-                <span>Total %</span>
-                ${getGradebookSortIndicator('total')}
-              </div>
-            </th>
-            <th rowspan="2" class="py-2.5 px-2 text-center bg-slate-200 font-black border-r border-slate-300 min-w-[85px]">Final Grade</th>
-            <th rowspan="2" class="py-2.5 px-2 text-center bg-slate-100 border-l border-slate-200 font-bold min-w-[105px]">Status</th>
-          </tr>
-        `;
-    tier2Html += `</tr>`;
-
-    thead.innerHTML = tier1Html + tier2Html;
-  }
+  // 1. Render 2-tier spreadsheet header
+  _renderGradebookHeader(thead, config, categoryPalette, isUnbalanced, totalCatWeight);
 
   // Filter students by selected section
   const sectionStudents = studentRoster.filter(s => s.section === selectedSec);
@@ -564,77 +804,8 @@ function renderGradebook() {
   // Update statistics drawer with all enrolled students in section
   renderGradebookStats(selectedSec, sectionStudents, config);
 
-  // Apply Grade and Status dropdown filters + Cohort filter
-  const gradeFilter = document.getElementById('gradebook-grade-filter')?.value || 'all';
-  const statusFilter = document.getElementById('gradebook-status-filter')?.value || 'all';
-
-  if ((gradeFilter !== 'all' || statusFilter !== 'all') && typeof gradebookCohortFilter !== 'undefined') {
-    gradebookCohortFilter = null;
-  }
-
-  let filtered = sectionStudents.filter(s => {
-    if (typeof gradebookCohortFilter !== 'undefined' && gradebookCohortFilter && Array.isArray(gradebookCohortFilter.studentIds)) {
-      if (!gradebookCohortFilter.studentIds.includes(s.id)) return false;
-    }
-    const res = gradeCache.get(s.id) || calculateStudentGrade(s, config, selectedSec);
-    const matchesGrade = (gradeFilter === 'all') || (res.msu.grade === gradeFilter);
-    const matchesStatus = (statusFilter === 'all') || (res.msu.status.toLowerCase() === statusFilter.toLowerCase());
-    return matchesGrade && matchesStatus;
-  });
-
-  // Apply intelligent column sorting
-  if (gradebookSortState.col === 'id') {
-    filtered.sort((a, b) => {
-      const cmp = (a.id || '').localeCompare(b.id || '', undefined, { numeric: true, sensitivity: 'base' });
-      return gradebookSortState.direction === 'asc' ? cmp : -cmp;
-    });
-  } else if (gradebookSortState.col === 'name') {
-    filtered.sort((a, b) => {
-      const nameA = `${a.last || ''}, ${a.first || ''}`.trim().toLowerCase();
-      const nameB = `${b.last || ''}, ${b.first || ''}`.trim().toLowerCase();
-      const cmp = nameA.localeCompare(nameB, undefined, { sensitivity: 'base' });
-      return gradebookSortState.direction === 'asc' ? cmp : -cmp;
-    });
-  } else if (gradebookSortState.col === 'total') {
-    filtered.sort((a, b) => {
-      const gradeA = (gradeCache.get(a.id) || calculateStudentGrade(a, config, selectedSec)).total || 0;
-      const gradeB = (gradeCache.get(b.id) || calculateStudentGrade(b, config, selectedSec)).total || 0;
-      return gradebookSortState.direction === 'asc' ? (gradeA - gradeB) : (gradeB - gradeA);
-    });
-  } else if (gradebookSortState.col.startsWith('sub_')) {
-    const subCol = gradebookSortState.col;
-    let targetCat = null;
-    let targetSub = null;
-    config.categories.forEach(cat => {
-      if (cat.subActivities) {
-        const found = cat.subActivities.find(sub => sub.id === subCol || 'sub_' + sub.id === subCol);
-        if (found) { targetCat = cat; targetSub = found; }
-      }
-    });
-    const actualSubId = targetSub ? targetSub.id : subCol.replace(/^sub_sub_/, 'sub_');
-    const catId = targetCat ? targetCat.id : '';
-    const maxScore = targetSub ? targetSub.maxScore : 100;
-
-    filtered.sort((a, b) => {
-      const valA = parseFloat(getStudentScore(a, actualSubId, catId, maxScore)) || 0;
-      const valB = parseFloat(getStudentScore(b, actualSubId, catId, maxScore)) || 0;
-      return gradebookSortState.direction === 'asc' ? (valA - valB) : (valB - valA);
-    });
-  } else if (gradebookSortState.col.startsWith('cat_')) {
-    const catCol = gradebookSortState.col;
-    let targetCat = config.categories.find(c => c.id === catCol || 'cat_' + c.id === catCol);
-    const actualCatId = targetCat ? targetCat.id : catCol.replace(/^cat_cat_/, 'cat_');
-    filtered.sort((a, b) => {
-      const gradeA = gradeCache.get(a.id) || calculateStudentGrade(a, config, selectedSec);
-      const gradeB = gradeCache.get(b.id) || calculateStudentGrade(b, config, selectedSec);
-      const valA = (gradeA.categoryTotals && gradeA.categoryTotals[actualCatId] !== undefined) ? gradeA.categoryTotals[actualCatId] : 0;
-      const valB = (gradeB.categoryTotals && gradeB.categoryTotals[actualCatId] !== undefined) ? gradeB.categoryTotals[actualCatId] : 0;
-      return gradebookSortState.direction === 'asc' ? (valA - valB) : (valB - valA);
-    });
-  }
-
-  // Update statistics drawer with all enrolled students
-  renderGradebookStats(selectedSec, sectionStudents, config);
+  // 2. Filter & Sort students
+  const filtered = _filterAndSortGradebookStudents(sectionStudents, config, selectedSec, gradeCache);
 
   const tfoot = document.getElementById('gradebook-table-foot');
 
@@ -662,166 +833,12 @@ function renderGradebook() {
     return;
   }
 
-  // Render rows with Excel-style keyboard navigation and alternating zebra striping
-  tbody.innerHTML = filtered.map((s, rowIdx) => {
-    const gradeResult = gradeCache.get(s.id) || calculateStudentGrade(s, config, selectedSec);
-    let colIdx = 0;
-    const isEven = (rowIdx % 2 === 0);
-    const rowClass = isEven ? 'grade-row-even bg-white' : 'grade-row-odd bg-slate-50/70';
-    const stickyCellBg = isEven ? 'bg-white' : 'bg-slate-50';
+  // 3. Render Student Rows
+  _renderGradebookStudentRows(tbody, filtered, config, selectedSec, gradeCache, categoryPalette, isUnbalanced);
 
-    let cellsHtml = '';
-    config.categories.forEach((cat, catIdx) => {
-      const catTheme = categoryPalette[catIdx % categoryPalette.length];
-      const isCollapsed = !!gradebookCollapsedCats[cat.id];
-      if (isCollapsed) {
-        const catScore = (gradeResult.categoryTotals && gradeResult.categoryTotals[cat.id] !== undefined) ? gradeResult.categoryTotals[cat.id] : 0;
-        cellsHtml += `
-              <td class="py-2 px-2 text-center ${catTheme.groupBorder} font-mono font-black text-xs" data-cat-summary="${cat.id}">
-                <span class="inline-block px-2 py-0.5 rounded-full text-xs font-bold ${catTheme.badge}">${(parseFloat(catScore) || 0).toFixed(2)}%</span>
-              </td>
-            `;
-      } else {
-        if (cat.subActivities && cat.subActivities.length > 0) {
-          cat.subActivities.forEach((sub, subIdx) => {
-            const maxScore = (sub.maxScore && sub.maxScore > 0) ? sub.maxScore : 100;
-            const val = getStudentScore(s, sub.id, cat.id, maxScore);
-            const numVal = parseFloat(val);
-            const isOverMax = !isNaN(numVal) && numVal > maxScore;
-            const inputClass = isOverMax ? 'border-rose-500 bg-rose-50 text-rose-700 ring-2 ring-rose-400 font-black' : 'bg-white border-slate-300';
-            const inputTitle = isOverMax ? `⚠️ Warning: Score (${val}) exceeds maximum possible items (${maxScore})!` : `Score (max ${maxScore})`;
-            const isLast = (subIdx === cat.subActivities.length - 1);
-            const cellBorder = isLast ? catTheme.groupBorder : 'border-r border-slate-100';
+  // 4. Render Class Average Summary Footer (tfoot)
+  _renderGradebookFooter(tfoot, filtered, config, selectedSec, gradeCache, categoryPalette, isUnbalanced);
 
-            cellsHtml += `
-                  <td class="py-2 px-1 text-center ${cellBorder}">
-                    <input type="number" min="0" max="${maxScore}" step="any"
-                      data-student="${escapeHtml(s.id)}"
-                      data-sub="${escapeHtml(sub.id)}"
-                      data-row="${rowIdx}"
-                      data-col="${colIdx}"
-                      value="${val}"
-                      title="${inputTitle}"
-                      onfocus="this.select()"
-                      onkeydown="handleGradeGridKey(event, ${rowIdx}, ${colIdx})"
-                      oninput="updateDynamicScore('${jsAttr(s.id)}', '${jsAttr(sub.id)}', this.value)"
-                      onchange="updateDynamicScore('${jsAttr(s.id)}', '${jsAttr(sub.id)}', this.value, true)"
-                      onblur="updateDynamicScore('${jsAttr(s.id)}', '${jsAttr(sub.id)}', this.value, true)"
-                      class="grade-cell-input w-14 text-center font-mono font-bold rounded py-1 text-xs focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition border ${inputClass}">
-                  </td>
-                `;
-            colIdx++;
-          });
-        } else {
-          cellsHtml += `<td class="py-2 px-1 text-center text-slate-300 ${catTheme.groupBorder}">—</td>`;
-        }
-      }
-    });
-
-    return `
-          <tr id="grade-row-${escapeHtml(s.id)}" data-student-id="${escapeHtml(s.id)}" class="${rowClass} hover:bg-blue-50/40 transition border-b border-slate-200 group">
-            <td class="sticky-grade-col-1 py-2.5 px-2 font-mono text-slate-400 text-center border-r border-slate-200 ${stickyCellBg}">${rowIdx + 1}</td>
-            <td class="sticky-grade-col-2 py-2.5 px-2.5 font-mono font-bold text-slate-800 border-r border-slate-200 whitespace-nowrap ${stickyCellBg}">${escapeHtml(s.id)}</td>
-            <td class="sticky-grade-col-3 py-2.5 px-3 font-bold text-slate-900 border-r border-slate-200 whitespace-nowrap ${stickyCellBg} overflow-hidden" title="${escapeHtml(s.last)}, ${escapeHtml(s.first)}">
-              <div class="truncate max-w-[216px]">${escapeHtml(s.last)}, ${escapeHtml(s.first)}</div>
-            </td>
-            ${cellsHtml}
-            ${isUnbalanced ? '<td class="py-2 px-1 text-center border-r border-rose-200 bg-rose-50/40 text-rose-600 font-bold text-xs" title="Total weight does not equal 100%">⚠️</td>' : ''}
-            <td class="py-2.5 px-2 text-center font-extrabold text-xs font-mono text-slate-800 bg-slate-100/90 border-r border-slate-200 grade-total-cell">${(parseFloat(gradeResult.total) || 0).toFixed(2)}%</td>
-            <td class="py-2.5 px-2 text-center border-r border-slate-200 bg-amber-50/70">
-              <span class="grade-msu-cell inline-block px-2 py-0.5 rounded font-mono font-black text-xs border ${gradeResult.msu.class}">${gradeResult.msu.grade}</span>
-            </td>
-            <td class="py-2.5 px-2 text-center ${stickyCellBg} border-l border-slate-200">
-              <select onchange="updateGradeStatusOverride('${jsAttr(s.id)}', this.value)" class="grade-status-select text-[11px] font-bold rounded border border-slate-300 px-1 py-1 bg-white focus:ring-1 focus:ring-msu-maroon ${gradeResult.msu.status === 'Passed' ? 'text-emerald-700' : (gradeResult.msu.status === 'Incomplete' ? 'text-orange-700' : (gradeResult.msu.status === 'Withdrawn' || gradeResult.msu.status === 'Dropped' ? 'text-slate-600' : 'text-rose-700'))}">
-                <option value="" ${!s.statusOverride ? 'selected' : ''}>Auto (${gradeResult.msu.status})</option>
-                <option value="INC" ${s.statusOverride === 'INC' ? 'selected' : ''}>INC</option>
-                <option value="WDRW" ${s.statusOverride === 'WDRW' ? 'selected' : ''}>WDRW</option>
-                <option value="DRP" ${s.statusOverride === 'DRP' ? 'selected' : ''}>DRP</option>
-              </select>
-            </td>
-          </tr>
-        `;
-  }).join('');
-
-  // Render Class Average Summary Footer (tfoot)
-  if (tfoot) {
-    let footCellsHtml = '';
-    let classSumTotal = 0;
-    let passCount = 0;
-
-    filtered.forEach(s => {
-      const res = gradeCache.get(s.id) || calculateStudentGrade(s, config, selectedSec);
-      classSumTotal += res.total;
-      if (res.msu.status === 'Passed') passCount++;
-    });
-
-    const classAvgTotal = filtered.length > 0 ? (classSumTotal / filtered.length) : 0;
-    const classAvgMsu = getMsuGrade(classAvgTotal, null, selectedSec);
-    const passRate = filtered.length > 0 ? ((passCount / filtered.length) * 100) : 0;
-
-    config.categories.forEach((cat, catIdx) => {
-      const catTheme = categoryPalette[catIdx % categoryPalette.length];
-      const isCollapsed = !!gradebookCollapsedCats[cat.id];
-
-      if (isCollapsed) {
-        let catSum = 0;
-        filtered.forEach(s => {
-          const res = calculateStudentGrade(s, config, selectedSec);
-          catSum += (res.categoryTotals && res.categoryTotals[cat.id]) ? res.categoryTotals[cat.id] : 0;
-        });
-        const catAvg = filtered.length > 0 ? (catSum / filtered.length) : 0;
-        footCellsHtml += `
-              <td class="py-2.5 px-2 text-center font-mono font-black text-xs ${catTheme.groupBorder} bg-slate-100" title="Class Average for ${escapeHtml(cat.name)}">
-                <span class="inline-block px-2 py-0.5 rounded-full text-xs font-bold ${catTheme.badge}">${catAvg.toFixed(2)}%</span>
-              </td>
-            `;
-      } else {
-        if (cat.subActivities && cat.subActivities.length > 0) {
-          cat.subActivities.forEach((sub, subIdx) => {
-            let subScoreSum = 0;
-            filtered.forEach(s => {
-              subScoreSum += parseFloat(getStudentScore(s, sub.id, cat.id, sub.maxScore)) || 0;
-            });
-            const maxScore = (sub.maxScore && sub.maxScore > 0) ? sub.maxScore : 100;
-            const avgScore = filtered.length > 0 ? (subScoreSum / filtered.length) : 0;
-            const avgPct = (avgScore / maxScore) * 100;
-            const isLast = (subIdx === cat.subActivities.length - 1);
-            const cellBorder = isLast ? catTheme.groupBorder : 'border-r border-slate-200';
-
-            footCellsHtml += `
-                  <td class="py-2 px-1 text-center font-mono text-[11px] ${cellBorder} bg-slate-100" title="${escapeHtml(sub.name)}: Avg ${avgScore.toFixed(1)} / ${maxScore} (${avgPct.toFixed(2)}%)">
-                    <div class="font-bold text-slate-800">${avgScore.toFixed(1)}</div>
-                    <div class="text-[9.5px] text-slate-500 font-normal">${avgPct.toFixed(2)}%</div>
-                  </td>
-                `;
-          });
-        } else {
-          footCellsHtml += `<td class="py-2 px-1 text-center text-slate-400 ${catTheme.groupBorder} bg-slate-100">—</td>`;
-        }
-      }
-    });
-
-    tfoot.innerHTML = `
-          <tr class="border-t-2 border-slate-300 bg-slate-100 text-slate-800">
-            <td class="sticky-grade-foot-1 py-2.5 px-2 text-center font-mono font-bold text-slate-400 border-r border-slate-200 bg-slate-100">—</td>
-            <td class="sticky-grade-foot-2 py-2.5 px-2.5 font-mono font-black text-slate-800 border-r border-slate-200 whitespace-nowrap bg-slate-100 uppercase tracking-wider text-[11px]">AVERAGE</td>
-            <td class="sticky-grade-foot-3 py-2.5 px-3 font-bold text-slate-800 border-r border-slate-200 whitespace-nowrap bg-slate-100 text-xs">
-              Class Mean (${filtered.length} Students)
-            </td>
-            ${footCellsHtml}
-            ${isUnbalanced ? '<td class="py-2 px-1 text-center border-r border-rose-200 bg-rose-50 text-rose-600 font-bold text-xs">—</td>' : ''}
-            <td class="py-2.5 px-2 text-center font-black text-xs font-mono text-slate-900 bg-slate-200 border-r border-slate-300">
-              ${classAvgTotal.toFixed(2)}%
-            </td>
-            <td class="py-2.5 px-2 text-center border-r border-slate-200 bg-amber-100/80">
-              <span class="grade-msu-cell inline-block px-2 py-0.5 rounded font-mono font-black text-xs border ${classAvgMsu.class}">${classAvgMsu.grade}</span>
-            </td>
-            <td class="py-2.5 px-2 text-center bg-slate-100 border-l border-slate-200 whitespace-nowrap">
-              <span class="text-[11px] font-black ${passRate >= 75 ? 'text-emerald-700' : 'text-rose-700'}">${passRate.toFixed(2)}% Pass</span>
-            </td>
-          </tr>
-        `;
-  }
   if (typeof updateGradebookResetFilterButton === 'function') {
     updateGradebookResetFilterButton();
   }

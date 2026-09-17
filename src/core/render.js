@@ -45,10 +45,10 @@ const Render = (() => {
    */
   const CHANGE_SETS = {
     // a lesson cell was edited, shifted, copied or cleared
-    lesson: ['matrix', 'progress', 'timetableSidebar'],
-    lessonUndo: ['matrix', 'progress', 'undoRedo'],
+    lesson: ['matrix', 'progress', 'plannerSidebar', 'timetableSidebar'],
+    lessonUndo: ['matrix', 'progress', 'undoRedo', 'plannerSidebar'],
     // planner matrix only
-    planner: ['matrix', 'progress'],
+    planner: ['matrix', 'progress', 'plannerSidebar'],
     plannerImport: ['matrix', 'progress', 'plannerSidebar'],
     // weekly timetable slots
     schedule: ['matrix', 'timetable'],

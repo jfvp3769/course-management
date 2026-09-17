@@ -15,6 +15,9 @@ function toggleTabSidebar(tabId) {
     const c = sidebar.closest('.tab-layout-container'); if(c) { c.classList.remove('sidebar-collapsed'); c.classList.add('sidebar-expanded'); }
     localStorage.setItem('sidebar_collapsed_' + tabId, '0');
     updateSidebarToggleButton(tabId, false);
+    if (tabId === 'planner' && typeof window !== 'undefined' && window._plannerSidebarStale) {
+      updatePlannerSidebar();
+    }
   } else {
     sidebar.classList.remove('tab-sidebar-expanded');
     sidebar.classList.add('tab-sidebar-collapsed');

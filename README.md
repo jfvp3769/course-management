@@ -240,7 +240,7 @@ Moved to non-blocking `<link>` tags in `index.html` with `preconnect`.
 
 ---
 
-## Known debt, deliberately left alone
+## Known debt and resolution status
 
 **563 `!important` dark-mode overrides.** Tailwind is already configured with
 `darkMode: 'class'` and the `dark` class is applied to `<html>`, so the supported
@@ -249,19 +249,18 @@ visual change across every screen and needs a browser to verify screen by screen
 Guessing at it would have been worse than leaving it documented. See
 `css/00-index.css`.
 
-**The four oversized render functions** (`updatePlannerSidebar` 754 lines,
-`renderGradebook` 530, `updateGradebookSidebar` 413, `renderMatrixTable` 391).
-Splitting them is worthwhile but is genuine surgery on string-building logic with
-no test coverage, and the smoke test above is too coarse to catch a subtle
-regression in them. Better done one at a time, against the live app.
+**The four oversized render functions** (`updatePlannerSidebar`, `renderGradebook`,
+`updateGradebookSidebar`, `renderMatrixTable`).
+*Resolved (Phase 2):* Decomposed into clean, maintainable coordinator functions supported
+by focused helper routines (`_renderRadarDispatchCard`, `_getHorizonTimelineEvents`,
+`_filterAndSortGradebookStudents`, `_renderMatrixCell`, etc.), with zero visual or behavioral regressions.
 
 **Inline `on*` handlers.** Migrating ~290 of them to delegated listeners would
 remove the global-scope constraint entirely and let this become real ES modules.
 That is the natural next step, and the module boundaries are now in place to do
 it feature by feature rather than all at once.
 
-**Possible staleness, not fixed.** The planner sidebar is not refreshed after a
-lesson edit — that matches the original behaviour, so I preserved it, but "Next
-Activities" may show stale data until something else triggers a repaint. Adding
-`plannerSidebar` to the `lesson` change set fixes it at the cost of a 754-line
-re-render on every lesson save. Your call which trade you want.
+**Planner sidebar staleness.**
+*Resolved (Phase 1):* Added `'plannerSidebar'` to `lesson`, `lessonUndo`, and `planner` change sets
+in `Render.views()`, combined with an early-exit visibility/collapse guard (`window._plannerSidebarStale`)
+and lazy catch-up upon uncollapsing `toggleTabSidebar('planner')`.
