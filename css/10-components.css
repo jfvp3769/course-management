@@ -1,0 +1,204 @@
+/* ---------------------------------------------------------------------------
+   10-components.css
+   Light-mode component styles: header action buttons, the backup reminder
+   banner and the planner matrix hover-expand controls.
+   (originally styles.css lines 2780-2980)
+   --------------------------------------------------------------------------- */
+
+/* ================= HEADER ACTION EXPANDABLE BUTTONS ================= */
+.header-action-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 2rem !important; /* 32px matching h-8 */
+  padding-left: 0.625rem !important; /* 10px */
+  padding-right: 0.625rem !important;
+  border-radius: 0.5rem !important;
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  flex-shrink: 0 !important;
+  cursor: pointer;
+  user-select: none;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: background-color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease, color 0.4s ease, transform 0.2s ease !important;
+}
+
+.header-action-btn:active {
+  transform: scale(0.96);
+}
+
+/* Individual fitted expand widths to eliminate dead overshoot lag */
+.header-btn-settings { --expand-w: 116px; }
+.header-btn-subjects { --expand-w: 118px; }
+.header-btn-hub      { --expand-w: 142px; }
+.header-btn-guide    { --expand-w: 80px; }
+.header-btn-theme    { --expand-w: 84px; }
+
+.header-action-btn .header-btn-label {
+  display: inline-block !important;
+  max-width: 0 !important;
+  opacity: 0 !important;
+  margin-left: 0 !important;
+  overflow: hidden !important;
+  white-space: nowrap !important;
+  vertical-align: middle !important;
+  pointer-events: none;
+  will-change: max-width, opacity, margin-left;
+  transition: max-width 0.58s cubic-bezier(0.25, 1, 0.35, 1),
+          opacity 0.35s ease,
+          margin-left 0.58s cubic-bezier(0.25, 1, 0.35, 1) !important;
+}
+
+.header-action-btn:hover .header-btn-label,
+.header-action-btn:focus-visible .header-btn-label {
+  max-width: var(--expand-w, 120px) !important;
+  opacity: 1 !important;
+  margin-left: 0.375rem !important; /* 6px */
+  transition: max-width 0.68s cubic-bezier(0.25, 1, 0.35, 1),
+          opacity 0.5s ease 0.06s,
+          margin-left 0.68s cubic-bezier(0.25, 1, 0.35, 1) !important;
+}
+
+/* ================= BACKUP REMINDER BANNER & NOTIFICATIONS ================= */
+#backup-reminder-banner {
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(0, 0, 0, 0.06);
+}
+
+html.theme-dark #backup-reminder-banner {
+  background-color: rgba(26, 30, 42, 0.96) !important;
+  border-color: rgba(245, 158, 11, 0.35) !important;
+  box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.08) !important;
+}
+
+html.theme-dark #backup-reminder-banner h4 {
+  color: #f8fafc !important;
+}
+
+html.theme-dark #backup-reminder-banner #backup-reminder-message {
+  color: #94a3b8 !important;
+}
+
+html.theme-dark #backup-reminder-banner #backup-reminder-badge {
+  background-color: rgba(245, 158, 11, 0.18) !important;
+  color: #fbbf24 !important;
+  border-color: rgba(245, 158, 11, 0.4) !important;
+}
+
+html.theme-dark #backup-reminder-banner button[onclick*="snoozeBackupReminder"] {
+  background-color: #334155 !important;
+  color: #e2e8f0 !important;
+  border-color: #475569 !important;
+}
+
+html.theme-dark #backup-reminder-banner button[onclick*="snoozeBackupReminder"]:hover {
+  background-color: #3e4f66 !important;
+}
+
+html.theme-dark #backup-reminder-banner button[onclick*="dismissBackupReminderBanner"] {
+  color: #94a3b8 !important;
+}
+
+html.theme-dark #backup-reminder-banner button[onclick*="dismissBackupReminderBanner"]:hover {
+  background-color: #334155 !important;
+  color: #f1f5f9 !important;
+}
+
+html.theme-dark #ei-last-backup-status {
+  color: #94a3b8 !important;
+}
+
+/* ================= PLANNER MATRIX ACTION BUTTONS (HOVER-EXPAND) ================= */
+.planner-action-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 2rem !important; /* 32px matching control height */
+  padding-left: 0.5625rem !important; /* ~9px icon button padding */
+  padding-right: 0.5625rem !important;
+  border-radius: 0.5rem !important;
+  font-size: 0.75rem !important;
+  font-weight: 700 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  flex-shrink: 0 !important;
+  cursor: pointer;
+  user-select: none;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: background-color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease, color 0.4s ease, transform 0.2s ease !important;
+}
+
+.planner-action-btn:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+/* Individual fitted expand widths to eliminate dead overshoot lag */
+.planner-btn-noclass { --expand-w: 155px; }
+.planner-btn-undo    { --expand-w: 42px; }
+.planner-btn-redo    { --expand-w: 42px; }
+.planner-btn-today   { --expand-w: 96px; }
+
+.planner-action-btn .planner-btn-label {
+  display: inline-block !important;
+  max-width: 0 !important;
+  opacity: 0 !important;
+  margin-left: 0 !important;
+  overflow: hidden !important;
+  white-space: nowrap !important;
+  vertical-align: middle !important;
+  pointer-events: none;
+  will-change: max-width, opacity, margin-left;
+  transition: max-width 0.58s cubic-bezier(0.25, 1, 0.35, 1),
+          opacity 0.35s ease,
+          margin-left 0.58s cubic-bezier(0.25, 1, 0.35, 1) !important;
+}
+
+.planner-action-btn:hover .planner-btn-label,
+.planner-action-btn:focus-visible .planner-btn-label {
+  max-width: var(--expand-w, 140px) !important;
+  opacity: 1 !important;
+  margin-left: 0.375rem !important; /* 6px */
+  transition: max-width 0.68s cubic-bezier(0.25, 1, 0.35, 1),
+          opacity 0.5s ease 0.06s,
+          margin-left 0.68s cubic-bezier(0.25, 1, 0.35, 1) !important;
+}
+
+/* Dark Mode Overrides for Planner Action Buttons */
+html.theme-dark .planner-btn-noclass {
+  background-color: rgba(225, 29, 72, 0.15) !important;
+  border-color: rgba(244, 63, 94, 0.35) !important;
+  color: #fda4af !important;
+}
+html.theme-dark .planner-btn-noclass:hover {
+  background-color: rgba(225, 29, 72, 0.28) !important;
+  color: #ffe4e6 !important;
+}
+
+html.theme-dark .planner-btn-undo,
+html.theme-dark .planner-btn-redo {
+  background-color: rgba(245, 158, 11, 0.15) !important;
+  border-color: rgba(245, 158, 11, 0.35) !important;
+  color: #fde68a !important;
+}
+html.theme-dark .planner-btn-undo:hover:not(:disabled),
+html.theme-dark .planner-btn-redo:hover:not(:disabled) {
+  background-color: rgba(245, 158, 11, 0.25) !important;
+  color: #ffffff !important;
+}
+
+html.theme-dark .planner-btn-today {
+  background-color: #b45309 !important;
+  border-color: #d97706 !important;
+  color: #ffffff !important;
+}
+html.theme-dark .planner-btn-today:hover {
+  background-color: #d97706 !important;
+}
+html.theme-dark .planner-btn-today svg {
+  color: #fef3c7 !important;
+}
+
+html.theme-dark #current-week-nav-label {
+  color: #f1f5f9 !important;
+}

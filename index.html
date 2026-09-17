@@ -41,7 +41,26 @@
       } catch (e) {}
     })();
   </script>
-  <link rel="stylesheet" href="styles.css">
+  <!-- Fonts: moved out of styles.css. An @import at the top of a stylesheet
+       blocks the CSSOM until it resolves, and in an offline PWA it never
+       resolves at all. As <link> tags they fetch in parallel and the
+       system-ui fallback applies immediately when offline. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" media="print" onload="this.media='all'"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap">
+
+  <!-- Stylesheet parts, in cascade order. See css/00-index.css. -->
+  <link rel="stylesheet" href="css/01-tokens.css">
+  <link rel="stylesheet" href="css/02-dark-components.css">
+  <link rel="stylesheet" href="css/03-dark-grades.css">
+  <link rel="stylesheet" href="css/04-dark-planner.css">
+  <link rel="stylesheet" href="css/05-dark-gradebook.css">
+  <link rel="stylesheet" href="css/06-dark-grading-modals.css">
+  <link rel="stylesheet" href="css/07-components.css">
+  <link rel="stylesheet" href="css/08-dark-modals.css">
+  <link rel="stylesheet" href="css/09-responsive.css">
+  <link rel="stylesheet" href="css/10-components.css">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#800000">
 </head>
@@ -2679,7 +2698,62 @@
   </div>
 
   <!-- ================= JAVASCRIPT LOGIC ================= -->
-  <script src="app.js"></script>
+  <!-- ===================================================================
+       Application modules.
+       Loaded as ordered classic scripts (not ES modules) on purpose: the
+       markup below uses inline on* handlers, which can only reach
+       functions in the global scope. Order matters - constants and state
+       first, bootstrap last.
+       =================================================================== -->
+  <!-- Core: constants, state, utilities, persistence -->
+  <script src="src/core/tips-data.js"></script>
+  <script src="src/core/constants.js"></script>
+  <script src="src/core/state.js"></script>
+  <script src="src/core/utils.js"></script>
+  <script src="src/core/render.js"></script>
+  <script src="src/core/storage.js"></script>
+  <script src="src/core/backup-reminder.js"></script>
+
+  <!-- Features -->
+  <script src="src/features/semester.js"></script>
+  <script src="src/features/classroom.js"></script>
+  <script src="src/features/planner-matrix.js"></script>
+  <script src="src/features/timetable.js"></script>
+  <script src="src/features/calendar.js"></script>
+  <script src="src/features/branding.js"></script>
+  <script src="src/features/timetable-editor.js"></script>
+  <script src="src/features/courses.js"></script>
+  <script src="src/features/lesson-planner.js"></script>
+  <script src="src/features/no-class.js"></script>
+  <script src="src/features/roster.js"></script>
+  <script src="src/features/gradebook.js"></script>
+  <script src="src/features/grading-scale.js"></script>
+  <script src="src/features/grading-criteria.js"></script>
+  <script src="src/features/present-week.js"></script>
+
+  <!-- Import / export -->
+  <script src="src/io/data-center.js"></script>
+
+  <!-- UI shell -->
+  <script src="src/ui/tabs.js"></script>
+  <script src="src/ui/color-picker.js"></script>
+  <script src="src/ui/sidebars.js"></script>
+  <script src="src/ui/guide.js"></script>
+  <script src="src/ui/tips.js"></script>
+  <script src="src/ui/easter-egg.js"></script>
+  <script src="src/ui/theme.js"></script>
+  <script src="src/ui/feedback.js"></script>
+  <script src="src/ui/layout.js"></script>
+
+  <!-- Tab sidebars -->
+  <script src="src/sidebars/planner.js"></script>
+  <script src="src/sidebars/timetable.js"></script>
+  <script src="src/sidebars/calendar.js"></script>
+  <script src="src/sidebars/roster.js"></script>
+  <script src="src/sidebars/gradebook.js"></script>
+
+  <!-- Bootstrap: must be last -->
+  <script src="src/bootstrap.js"></script>
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {

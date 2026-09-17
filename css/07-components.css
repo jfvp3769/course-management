@@ -1,0 +1,1197 @@
+/* ---------------------------------------------------------------------------
+   07-components.css
+   Mixed light-mode components and the remaining dark overrides, in original
+   order. Still the largest part - see README for why it was not split
+   further.
+   (originally styles.css lines 1121-2310)
+   --------------------------------------------------------------------------- */
+
+.sticky-col-day {
+  position: sticky;
+  left: 0;
+  width: 42px;
+  min-width: 42px;
+  max-width: 42px;
+  z-index: 25;
+  background-color: var(--slate-50) !important;
+}
+.sticky-col-date {
+  position: sticky;
+  left: 42px;
+  width: 68px;
+  min-width: 68px;
+  max-width: 68px;
+  z-index: 25;
+  background-color: var(--slate-50) !important;
+  box-shadow: 4px 0 6px -2px rgba(0, 0, 0, 0.08);
+  border-right: 2px solid var(--slate-300) !important;
+}
+.sticky-col-progress {
+  position: sticky;
+  left: 110px;
+  width: 66px;
+  min-width: 66px;
+  max-width: 66px;
+  z-index: 25;
+  background-color: var(--amber-50) !important;
+  box-shadow: 4px 0 6px -2px rgba(0, 0, 0, 0.08);
+  border-right: 2px solid var(--slate-300) !important;
+}
+.matrix-row-weekend td.sticky-col-day,
+.matrix-row-weekend td.sticky-col-date,
+.matrix-row-weekend td.sticky-col-progress {
+  background-color: var(--slate-300) !important;
+}
+.sticky-header-day {
+  position: sticky;
+  top: 0;
+  left: 0;
+  width: 42px;
+  min-width: 42px;
+  max-width: 42px;
+  z-index: 45;
+  background-color: var(--slate-900) !important;
+}
+.sticky-header-date {
+  position: sticky;
+  top: 0;
+  left: 42px;
+  width: 68px;
+  min-width: 68px;
+  max-width: 68px;
+  z-index: 45;
+  background-color: var(--slate-900) !important;
+  box-shadow: 4px 0 6px -2px rgba(0, 0, 0, 0.08);
+  border-right: 2px solid var(--slate-700) !important;
+}
+.sticky-header-progress {
+  position: sticky;
+  top: 0;
+  left: 110px;
+  z-index: 45;
+  background-color: var(--slate-900) !important;
+  box-shadow: 4px 0 6px -2px rgba(0, 0, 0, 0.08);
+}
+
+/* Calibrated Row Height: 7 rows fill exactly the container */
+.matrix-row-height {
+  height: 60px;
+  max-height: 60px;
+  scroll-margin-top: 70px;
+}
+
+/* Column Resizer Handle */
+.col-resizer {
+  position: absolute;
+  top: 0;
+  right: -3px;
+  width: 8px;
+  cursor: col-resize;
+  user-select: none;
+  height: 100%;
+  z-index: 50;
+}
+.col-resizer:hover, .col-resizing {
+  background-color: var(--msu-gold);
+}
+
+/* Scrollbars globally to all scrollable elements (calibrated 12px horizontal height for easy grab) */
+::-webkit-scrollbar {
+  width: 6px !important;
+  height: 12px !important;
+}
+::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--slate-300) !important;
+  border-radius: 9999px !important;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--slate-400) !important;
+}
+* {
+  scrollbar-width: thin !important;
+  scrollbar-color: var(--slate-300) transparent !important;
+}
+
+/* Hide root viewport scrollbars completely while keeping full wheel & touch scrollability */
+html, body {
+  -ms-overflow-style: none !important;  /* IE and Edge */
+  scrollbar-width: none !important;  /* Firefox */
+}
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none !important;  /* Chrome, Safari, Edge, Opera */
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* Hide scrollbars utility while maintaining full touch & wheel scrollability */
+.no-scrollbar::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+.no-scrollbar {
+  -ms-overflow-style: none !important;  /* IE and Edge */
+  scrollbar-width: none !important;  /* Firefox */
+}
+
+/* Permanent Current Date Highlight (Light Mode) */
+.row-today-active {
+  background-color: var(--yellow-100) !important;
+  border-left: 4px solid var(--msu-maroon) !important;
+  box-shadow: inset 0 1px 0 var(--yellow-300), inset 0 -1px 0 var(--yellow-300);
+}
+.row-today-active > td {
+  background-color: var(--yellow-100) !important;
+}
+.row-today-active > td.sticky-col-day,
+.row-today-active > td.sticky-col-date,
+.row-today-active > td.sticky-col-progress {
+  background-color: var(--yellow-200) !important;
+}
+.row-today-active > td.sticky-col-day span {
+  background-color: var(--msu-maroon) !important;
+  color: var(--white) !important;
+  font-weight: 800 !important;
+}
+.row-today-active > td.sticky-col-date {
+  color: var(--yellow-900) !important;
+  font-weight: 800 !important;
+}
+
+@keyframes todayJumpPulse {
+  0%, 100% { background-color: var(--yellow-100); }
+  50% { background-color: var(--yellow-300); }
+}
+.row-today-pulse {
+  animation: todayJumpPulse 0.9s ease-in-out 2;
+}
+
+/* Permanent Current Date Highlight (Dark Mode Override - Luminous Gold) */
+html.theme-dark .row-today-active {
+  background-color: #433306 !important;
+  border-left: 4px solid #facc15 !important;
+  box-shadow: inset 0 2px 0 rgba(250, 204, 21, 0.45), inset 0 -2px 0 rgba(250, 204, 21, 0.45) !important;
+}
+
+html.theme-dark .row-today-active > td {
+  background-color: #433306 !important;
+  border-color: #634b0a !important;
+}
+
+html.theme-dark .row-today-active > td.sticky-col-day,
+html.theme-dark .row-today-active > td.sticky-col-date,
+html.theme-dark .row-today-active > td.sticky-col-progress {
+  background-color: #503d07 !important;
+  border-color: #78590c !important;
+}
+
+html.theme-dark .row-today-active > td.sticky-col-day span {
+  background-color: #800000 !important;
+  color: #fef08a !important;
+  border: 1.5px solid #facc15 !important;
+  box-shadow: 0 0 8px rgba(250, 204, 21, 0.35) !important;
+  font-weight: 800 !important;
+}
+
+html.theme-dark .row-today-active > td.sticky-col-date {
+  color: #fef08a !important;
+  font-weight: 900 !important;
+  text-shadow: 0 0 6px rgba(250, 204, 21, 0.3) !important;
+}
+
+/* Unplanned "+ Click to plan" Slots in Active Row Under Dark Mode */
+html.theme-dark .row-today-active .matrix-cell-slot > div.border-dashed {
+  background-color: #352804 !important;
+  border-color: #85610a !important;
+  color: #fef08a !important;
+}
+
+html.theme-dark .row-today-active .matrix-cell-slot:hover > div.border-dashed {
+  background-color: #523e07 !important;
+  border-color: #facc15 !important;
+  color: #ffffff !important;
+}
+
+/* Dark Mode Jump Pulse Animation */
+@keyframes todayJumpPulseDark {
+  0%, 100% { background-color: #433306; }
+  50% { background-color: #78590c; box-shadow: 0 0 16px rgba(250, 204, 21, 0.6); }
+}
+
+html.theme-dark .row-today-pulse,
+html.theme-dark .row-today-pulse > td {
+  animation: todayJumpPulseDark 0.9s ease-in-out 2 !important;
+}
+
+.timetable-hour-slot {
+  height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Hide number stepper arrows in Gradebook, Criteria, and Grading Scale modals */
+.grade-cell-input::-webkit-outer-spin-button,
+.grade-cell-input::-webkit-inner-spin-button,
+#grading-criteria-modal input[type="number"]::-webkit-outer-spin-button,
+#grading-criteria-modal input[type="number"]::-webkit-inner-spin-button,
+#grading-scale-modal input[type="number"]::-webkit-outer-spin-button,
+#grading-scale-modal input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none !important;
+  margin: 0 !important;
+}
+.grade-cell-input,
+#grading-criteria-modal input[type="number"],
+#grading-scale-modal input[type="number"] {
+  -moz-appearance: textfield !important;
+  appearance: textfield !important;
+}
+
+/* Lesson Planner Matrix: Allow column resizing regardless of long text */
+#matrix-table {
+  table-layout: fixed !important;
+}
+#matrix-table th,
+#matrix-table td {
+  overflow: hidden;
+  min-width: 0;
+}
+#matrix-table td.matrix-cell-slot:hover {
+  position: relative;
+  overflow: visible !important;
+  z-index: 22;
+}
+
+/* MSU Gradebook Freeze Panes (Sticky First 3 Columns: #, Student ID, Student Name) */
+.sticky-grade-col-1 {
+  position: sticky;
+  left: 0;
+  width: 40px;
+  min-width: 40px;
+  max-width: 40px;
+  z-index: 25;
+}
+.sticky-grade-col-2 {
+  position: sticky;
+  left: 40px;
+  width: 105px;
+  min-width: 105px;
+  max-width: 105px;
+  z-index: 25;
+}
+.sticky-grade-col-3 {
+  position: sticky;
+  left: 145px;
+  width: 240px;
+  min-width: 240px;
+  max-width: 240px;
+  z-index: 25;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  box-shadow: 4px 0 6px -2px rgba(0, 0, 0, 0.08);
+}
+
+/* Sticky Corner Headers (Sticky Top + Sticky Left) */
+.sticky-grade-head-1 {
+  position: sticky;
+  top: 0;
+  left: 0;
+  width: 40px;
+  min-width: 40px;
+  max-width: 40px;
+  z-index: 50 !important;
+  background-color: var(--slate-100) !important;
+}
+.sticky-grade-head-2 {
+  position: sticky;
+  top: 0;
+  left: 40px;
+  width: 105px;
+  min-width: 105px;
+  max-width: 105px;
+  z-index: 50 !important;
+  background-color: var(--slate-100) !important;
+}
+.sticky-grade-head-3 {
+  position: sticky;
+  top: 0;
+  left: 145px;
+  width: 240px;
+  min-width: 240px;
+  max-width: 240px;
+  z-index: 50 !important;
+  background-color: var(--slate-100) !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  box-shadow: 4px 0 6px -2px rgba(0, 0, 0, 0.08);
+}
+
+/* Vertical Freeze for All Gradebook Table Headers */
+#gradebook-table-head {
+  position: sticky;
+  top: 0;
+  z-index: 35;
+}
+#gradebook-table-head tr:first-child th {
+  position: sticky;
+  top: 0;
+  z-index: 35;
+  background-color: var(--slate-100);
+}
+#gradebook-table-head tr:nth-child(2) th {
+  position: sticky;
+  top: 36px;
+  z-index: 35;
+}
+#gradebook-table-head th.sticky-grade-head-1,
+#gradebook-table-head th.sticky-grade-head-2,
+#gradebook-table-head th.sticky-grade-head-3 {
+  top: 0;
+  z-index: 50 !important;
+  background-color: var(--slate-100) !important;
+}
+
+/* Professional Alternating Row Zebra Striping & Solid Backgrounds */
+.grade-row-even {
+  background-color: var(--white);
+}
+.grade-row-odd {
+  background-color: var(--slate-50);
+}
+.grade-row-even td.sticky-grade-col-1,
+.grade-row-even td.sticky-grade-col-2,
+.grade-row-even td.sticky-grade-col-3 {
+  background-color: var(--white) !important;
+}
+.grade-row-odd td.sticky-grade-col-1,
+.grade-row-odd td.sticky-grade-col-2,
+.grade-row-odd td.sticky-grade-col-3 {
+  background-color: var(--slate-50) !important;
+}
+#gradebook-table-body tr:hover {
+  background-color: var(--blue-50) !important;
+}
+#gradebook-table-body tr:hover td.sticky-grade-col-1,
+#gradebook-table-body tr:hover td.sticky-grade-col-2,
+#gradebook-table-body tr:hover td.sticky-grade-col-3 {
+  background-color: var(--blue-50) !important;
+}
+
+/* App-wide Snappy & Smooth Animations */
+@keyframes fadeInSlideUp {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modalPopIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes toastSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.tab-content:not(.hidden) {
+  animation: fadeInSlideUp 0.18s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+div[id$="-modal"]:not(.hidden) > div {
+  animation: modalPopIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+#toast.toast-animated {
+  animation: toastSlideUp 0.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+button, .tab-btn, a {
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+button:active, .tab-btn:active {
+  transform: scale(0.97);
+}
+
+/* Print Styles for Faculty Reports */
+@media print {
+  header, #toast, .tab-btn, button, #top-scrollbar-container, .col-resizer, .no-print {
+    display: none !important;
+  }
+  body, main {
+    background: white !important;
+    color: black !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+  }
+  #matrix-scroll-wrapper {
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    page-break-inside: auto;
+  }
+  tr {
+    page-break-inside: avoid;
+    page-break-after: auto;
+  }
+  .matrix-row-height {
+    height: auto !important;
+    max-height: none !important;
+  }
+  .sticky-col-day, .sticky-col-date, .sticky-col-progress,
+  .sticky-header-day, .sticky-header-date, .sticky-header-progress {
+    position: static !important;
+    box-shadow: none !important;
+  }
+}
+/* Sticky Frozen Columns for Gradebook Table Footer */
+.sticky-grade-foot-1 {
+  position: sticky;
+  bottom: 0;
+  left: 0;
+  width: 40px;
+  min-width: 40px;
+  max-width: 40px;
+  z-index: 45 !important;
+  background-color: var(--slate-100) !important;
+}
+.sticky-grade-foot-2 {
+  position: sticky;
+  bottom: 0;
+  left: 40px;
+  width: 105px;
+  min-width: 105px;
+  max-width: 105px;
+  z-index: 45 !important;
+  background-color: var(--slate-100) !important;
+}
+.sticky-grade-foot-3 {
+  position: sticky;
+  bottom: 0;
+  left: 145px;
+  width: 240px;
+  min-width: 240px;
+  max-width: 240px;
+  z-index: 45 !important;
+  background-color: var(--slate-100) !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  box-shadow: 4px 0 6px -2px rgba(0, 0, 0, 0.08);
+}
+#gradebook-table-foot {
+  position: sticky;
+  bottom: 0;
+  z-index: 40;
+}
+
+/* Color Swatch Picker */
+.color-swatch-btn {
+  transition: all 0.15s ease;
+}
+.color-swatch-btn:hover {
+  transform: scale(1.15);
+}
+.color-swatch-active {
+  box-shadow: 0 0 0 2px var(--white), 0 0 0 4px var(--slate-800) !important;
+  transform: scale(1.15);
+}
+
+/* Side-by-Side Sliding Sidebar (Positioned to the right of the main display window) */
+.tab-content {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+.tab-layout-container {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: flex-start !important;
+  justify-content: flex-start !important;
+  justify-content: safe center !important;
+  gap: 1rem !important;
+  width: 100% !important;
+  max-width: 1650px !important;
+  margin: 0 auto !important;
+  padding-top: 0 !important;
+  box-sizing: border-box !important;
+  transition: all 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.tab-main-window {
+  position: relative !important;
+  z-index: 10 !important;
+  flex: 1 1 0% !important;
+  min-width: 0 !important;
+  max-width: 1280px !important;
+  width: 100% !important;
+}
+
+.tab-sidebar {
+  position: relative !important;
+  z-index: 1 !important;
+  width: 336px;
+  flex-shrink: 0;
+  overflow-x: hidden;
+  overflow-y: auto !important;
+  padding: 52px 10px 3rem 6px !important;
+  will-change: width, opacity, transform;
+}
+
+.tab-sidebar > div[id]:first-child,
+.tab-sidebar > div[id]:first-of-type {
+  margin-top: 0 !important;
+}
+
+.tab-sidebar-expanded {
+  width: 336px !important;
+  opacity: 1 !important;
+  transform: translateX(0) !important;
+  margin-left: 0 !important;
+  pointer-events: auto !important;
+  display: block !important;
+  transition: width 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1) 0.05s !important;
+}
+
+.tab-sidebar-collapsed {
+  width: 0 !important;
+  min-width: 0 !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding: 0 !important;
+  opacity: 0 !important;
+  transform: translateX(-100%) !important;
+  pointer-events: none !important;
+  overflow: hidden !important;
+  transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Prevent content cards inside sidebar from squishing or reflowing during collapse */
+.tab-sidebar > * {
+  width: 320px !important;
+  min-width: 320px !important;
+  box-sizing: border-box !important;
+}
+
+.sidebar-drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.625rem 0.875rem;
+  background-color: var(--white);
+  border: 1px solid var(--slate-200);
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+/* Light Mode Universal Row Flash (Overrides sticky columns & colored cells) */
+tr.row-flash-highlight > td,
+tr.row-flash-highlight > th,
+tr.row-flash-highlight td[class*="bg-"],
+tr.row-flash-highlight td.sticky-grade-col-1,
+tr.row-flash-highlight td.sticky-grade-col-2,
+tr.row-flash-highlight td.sticky-grade-col-3 {
+  background-color: #fef08a !important;
+  color: #713f12 !important;
+  transition: background-color 0.25s ease, color 0.25s ease !important;
+}
+
+/* Dark Mode Universal Row Flash */
+html.theme-dark tr.row-flash-highlight > td,
+html.theme-dark tr.row-flash-highlight > th,
+html.theme-dark tr.row-flash-highlight td[class*="bg-"],
+html.theme-dark tr.row-flash-highlight td.sticky-grade-col-1,
+html.theme-dark tr.row-flash-highlight td.sticky-grade-col-2,
+html.theme-dark tr.row-flash-highlight td.sticky-grade-col-3 {
+  background-color: #854d0e !important;
+  color: #fef08a !important;
+  transition: background-color 0.25s ease, color 0.25s ease !important;
+}
+
+/* Student Name Cell Pulsing Halo */
+tr.row-flash-highlight td.sticky-grade-col-3 {
+  box-shadow: inset 0 0 0 2px #f59e0b, 0 0 14px rgba(245, 158, 11, 0.75) !important;
+  z-index: 35 !important;
+}
+
+/* Input Error Pulse Beacon */
+@keyframes errorBeacon {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+  50% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0.95); }
+}
+.input-beacon-pulse {
+  animation: errorBeacon 0.5s ease-in-out 3 !important;
+  border-color: #ef4444 !important;
+}
+
+/* Gradebook Sidebar Radar Expansion & Hidden Scrollbar Overrides */
+#gradebook-widget-errors,
+#gradebook-widget-atrisk {
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 160px !important;
+}
+
+#gradebook-errors-list,
+#gradebook-atrisk-list {
+  flex: 1 1 auto !important;
+  max-height: none !important;
+  overflow-y: auto !important;
+  scrollbar-width: none !important; /* Firefox */
+  -ms-overflow-style: none !important; /* IE/Edge */
+}
+
+#gradebook-errors-list::-webkit-scrollbar,
+#gradebook-atrisk-list::-webkit-scrollbar {
+  display: none !important; /* Chrome, Safari, Edge */
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* Static Navigated Day & Date Badge Highlight */
+.day-navigated-highlight {
+  background-color: var(--yellow-200) !important;
+  border: 2px solid var(--amber-700) !important;
+  color: var(--amber-900) !important;
+  font-weight: 900 !important;
+  z-index: 30;
+  transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease !important;
+}
+
+/* Static Navigated Activity Card Highlight */
+.activity-navigated-highlight {
+  border-color: #d97706 !important;
+  border-width: 2px !important;
+  z-index: 40 !important;
+  background-color: #fef3c7 !important;
+  color: #78350f !important;
+  box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.4) !important;
+  transition: background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease !important;
+}
+
+html.theme-dark .activity-navigated-highlight {
+  background-color: #2e1a05 !important;
+  border-color: #f59e0b !important;
+  color: #fef3c7 !important;
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.5) !important;
+}
+
+/* Walkthrough Guide Justified Text */
+.guide-text-justify {
+  text-align: justify !important;
+  text-justify: inter-word !important;
+}
+
+/* Sidebar Docked Toggle Tab (Compact Ear Tab when Collapsed, Elongated Header when Expanded) */
+.sidebar-docked-tag {
+  position: absolute;
+  top: -1px !important;
+  left: calc(100% - 1px) !important;
+  width: 36px;
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  box-sizing: border-box !important;
+  cursor: pointer;
+  user-select: none;
+  background-color: var(--white);
+  border: 1px solid var(--slate-300);
+  border-left: 1px solid var(--white) !important;
+  border-top-right-radius: 12px;
+  border-bottom-right-radius: 12px;
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  z-index: 30;
+  margin: 0 !important;
+  transition: width 0.35s cubic-bezier(0.25, 1, 0.5, 1),
+              padding 0.35s cubic-bezier(0.25, 1, 0.5, 1),
+              background-color 0.3s ease,
+              border-color 0.3s ease,
+              box-shadow 0.3s ease;
+  will-change: width, padding;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.sidebar-docked-tag.sidebar-tag-collapsed {
+  width: 36px !important;
+  background-color: var(--amber-50) !important;
+  border-color: var(--amber-500) !important;
+  border-left-color: var(--amber-50) !important;
+  color: var(--amber-800) !important;
+  box-shadow: 2px 2px 8px -1px rgba(245, 158, 11, 0.25);
+  justify-content: flex-start;
+  padding: 0 0 0 10px;
+  transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+              padding 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+              background-color 0.3s ease,
+              border-color 0.3s ease,
+              box-shadow 0.3s ease !important;
+}
+.sidebar-docked-tag.sidebar-tag-collapsed:hover {
+  background-color: var(--yellow-200) !important;
+  border-color: var(--amber-600) !important;
+  border-left-color: var(--yellow-200) !important;
+  transform: translateX(2px);
+}
+.sidebar-docked-tag.sidebar-tag-expanded {
+  width: 346px !important;
+  background-color: var(--white) !important;
+  border-color: var(--slate-300) !important;
+  border-left-color: var(--white) !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.08);
+  justify-content: center !important;
+  padding: 0 0.875rem;
+  transition: width 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              padding 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              background-color 0.25s ease,
+              border-color 0.25s ease,
+              box-shadow 0.25s ease !important;
+}
+.sidebar-docked-tag.sidebar-tag-expanded:hover {
+  background-color: var(--slate-50) !important;
+}
+
+/* Draggable & Resizable Sidebar Widgets with enhanced right and bottom shadow (Direct Children Only) */
+.tab-sidebar > div[id],
+.tab-sidebar > div.bg-white,
+.tab-sidebar > [id^="planner-widget-"],
+.tab-sidebar > [id^="timetable-widget-"],
+.tab-sidebar > [id^="calendar-widget-"],
+.tab-sidebar > [id^="roster-widget-"],
+.tab-sidebar > [id^="gradebook-widget-"] {
+  resize: none !important;
+  position: relative !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  min-height: 80px !important;
+  box-shadow: 3px 4px 8px -1px rgba(0, 0, 0, 0.12), 1px 2px 4px -1px rgba(0, 0, 0, 0.08) !important;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease !important;
+}
+
+html.theme-dark .tab-sidebar > div[id],
+html.theme-dark .tab-sidebar > div.bg-white,
+html.theme-dark .tab-sidebar > [id^="planner-widget-"],
+html.theme-dark .tab-sidebar > [id^="timetable-widget-"],
+html.theme-dark .tab-sidebar > [id^="calendar-widget-"],
+html.theme-dark .tab-sidebar > [id^="roster-widget-"],
+html.theme-dark .tab-sidebar > [id^="gradebook-widget-"] {
+  box-shadow: 2px 4px 14px -1px rgba(0, 0, 0, 0.55), 1px 2px 4px -1px rgba(0, 0, 0, 0.35) !important;
+  border: 1px solid #334155 !important;
+}
+
+/* --- Full-Width Bottom Resizer Bar for Sidebar Widgets --- */
+.widget-bottom-resizer {
+  position: relative;
+  width: calc(100% + 1.75rem) !important;
+  margin-left: -0.875rem !important;
+  margin-right: -0.875rem !important;
+  margin-bottom: -0.875rem !important;
+  margin-top: auto !important;
+  height: 12px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: ns-resize !important;
+  user-select: none !important;
+  touch-action: none !important;
+  z-index: 25;
+  padding: 0 !important;
+  border-top: 1px solid rgba(226, 232, 240, 0.95) !important;
+  background-color: rgba(248, 250, 252, 0.9) !important;
+  border-radius: 0 0 0.75rem 0.75rem !important;
+  transition: background-color 0.2s ease, border-color 0.2s ease !important;
+  flex-shrink: 0 !important;
+}
+
+.widget-bottom-resizer::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -4px;
+  bottom: -4px;
+  z-index: 1;
+  cursor: ns-resize !important;
+}
+
+.widget-bottom-resizer:hover,
+.widget-resizing .widget-bottom-resizer {
+  background-color: rgba(254, 243, 199, 0.75) !important;
+  border-top-color: rgba(245, 158, 11, 0.6) !important;
+}
+
+.widget-resizer-grip {
+  width: 36px;
+  height: 3.5px;
+  border-radius: 9999px;
+  background-color: #cbd5e1;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+  position: relative;
+  z-index: 2;
+}
+
+.widget-bottom-resizer:hover .widget-resizer-grip,
+.widget-resizing .widget-resizer-grip {
+  background-color: var(--msu-gold, #f59e0b) !important;
+  width: 52px;
+  height: 4px;
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
+}
+
+html.theme-dark .widget-bottom-resizer {
+  border-top: 1px solid #334155 !important;
+  background-color: rgba(15, 23, 42, 0.7) !important;
+}
+
+html.theme-dark .widget-bottom-resizer:hover,
+html.theme-dark .widget-resizing .widget-bottom-resizer {
+  background-color: rgba(245, 158, 11, 0.18) !important;
+  border-top-color: rgba(245, 158, 11, 0.65) !important;
+}
+
+html.theme-dark .widget-resizer-grip {
+  background-color: #475569;
+}
+
+html.theme-dark .widget-bottom-resizer:hover .widget-resizer-grip,
+html.theme-dark .widget-resizing .widget-resizer-grip {
+  background-color: #f59e0b !important;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.7);
+}
+
+body.resizing-widget-active {
+  cursor: ns-resize !important;
+  user-select: none !important;
+}
+
+/* --- Full-Width Bottom Resizer Bar for Main Tab Content Windows --- */
+.main-table-bottom-resizer {
+  position: relative;
+  width: 100% !important;
+  height: 14px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: ns-resize !important;
+  user-select: none !important;
+  touch-action: none !important;
+  z-index: 10;
+  padding: 0 !important;
+  border-top: 1px solid rgba(226, 232, 240, 0.95) !important;
+  background-color: rgba(248, 250, 252, 0.95) !important;
+  border-radius: 0 0 0.75rem 0.75rem !important;
+  transition: background-color 0.2s ease, border-color 0.2s ease !important;
+  flex-shrink: 0 !important;
+}
+
+.main-table-bottom-resizer::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0; /* Strictly 0: Never bleed upwards into the horizontal scrollbar above */
+  bottom: -4px;
+  z-index: 1;
+  cursor: ns-resize !important;
+}
+
+.main-table-bottom-resizer:hover,
+.main-window-resizing .main-table-bottom-resizer {
+  background-color: rgba(254, 243, 199, 0.75) !important;
+  border-top-color: rgba(245, 158, 11, 0.6) !important;
+}
+
+.main-resizer-grip {
+  width: 48px;
+  height: 3.5px;
+  border-radius: 9999px;
+  background-color: #cbd5e1;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+  position: relative;
+  z-index: 2;
+}
+
+.main-table-bottom-resizer:hover .main-resizer-grip,
+.main-window-resizing .main-resizer-grip {
+  background-color: var(--msu-gold, #f59e0b) !important;
+  width: 72px;
+  height: 4px;
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
+}
+
+html.theme-dark .main-table-bottom-resizer {
+  border-top: 1px solid #334155 !important;
+  background-color: rgba(15, 23, 42, 0.85) !important;
+}
+
+html.theme-dark .main-table-bottom-resizer:hover,
+html.theme-dark .main-window-resizing .main-table-bottom-resizer {
+  background-color: rgba(245, 158, 11, 0.18) !important;
+  border-top-color: rgba(245, 158, 11, 0.65) !important;
+}
+
+html.theme-dark .main-resizer-grip {
+  background-color: #475569;
+}
+
+html.theme-dark .main-table-bottom-resizer:hover .main-resizer-grip,
+html.theme-dark .main-window-resizing .main-resizer-grip {
+  background-color: #f59e0b !important;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.7);
+}
+
+body.resizing-main-window-active {
+  cursor: ns-resize !important;
+  user-select: none !important;
+}
+
+/* Inner scroll areas for sidebar widgets with dynamic heights */
+.tab-sidebar > div[id] #planner-milestones-list,
+.tab-sidebar > div[id] #planner-subject-pace-list,
+.tab-sidebar > div[id] #timetable-load-scroll-container,
+.tab-sidebar > div[id] #timetable-conflicts-container,
+.tab-sidebar > div[id] #timetable-today-agenda,
+.tab-sidebar > div[id] #calendar-upcoming-deadlines,
+.tab-sidebar > div[id] #calendar-lost-days-list,
+.tab-sidebar > div[id] #roster-sections-breakdown,
+.tab-sidebar > div[id] #gradebook-errors-list,
+.tab-sidebar > div[id] #gradebook-atrisk-list,
+.tab-sidebar > div[id] #gradebook-stats-scroll-container {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: none !important;
+  overflow-y: auto;
+}
+
+/* Teaching Radar Filter Pills */
+.radar-filter-pill {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+  cursor: pointer;
+  user-select: none;
+}
+html.theme-dark .radar-filter-pill:not(.bg-msu-maroon) {
+  background-color: #1e293b !important;
+  color: #94a3b8 !important;
+  border: 1px solid #334155 !important;
+}
+html.theme-dark .radar-filter-pill:not(.bg-msu-maroon):hover {
+  background-color: #334155 !important;
+  color: #f1f5f9 !important;
+}
+html.theme-dark #planner-radar-filter-pills {
+  border-color: #334155 !important;
+}
+
+/* Fixed-grid metric cards: prevent stretching into hollow tall blocks when resized */
+.tab-sidebar > div[id] #planner-pacing-stats,
+.tab-sidebar > div[id] #calendar-events-distribution {
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 0.5rem !important;
+  align-content: start !important;
+  grid-auto-rows: min-content !important;
+  flex: none !important;
+}
+
+#timetable-load-scroll-container #timetable-load-stats,
+#timetable-load-scroll-container #timetable-daily-distribution,
+#gradebook-stats-scroll-container #gradebook-stats-content,
+#gradebook-stats-scroll-container #gradebook-grade-distribution {
+  flex: none !important;
+  overflow-y: visible !important;
+  max-height: none !important;
+}
+
+html.theme-dark #gradebook-widget-stats .bg-slate-50 {
+  background-color: #0f172a !important;
+  border-color: #334155 !important;
+}
+html.theme-dark #gradebook-widget-stats .bg-slate-100 {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+}
+html.theme-dark #gradebook-widget-stats .bg-slate-200 {
+  background-color: #334155 !important;
+}
+html.theme-dark #gradebook-widget-stats .text-slate-900,
+html.theme-dark #gradebook-widget-stats .text-slate-800,
+html.theme-dark #gradebook-widget-stats .text-slate-700 {
+  color: #f1f5f9 !important;
+}
+html.theme-dark #gradebook-widget-stats .text-slate-500,
+html.theme-dark #gradebook-widget-stats .text-slate-400 {
+  color: #94a3b8 !important;
+}
+html.theme-dark #gradebook-widget-stats .border-slate-100 {
+  border-color: #334155 !important;
+}
+html.theme-dark #gradebook-widget-stats #btn-grade-dist-grouped,
+html.theme-dark #gradebook-widget-stats #btn-grade-dist-full {
+  border-color: #334155 !important;
+}
+html.theme-dark #gradebook-widget-stats .hover\:bg-slate-100:hover {
+  background-color: rgba(51, 65, 85, 0.4) !important;
+}
+
+html.theme-dark div[id$="-modal"] > div {
+  box-shadow: var(--dark-modal-shadow) !important;
+  border: 1px solid #475569 !important;
+}
+
+/* Primary display cards across all tabs (Excludes transparent layout wrappers) */
+.tab-main-window > div.bg-white,
+.tab-main-window .bg-white.rounded-xl,
+.tab-main-window .bg-white.rounded-2xl,
+#matrix-scroll-wrapper {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.05) !important;
+}
+
+html.theme-dark .tab-main-window > div.bg-white,
+html.theme-dark .tab-main-window .bg-white.rounded-xl,
+html.theme-dark .tab-main-window .bg-white.rounded-2xl,
+html.theme-dark #matrix-scroll-wrapper {
+  box-shadow: var(--dark-surface-shadow) !important;
+  border: 1px solid #334155 !important;
+}
+
+/* Ensure layout wrappers remain completely borderless and unshadowed */
+.tab-main-window > .w-full,
+html.theme-dark .tab-main-window > .w-full {
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+.widget-drag-handle {
+  cursor: grab !important;
+  user-select: none !important;
+}
+
+.widget-drag-handle * {
+  pointer-events: none;
+}
+
+.widget-drag-handle button,
+.widget-drag-handle a,
+.widget-drag-handle input,
+.widget-drag-handle select {
+  pointer-events: auto;
+}
+
+.widget-drag-handle:active {
+  cursor: grabbing !important;
+}
+
+.cursor-grab {
+  cursor: grab !important;
+}
+.cursor-grab:active,
+.active\:cursor-grabbing:active {
+  cursor: grabbing !important;
+}
+
+/* Modal Pop-Out Animation & Beautified Dragging Styles */
+@keyframes modalPopOut {
+  from { opacity: 1; transform: scale(1) translateY(0); }
+  to { opacity: 0; transform: scale(0.96) translateY(-6px); }
+}
+
+.modal-closing > div {
+  animation: modalPopOut 0.16s cubic-bezier(0.4, 0, 1, 1) forwards !important;
+}
+
+/* Floating User Guide Modal Dark Mode */
+html.theme-dark #user-guide-card {
+  background-color: #1e293b !important;
+  color: #f8fafc !important;
+  border-color: #b45309 !important;
+}
+html.theme-dark #user-guide-modal .bg-slate-50 {
+  background-color: #0f172a !important;
+  border-color: #334155 !important;
+}
+html.theme-dark #user-guide-modal .bg-amber-50 {
+  background-color: #2b1803 !important;
+  border-color: #78350f !important;
+}
+html.theme-dark #user-guide-modal .border-slate-200 {
+  border-color: #334155 !important;
+}
+html.theme-dark #user-guide-modal .text-slate-900,
+html.theme-dark #user-guide-modal .text-slate-800 {
+  color: #f8fafc !important;
+}
+html.theme-dark #user-guide-modal .text-slate-700,
+html.theme-dark #user-guide-modal .text-slate-600 {
+  color: #cbd5e1 !important;
+}
+html.theme-dark #user-guide-modal #guide-step-select {
+  background-color: #0f172a !important;
+  color: #f8fafc !important;
+  border-color: #334155 !important;
+}
+html.theme-dark #user-guide-modal button[onclick*="navigateGuideStep"] {
+  background-color: #1e293b !important;
+  border-color: #475569 !important;
+  color: #e2e8f0 !important;
+}
+
+.widget-drag-over {
+  border-top: 3px solid var(--amber-700) !important;
+  transform: translateY(2px);
+}
+
+.grade-cat-drag-over {
+  outline: 2px dashed var(--indigo-600) !important;
+  outline-offset: -2px;
+}
+
+.tab-sidebar.is-dragging {
+  user-select: none !important;
+}
+
+.tab-sidebar > div[id].is-being-dragged {
+  opacity: 0.35 !important;
+  transform: scale(0.98) !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15) !important;
+}

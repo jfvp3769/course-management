@@ -1,0 +1,895 @@
+/* ===========================================================================
+ * PLANNER SIDEBAR
+ * ---------------------------------------------------------------------------
+ * Next activities, coverage radar, milestones and lost-day tracking.
+ * ======================================================================== */
+
+// 1. Planner Sidebar Updates & Navigation
+function jumpToMatrixDate(dateKey, courseCode = '', section = '', isMilestone = false) {
+  if (!dateKey) return;
+  switchTab('planner');
+
+  // Ensure full semester dates are visible if month filter excluded this date
+  const parts = dateKey.split('-');
+  const month = parts[1];
+  if (selectedMonthFilter !== 'all') {
+    const monthFilter = document.getElementById('filter-month');
+    if (monthFilter) monthFilter.value = 'all';
+    selectedMonthFilter = 'all';
+    renderMatrixTable();
+  }
+
+  setTimeout(() => {
+    const wrapper = document.getElementById('matrix-scroll-wrapper');
+    const thead = document.getElementById('matrix-head');
+    const theadHeight = (thead && typeof thead.offsetHeight === 'number' && !isNaN(thead.offsetHeight)) ? thead.offsetHeight : 86;
+
+    let targetTop = wrapper ? wrapper.scrollTop : 0;
+    let targetLeft = wrapper ? wrapper.scrollLeft : 0;
+
+    // 1. Locate the week containing the navigated date
+    let targetEntry = semesterDates.find(d => d.dateKey === dateKey);
+    let targetWeekNumber = targetEntry ? targetEntry.weekNumber : null;
+
+    if (targetWeekNumber) {
+      currentWeekViewIndex = targetWeekNumber;
+      const totalWeeks = semesterDates.length > 0 ? semesterDates[0].totalWeeks : 18;
+      const navLabel = document.getElementById('current-week-nav-label');
+      if (navLabel) navLabel.innerText = `Week ${currentWeekViewIndex}/${totalWeeks}`;
+      saveAppState();
+
+      // Display the week starting from Sunday at the top row (do NOT bring navigated date to top row)
+      const sundayEntry = semesterDates.find(d => d.weekNumber === targetWeekNumber && d.dayOfWeek === 'Sun') ||
+                          semesterDates.find(d => d.weekNumber === targetWeekNumber);
+      if (sundayEntry) {
+        const sundayRow = document.getElementById('row-' + sundayEntry.dateKey);
+        if (sundayRow) {
+          targetTop = Math.max(0, sundayRow.offsetTop - theadHeight);
+        }
+      }
+    } else {
+      // Fallback if week number not found
+      const row = document.getElementById('row-' + dateKey);
+      if (row) targetTop = Math.max(0, row.offsetTop - theadHeight);
+    }
+
+    // 2. Identify the navigated target cell/card for horizontal scroll calculation
+    const targetRow = document.getElementById('row-' + dateKey);
+    let targetCell = null;
+    let targetCard = null;
+
+    if (courseCode && section) {
+      const cellKey = dateKey + '__' + courseCode + '__' + section;
+      targetCell = document.getElementById('cell-' + cellKey);
+      targetCard = document.getElementById('card-' + cellKey);
+    } else if (isMilestone) {
+      targetCell = document.getElementById('cell-' + dateKey + '__notes');
+      targetCard = document.getElementById('card-' + dateKey + '__notes');
+    } else if (targetRow) {
+      // If called with only dateKey, look for the first planned activity in this row
+      targetCell = targetRow.querySelector('.matrix-cell-slot') || targetRow.querySelector('[id^="cell-"]');
+      if (targetCell) {
+        targetCard = targetCell.querySelector('[id^="card-"]') || targetCell.querySelector('div');
+      }
+    }
+
+    if (targetCell && wrapper) {
+      const stickyLeftWidth = 110; // 42px Day + 68px Date sticky columns
+      const cellLeft = targetCell.offsetLeft;
+      const cellWidth = targetCell.offsetWidth;
+      const cellRight = cellLeft + cellWidth;
+
+      const viewLeft = wrapper.scrollLeft + stickyLeftWidth;
+      const viewRight = wrapper.scrollLeft + wrapper.clientWidth;
+
+      if (cellLeft < viewLeft) {
+        targetLeft = Math.max(0, cellLeft - stickyLeftWidth - 12);
+      } else if (cellRight > viewRight) {
+        targetLeft = cellRight - wrapper.clientWidth + 24;
+      }
+    }
+
+    // 3. Coordinated scroll on both axes at once
+    if (wrapper) {
+      wrapper.scrollTo({ top: targetTop, left: targetLeft, behavior: 'smooth' });
+    }
+
+    // 4. Clear any lingering flash highlights before triggering a new one
+    document.querySelectorAll('.row-flash-highlight').forEach(r => r.classList.remove('row-flash-highlight'));
+    document.querySelectorAll('.day-navigated-highlight').forEach(el => el.classList.remove('day-navigated-highlight'));
+    document.querySelectorAll('.activity-navigated-highlight').forEach(el => el.classList.remove('activity-navigated-highlight'));
+
+    // 5. Highlight the navigated date & day badge with automatic removal
+    if (targetRow) {
+      const dayBadge = targetRow.querySelector('.sticky-col-day span');
+      if (dayBadge) {
+        void dayBadge.offsetWidth;
+        dayBadge.classList.add('day-navigated-highlight');
+        setTimeout(() => dayBadge.classList.remove('day-navigated-highlight'), 1400);
+      }
+
+      const dateCell = targetRow.querySelector('.sticky-col-date');
+      if (dateCell) {
+        void dateCell.offsetWidth;
+        dateCell.classList.add('day-navigated-highlight');
+        setTimeout(() => dateCell.classList.remove('day-navigated-highlight'), 1400);
+      }
+
+      void targetRow.offsetWidth;
+      targetRow.classList.add('row-flash-highlight');
+      setTimeout(() => targetRow.classList.remove('row-flash-highlight'), 1600);
+    }
+
+    // 6. Highlight activity card / cell and show toast with automatic removal
+    if (targetCell) {
+      const elToHighlight = targetCard || targetCell;
+      void elToHighlight.offsetWidth;
+      elToHighlight.classList.add('activity-navigated-highlight');
+      setTimeout(() => elToHighlight.classList.remove('activity-navigated-highlight'), 1400);
+
+      const activityDesc = courseCode ? `${courseCode} (${section})` : (isMilestone ? 'Academic Event' : 'Activity');
+      showToast(`Navigated to: ${activityDesc} • ${dateKey}`);
+    } else if (targetRow) {
+      showToast('Navigated to: ' + dateKey);
+    } else {
+      showToast('Date ' + dateKey + ' not in current view.', '⚠️');
+    }
+  }, 50);
+}
+
+window.jumpToMatrixDate = jumpToMatrixDate;
+
+function setRadarFilter(filter) {
+  currentRadarFilter = filter;
+  updatePlannerSidebar();
+}
+if (typeof window !== 'undefined') window.setRadarFilter = setRadarFilter;
+
+function updatePlannerSidebar() {
+  const actualNow = (typeof window !== 'undefined' && window._overrideCurrentDate)
+    ? new Date(window._overrideCurrentDate)
+    : new Date();
+  const currentHours = actualNow.getHours();
+  const currentMinutes = actualNow.getMinutes();
+  const currentTotalMinutes = currentHours * 60 + currentMinutes;
+
+  const now = new Date(actualNow.getFullYear(), actualNow.getMonth(), actualNow.getDate());
+  const nowYear = now.getFullYear();
+  const nowMonth = String(now.getMonth() + 1).padStart(2, '0');
+  const nowDay = String(now.getDate()).padStart(2, '0');
+  const todayStr = `${nowYear}-${nowMonth}-${nowDay}`;
+  const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const currentSystemDay = dayNames[actualNow.getDay()];
+
+  // =========================================================
+  // 1. TEACHING RADAR (Live Dispatch, Lookahead & Upcoming Horizon)
+  // =========================================================
+  const todaySemesterDate = (typeof semesterDates !== 'undefined' && Array.isArray(semesterDates))
+    ? semesterDates.find(d => d.dateKey === todayStr)
+    : null;
+  const isCampusSuspended = todaySemesterDate ? todaySemesterDate.isNoClassDate : false;
+
+  const activeTodaySlots = [];
+  const seenSlotKeys = new Set();
+
+  // A. Evaluate regularly scheduled timetable slots for today
+  if (Array.isArray(weeklyTimetable)) {
+    const regularSlots = weeklyTimetable.filter(t => t.day === currentSystemDay);
+    regularSlots.forEach(s => {
+      const cellKey = `${todayStr}__${s.course}__${s.section}`;
+      seenSlotKeys.add(cellKey);
+
+      if (isCampusSuspended) return; // Campus holiday / university suspension
+
+      const entry = (typeof plannerEntries === 'object' && plannerEntries !== null)
+        ? plannerEntries[cellKey]
+        : null;
+
+      if (!entry) return; // Unplanned / no activity scheduled
+
+      const rawTopic = (entry.topic || '').trim();
+      const rawActivity = (entry.activity || '').trim();
+      const rawType = (entry.type || '').trim();
+      const rawStatus = (entry.status || '').trim();
+      const topicLower = rawTopic.toLowerCase();
+      const actLower = rawActivity.toLowerCase();
+
+      // Exclude cancelled / suspended
+      const isNoClass = (rawType === 'No Class') ||
+        (rawStatus === 'Cancelled') ||
+        topicLower.includes('no class') ||
+        actLower.includes('no class') ||
+        topicLower.includes('class suspended') ||
+        actLower.includes('class suspended') ||
+        topicLower.includes('session suspended');
+
+      if (isNoClass) return;
+
+      const hasContent = (rawTopic.length > 0) || (rawActivity.length > 0);
+      if (!hasContent) return;
+
+      const isNoActivity = topicLower.includes('no planned activity') ||
+        actLower.includes('no planned activity') ||
+        topicLower.includes('no activity') ||
+        actLower.includes('no activity') ||
+        topicLower === 'unplanned';
+
+      if (isNoActivity) return;
+
+      activeTodaySlots.push({
+        course: s.course,
+        section: s.section,
+        startTime: entry.startTime || s.startTime,
+        endTime: entry.endTime || s.endTime,
+        room: entry.room || s.room || 'TBA',
+        type: entry.type || s.type || 'Lecture',
+        topic: rawTopic,
+        activity: rawActivity,
+        notes: entry.notes || '',
+        isSpecialSession: false,
+        dateKey: todayStr
+      });
+    });
+  }
+
+  // B. Special sessions / makeup classes planned for today in plannerEntries
+  if (typeof plannerEntries === 'object' && plannerEntries !== null) {
+    Object.entries(plannerEntries).forEach(([cellKey, entry]) => {
+      if (!entry) return;
+      if (!cellKey.startsWith(todayStr + '__')) return;
+
+      const parts = cellKey.split('__');
+      if (parts.length < 3) return;
+      const [, course, section] = parts;
+
+      const isRegularSlot = Array.isArray(weeklyTimetable) && weeklyTimetable.some(t => t.day === currentSystemDay && t.course === course && t.section === section);
+      if (seenSlotKeys.has(cellKey) || isRegularSlot) return;
+
+      const rawTopic = (entry.topic || '').trim();
+      const rawActivity = (entry.activity || '').trim();
+      const rawType = (entry.type || '').trim();
+      const rawStatus = (entry.status || '').trim();
+      const topicLower = rawTopic.toLowerCase();
+      const actLower = rawActivity.toLowerCase();
+
+      const isNoClass = (rawType === 'No Class') ||
+        (rawStatus === 'Cancelled') ||
+        topicLower.includes('no class') ||
+        actLower.includes('no class') ||
+        topicLower.includes('class suspended') ||
+        actLower.includes('class suspended') ||
+        topicLower.includes('session suspended');
+
+      if (isNoClass) return;
+
+      const hasContent = (rawTopic.length > 0) || (rawActivity.length > 0);
+      if (!hasContent) return;
+
+      const isNoActivity = topicLower.includes('no planned activity') ||
+        actLower.includes('no planned activity') ||
+        topicLower.includes('no activity') ||
+        actLower.includes('no activity');
+
+      if (isNoActivity) return;
+
+      const fallbackSlot = Array.isArray(weeklyTimetable) ? weeklyTimetable.find(t => t.course === course && t.section === section) : null;
+      activeTodaySlots.push({
+        course,
+        section,
+        startTime: entry.startTime || (fallbackSlot ? fallbackSlot.startTime : '08:00'),
+        endTime: entry.endTime || (fallbackSlot ? fallbackSlot.endTime : '09:30'),
+        room: entry.room || (fallbackSlot ? fallbackSlot.room : 'TBA'),
+        type: entry.type || (fallbackSlot ? fallbackSlot.type : 'Special Session'),
+        topic: rawTopic,
+        activity: rawActivity,
+        notes: entry.notes || '',
+        isSpecialSession: true,
+        dateKey: todayStr
+      });
+    });
+  }
+
+  // Sort today's active classes
+  activeTodaySlots.sort((a, b) => timeToMinutes(a.startTime) - timeToMinutes(b.startTime));
+  const remainingToday = activeTodaySlots.filter(s => timeToMinutes(s.endTime) > currentTotalMinutes);
+  const upcomingToday = remainingToday[0] || null;
+
+  // C. Lookahead Engine: If classes today have ended or off-day, locate next scheduled meeting across future dates
+  let lookaheadClass = null;
+  if (!upcomingToday && Array.isArray(semesterDates)) {
+    const todayIdx = semesterDates.findIndex(d => d.dateKey === todayStr);
+    const startScanIdx = todayIdx >= 0 ? todayIdx + 1 : 0;
+
+    for (let i = startScanIdx; i < semesterDates.length; i++) {
+      const fDateObj = semesterDates[i];
+      if (!fDateObj) continue;
+      const fDateKey = fDateObj.dateKey;
+      const fDayName = FULL_DAY_NAMES[fDateObj.dayOfWeek] || fDateObj.dayOfWeek;
+      const fIsSuspended = fDateObj.isNoClassDate;
+
+      const candidatesOnDate = [];
+
+      // Check future regular timetable slots
+      if (!fIsSuspended && Array.isArray(weeklyTimetable)) {
+        const fRegSlots = weeklyTimetable.filter(t => t.day === fDayName);
+        fRegSlots.forEach(s => {
+          const cellKey = `${fDateKey}__${s.course}__${s.section}`;
+          const entry = (typeof plannerEntries === 'object' && plannerEntries !== null) ? plannerEntries[cellKey] : null;
+          if (!entry) return;
+          const topic = (entry.topic || '').trim();
+          const activity = (entry.activity || '').trim();
+          const type = (entry.type || '').trim();
+          const status = (entry.status || '').trim();
+          if (type === 'No Class' || status === 'Cancelled' || topic.toLowerCase().includes('no class') || topic.toLowerCase().includes('class suspended')) return;
+          if (!topic && !activity) return;
+          if (topic.toLowerCase().includes('no planned activity') || topic.toLowerCase().includes('no activity')) return;
+
+          candidatesOnDate.push({
+            course: s.course,
+            section: s.section,
+            startTime: entry.startTime || s.startTime,
+            endTime: entry.endTime || s.endTime,
+            room: entry.room || s.room || 'TBA',
+            type: entry.type || s.type || 'Lecture',
+            topic,
+            activity,
+            dateKey: fDateKey,
+            dayName: fDayName,
+            isSpecialSession: false
+          });
+        });
+      }
+
+      // Check future special sessions / makeups
+      if (typeof plannerEntries === 'object' && plannerEntries !== null) {
+        Object.entries(plannerEntries).forEach(([cellKey, entry]) => {
+          if (!entry || !cellKey.startsWith(fDateKey + '__')) return;
+          const parts = cellKey.split('__');
+          if (parts.length < 3) return;
+          const [, cCode, sec] = parts;
+          const isRegular = Array.isArray(weeklyTimetable) && weeklyTimetable.some(t => t.day === fDayName && t.course === cCode && t.section === sec);
+          if (isRegular) return;
+
+          const topic = (entry.topic || '').trim();
+          const activity = (entry.activity || '').trim();
+          const type = (entry.type || '').trim();
+          const status = (entry.status || '').trim();
+          if (type === 'No Class' || status === 'Cancelled' || topic.toLowerCase().includes('no class')) return;
+          if (!topic && !activity) return;
+
+          const fallback = Array.isArray(weeklyTimetable) ? weeklyTimetable.find(t => t.course === cCode && t.section === sec) : null;
+          candidatesOnDate.push({
+            course: cCode,
+            section: sec,
+            startTime: entry.startTime || (fallback ? fallback.startTime : '08:00'),
+            endTime: entry.endTime || (fallback ? fallback.endTime : '09:30'),
+            room: entry.room || (fallback ? fallback.room : 'TBA'),
+            type: entry.type || (fallback ? fallback.type : 'Special Session'),
+            topic,
+            activity,
+            dateKey: fDateKey,
+            dayName: fDayName,
+            isSpecialSession: true
+          });
+        });
+      }
+
+      if (candidatesOnDate.length > 0) {
+        candidatesOnDate.sort((a, b) => timeToMinutes(a.startTime) - timeToMinutes(b.startTime));
+        lookaheadClass = candidatesOnDate[0];
+        const fParts = fDateKey.split('-').map(Number);
+        const fDate = new Date(fParts[0], fParts[1] - 1, fParts[2]);
+        lookaheadClass.diffDays = Math.round((fDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+        break;
+      }
+    }
+  }
+
+  // D. Render Tier 1: Live Dispatch Card & Radar Badge
+  const dispatchCardEl = document.getElementById('planner-radar-dispatch-card');
+  const radarStatusBadge = document.getElementById('planner-radar-status-badge');
+
+  if (dispatchCardEl) {
+    if (upcomingToday) {
+      const startMin = timeToMinutes(upcomingToday.startTime);
+      const isOngoing = currentTotalMinutes >= startMin;
+      const diffMin = startMin - currentTotalMinutes;
+
+      let countdownText = `${diffMin}m`;
+      if (diffMin >= 60) {
+        const hrs = Math.floor(diffMin / 60);
+        const mins = diffMin % 60;
+        countdownText = mins > 0 ? `${hrs}h ${mins}m` : `${hrs}h`;
+      }
+
+      if (radarStatusBadge) {
+        radarStatusBadge.className = isOngoing
+          ? 'text-[10px] font-black px-1.5 py-0.5 rounded bg-emerald-500 text-white animate-pulse shadow-2xs'
+          : 'text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-50 text-amber-900 border border-amber-300 shadow-2xs';
+        radarStatusBadge.innerText = isOngoing
+          ? (upcomingToday.isSpecialSession ? '⚡ Special In Progress' : 'Class In Progress')
+          : (upcomingToday.isSpecialSession ? `⚡ Special in ${countdownText}` : `Starts in ${countdownText}`);
+      }
+
+      const classroomLink = (typeof getClassroomLink === 'function') ? getClassroomLink(upcomingToday.course, upcomingToday.section) : '';
+      dispatchCardEl.innerHTML = `
+            <div id="planner-radar-active-card"
+              class="p-2.5 rounded-xl border ${isOngoing ? 'bg-emerald-50 border-emerald-300 text-emerald-950' : (upcomingToday.isSpecialSession ? 'bg-amber-50/70 border-amber-300 text-amber-950' : 'bg-slate-50 border-slate-200 text-slate-900')} space-y-1.5 cursor-pointer transition hover:border-emerald-400 hover:shadow-xs group"
+              title="${classroomLink ? `Open Google Classroom for ${escapeHtml(upcomingToday.course)} ${escapeHtml(upcomingToday.section)} in new tab` : 'Click to jump to today in matrix'}">
+              <div class="flex items-center justify-between gap-1.5">
+                <span class="font-black text-xs flex items-center gap-1.5 min-w-0">
+                  <span class="truncate">${escapeHtml(upcomingToday.course)} (${escapeHtml(upcomingToday.section)})</span>
+                  ${upcomingToday.isSpecialSession ? '<span class="text-[8px] font-extrabold px-1.5 py-0.2 rounded bg-amber-200 text-amber-900 border border-amber-300 uppercase tracking-tight shrink-0">⚡ Special</span>' : ''}
+                  <svg class="w-3.5 h-3.5 ${classroomLink ? 'text-emerald-700' : 'text-slate-400'} shrink-0 group-hover:scale-110 transition" viewBox="0 0 24 24" fill="currentColor" title="${classroomLink ? 'Google Classroom Linked' : 'Google Classroom Not Configured'}">
+                    <path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/>
+                  </svg>
+                </span>
+                <span class="font-mono font-bold text-[10px] shrink-0">${formatTime12(upcomingToday.startTime)} - ${formatTime12(upcomingToday.endTime)}</span>
+              </div>
+              ${upcomingToday.topic ? `
+                <div class="text-[11px] font-semibold text-slate-700 leading-tight break-words" title="${escapeHtml(upcomingToday.topic)}">
+                  ${escapeHtml(upcomingToday.topic)}
+                </div>
+              ` : ''}
+              ${upcomingToday.activity && upcomingToday.activity !== upcomingToday.topic ? `
+                <div class="text-[10px] text-slate-500 truncate" title="${escapeHtml(upcomingToday.activity)}">
+                  🎯 ${escapeHtml(upcomingToday.activity)}
+                </div>
+              ` : ''}
+              <div class="flex items-center justify-between text-[11px] text-slate-600">
+                <span class="truncate">${escapeHtml(upcomingToday.room || 'TBA')} • ${escapeHtml(upcomingToday.type || 'Lecture')}</span>
+                ${classroomLink ? `<span class="text-[10px] font-bold text-emerald-700 group-hover:underline shrink-0 ml-1">Classroom ↗</span>` : ''}
+              </div>
+            </div>
+          `;
+
+      const activeCardEl = document.getElementById('planner-radar-active-card');
+      if (activeCardEl) {
+        activeCardEl.onclick = () => {
+          if (classroomLink) {
+            window.open(classroomLink, '_blank');
+          } else {
+            jumpToMatrixDate(todayStr, upcomingToday.course, upcomingToday.section);
+          }
+        };
+      }
+    } else if (lookaheadClass) {
+      const isTmrw = lookaheadClass.diffDays === 1;
+      const dayBadgeText = isTmrw ? 'Tomorrow' : (lookaheadClass.diffDays <= 6 ? lookaheadClass.dayName : lookaheadClass.dateKey);
+
+      if (radarStatusBadge) {
+        radarStatusBadge.className = 'text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-50 text-blue-800 border border-blue-200';
+        radarStatusBadge.innerText = isTmrw ? 'Next: Tomorrow' : `Next: ${lookaheadClass.dayName.substring(0, 3)}`;
+      }
+
+      const classroomLink = (typeof getClassroomLink === 'function') ? getClassroomLink(lookaheadClass.course, lookaheadClass.section) : '';
+      dispatchCardEl.innerHTML = `
+            <div id="planner-radar-lookahead-card"
+              class="p-2.5 rounded-xl border bg-blue-50/60 border-blue-200/90 text-slate-900 space-y-1.5 cursor-pointer transition hover:border-blue-400 hover:shadow-xs group"
+              title="Click to jump to ${lookaheadClass.dateKey} in matrix">
+              <div class="flex items-center justify-between gap-1.5">
+                <span class="font-black text-xs flex items-center gap-1.5 min-w-0">
+                  <span class="text-[9px] font-black px-1.5 py-0.2 rounded bg-blue-200 text-blue-900 border border-blue-300 uppercase tracking-tight shrink-0">Next Up</span>
+                  <span class="truncate">${escapeHtml(lookaheadClass.course)} (${escapeHtml(lookaheadClass.section)})</span>
+                  ${lookaheadClass.isSpecialSession ? '<span class="text-[8px] font-extrabold px-1 rounded bg-amber-200 text-amber-900 border border-amber-300 uppercase shrink-0">⚡ Special</span>' : ''}
+                </span>
+                <span class="font-mono font-bold text-[10px] text-blue-900 shrink-0">${formatTime12(lookaheadClass.startTime)}</span>
+              </div>
+              <div class="text-[10px] text-slate-500 font-semibold flex items-center gap-1">
+                <span>📅 ${dayBadgeText} (${lookaheadClass.dateKey})</span>
+                <span>• Rm ${escapeHtml(lookaheadClass.room || 'TBA')}</span>
+              </div>
+              ${lookaheadClass.topic ? `
+                <div class="text-[11px] font-semibold text-slate-700 leading-tight truncate" title="${escapeHtml(lookaheadClass.topic)}">
+                  ${escapeHtml(lookaheadClass.topic)}
+                </div>
+              ` : ''}
+              <div class="flex items-center justify-between text-[10px] text-slate-600 pt-0.5">
+                <span class="text-blue-700 font-semibold group-hover:underline">View in Matrix ➔</span>
+                ${classroomLink ? `<a href="${classroomLink}" target="_blank" onclick="event.stopPropagation()" class="font-bold text-emerald-700 hover:underline">Classroom ↗</a>` : ''}
+              </div>
+            </div>
+          `;
+
+      const lookaheadCardEl = document.getElementById('planner-radar-lookahead-card');
+      if (lookaheadCardEl) {
+        lookaheadCardEl.onclick = () => {
+          jumpToMatrixDate(lookaheadClass.dateKey, lookaheadClass.course, lookaheadClass.section);
+        };
+      }
+    } else {
+      if (radarStatusBadge) {
+        radarStatusBadge.className = 'text-[10px] font-semibold px-1.5 py-0.5 rounded bg-slate-100 text-slate-600';
+        radarStatusBadge.innerText = 'Term Done';
+      }
+      dispatchCardEl.innerHTML = `
+            <div class="p-3 bg-slate-50 border border-dashed border-slate-200 rounded-xl text-center text-slate-500 text-[11px] space-y-1">
+              <div class="font-bold text-slate-700">🎉 No more scheduled classes</div>
+              <div class="text-[10px] text-slate-400">All planned classes for this term have concluded.</div>
+            </div>
+          `;
+    }
+  }
+
+  // E. Update Filter Pills Strip UI
+  const pillsContainer = document.getElementById('planner-radar-filter-pills');
+  if (pillsContainer) {
+    const pillButtons = pillsContainer.querySelectorAll('button[data-radar-filter]');
+    pillButtons.forEach(btn => {
+      const f = btn.getAttribute('data-radar-filter');
+      const isSelected = (f === currentRadarFilter);
+      if (isSelected) {
+        btn.className = 'radar-filter-pill px-2 py-0.5 text-[10px] font-bold rounded-md bg-msu-maroon text-white transition shadow-2xs';
+      } else {
+        btn.className = 'radar-filter-pill px-2 py-0.5 text-[10px] font-medium rounded-md bg-slate-100 text-slate-600 hover:bg-slate-200 transition';
+      }
+    });
+  }
+
+  // F. Tier 2: Scrollable Horizon Timeline (Matrix Planned Entries + University Milestones)
+  const nextActivitiesList = document.getElementById('planner-milestones-list');
+
+  if (nextActivitiesList) {
+    const upcomingItems = [];
+
+    // 1. Planned activities from Schedule & Activity Matrix
+    if (typeof plannerEntries === 'object' && plannerEntries !== null) {
+      Object.entries(plannerEntries).forEach(([cellKey, entry]) => {
+        if (!entry) return;
+        if (entry.status === 'Completed' || entry.status === 'Cancelled') return;
+
+        const parts = cellKey.split('__');
+        if (parts.length < 3) return;
+        const [dateKey, course, section] = parts;
+
+        const topic = (entry.topic || '').trim();
+        const activity = (entry.activity || '').trim();
+        const type = entry.type || entry.activityType || 'Lecture';
+
+        if (!topic && !activity && type !== 'No Class') return;
+
+        const dateParts = dateKey.split('-').map(Number);
+        let targetDate = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]);
+        if (isNaN(targetDate.getTime())) return;
+
+        const diffDays = Math.round((targetDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+        if (diffDays < 0 || diffDays > 30) return;
+
+        const targetDayName = dayNames[targetDate.getDay()];
+        let slot = null;
+        if (Array.isArray(weeklyTimetable)) {
+          slot = weeklyTimetable.find(t => t.course === course && t.section === section && t.day === targetDayName);
+          if (!slot) {
+            slot = weeklyTimetable.find(t => t.course === course && t.section === section);
+          }
+        }
+
+        const startTime = entry.startTime || (slot ? slot.startTime : '');
+        const endTime = entry.endTime || (slot ? slot.endTime : '');
+        const room = entry.room || (slot ? slot.room : '');
+
+        // Remove if class on today has already passed
+        if (diffDays === 0 && endTime) {
+          const endMin = timeToMinutes(endTime);
+          if (endMin > 0 && currentTotalMinutes > endMin) {
+            return;
+          }
+        }
+
+        upcomingItems.push({
+          source: 'matrix',
+          dateKey,
+          targetDate,
+          diffDays,
+          course,
+          section,
+          type,
+          startTime,
+          endTime,
+          room,
+          topic: topic || (type === 'No Class' ? 'No Class Scheduled' : (activity || 'Class Session')),
+          activity: activity,
+          notes: entry.notes || '',
+          status: entry.status || 'Planned',
+          isSchoolMilestone: false
+        });
+      });
+    }
+
+    // 2. School Calendar Milestones & Major University Events
+    if (Array.isArray(msuCalendarEvents)) {
+      msuCalendarEvents.forEach(evt => {
+        if (!evt) return;
+        let targetDate = null;
+        let dateKey = evt.dateKey || '';
+
+        if (dateKey) {
+          const dParts = dateKey.split('-').map(Number);
+          targetDate = new Date(dParts[0], dParts[1] - 1, dParts[2]);
+        } else if (evt.firstSem || evt.sem1) {
+          const text = evt.firstSem || evt.sem1 || '';
+          const dateMatch = text.match(/(\w+\s+\d+)/);
+          if (dateMatch) {
+            const year = semesterConfig.academicYear ? semesterConfig.academicYear.substring(0, 4) : '2026';
+            targetDate = new Date(dateMatch[1] + ', ' + year);
+            if (!isNaN(targetDate.getTime())) {
+              const mStr = String(targetDate.getMonth() + 1).padStart(2, '0');
+              const dStr = String(targetDate.getDate()).padStart(2, '0');
+              dateKey = `${targetDate.getFullYear()}-${mStr}-${dStr}`;
+            }
+          }
+        }
+
+        if (!targetDate || isNaN(targetDate.getTime())) return;
+        targetDate.setHours(0, 0, 0, 0);
+
+        const diffDays = Math.round((targetDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+        if (diffDays < 0 || diffDays > 30) return;
+
+        const evtStartTime = evt.startTime || '';
+        const evtEndTime = evt.endTime || '';
+
+        if (diffDays === 0 && evtEndTime) {
+          const endMin = timeToMinutes(evtEndTime);
+          if (endMin > 0 && currentTotalMinutes > endMin) return;
+        }
+
+        const isMilestone = (evt.type === 'milestone' || evt.type === 'exam' || evt.type === 'holiday' || evt.isNoClass);
+        if (!isMilestone) return;
+
+        upcomingItems.push({
+          source: 'calendar',
+          dateKey,
+          targetDate,
+          diffDays,
+          type: evt.type || 'milestone',
+          startTime: evtStartTime,
+          endTime: evtEndTime,
+          topic: evt.activity || evt.title || 'Academic Milestone',
+          activity: evt.firstSem || evt.sem1 || dateKey || '',
+          isNoClass: !!evt.isNoClass,
+          isSchoolMilestone: true
+        });
+      });
+    }
+
+    // Sort chronologically
+    upcomingItems.sort((a, b) => {
+      if (a.dateKey !== b.dateKey) {
+        return a.dateKey.localeCompare(b.dateKey);
+      }
+      const aTime = a.startTime ? timeToMinutes(a.startTime) : (a.isSchoolMilestone ? -1 : 9999);
+      const bTime = b.startTime ? timeToMinutes(b.startTime) : (b.isSchoolMilestone ? -1 : 9999);
+      if (aTime !== bTime) {
+        return aTime - bTime;
+      }
+      if (a.isSchoolMilestone && !b.isSchoolMilestone) return -1;
+      if (!a.isSchoolMilestone && b.isSchoolMilestone) return 1;
+      return (a.course || '').localeCompare(b.course || '');
+    });
+
+    // Filter items according to currentRadarFilter
+    let filteredItems = upcomingItems;
+    if (currentRadarFilter === 'today') {
+      filteredItems = upcomingItems.filter(item => item.diffDays === 0);
+    } else if (currentRadarFilter === 'week') {
+      filteredItems = upcomingItems.filter(item => item.diffDays >= 0 && item.diffDays <= 7);
+    } else if (currentRadarFilter === 'milestones') {
+      filteredItems = upcomingItems.filter(item => item.isSchoolMilestone || item.type === 'Exam' || item.type === 'Quiz' || item.type === 'No Class');
+    }
+
+    const displayList = filteredItems.slice(0, 15);
+
+    if (displayList.length === 0) {
+      let emptyText = 'No activities scheduled in the next 30 days.';
+      if (currentRadarFilter === 'today') emptyText = 'No remaining classes or activities scheduled for today.';
+      else if (currentRadarFilter === 'week') emptyText = 'No more activities scheduled for this week.';
+      else if (currentRadarFilter === 'milestones') emptyText = 'No upcoming exams or university milestones.';
+
+      nextActivitiesList.innerHTML = `
+            <div class="text-slate-400 italic text-[11px] py-4 text-center bg-slate-50 rounded-lg border border-dashed border-slate-200">
+              ${emptyText}<br><span class="text-[10px] text-slate-400">Add lessons, quizzes, or exams in the matrix.</span>
+            </div>
+          `;
+    } else {
+      nextActivitiesList.innerHTML = displayList.map(item => {
+        let daysBadge = '';
+        if (item.diffDays === 0) {
+          const startMin = item.startTime ? timeToMinutes(item.startTime) : 0;
+          const endMin = item.endTime ? timeToMinutes(item.endTime) : 0;
+          const isOngoing = startMin > 0 && endMin > 0 && currentTotalMinutes >= startMin && currentTotalMinutes <= endMin;
+
+          if (isOngoing) {
+            daysBadge = `<span class="text-[10px] font-black px-1.5 py-0.5 rounded bg-emerald-500 text-white shadow-2xs shrink-0 animate-pulse">Now</span>`;
+          } else {
+            daysBadge = `<span class="text-[10px] font-black px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-300 shrink-0 shadow-2xs">Today</span>`;
+          }
+        } else if (item.diffDays === 1) {
+          daysBadge = `<span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-100 text-blue-800 border border-blue-200 shrink-0">Tmrw</span>`;
+        } else {
+          daysBadge = `<span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200 shrink-0">${item.diffDays}d left</span>`;
+        }
+
+        const cursorClass = item.dateKey ? 'cursor-pointer hover:shadow-xs transition' : '';
+
+        // School Calendar Milestone card
+        if (item.isSchoolMilestone) {
+          const clickAttr = item.dateKey ? `onclick="jumpToMatrixDate('${jsAttr(item.dateKey)}', '', '', true)"` : '';
+          let milestoneTypeLabel = 'School Milestone';
+          let milestoneBg = 'bg-gradient-to-r from-amber-50/90 via-orange-50/70 to-amber-50/90 border-2 border-amber-300 ring-1 ring-amber-200/60 shadow-2xs';
+          if (item.type === 'exam') {
+            milestoneTypeLabel = 'Major Exam Period';
+          } else if (item.type === 'holiday' || item.isNoClass) {
+            milestoneTypeLabel = 'University Holiday / No Class';
+          }
+
+          return `
+                <div ${clickAttr} title="${item.dateKey ? 'Click to view event in matrix' : ''}"
+                  class="p-2.5 rounded-xl ${milestoneBg} flex items-start justify-between gap-2.5 ${cursorClass}">
+                  <div class="min-w-0 flex-1 space-y-1">
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                      <span class="text-[9px] font-black px-1.5 py-0.5 rounded bg-amber-200 text-amber-950 border border-amber-300 flex items-center gap-1 shrink-0">
+                        ⭐ ${milestoneTypeLabel}
+                      </span>
+                      <span class="text-[10px] font-bold text-amber-800 font-mono">${escapeHtml(item.dateKey || item.activity)}</span>
+                    </div>
+                    <div class="font-bold text-slate-900 text-xs leading-snug break-words">
+                      <span>${escapeHtml(item.topic)}</span>
+                    </div>
+                  </div>
+                  <div class="shrink-0 pt-0.5">${daysBadge}</div>
+                </div>
+              `;
+        }
+
+        // Planned Matrix Activity card
+        const clickAttr = item.dateKey ? `onclick="jumpToMatrixDate('${jsAttr(item.dateKey)}', '${jsAttr(item.course || '')}', '${jsAttr(item.section || '')}')"` : '';
+        let typeColor = 'bg-blue-100 text-blue-800 border-blue-200';
+        if (item.type === 'Quiz') {
+          typeColor = 'bg-purple-100 text-purple-800 border-purple-200';
+        } else if (item.type === 'Exam') {
+          typeColor = 'bg-rose-100 text-rose-800 border-rose-200';
+        } else if (item.type === 'Laboratory') {
+          typeColor = 'bg-emerald-100 text-emerald-800 border-emerald-200';
+        } else if (item.type === 'No Class') {
+          typeColor = 'bg-rose-100 text-rose-800 border-rose-200';
+        } else if (item.type === 'Makeup Class' || item.type === 'Special Session') {
+          typeColor = 'bg-amber-100 text-amber-900 border-amber-300';
+        }
+
+        const typeBadge = `<span class="text-[9px] font-black px-1.5 py-0.5 rounded ${typeColor} border shrink-0">${escapeHtml(item.type)}</span>`;
+        const timeBadge = (item.startTime && item.endTime) ? `
+              <span class="text-[10px] text-indigo-700 font-semibold font-mono bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-200/70 shrink-0 flex items-center gap-0.5" title="Class Schedule">
+                <span>🕒</span>
+                <span>${formatTime12(item.startTime)} – ${formatTime12(item.endTime)}</span>
+              </span>
+            ` : '';
+        const roomBadge = item.room ? `
+              <span class="text-[9px] text-slate-500 font-semibold bg-slate-100 px-1 py-0.5 rounded border border-slate-200 shrink-0" title="Room">
+                Rm ${escapeHtml(item.room)}
+              </span>
+            ` : '';
+
+        return `
+              <div ${clickAttr} title="${item.dateKey ? 'Click to jump to ' + item.dateKey + ' in matrix' : ''}"
+                class="p-2.5 bg-slate-50 hover:bg-indigo-50/50 rounded-xl border border-slate-200 hover:border-indigo-200 flex items-start justify-between gap-2.5 ${cursorClass}">
+                <div class="min-w-0 flex-1 space-y-1">
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <span class="text-[10px] font-extrabold text-slate-700 bg-white px-1.5 py-0.5 rounded border border-slate-200 shrink-0">
+                      ${escapeHtml(item.course)} (${escapeHtml(item.section)})
+                    </span>
+                    ${typeBadge}
+                    <span class="text-[10px] text-slate-500 font-mono">${escapeHtml(item.dateKey)}</span>
+                    ${timeBadge}
+                    ${roomBadge}
+                  </div>
+                  <div class="font-bold text-slate-800 text-xs leading-snug break-words">
+                    <span>${escapeHtml(item.topic)}</span>
+                  </div>
+                  ${item.activity && item.activity !== item.topic ? `<div class="text-[11px] text-slate-500 truncate">${escapeHtml(item.activity)}</div>` : ''}
+                </div>
+                <div class="shrink-0 pt-0.5">${daysBadge}</div>
+              </div>
+            `;
+      }).join('');
+    }
+  }
+
+  initDraggableSidebarWidgets('sidebar-planner');
+
+  // =========================================================
+  // 2. TEACHING DAYS DISTRIBUTION (Unified Single Source of Truth)
+  // =========================================================
+  const pacingStats = document.getElementById('planner-pacing-stats');
+  const pacingPctBadge = document.getElementById('planner-pacing-pct-badge');
+
+  if (pacingStats && Array.isArray(semesterDates) && semesterDates.length > 0) {
+    const stats = calculateTeachingDaysStats();
+
+    if (pacingPctBadge) {
+      pacingPctBadge.textContent = stats.termElapsedPct.toFixed(2) + '% Term Elapsed';
+    }
+
+    pacingStats.innerHTML = `
+          <div class="p-2 bg-slate-50 rounded-lg border border-slate-200">
+            <div class="text-sm font-black text-slate-900">${stats.totalTeachingDays}</div>
+            <div class="text-[10px] text-slate-500 font-semibold">Teaching Days</div>
+          </div>
+          <div class="p-2 bg-emerald-50 rounded-lg border border-emerald-200">
+            <div class="text-sm font-black text-emerald-800">${stats.heldTeachingDays}</div>
+            <div class="text-[10px] text-emerald-600 font-semibold">Held / Conducted</div>
+          </div>
+          <div class="p-2 bg-rose-50 rounded-lg border border-rose-200">
+            <div class="text-sm font-black text-rose-800">${stats.noClassDays}</div>
+            <div class="text-[10px] text-rose-600 font-semibold">No Class / Off</div>
+          </div>
+          <div class="p-2 bg-amber-50 rounded-lg border border-amber-200">
+            <div class="text-sm font-black text-amber-900">${stats.remainingDays}</div>
+            <div class="text-[10px] text-amber-700 font-semibold">Remaining Days</div>
+          </div>
+        `;
+  }
+
+  const subjectPaceList = document.getElementById('planner-subject-pace-list');
+  if (subjectPaceList && courseData && courseData.subjects) {
+    const noClassDates = new Set();
+    if (Array.isArray(msuCalendarEvents)) {
+      msuCalendarEvents.forEach(evt => {
+        if (evt && evt.isNoClass && evt.dateKey) noClassDates.add(evt.dateKey);
+      });
+    }
+
+    let paceItems = [];
+    courseData.subjects.forEach(sub => {
+      (sub.sections || []).forEach(sec => {
+        const secSlots = (weeklyTimetable || []).filter(t => t.course === sub.code && t.section === sec);
+        const secDays = secSlots.map(t => t.day);
+
+        let totalMtgs = 0;
+        let doneMtgs = 0;
+
+        (semesterDates || []).forEach(d => {
+          if (d.isWeekend) return;
+          const fullDay = FULL_DAY_NAMES[d.dayOfWeek] || d.dayOfWeek;
+          if (!secDays.includes(fullDay)) return;
+
+          const cellKey = `${d.dateKey}__${sub.code}__${sec}`;
+          const entry = plannerEntries ? plannerEntries[cellKey] : null;
+          const isSuspended = d.isNoClassDate || noClassDates.has(d.dateKey) ||
+            (entry && (entry.type === 'No Class' || entry.status === 'Cancelled'));
+
+          if (isSuspended) return;
+
+          totalMtgs++;
+
+          const slot = secSlots.find(s => s.day === fullDay);
+          const endMin = slot && slot.endTime ? timeToMinutes(slot.endTime) : 0;
+          const isPastDate = d.dateKey < todayStr;
+          const isPastTimeToday = (d.dateKey === todayStr) && (endMin > 0 ? currentTotalMinutes >= endMin : true);
+          const isCompleted = (entry && entry.status === 'Completed') || isPastDate || isPastTimeToday;
+
+          if (isCompleted) doneMtgs++;
+        });
+
+        const pct = totalMtgs > 0 ? ((doneMtgs / totalMtgs) * 100).toFixed(1) : '0.0';
+        paceItems.push({ course: sub.code, sec, doneMtgs, totalMtgs, pct, color: sub.color || 'bg-blue-600' });
+      });
+    });
+
+    if (paceItems.length === 0) {
+      subjectPaceList.innerHTML = '<div class="text-slate-400 italic text-[11px] py-2 text-center">No sections configured.</div>';
+    } else {
+      subjectPaceList.innerHTML = paceItems.map(it => `
+            <div class="p-2 bg-slate-50 border border-slate-200 rounded-lg space-y-1">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-slate-800 text-[11px]">${escapeHtml(it.course)} (${escapeHtml(it.sec)})</span>
+                <span class="font-mono text-[10px] font-bold text-indigo-700">${it.doneMtgs} / ${it.totalMtgs} mtgs (${it.pct}%)</span>
+              </div>
+              <div class="w-full bg-slate-200 rounded-full h-1.5 overflow-hidden">
+                <div class="bg-indigo-600 h-full rounded-full transition-all duration-300" style="width: ${it.pct}%"></div>
+              </div>
+            </div>
+          `).join('');
+    }
+  }
+}

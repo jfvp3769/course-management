@@ -1,0 +1,164 @@
+/* ---------------------------------------------------------------------------
+   04-dark-planner.css
+   Dark-mode planner matrix rows, cells, badges and the timetable grid.
+   (originally styles.css lines 487-645)
+   --------------------------------------------------------------------------- */
+
+/* Lesson Planner Matrix Rows & Sticky Headers */
+html.theme-dark #matrix-table tbody tr {
+  background-color: #1e293b !important;
+  color: #e2e8f0 !important;
+  border-color: #334155 !important;
+}
+
+html.theme-dark .sticky-col-day,
+html.theme-dark .sticky-col-date {
+  background-color: #0f172a !important;
+  border-color: #334155 !important;
+  color: #e2e8f0 !important;
+}
+
+/* Mute Weekend Rows (Removes Stark Light-Gray Bands) */
+html.theme-dark tr.matrix-row-height.bg-slate-300,
+html.theme-dark tr[class*="bg-slate-300"],
+html.theme-dark td[class*="bg-slate-300"] {
+  background-color: #131b29 !important;
+  color: #64748b !important;
+}
+
+html.theme-dark td.sticky-col-day span[class*="bg-slate-400"] {
+  background-color: #1e293b !important;
+  color: #94a3b8 !important;
+}
+
+/* Matrix Planner Cells: High Contrast for Buttons, Tags & Text */
+html.theme-dark .matrix-cell-slot [id^="card-"] button {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+
+html.theme-dark .matrix-cell-slot [id^="card-"] button:hover {
+  background-color: #f1f5f9 !important;
+}
+
+html.theme-dark .matrix-cell-slot [id^="card-"] span[class*="bg-white"] {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+
+html.theme-dark .matrix-cell-slot [id^="card-"] .border-t,
+html.theme-dark [id^="card-"] .border-t {
+  color: #cbd5e1 !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+/* Header Badges */
+html.theme-dark #planner-total-weeks-badge {
+  color: #fca5a5 !important;
+  background-color: rgba(159, 18, 57, 0.35) !important;
+  border-color: rgba(244, 63, 94, 0.4) !important;
+}
+
+/* Unplaced Matrix Card Slot (+ Click to plan & Time label) */
+html.theme-dark .matrix-cell-slot > div.border-dashed,
+html.theme-dark .matrix-cell-slot > div.border-dashed div {
+  background-color: #141d2b !important;
+  border-color: #334155 !important;
+  color: #cbd5e1 !important;
+}
+
+html.theme-dark .matrix-cell-slot:hover > div.border-dashed,
+html.theme-dark .matrix-cell-slot:hover > div.border-dashed div {
+  background-color: #1e293b !important;
+  border-color: #64748b !important;
+  color: #f8fafc !important;
+}
+
+html.theme-dark .matrix-cell-slot > div.border-dashed button {
+  background-color: #0f172a !important;
+  color: #f8fafc !important;
+  border-color: #334155 !important;
+}
+
+/* Timetable Card Section Badges & Text (Prevents White-on-White) */
+html.theme-dark #timetable-scroll-wrapper [id^="timetable-card-"] a,
+html.theme-dark #timetable-scroll-wrapper [id^="timetable-card-"] button,
+html.theme-dark #timetable-scroll-wrapper [id^="timetable-card-"] span.font-sans {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+
+html.theme-dark #timetable-scroll-wrapper [id^="timetable-card-"] a span,
+html.theme-dark #timetable-scroll-wrapper [id^="timetable-card-"] button span {
+  color: #0f172a !important;
+}
+
+/* Matrix Daily Notes Card */
+html.theme-dark div[id$="__notes"] {
+  background-color: #162032 !important;
+  border-color: #334155 !important;
+  color: #f1f5f9 !important;
+}
+
+/* Timetable Grid & Hour Column */
+html.theme-dark .timetable-hour-slot {
+  background-color: #0f172a !important;
+  border-color: #334155 !important;
+  color: #cbd5e1 !important;
+}
+
+html.theme-dark #timetable-scroll-wrapper .grid > div {
+  border-color: #334155 !important;
+}
+
+/* Academic Calendar Highlighted Cells */
+html.theme-dark #calendar-table-body tr {
+  border-color: #334155 !important;
+  background-color: #1e293b !important;
+}
+
+html.theme-dark #calendar-table-body td {
+  border-color: #334155 !important;
+  color: #e2e8f0 !important;
+}
+
+html.theme-dark #calendar-table-body span[class*="bg-slate-100"] {
+  background-color: #141d2b !important;
+  border-color: #334155 !important;
+  color: #cbd5e1 !important;
+}
+
+html.theme-dark #calendar-table-body span[class*="bg-rose-100"] {
+  background-color: #3b0712 !important;
+  border-color: #881337 !important;
+  color: #fecdd3 !important;
+}
+
+html.theme-dark #calendar-table-body span[class*="bg-amber-100"] {
+  background-color: #2e1a05 !important;
+  border-color: #78350f !important;
+  color: #fde68a !important;
+}
+
+html.theme-dark #calendar-table-body span[class*="bg-emerald-100"] {
+  background-color: #022c22 !important;
+  border-color: #065f46 !important;
+  color: #a7f3d0 !important;
+}
+
+html.theme-dark #calendar-table-body span[class*="bg-blue-100"] {
+  background-color: #172554 !important;
+  border-color: #1e3a8a !important;
+  color: #bfdbfe !important;
+}
+
+html.theme-dark td[class*="bg-amber-50"],
+html.theme-dark td[class*="bg-blue-50"],
+html.theme-dark td[class*="bg-emerald-50"] {
+  background-color: #162032 !important;
+  border-color: #334155 !important;
+  color: #f1f5f9 !important;
+}

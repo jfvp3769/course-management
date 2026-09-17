@@ -1,0 +1,189 @@
+/* ---------------------------------------------------------------------------
+   08-dark-modals.css
+   Dark theming for the feedback, settings, tips and manage-courses modals.
+   (originally styles.css lines 2311-2493)
+   --------------------------------------------------------------------------- */
+
+/* ================= FLOATING FEEDBACK BUTTON & MODAL THEMES ================= */
+#btn-feedback-floating {
+  box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.12), 0 2px 4px -2px rgba(0, 0, 0, 0.08);
+  padding: 0 !important;
+}
+#btn-feedback-floating .feedback-icon-wrapper {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 44px !important;
+  height: 44px !important;
+  line-height: 1 !important;
+  text-align: center !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+#btn-feedback-floating .feedback-emoji {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 22px !important;
+  line-height: 1 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  transform-origin: center center !important;
+}
+
+html.theme-dark #btn-feedback-floating {
+  background-color: #1e293b !important;
+  border-color: #475569 !important;
+  color: #f1f5f9 !important;
+  box-shadow: 0 4px 14px -1px rgba(0, 0, 0, 0.55) !important;
+}
+html.theme-dark #btn-feedback-floating:hover {
+  background-color: #24344d !important;
+  border-color: #f59e0b !important;
+  color: #facc15 !important;
+}
+html.theme-dark #btn-feedback-floating span:last-child {
+  color: #f8fafc !important;
+}
+html.theme-dark #btn-feedback-floating:hover span:last-child {
+  color: #facc15 !important;
+}
+
+/* Feedback Modal Dark Mode Harmonization */
+html.theme-dark #feedback-modal .bg-white {
+  background-color: #1e293b !important;
+  color: #f8fafc !important;
+}
+html.theme-dark #feedback-modal .border-slate-100,
+html.theme-dark #feedback-modal .border-slate-200 {
+  border-color: #334155 !important;
+}
+html.theme-dark #feedback-modal label.border-slate-200 {
+  background-color: #0f172a !important;
+  border-color: #334155 !important;
+  color: #cbd5e1 !important;
+}
+html.theme-dark #feedback-modal label.border-slate-200:has(input:checked) {
+  background-color: #2b1803 !important;
+  border-color: #b45309 !important;
+  color: #fde68a !important;
+}
+html.theme-dark #feedback-modal label.border-slate-200:first-child:has(input:checked) {
+  background-color: #3b0712 !important;
+  border-color: #be123c !important;
+  color: #fecdd3 !important;
+}
+html.theme-dark #feedback-modal button[onclick*="closeFeedbackModal"].bg-slate-100 {
+  background-color: #0f172a !important;
+  border-color: #334155 !important;
+  color: #cbd5e1 !important;
+}
+html.theme-dark #feedback-modal button[onclick*="closeFeedbackModal"].bg-slate-100:hover {
+  background-color: #1e293b !important;
+  color: #ffffff !important;
+}
+
+/* ================= SETTINGS & TIPS MODAL DARK THEMES ================= */
+html.theme-dark #term-settings-modal .bg-white,
+html.theme-dark #tips-modal .bg-white {
+  background-color: #1e293b !important;
+  color: #f8fafc !important;
+}
+html.theme-dark #term-settings-modal .bg-slate-50,
+html.theme-dark #term-settings-modal div[class*="bg-slate-50"],
+html.theme-dark #tips-modal .bg-slate-50 {
+  background-color: #0f172a !important;
+  border-color: #334155 !important;
+}
+html.theme-dark #term-settings-modal .border-slate-100,
+html.theme-dark #term-settings-modal .border-slate-200,
+html.theme-dark #tips-modal .border-slate-100,
+html.theme-dark #tips-modal .border-slate-200 {
+  border-color: #334155 !important;
+}
+html.theme-dark #term-settings-modal input[type="text"],
+html.theme-dark #term-settings-modal input[type="date"],
+html.theme-dark #term-settings-modal input[type="email"] {
+  background-color: #0b1329 !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
+html.theme-dark #term-settings-modal label.cursor-pointer {
+  background-color: #1e293b !important;
+  border-color: #475569 !important;
+  color: #f8fafc !important;
+}
+html.theme-dark #term-settings-modal label.cursor-pointer:hover {
+  background-color: #334155 !important;
+}
+html.theme-dark #term-settings-modal button#setting-logo-reset-btn {
+  background-color: #0f172a !important;
+  border-color: #334155 !important;
+  color: #cbd5e1 !important;
+}
+html.theme-dark #term-settings-modal button#setting-logo-reset-btn:hover {
+  background-color: #1e293b !important;
+  color: #ffffff !important;
+}
+html.theme-dark #tips-modal #tip-icon-box {
+  background-color: #2b1803 !important;
+  border-color: #b45309 !important;
+}
+html.theme-dark #tips-modal #tip-title {
+  color: #f8fafc !important;
+}
+html.theme-dark #tips-modal #tip-desc {
+  color: #cbd5e1 !important;
+}
+html.theme-dark #tips-modal button[onclick*="prevTip"],
+html.theme-dark #tips-modal button[onclick*="nextTip"] {
+  background-color: #0f172a !important;
+  border-color: #334155 !important;
+  color: #e2e8f0 !important;
+}
+html.theme-dark #tips-modal button[onclick*="prevTip"]:hover,
+html.theme-dark #tips-modal button[onclick*="nextTip"]:hover {
+  background-color: #1e293b !important;
+  color: #ffffff !important;
+}
+html.theme-dark #tips-modal label {
+  color: #cbd5e1 !important;
+}
+
+/* ================= MANAGE COURSES MODAL DARK THEME ================= */
+html.theme-dark #manage-courses-modal > div {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
+html.theme-dark #manage-courses-modal .bg-slate-50 {
+  background-color: #0f172a !important;
+  border-color: #334155 !important;
+}
+html.theme-dark #manage-courses-modal .bg-white {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
+html.theme-dark #manage-courses-modal .text-slate-900 {
+  color: #f8fafc !important;
+}
+html.theme-dark #manage-courses-modal .text-slate-800 {
+  color: #f1f5f9 !important;
+}
+html.theme-dark #manage-courses-modal .text-slate-700,
+html.theme-dark #manage-courses-modal .text-slate-600 {
+  color: #cbd5e1 !important;
+}
+html.theme-dark #manage-courses-modal .border-slate-200,
+html.theme-dark #manage-courses-modal .border-slate-300 {
+  border-color: #334155 !important;
+}
+html.theme-dark #manage-courses-modal input[type="text"] {
+  background-color: #0b1329 !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
+html.theme-dark #manage-courses-modal button:hover {
+  filter: brightness(1.15);
+}

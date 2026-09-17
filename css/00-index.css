@@ -1,0 +1,27 @@
+/* =============================================================================
+ * MSU-GSC COURSE & LESSON MANAGER - STYLESHEET
+ * -----------------------------------------------------------------------------
+ * Loaded in this order from index.html. Order is significant: the parts are a
+ * straight slice of the original single stylesheet, so the cascade is unchanged.
+ *
+ *   01-tokens.css              Font imports, base typography and the light/dark custom-property tokens.
+ *   02-dark-components.css     Dark-mode harmonisation for buttons, lesson cards, badges and pills.
+ *   03-dark-grades.css         Dark-mode final-grade badges, table contrast and form controls.
+ *   04-dark-planner.css        Dark-mode planner matrix rows, cells, badges and the timetable grid.
+ *   05-dark-gradebook.css      Dark-mode gradebook sticky columns and the roster/gradebook sidebars.
+ *   06-dark-grading-modals.css Dark-mode grading criteria and grading scale modals, drawers and
+ *   07-components.css          Mixed light-mode components and the remaining dark overrides, in original
+ *   08-dark-modals.css         Dark theming for the feedback, settings, tips and manage-courses modals.
+ *   09-responsive.css          Narrow-laptop (<1366px) layout tuning.
+ *   10-components.css          Light-mode component styles: header action buttons, the backup reminder
+ *
+ * KNOWN DEBT
+ * ----------
+ * Of 981 `!important` declarations, 563 sit in `html.theme-dark` rules that
+ * override Tailwind utilities at equal specificity. Tailwind is already
+ * configured with darkMode:'class' and the `dark` class is applied to <html>,
+ * so the supported fix is to write `dark:` variants in the markup and delete
+ * these overrides. That is a large, visual change and is deliberately NOT part
+ * of this refactor - it needs a browser to verify screen by screen.
+ * ========================================================================== */
+

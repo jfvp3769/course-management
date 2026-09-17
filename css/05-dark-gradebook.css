@@ -1,0 +1,254 @@
+/* ---------------------------------------------------------------------------
+   05-dark-gradebook.css
+   Dark-mode gradebook sticky columns and the roster/gradebook sidebars.
+   (originally styles.css lines 646-894)
+   --------------------------------------------------------------------------- */
+
+/* Gradebook Sticky Columns & Rows (Fixes Blinding White Columns) */
+html.theme-dark .sticky-grade-col-1,
+html.theme-dark .sticky-grade-col-2,
+html.theme-dark .sticky-grade-col-3,
+html.theme-dark .sticky-grade-head-1,
+html.theme-dark .sticky-grade-head-2,
+html.theme-dark .sticky-grade-head-3,
+html.theme-dark .sticky-grade-foot-1,
+html.theme-dark .sticky-grade-foot-2,
+html.theme-dark .sticky-grade-foot-3 {
+  background-color: #0f172a !important;
+  color: #f8fafc !important;
+  border-color: #334155 !important;
+}
+
+html.theme-dark .grade-row-even,
+html.theme-dark .grade-row-even td.sticky-grade-col-1,
+html.theme-dark .grade-row-even td.sticky-grade-col-2,
+html.theme-dark .grade-row-even td.sticky-grade-col-3 {
+  background-color: #1e293b !important;
+  color: #f1f5f9 !important;
+}
+
+html.theme-dark .grade-row-odd,
+html.theme-dark .grade-row-odd td.sticky-grade-col-1,
+html.theme-dark .grade-row-odd td.sticky-grade-col-2,
+html.theme-dark .grade-row-odd td.sticky-grade-col-3 {
+  background-color: #0f172a !important;
+  color: #f1f5f9 !important;
+}
+
+html.theme-dark .grade-cell-input {
+  background-color: #0f172a !important;
+  color: #f8fafc !important;
+  border-color: #475569 !important;
+}
+
+html.theme-dark .grade-total-cell {
+  background-color: #0f172a !important;
+  color: #f8fafc !important;
+}
+
+html.theme-dark .grade-status-select {
+  background-color: #0f172a !important;
+  border-color: #475569 !important;
+  color: #f8fafc !important;
+}
+
+html.theme-dark #gradebook-table-head tr th,
+html.theme-dark #gradebook-table-foot tr td {
+  background-color: #0f172a !important;
+  border-color: #334155 !important;
+  color: #cbd5e1 !important;
+}
+
+/* Sidebar Sub-Cards & Panels (Smooth, Non-glaring Card Surfacing) */
+html.theme-dark .tab-sidebar .bg-slate-50,
+html.theme-dark .tab-sidebar .bg-slate-100 {
+  background-color: #0f172a !important;
+  border-color: #334155 !important;
+  color: #e2e8f0 !important;
+}
+
+/* Roster "Enrollment by Section" Widget Dark Mode & Hover Fix */
+html.theme-dark #roster-total-students-badge {
+  background-color: #1e1b4b !important;
+  border-color: #4338ca !important;
+  color: #c7d2fe !important;
+}
+
+html.theme-dark #roster-sections-breakdown > div {
+  border: 1px solid transparent !important;
+  transition: background-color 0.15s ease, border-color 0.15s ease !important;
+}
+
+html.theme-dark #roster-sections-breakdown > div:hover {
+  background-color: #24344d !important;
+  border-color: #3b82f6 !important;
+}
+
+html.theme-dark #roster-sections-breakdown > div:hover .text-slate-800 {
+  color: #f8fafc !important;
+}
+
+html.theme-dark #roster-sections-breakdown .text-indigo-700 {
+  color: #a5b4fc !important;
+}
+
+html.theme-dark #roster-sections-breakdown .bg-slate-200 {
+  background-color: #0b1120 !important;
+}
+
+/* Sidebar Milestone Cards (High-Contrast Rich Amber in Dark Mode - Excludes bg-amber-500) */
+html.theme-dark .tab-sidebar div[class~="bg-amber-50"],
+html.theme-dark .tab-sidebar div[class*="bg-amber-50/"],
+html.theme-dark .tab-sidebar div[class~="bg-orange-50"],
+html.theme-dark .tab-sidebar div[class*="bg-orange-50/"],
+html.theme-dark .tab-sidebar div[class*="from-amber-50"] {
+  background: linear-gradient(to right, #2b1803, #382005) !important;
+  border-color: #b45309 !important;
+  color: #fde68a !important;
+}
+
+/* Gradebook Sidebar: Grade Distribution Histogram High-Contrast Bars */
+html.theme-dark #gradebook-grade-distribution .bg-slate-100 {
+  background-color: #0b1120 !important;
+  border: 1px solid #334155 !important;
+}
+
+html.theme-dark #gradebook-grade-distribution .bg-amber-500 {
+  background-color: #f59e0b !important;
+  background-image: none !important;
+  box-shadow: 0 0 6px rgba(245, 158, 11, 0.4) !important;
+}
+
+html.theme-dark #gradebook-grade-distribution .bg-emerald-600 {
+  background-color: #10b981 !important;
+}
+
+html.theme-dark #gradebook-grade-distribution .bg-blue-600 {
+  background-color: #3b82f6 !important;
+}
+
+html.theme-dark #gradebook-grade-distribution .bg-rose-600 {
+  background-color: #f43f5e !important;
+}
+
+html.theme-dark #gradebook-grade-distribution .bg-slate-400 {
+  background-color: #94a3b8 !important;
+}
+
+html.theme-dark .tab-sidebar div[class*="from-amber-50"] .text-slate-900,
+html.theme-dark .tab-sidebar div[class*="from-amber-50"] .text-amber-800,
+html.theme-dark .tab-sidebar div[class*="from-amber-50"] div {
+  color: #fef3c7 !important;
+}
+
+/* 1. Teaching Days Distribution Widget Dark Mode */
+html.theme-dark #planner-pacing-pct-badge {
+  background-color: #064e3b !important;
+  border-color: #059669 !important;
+  color: #a7f3d0 !important;
+}
+
+html.theme-dark #planner-pacing-stats > div:nth-child(1) {
+  background-color: #141d2b !important;
+  border-color: #334155 !important;
+}
+html.theme-dark #planner-pacing-stats > div:nth-child(1) .text-slate-900 {
+  color: #f8fafc !important;
+}
+html.theme-dark #planner-pacing-stats > div:nth-child(1) .text-slate-500 {
+  color: #94a3b8 !important;
+}
+
+html.theme-dark #planner-pacing-stats > div:nth-child(2) {
+  background-color: #062d22 !important;
+  border-color: #047857 !important;
+}
+html.theme-dark #planner-pacing-stats > div:nth-child(2) .text-emerald-800 {
+  color: #34d399 !important;
+}
+html.theme-dark #planner-pacing-stats > div:nth-child(2) .text-emerald-600 {
+  color: #a7f3d0 !important;
+}
+
+html.theme-dark #planner-pacing-stats > div:nth-child(3) {
+  background-color: #3b0712 !important;
+  border-color: #be123c !important;
+}
+html.theme-dark #planner-pacing-stats > div:nth-child(3) .text-rose-800 {
+  color: #fb7185 !important;
+}
+html.theme-dark #planner-pacing-stats > div:nth-child(3) .text-rose-600 {
+  color: #fecdd3 !important;
+}
+
+html.theme-dark #planner-pacing-stats > div:nth-child(4) {
+  background-color: #2e1a05 !important;
+  border-color: #b45309 !important;
+}
+html.theme-dark #planner-pacing-stats > div:nth-child(4) .text-amber-900 {
+  color: #fbbf24 !important;
+}
+html.theme-dark #planner-pacing-stats > div:nth-child(4) .text-amber-700 {
+  color: #fde68a !important;
+}
+
+/* 2. Academic Calendar Event Distribution Buttons Dark Mode */
+html.theme-dark #calendar-events-distribution button {
+  transition: all 0.15s ease !important;
+}
+
+html.theme-dark #calendar-events-distribution button[title*="Holidays"] {
+  background-color: #2d0a14 !important;
+  border-color: #9f1239 !important;
+}
+html.theme-dark #calendar-events-distribution button[title*="Holidays"]:hover {
+  background-color: #3b0d1b !important;
+}
+html.theme-dark #calendar-events-distribution button[title*="Holidays"] .text-rose-800 {
+  color: #fb7185 !important;
+}
+html.theme-dark #calendar-events-distribution button[title*="Holidays"] .text-rose-600 {
+  color: #fda4af !important;
+}
+
+html.theme-dark #calendar-events-distribution button[title*="Exams"] {
+  background-color: #2b1803 !important;
+  border-color: #b45309 !important;
+}
+html.theme-dark #calendar-events-distribution button[title*="Exams"]:hover {
+  background-color: #3d2205 !important;
+}
+html.theme-dark #calendar-events-distribution button[title*="Exams"] .text-amber-900 {
+  color: #fbbf24 !important;
+}
+html.theme-dark #calendar-events-distribution button[title*="Exams"] .text-amber-700 {
+  color: #fde68a !important;
+}
+
+html.theme-dark #calendar-events-distribution button[title*="Milestones"] {
+  background-color: #06291e !important;
+  border-color: #047857 !important;
+}
+html.theme-dark #calendar-events-distribution button[title*="Milestones"]:hover {
+  background-color: #093b2c !important;
+}
+html.theme-dark #calendar-events-distribution button[title*="Milestones"] .text-emerald-800 {
+  color: #34d399 !important;
+}
+html.theme-dark #calendar-events-distribution button[title*="Milestones"] .text-emerald-600 {
+  color: #a7f3d0 !important;
+}
+
+html.theme-dark #calendar-events-distribution button[title*="Activities"] {
+  background-color: #0e1e38 !important;
+  border-color: #1d4ed8 !important;
+}
+html.theme-dark #calendar-events-distribution button[title*="Activities"]:hover {
+  background-color: #142a4d !important;
+}
+html.theme-dark #calendar-events-distribution button[title*="Activities"] .text-blue-900 {
+  color: #60a5fa !important;
+}
+html.theme-dark #calendar-events-distribution button[title*="Activities"] .text-blue-600 {
+  color: #bfdbfe !important;
+}
