@@ -1,13 +1,13 @@
-# Faculty Course & Lesson Manager (v2.3.0)
+# Faculty Course & Lesson Manager (v2.4.0)
 
-[![Offline Ready](https://img.shields.io/badge/Offline-100%25%20Ready-success?style=flat-square&logo=pwa)](file:///p:/apps/msu-course-manager-v2/index.html)
-[![Zero Build](https://img.shields.io/badge/Build%20Step-Zero%20Bundler-blue?style=flat-square)](file:///p:/apps/msu-course-manager-v2/index.html)
-[![Architecture](https://img.shields.io/badge/Architecture-Modular%20Vanilla%20JS-amber?style=flat-square)](file:///p:/apps/msu-course-manager-v2/src/)
-[![License: Academic](https://img.shields.io/badge/License-Faculty%20Academic%20Open-emerald?style=flat-square)](file:///p:/apps/msu-course-manager-v2/README.md)
+[![Offline Ready](https://img.shields.io/badge/Offline-100%25%20Ready-success?style=flat-square&logo=pwa)](index.html)
+[![Zero Build](https://img.shields.io/badge/Build%20Step-Zero%20Bundler-blue?style=flat-square)](index.html)
+[![Architecture](https://img.shields.io/badge/Architecture-Modular%20Vanilla%20JS-amber?style=flat-square)](src/)
+[![License: Academic](https://img.shields.io/badge/License-Faculty%20Academic%20Open-emerald?style=flat-square)](README.md)
 
 A high-performance, offline-first faculty portal and academic productivity system designed for university and college educators across institutions.
 
-Engineered with an uncompromising commitment to local privacy and zero server dependencies, it empowers instructors to plan semester syllabus matrices, audit timetable room collisions, track lost instructional days due to calendar events, manage student rosters, and calculate institutional grades (supporting 1.00–5.00, letter grades, and custom scales) directly inside any modern web browser.
+Engineered with an uncompromising commitment to local privacy and zero server dependencies, it empowers instructors to plan semester syllabus matrices, audit timetable room collisions, track lost instructional days due to calendar events, manage student rosters, customize visual themes and workspace canvases, and calculate institutional grades (supporting 1.00–5.00, letter grades, and custom scales) directly inside any modern web browser.
 
 ---
 
@@ -19,7 +19,8 @@ Engineered with an uncompromising commitment to local privacy and zero server de
    - [3. Academic Calendar & Lost Days Engine](#3-academic-calendar--lost-days-engine)
    - [4. Class List (Roster) & Faculty Communications](#4-class-list-roster--faculty-communications)
    - [5. Class Record & Offline Gradebook](#5-class-record--offline-gradebook)
-   - [6. Data Center, Vault & Custom Branding](#6-data-center-vault--custom-branding)
+   - [6. Visual Themes & Custom Color Palettes](#6-visual-themes--custom-color-palettes)
+   - [7. Data Center, Vault & Custom Branding](#7-data-center-vault--custom-branding)
 3. [Quick Start & Instructions](#quick-start--instructions)
 4. [Keyboard Shortcuts](#keyboard-shortcuts)
 5. [Architecture & Code Organization](#architecture--code-organization)
@@ -38,6 +39,7 @@ Modern academic environments demand reliable digital tools that remain fully fun
 - **Zero Build, Zero Bundler**: No Node.js build step, Webpack, Vite, or Babel required. Edit any HTML, CSS, or JS file and refresh your browser.
 - **Double-Click Executable (`file:///`)**: Runs natively by double-clicking `index.html` straight from Windows Explorer, macOS Finder, or Linux file managers.
 - **Universal Multi-School Compatibility**: Flexible for any higher education institution, college, or polytechnic. Easily customize the institution name, department header, and school emblem in Portal Settings.
+- **Dynamic Visual Theming**: 8 preset header gradients and 5 distinct workspace background palettes, plus full custom color pickers for institutional branding.
 - **Client-Side Data Sovereignty**: All courses, syllabi, rosters, schedules, and grades stay 100% on the user's computer in browser `localStorage`. No cloud data collection, no account logins, and no tracking.
 - **Automated Data Protection**: Includes periodic data safety backup reminders and comprehensive JSON import/export with schema validation.
 - **Flexible Grading Compliance**: Ships with standard institutional numeric scales (1.00 to 5.00) and allows custom cutoffs, custom labels, and section-specific grading scales.
@@ -83,7 +85,14 @@ Modern academic environments demand reliable digital tools that remain fully fun
 - **Grade Distribution Histogram**: Toggle between 5 grouped tiers (Superior, Very Good, Passing, Incomplete, Failed) or the full 11-grade institutional scale.
 - **Spreadsheet Keyboard Navigation**: Arrow-key and Enter-key grid navigation, in-place reactive recalculation, category collapsing, and CSV Class Record export.
 
-### 6. Data Center, Vault & Custom Branding
+### 6. Visual Themes & Custom Color Palettes
+- **Visual Theme & Appearance Modal**: Dedicated modal accessible directly from the top header Theme button for streamlined personalization.
+- **Header Color Palettes**: Choose from 8 rich preset gradients (Heritage Maroon, Academic Navy, Ocean Sapphire, Forest Emerald, Royal Violet, Executive Slate, Mahogany Bronze, Deep Teal) or create a bespoke institutional palette using RGB/Hex color pickers.
+- **Workspace Window Background Canvases**: 5 distinct canvas palettes (Cool Slate, Studio Minimal, Warm Sand, Glacier Blue, Sage Green) with high-contrast light and dark variations.
+- **Universal Themed Modals**: Consistent dynamic gradient headers, themed subtitles, and matching primary buttons across all 10 application dialogs and modals.
+- **Translucent Glass Action Buttons**: Modern semi-transparent header buttons (`bg-white/10` with glass borders) featuring theme-reactive icons and labels that dynamically synchronize with the active date text color.
+
+### 7. Data Center, Vault & Custom Branding
 - **Complete Portal Backup & Restore**: One-click JSON backup export and restore of the entire portal database with schema validation and orphaned student record cleanup.
 - **Monotonic Grading Scale Editor**: Customize section or course-level cutoff scales with descending monotonic validation ($1.00 > 1.25 > \dots > 3.00$).
 - **Custom Institutional Branding**: Set your school or department name, upload custom SVG/PNG institution logos, and customize course color badges.
@@ -99,7 +108,7 @@ No dependencies, Node.js, or terminal installations are necessary:
    ```bash
    git clone https://github.com/jfvp3769/course-management.git
    ```
-2. Open the project folder and double-click [`index.html`](file:///p:/apps/msu-course-manager-v2/index.html) to run directly in any modern browser (Google Chrome, Microsoft Edge, Mozilla Firefox, Safari, Brave).
+2. Open the project folder and double-click [`index.html`](index.html) to run directly in any modern browser (Google Chrome, Microsoft Edge, Mozilla Firefox, Safari, Brave).
 
 ### Running via Local HTTP Server (Optional)
 If you prefer running via a local web server (e.g., to enable full Progressive Web App service worker caching features):
@@ -139,7 +148,7 @@ course-management/
 ├── logo.svg                     # Vector academic emblem (universal default)
 ├── css/
 │   ├── 00-index.css             # CSS architecture catalog & load manifest
-│   ├── 01-tokens.css            # Academic Crimson/Gold design tokens, surfaces, borders
+│   ├── 01-tokens.css            # Dynamic theme tokens, surfaces, borders, link styles
 │   ├── 02-dark-components.css   # Dark theme surface & widget styling
 │   ├── 03-dark-grades.css       # Dark theme grade badges & distribution styles
 │   ├── 04-dark-planner.css      # Dark theme matrix cells & cards
@@ -147,11 +156,11 @@ course-management/
 │   ├── 07-components.css        # Core component classes, widget drag handles, resizers
 │   ├── 08-dark-modals.css       # Dark theme modal dialogs & drawers
 │   ├── 09-responsive.css        # Mobile, tablet, & desktop media queries
-│   └── 10-components.css        # Specialized utilities & enhancements
+│   └── 10-components.css        # Header expandable action buttons & backup banner
 ├── src/
 │   ├── bootstrap.js             # Ordered application startup & event initialization
 │   ├── core/
-│   │   ├── constants.js         # Default configurations & grading templates
+│   │   ├── constants.js         # Default configurations, grading templates & palettes
 │   │   ├── state.js             # Centralized mutable application state
 │   │   ├── events.js            # Centralized Event Delegation & Action Registry
 │   │   ├── render.js            # Render pipeline coordinator & change sets
@@ -183,9 +192,9 @@ course-management/
 │   │   └── gradebook.js         # At-Risk radar, Input Error radar, performance stats
 │   ├── ui/
 │   │   ├── layout.js            # Dual scrollbars & main window height resizers
-│   │   ├── tabs.js              # Tab switching & view state management
+│   │   ├── tabs.js              # Tab switching, theme synchronization & view state
 │   │   ├── sidebars.js          # Sidebar collapse & vertical drag reordering
-│   │   ├── theme.js             # Dark / Light theme toggle & sync
+│   │   ├── theme.js             # Visual theme modal, palette customizer & dark mode sync
 │   │   ├── color-picker.js      # Course color theme picker
 │   │   ├── tips.js              # Faculty tip modal rotation
 │   │   ├── feedback.js          # Toast notification alerts
@@ -201,7 +210,7 @@ course-management/
 
 ## Event Delegation Engine
 
-In v2.1.0+, all inline `onclick`, `onchange`, `oninput`, and `onkeydown` attributes were eliminated in favor of a modern **Centralized Event Delegation & Action Registry** ([`src/core/events.js`](file:///p:/apps/msu-course-manager-v2/src/core/events.js)):
+In v2.1.0+, all inline `onclick`, `onchange`, `oninput`, and `onkeydown` attributes were eliminated in favor of a modern **Centralized Event Delegation & Action Registry** ([`src/core/events.js`](src/core/events.js)):
 - **Performance**: A single document-level listener dispatches actions without attaching memory-heavy event handlers to thousands of table cells.
 - **Declarative Markup**: Interactive HTML elements declare actions via `data-action="..."` (e.g. `data-action="filterGradebookByCohort"`).
 - **Graceful Fallback**: Supports direct parameters via `data-*` dataset attributes while maintaining compatibility with global handlers.
@@ -210,10 +219,10 @@ In v2.1.0+, all inline `onclick`, `onchange`, `oninput`, and `onkeydown` attribu
 
 ## Offline PWA & Service Worker Operation
 
-The application uses an enhanced Service Worker ([`sw.js`](file:///p:/apps/msu-course-manager-v2/sw.js)) configured with:
+The application uses an enhanced Service Worker ([`sw.js`](sw.js)) configured with:
 - **Resilient Cache Strategy**: Caches application assets individually so missing optional assets do not abort installation.
 - **Network-First for Navigations**: Ensures online deployments fetch the newest code while falling back seamlessly to cache when offline.
-- **Cache Lifecycle Management**: Updates to cache name `faculty-course-manager-v2.30` automatically purge obsolete asset versions.
+- **Cache Lifecycle Management**: Updates to cache name `faculty-course-manager-v2.35` automatically purge obsolete asset versions.
 
 ---
 
@@ -228,11 +237,28 @@ All user data is stored entirely on the client side via the browser's `localStor
 
 ## Version History & Changelog
 
-### Version 2.3.0 (September 2026) — *Current Release*
+### Version 2.4.0 (September 2026) — *Current Release*
+- **Visual Theme & Appearance Customization**:
+  - Added dedicated **Visual Theme & Appearance** modal directly in the top header (`#btn-theme-toggle`), decoupling visual theming from administrative term settings.
+  - Implemented 8 rich preset header gradients: Heritage Maroon & Gold, Academic Navy & Gold, Ocean Sapphire & Sky, Forest Emerald & Mint, Royal Violet & Lavender, Executive Slate & Ice, Mahogany & Amber Bronze, and Deep Teal & Seafoam.
+  - Added full Custom Primary and Accent color pickers with instant live preview and local storage persistence.
+  - Implemented 5 distinctive workspace background canvases: Cool Slate, Studio Minimal / Ash, Warm Sand / Paper, Glacier Blue, and Sage Green.
+- **Dynamic Theming Harmonization Across All Windows & Tabs**:
+  - Tab title theme synchronization: active tab titles and indicators dynamically track the active header theme tokens (`--app-header-tab-text`, `--app-header-accent`).
+  - Applied consistent `.app-themed-header` gradients, `.app-themed-subtitle` typography, and `.app-themed-btn-primary` actions across all 10 application dialogs (Portal Settings, Manage Courses, Edit Subject, Add/Edit Section, Export/Import Hub, Tips, User Guide, Secret Knowledge Vault, Feedback).
+  - Dynamic `.app-themed-link` styling for inline action links (such as "+ Add Section" inside subject management cards).
+- **Translucent White Glass Header Action Buttons**:
+  - Unified all 5 header action buttons (`Portal Settings`, `Manage Subjects`, `Export / Import Hub`, `User Guide`, `Theme`) into clean, consistent translucent white glass pills (`bg-white/10 hover:bg-white/20 border-white/20`).
+  - Dynamically bound button icons and expandable labels to `--app-header-tab-text`, perfectly matching the date text and active theme palette.
+  - Harmonized real-time live clock icon, separator, and subtitle with theme text colors.
+- **Service Worker & Cache Upgrade**:
+  - Bumped service worker cache to `v2.35` for immediate update propagation across devices.
+
+### Version 2.3.0 (September 2026)
 - **Universal Institution & Multi-School Support**:
   - Removed hardcoded institutional restrictions; the portal is now universally applicable to faculty from any college, university, or academic institution.
   - Default portal title updated to `"University Faculty Portal"` with customizable school name and logo uploading in Portal Settings.
-  - Added new clean, vector academic SVG emblem ([`logo.svg`](file:///p:/apps/msu-course-manager-v2/logo.svg)) featuring a laurel wreath, graduation cap, and open book.
+  - Added new clean, vector academic SVG emblem ([`logo.svg`](logo.svg)) featuring a laurel wreath, graduation cap, and open book.
   - Universal student email placeholders (`@university.edu`) across single enrollment, bulk paste, and settings.
   - Generalized export filenames (`Faculty_Course_Manager_Backup_YYYY-MM-DD.json`, `Class_Record_*.csv`, etc.).
 - **Zero-Loss Data Migration Engine**:
@@ -240,7 +266,7 @@ All user data is stored entirely on the client side via the browser's `localStor
   - Preserved dual-key compatibility for UI preferences (`faculty_dark_mode`, `faculty_main_win_h_*`, `faculty_last_backup_time`).
   - Generalized backup structure validator accepting both `academicCalendarEvents` and legacy event structures.
 - **Technical Debt & Polish Remediations**:
-  - **Grading Scale Monotonic Validation**: Added strictly descending cutoff validation ($1.00 > 1.25 > 1.50 > \dots > 3.00$) in [`src/features/grading-scale.js`](file:///p:/apps/msu-course-manager-v2/src/features/grading-scale.js) before saving.
+  - **Grading Scale Monotonic Validation**: Added strictly descending cutoff validation ($1.00 > 1.25 > 1.50 > \dots > 3.00$) in [`src/features/grading-scale.js`](src/features/grading-scale.js) before saving.
   - **Smooth double-rAF Scrolling**: Migrated remaining jump and highlight `setTimeout(..., 50)` delays to double `requestAnimationFrame` for smooth scrolling on lower-end devices.
   - **Dead File Cleanup**: Removed empty legacy stylesheet `css/06-dark-grading-modals.css`.
 
@@ -262,7 +288,7 @@ All user data is stored entirely on the client side via the browser's `localStor
 - **Centralized Event Delegation (`src/core/events.js`)**:
   - Migrated over 290 inline `on*` handlers to document-level delegated event listeners.
 - **RFC 4180 Multi-Line CSV Parser**:
-  - Implemented robust quoted CSV parsing in [`src/core/utils.js`](file:///p:/apps/msu-course-manager-v2/src/core/utils.js) handling commas, quotes, and newlines.
+  - Implemented robust quoted CSV parsing in [`src/core/utils.js`](src/core/utils.js) handling commas, quotes, and newlines.
 - **Backup Structure Validation**:
   - Added schema integrity validation and orphaned student cleanup on JSON backup restoration.
 - **Roster Communication Tools**:
