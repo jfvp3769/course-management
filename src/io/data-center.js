@@ -62,12 +62,12 @@ function switchExportImportTab(tabId) {
     const panel = document.getElementById('ei-panel-' + t);
     if (t === tabId) {
       if (btn) {
-        btn.className = 'ei-tab px-3 py-1.5 rounded-lg border border-transparent bg-slate-900 text-white font-bold transition';
+        btn.className = 'ei-tab px-3 py-1.5 rounded-lg border border-transparent app-themed-btn-primary text-white font-bold transition shadow-2xs';
       }
       if (panel) panel.classList.remove('hidden');
     } else {
       if (btn) {
-        btn.className = 'ei-tab px-3 py-1.5 rounded-lg border border-transparent text-slate-500 hover:bg-slate-100 transition';
+        btn.className = 'ei-tab px-3 py-1.5 rounded-lg border border-transparent text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition';
       }
       if (panel) panel.classList.add('hidden');
     }

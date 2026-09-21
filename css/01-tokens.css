@@ -32,11 +32,18 @@ body { font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Sego
   --msu-maroon: #800000;
   --msu-gold: #daa520;
   --header-gradient: linear-gradient(to right, #5A0000, #800000, #0f172a);
+  --app-header-bg: linear-gradient(to right, #4a0000, #800000, #0f172a);
+  --app-header-primary: #800000;
+  --app-header-accent: #daa520;
+  --app-header-nav-border: rgba(155, 17, 30, 0.6);
+  --app-header-tab-text: #fde047;
+  --app-window-bg: #e2e8f0;
 }
 
 /* Clean Modern Dark Mode: Elevated Surfaces + Deep Ambient Shadow */
 html.theme-dark {
   color-scheme: dark;
+  --app-window-bg: #0f172a;
   --slate-50: #0f172a;
   --slate-100: #1e293b;
   --slate-200: #334155;
@@ -63,9 +70,64 @@ html.theme-dark ::-webkit-scrollbar-thumb:hover {
   background: #475569;
 }
 
+body {
+  background-color: var(--app-window-bg, #e2e8f0) !important;
+}
+
 html.theme-dark body {
-  background-color: #0b1120;
-  color: #f1f5f9;
+  background-color: var(--app-window-bg, #0f172a) !important;
+}
+
+#app-main-header,
+.app-themed-header {
+  background: var(--app-header-bg, linear-gradient(to right, #4a0000, #800000, #0f172a)) !important;
+  border-bottom-color: var(--app-header-accent, #daa520) !important;
+}
+
+.app-themed-subtitle {
+  color: var(--app-header-tab-text, #fde047) !important;
+}
+
+.app-themed-card {
+  border-color: var(--app-header-accent, #daa520) !important;
+}
+
+.app-themed-btn-primary {
+  background-color: var(--app-header-primary, #800000) !important;
+  border-color: var(--app-header-primary, #800000) !important;
+  color: #ffffff !important;
+}
+
+.app-themed-btn-primary:hover {
+  filter: brightness(1.15);
+}
+
+.app-themed-link {
+  color: var(--app-header-primary, #800000) !important;
+}
+
+html.theme-dark .app-themed-link {
+  color: var(--app-header-accent, #daa520) !important;
+}
+
+#header-school-logo-ring {
+  border-color: var(--app-header-accent, #daa520) !important;
+}
+
+#header-main-nav {
+  border-top-color: var(--app-header-nav-border, rgba(155, 17, 30, 0.6)) !important;
+}
+
+.tab-btn.is-active-tab,
+#header-main-nav .tab-btn.is-active-tab,
+#tab-btn-planner.is-active-tab {
+  border-bottom-color: var(--app-header-accent, #daa520) !important;
+  color: var(--app-header-tab-text, #fde047) !important;
+}
+
+.tab-btn.is-active-tab *,
+#header-main-nav .tab-btn.is-active-tab * {
+  color: var(--app-header-tab-text, #fde047) !important;
 }
 
 html.theme-dark .bg-white {

@@ -81,7 +81,7 @@ setTimeout(() => {
     ['Render.after persists + repaints', () => {
       const key = window.__probe('STORAGE_KEY');
       window.localStorage.removeItem(key);
-      window.__probe("plannerEntries['2026-08-10__CVE112__B15.1'].topic = 'SMOKE TEST TOPIC'");
+      window.__probe("plannerEntries['2026-08-10__CVE111__B15.1'].topic = 'SMOKE TEST TOPIC'");
       window.Render.after('lesson', { immediate: true });
       return !!window.localStorage.getItem(key) &&
              g('matrix-body').innerHTML.includes('SMOKE TEST TOPIC');

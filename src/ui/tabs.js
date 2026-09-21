@@ -7,15 +7,35 @@
 function switchTab(tabId) {
   saveAppState(true);
   const tabs = ['planner', 'timetable', 'calendar', 'roster', 'gradebook'];
+  const root = document.documentElement;
+  const curAccent = root.style.getPropertyValue('--app-header-accent') || '#daa520';
+  const curTabText = root.style.getPropertyValue('--app-header-tab-text') || '#fde047';
+
   tabs.forEach(t => {
     const btn = document.getElementById('tab-btn-' + t);
     const content = document.getElementById('tab-content-' + t);
     if (btn) btn.setAttribute('aria-selected', t === tabId ? 'true' : 'false');
     if (t === tabId) {
-      if (btn) btn.className = "tab-btn px-4 py-2.5 text-xs sm:text-sm font-bold border-b-2 border-msu-gold text-amber-200 flex items-center gap-2 shrink-0";
+      if (btn) {
+        btn.className = "tab-btn is-active-tab px-3 sm:px-4 py-2.5 text-xs sm:text-sm font-bold border-b-2 flex items-center gap-1.5 sm:gap-2 shrink-0";
+        btn.style.setProperty('border-bottom-color', curAccent, 'important');
+        btn.style.setProperty('color', curTabText, 'important');
+        const span = btn.querySelector('span');
+        if (span) span.style.setProperty('color', curTabText, 'important');
+        const svg = btn.querySelector('svg');
+        if (svg) svg.style.setProperty('color', curTabText, 'important');
+      }
       if (content) content.classList.remove('hidden');
     } else {
-      if (btn) btn.className = "tab-btn px-4 py-2.5 text-xs sm:text-sm font-medium border-b-2 border-transparent text-slate-300 hover:text-white flex items-center gap-2 shrink-0 transition";
+      if (btn) {
+        btn.className = "tab-btn px-3 sm:px-4 py-2.5 text-xs sm:text-sm font-medium border-b-2 border-transparent text-slate-300 hover:text-white flex items-center gap-1.5 sm:gap-2 shrink-0 transition";
+        btn.style.removeProperty('border-bottom-color');
+        btn.style.removeProperty('color');
+        const span = btn.querySelector('span');
+        if (span) span.style.removeProperty('color');
+        const svg = btn.querySelector('svg');
+        if (svg) svg.style.removeProperty('color');
+      }
       if (content) content.classList.add('hidden');
     }
   });

@@ -167,58 +167,58 @@ const DEFAULT_DATA = {
   },
   courseData: {
     classroomLinks: {
-      'CVE112__B15.1': 'https://classroom.google.com'
+      'CVE111__B15.1': 'https://classroom.google.com'
     },
     subjects: [
       {
-        code: "CVE112",
-        title: "Mechanics of Deformable Bodies",
-        units: 3,
+        code: "CVE111",
+        title: "Hydraulics 1",
+        units: 4.55,
         colorTheme: "blue",
         color: COLOR_PALETTES.blue.color,
         headerBg: COLOR_PALETTES.blue.headerBg,
         badgeBg: COLOR_PALETTES.blue.badgeBg,
-        sections: ["B15.1", "E15", "M15"]
+        sections: ["B15.1", "E15", "N15.2"]
       },
       {
-        code: "CVE113",
-        title: "Structural Theory",
-        units: 3,
+        code: "CVE155",
+        title: "Mechanics of Deformable Bodies",
+        units: 4.00,
         colorTheme: "emerald",
         color: COLOR_PALETTES.emerald.color,
         headerBg: COLOR_PALETTES.emerald.headerBg,
         badgeBg: COLOR_PALETTES.emerald.badgeBg,
-        sections: ["J15"]
+        sections: ["I15"]
       },
       {
         code: "CVE169",
-        title: "Civil Engineering Project & Design",
-        units: 3,
+        title: "Civil Engineering Refresher Course",
+        units: 3.00,
         colorTheme: "amber",
         color: COLOR_PALETTES.amber.color,
         headerBg: COLOR_PALETTES.amber.headerBg,
         badgeBg: COLOR_PALETTES.amber.badgeBg,
-        sections: ["Main"]
+        sections: ["R15"]
       }
     ]
   },
   columnWidths: {
-    'CVE112__B15.1': 190,
-    'CVE112__E15': 190,
-    'CVE112__M15': 190,
-    'CVE113__J15': 190,
-    'CVE169__Main': 200
+    'CVE111__B15.1': 190,
+    'CVE111__E15': 190,
+    'CVE111__N15.2': 190,
+    'CVE155__I15': 190,
+    'CVE169__R15': 200
   },
   weeklyTimetable: [
-    { course: "CVE112", section: "B15.1", day: "Monday", startTime: "07:30", endTime: "09:00", room: "Eng 201", type: "Lecture" },
-    { course: "CVE112", section: "B15.1", day: "Wednesday", startTime: "07:30", endTime: "09:00", room: "Eng 201", type: "Lecture" },
-    { course: "CVE112", section: "E15", day: "Tuesday", startTime: "09:00", endTime: "10:30", room: "Eng 204", type: "Lecture" },
-    { course: "CVE112", section: "E15", day: "Thursday", startTime: "09:00", endTime: "10:30", room: "Eng 204", type: "Lecture" },
-    { course: "CVE112", section: "M15", day: "Monday", startTime: "13:00", endTime: "14:30", room: "Eng 205", type: "Lecture" },
-    { course: "CVE112", section: "M15", day: "Wednesday", startTime: "13:00", endTime: "14:30", room: "Eng 205", type: "Lecture" },
-    { course: "CVE113", section: "J15", day: "Tuesday", startTime: "10:30", endTime: "12:00", room: "Eng 301", type: "Lecture" },
-    { course: "CVE113", section: "J15", day: "Thursday", startTime: "10:30", endTime: "12:00", room: "Eng 301", type: "Lecture" },
-    { course: "CVE169", section: "Main", day: "Friday", startTime: "08:00", endTime: "11:00", room: "CAD Lab", type: "Laboratory" }
+    { course: "CVE111", section: "B15.1", day: "Monday", startTime: "09:00", endTime: "11:30", room: "ELAB-6", type: "Lecture" },
+    { course: "CVE111", section: "B15.1", day: "Thursday", startTime: "09:00", endTime: "11:30", room: "ELAB-6", type: "Lecture" },
+    { course: "CVE111", section: "E15", day: "Monday", startTime: "13:00", endTime: "15:30", room: "H2-02", type: "Lecture" },
+    { course: "CVE111", section: "E15", day: "Thursday", startTime: "13:00", endTime: "15:30", room: "H2-02", type: "Lecture" },
+    { course: "CVE111", section: "N15.2", day: "Tuesday", startTime: "14:30", endTime: "17:00", room: "ELAB-6", type: "Lecture" },
+    { course: "CVE111", section: "N15.2", day: "Friday", startTime: "14:30", endTime: "17:00", room: "ELAB-6", type: "Lecture" },
+    { course: "CVE155", section: "I15", day: "Tuesday", startTime: "08:30", endTime: "10:30", room: "H2-15", type: "Lecture" },
+    { course: "CVE155", section: "I15", day: "Friday", startTime: "08:30", endTime: "10:30", room: "H2-15", type: "Lecture" },
+    { course: "CVE169", section: "R15", day: "Wednesday", startTime: "09:00", endTime: "12:00", room: "ELAB-3", type: "Lecture" }
   ],
   academicCalendarEvents: [
     { num: 1, activity: "Regular Registration (Freshmen)", firstSem: "July 1 – 31, 2026", secondSem: "—", summer: "—", dateKey: "", isNoClass: false, type: "admin" },
@@ -245,20 +245,924 @@ const DEFAULT_DATA = {
     { num: 22, activity: "Christmas Vacation / Semestral Break Begins", firstSem: "December 12, 2026 – January 3, 2027", secondSem: "May 24 – July 22, 2027", summer: "—", dateKey: "2026-12-12", isNoClass: true, type: "holiday" }
   ],
   plannerEntries: {
-    "2026-08-10__CVE112__B15.1": { topic: "Course Orientation & Syllabus Overview", activity: "Review of Grading Matrix & Reference Books", type: "Lecture", status: "Completed", notes: "Provide link to syllabus" },
-    "2026-08-12__CVE112__B15.1": { topic: "Normal & Shear Stress Review", activity: "Sample problem derivation on whiteboard", type: "Lecture", status: "Planned", notes: "Seatwork #1 assigned" },
-    "2026-08-11__CVE112__E15": { topic: "Course Introduction & Policies", activity: "Diagnostic assessment on Statics of Rigid Bodies", type: "Lecture", status: "Planned", notes: "" },
-    "2026-08-10__CVE112__M15": { topic: "Course Overview & Objectives", activity: "Discussion of course requirements", type: "Lecture", status: "Planned", notes: "" },
-    "2026-08-11__CVE113__J15": { topic: "Introduction to Structural Theory", activity: "Lecture on Determinacy and Stability of Beams", type: "Lecture", status: "Planned", notes: "" },
-    "2026-08-14__CVE169__Main": { topic: "Capstone Project Group Formulation", activity: "Brainstorming of Project Titles & Advisers", type: "Laboratory", status: "Planned", notes: "Submit 3 title proposals" }
-  },
+    "2026-08-10__CVE111__B15.1": {
+        "topic": "Course Orientation & Fluid Properties",
+        "activity": "Syllabus discussion, mass density & specific gravity",
+        "type": "Lecture",
+        "status": "Completed",
+        "notes": "Provide link to syllabus"
+    },
+    "2026-08-13__CVE111__B15.1": {
+        "topic": "Viscosity & Surface Tension",
+        "activity": "Newton's law of viscosity and shear stress derivation",
+        "type": "Lecture",
+        "status": "Completed",
+        "notes": "Seatwork #1 assigned"
+    },
+    "2026-08-17__CVE111__B15.1": {
+        "topic": "Principles of Hydrostatic Pressure",
+        "activity": "Pressure variation with depth (dp = -gamma*dz)",
+        "type": "Lecture",
+        "status": "Planned",
+        "notes": ""
+    },
+    "2026-08-20__CVE111__B15.1": {
+        "topic": "Manometers & Pressure Transducers",
+        "activity": "Multi-fluid open & differential U-tube calculations",
+        "type": "Lecture",
+        "status": "Planned",
+        "notes": "Problem Set #1 due"
+    },
+    "2026-08-24__CVE111__B15.1": {
+        "topic": "Hydrostatic Force on Plane Surfaces",
+        "activity": "Center of pressure and centroidal moment of inertia",
+        "type": "Lecture",
+        "status": "Planned",
+        "notes": ""
+    },
+    "2026-08-27__CVE111__B15.1": {
+        "topic": "Hydrostatic Force on Curved Surfaces",
+        "activity": "Resolving horizontal & vertical pressure prisms",
+        "type": "Lecture",
+        "status": "Planned",
+        "notes": "Quiz #1 in ELAB-6"
+    },
+    "2026-08-31__CVE111__B15.1": {
+        "topic": "Buoyancy & Archimedes' Principle",
+        "activity": "Submerged volume analysis and draft calculations",
+        "type": "Lecture",
+        "status": "Planned",
+        "notes": ""
+    },
+    "2026-09-03__CVE111__B15.1": {
+        "topic": "Stability of Floating Bodies",
+        "activity": "Metacentric height (MG) derivation on barge hulls",
+        "type": "Lecture",
+        "status": "Planned",
+        "notes": "Problem Set #2 assigned"
+    },
+    "2026-09-07__CVE111__B15.1": {
+        "topic": "Fluid Kinematics & Continuity Equation",
+        "activity": "Streamlines, pathlines, and 1D conservation of mass",
+        "type": "Lecture",
+        "status": "Planned",
+        "notes": "Pre-Exam Review"
+    },
+    "2026-09-10__CVE111__B15.1": {
+        "topic": "FIRST PRELIMINARY EXAMINATION",
+        "activity": "Major exam on Fluid Properties, Hydrostatics & Buoyancy",
+        "type": "Exam",
+        "status": "Planned",
+        "notes": "Room: ELAB-6 (09:00 - 11:30)"
+    },
+    "2026-08-10__CVE111__E15": {
+        "topic": "Course Orientation & Fluid Properties",
+        "activity": "Syllabus discussion, mass density & specific gravity",
+        "type": "Lecture",
+        "status": "Completed",
+        "notes": "Distribute course outline"
+    },
+    "2026-08-13__CVE111__E15": {
+        "topic": "Viscosity & Surface Tension",
+        "activity": "Newton's law of viscosity and shear stress derivation",
+        "type": "Lecture",
+        "status": "Completed",
+        "notes": "Seatwork #1 assigned"
+    },
+    "2026-08-17__CVE111__E15": {
+        "topic": "Principles of Hydrostatic Pressure",
+        "activity": "Pressure variation with depth (dp = -gamma*dz)",
+        "type": "Lecture",
+        "status": "Planned",
+        "notes": ""
+    },
+    "2026-08-20__CVE111__E15": {
+        "topic": "Manometers & Pressure Transducers",
+        "activity": "Multi-fluid open & differential U-tube calculations",
+        "type": "Lecture",
+        "status": "Planned",
+        "notes": "Problem Set #1 due"
+    },
+    "2026-08-24__CVE111__E15": {
+        "topic": "Hydrostatic Force on Plane Surfaces",
+        "activity": "Center of pressure and centroidal moment of inertia",
+        "type": "Lecture",
+        "status": "Planned",
+        "notes": ""
+    },
+    "2026-08-27__CVE111__E15": {
+        "topic": "Hydrostatic Force on Curved Surfaces",
+        "activity": "Resolving horizontal & vertical pressure prisms",
+        "type": "Lecture",
+        "status": "Planned",
+        "notes": "Quiz #1 in H2-02"
+    },
+    "2026-08-31__CVE111__E15": {
+        "topic": "Buoyancy & Archimedes' Principle",
+        "activity": "Submerged volume analysis and draft calculations",
+        "type": "Lecture",
+        "status": "Planned",
+        "notes": ""
+    },
+    "2026-09-03__CVE111__E15": {
+        "topic": "Stability of Floating Bodies",
+        "activity": "Metacentric height (MG) derivation on barge hulls",
+        "type": "Lecture",
+        "status": "Planned",
+        "notes": "Problem Set #2 assigned"
+    },
+    "2026-09-07__CVE111__E15": {
+        "topic": "Fluid Kinematics & Continuity Equation",
+        "activity": "Streamlines, pathlines, and 1D conservation of mass",
+        "type": "Lecture",
+        "status": "Planned",
+        "notes": "Pre-Exam Review"
+    },
+    "2026-09-10__CVE111__E15": {
+        "topic": "FIRST PRELIMINARY EXAMINATION",
+        "activity": "Major exam on Fluid Properties, Hydrostatics & Buoyancy",
+        "type": "Exam",
+        "status": "Planned",
+        "notes": "Room: H2-02 (13:00 - 15:30)"
+    },
+    "2026-08-11__CVE111__N15.2": {
+        "topic": "Course Orientation & Fluid Properties",
+        "activity": "Syllabus discussion, mass density & specific gravity",
+        "type": "Lecture",
+        "status": "Completed",
+        "notes": "Provide link to syllabus"
+    },
+    "2026-08-14__CVE111__N15.2": {
+        "topic": "Viscosity & Surface Tension",
+        "activity": "Newton's law of viscosity and shear stress derivation",
+        "type": "Lecture",
+        "status": "Completed",
+        "notes": "Seatwork #1 assigned"
+    },
+    "2026-08-18__CVE111__N15.2": {
+        "topic": "Principles of Hydrostatic Pressure",
+        "activity": "Pressure variation with depth (dp = -gamma*dz)",
+        "type": "Lecture",
+        "status": "Planned",
+        "notes": ""
+    },
+    "2026-08-21__CVE111__N15.2": {
+        "topic": "Manometers & Pressure Transducers",
+        "activity": "Multi-fluid open & differential U-tube calculations",
+        "type": "Lecture",
+        "status": "Planned",
+        "notes": "Problem Set #1 due"
+    },
+    "2026-08-25__CVE111__N15.2": {
+        "topic": "Hydrostatic Force on Plane Surfaces",
+        "activity": "Center of pressure and centroidal moment of inertia",
+        "type": "Lecture",
+        "status": "Planned",
+        "notes": ""
+    },
+    "2026-08-28__CVE111__N15.2": {
+        "topic": "Hydrostatic Force on Curved Surfaces",
+        "activity": "Resolving horizontal & vertical pressure prisms",
+        "type": "Lecture",
+        "status": "Planned",
+        "notes": "Quiz #1 in ELAB-6"
+    },
+    "2026-09-01__CVE111__N15.2": {
+        "topic": "INSTITUTIONAL FOUNDATION DAY (No Classes)",
+        "activity": "University Charter Day Celebrations",
+        "type": "Activity",
+        "status": "Suspended",
+        "notes": "Campus holiday"
+    },
+    "2026-09-04__CVE111__N15.2": {
+        "topic": "Buoyancy & Archimedes' Principle",
+        "activity": "Submerged volume analysis and draft calculations",
+        "type": "Lecture",
+        "status": "Planned",
+        "notes": "Problem Set #2 assigned"
+    },
+    "2026-09-08__CVE111__N15.2": {
+        "topic": "Stability of Floating Bodies & Fluid Kinematics",
+        "activity": "Metacentric height (MG) & continuity equation",
+        "type": "Lecture",
+        "status": "Planned",
+        "notes": "Pre-Exam Review"
+    },
+    "2026-09-11__CVE111__N15.2": {
+        "topic": "FIRST PRELIMINARY EXAMINATION",
+        "activity": "Major exam on Fluid Properties, Hydrostatics & Buoyancy",
+        "type": "Exam",
+        "status": "Planned",
+        "notes": "Room: ELAB-6 (14:30 - 17:00)"
+    },
+    "2026-08-11__CVE155__I15": {
+        "topic": "Course Introduction & Review of Statics",
+        "activity": "Internal forces and method of sections review",
+        "type": "Lecture",
+        "status": "Completed",
+        "notes": "Prerequisite diagnostic"
+    },
+    "2026-08-14__CVE155__I15": {
+        "topic": "Concept of Normal & Direct Shear Stress",
+        "activity": "Axial bar stresses and bolted shear connection calculations",
+        "type": "Lecture",
+        "status": "Completed",
+        "notes": "Seatwork #1 assigned"
+    },
+    "2026-08-18__CVE155__I15": {
+        "topic": "Bearing Stress & Thin-Walled Vessels",
+        "activity": "Bearing contact area and cylindrical hoop stresses",
+        "type": "Lecture",
+        "status": "Planned",
+        "notes": ""
+    },
+    "2026-08-21__CVE155__I15": {
+        "topic": "Concept of Normal Strain & Hooke's Law",
+        "activity": "Stress-strain diagrams, elastic modulus, Poisson's ratio",
+        "type": "Lecture",
+        "status": "Planned",
+        "notes": "Problem Set #1 due"
+    },
+    "2026-08-25__CVE155__I15": {
+        "topic": "Axial Elongation & Statically Indeterminate Bars",
+        "activity": "Deformation formulas (delta = PL/AE) and compatibility",
+        "type": "Lecture",
+        "status": "Planned",
+        "notes": ""
+    },
+    "2026-08-28__CVE155__I15": {
+        "topic": "Thermal Stresses & Temperature Changes",
+        "activity": "Restrained bar expansions and induced thermal stress",
+        "type": "Lecture",
+        "status": "Planned",
+        "notes": "Quiz #1 in H2-15"
+    },
+    "2026-09-01__CVE155__I15": {
+        "topic": "INSTITUTIONAL FOUNDATION DAY (No Classes)",
+        "activity": "University Charter Day Celebrations",
+        "type": "Activity",
+        "status": "Suspended",
+        "notes": "Campus holiday"
+    },
+    "2026-09-04__CVE155__I15": {
+        "topic": "Torsion of Circular Shafts & Torque Diagram",
+        "activity": "Derivation of torsion formula (tau = Tr/J)",
+        "type": "Lecture",
+        "status": "Planned",
+        "notes": "Problem Set #2 assigned"
+    },
+    "2026-09-08__CVE155__I15": {
+        "topic": "Angle of Twist & Power Transmission",
+        "activity": "Shaft rotation formulas and horsepower design problems",
+        "type": "Lecture",
+        "status": "Planned",
+        "notes": "Pre-Exam Review"
+    },
+    "2026-09-11__CVE155__I15": {
+        "topic": "FIRST PRELIMINARY EXAMINATION",
+        "activity": "Major exam on Stress, Strain, Axial Members & Torsion",
+        "type": "Exam",
+        "status": "Planned",
+        "notes": "Room: H2-15 (08:30 - 10:30)"
+    },
+    "2026-08-12__CVE169__R15": {
+        "topic": "Orientation & CE Board Exam Mechanics",
+        "activity": "Diagnostic exam on Mathematics & Surveying",
+        "type": "Lecture",
+        "status": "Completed",
+        "notes": "Board syllabus review"
+    },
+    "2026-08-19__CVE169__R15": {
+        "topic": "Refresher Module 1: Structural Engineering & Mechanics",
+        "activity": "Forces, moments, and statically determinate truss analysis",
+        "type": "Lecture",
+        "status": "Planned",
+        "notes": "Problem Set 1 (15 items)"
+    },
+    "2026-08-26__CVE169__R15": {
+        "topic": "Refresher Module 2: Geotechnical Engineering Review",
+        "activity": "Soil phase relationships, compaction, and classification",
+        "type": "Lecture",
+        "status": "Planned",
+        "notes": "Timed Quiz #1 (1 hr)"
+    },
+    "2026-09-02__CVE169__R15": {
+        "topic": "Refresher Module 3: Hydraulics & Water Resources Review",
+        "activity": "Hydrostatic forces, buoyancy, and Bernoulli theorem review",
+        "type": "Lecture",
+        "status": "Planned",
+        "notes": "Board problems compilation"
+    },
+    "2026-09-09__CVE169__R15": {
+        "topic": "FIRST PRELIMINARY DIAGNOSTIC EXAM",
+        "activity": "Timed 50-item simulated board exam covering Modules 1 to 3",
+        "type": "Exam",
+        "status": "Planned",
+        "notes": "Venue: ELAB-3 (09:00 - 12:00)"
+    }
+},
   studentRoster: [
-    { id: "2022-0142", last: "Al-Ghazali", first: "Fatima", email: "fatima.alghazali@university.edu", section: "CVE112 - B15.1", qz: 92, lab: 88, p1: 89, p2: 91, fin: 90 },
-    { id: "2023-0854", last: "Pendatun", first: "Datu Ali", email: "ali.pendatun@university.edu", section: "CVE112 - B15.1", qz: 85, lab: 84, p1: 82, p2: 86, fin: 88 },
-    { id: "2023-1105", last: "Santos", first: "Juan", email: "juan.santos@university.edu", section: "CVE112 - B15.1", qz: 78, lab: 80, p1: 75, p2: 79, fin: 82 },
-    { id: "2023-1490", last: "Campos", first: "Maria", email: "maria.campos@university.edu", section: "CVE112 - E15", qz: 95, lab: 92, p1: 94, p2: 96, fin: 95 },
-    { id: "2022-0912", last: "Dimalanta", first: "Karlo", email: "karlo.dimalanta@university.edu", section: "CVE113 - J15", qz: 88, lab: 90, p1: 86, p2: 89, fin: 91 }
-  ],
+    {
+        "id": "2023-0101",
+        "last": "Alvarez",
+        "first": "Marco",
+        "email": "marco.alvarez@university.edu",
+        "section": "CVE111 - E15",
+        "qz": 92,
+        "lab": 90,
+        "p1": 94,
+        "p2": 91,
+        "fin": 93
+    },
+    {
+        "id": "2023-0102",
+        "last": "Bernardo",
+        "first": "Camille",
+        "email": "camille.bernardo@university.edu",
+        "section": "CVE111 - E15",
+        "qz": 88,
+        "lab": 85,
+        "p1": 89,
+        "p2": 87,
+        "fin": 88
+    },
+    {
+        "id": "2023-0103",
+        "last": "Castillo",
+        "first": "Danilo",
+        "email": "danilo.castillo@university.edu",
+        "section": "CVE111 - E15",
+        "qz": 76,
+        "lab": 78,
+        "p1": 74,
+        "p2": 78,
+        "fin": 79
+    },
+    {
+        "id": "2023-0104",
+        "last": "De Leon",
+        "first": "Elena",
+        "email": "elena.deleon@university.edu",
+        "section": "CVE111 - E15",
+        "qz": 95,
+        "lab": 94,
+        "p1": 96,
+        "p2": 95,
+        "fin": 96
+    },
+    {
+        "id": "2023-0105",
+        "last": "Espino",
+        "first": "Gabriel",
+        "email": "gabriel.espino@university.edu",
+        "section": "CVE111 - E15",
+        "qz": 82,
+        "lab": 84,
+        "p1": 80,
+        "p2": 83,
+        "fin": 85
+    },
+    {
+        "id": "2023-0106",
+        "last": "Flores",
+        "first": "Hannah",
+        "email": "hannah.flores@university.edu",
+        "section": "CVE111 - E15",
+        "qz": 90,
+        "lab": 89,
+        "p1": 92,
+        "p2": 90,
+        "fin": 91
+    },
+    {
+        "id": "2023-0107",
+        "last": "Garcia",
+        "first": "Ian",
+        "email": "ian.garcia@university.edu",
+        "section": "CVE111 - E15",
+        "qz": 68,
+        "lab": 72,
+        "p1": 65,
+        "p2": 70,
+        "fin": 72
+    },
+    {
+        "id": "2023-0108",
+        "last": "Hernandez",
+        "first": "Jasmine",
+        "email": "jasmine.hernandez@university.edu",
+        "section": "CVE111 - E15",
+        "qz": 84,
+        "lab": 86,
+        "p1": 85,
+        "p2": 84,
+        "fin": 86
+    },
+    {
+        "id": "2023-0109",
+        "last": "Ilagan",
+        "first": "Kevin",
+        "email": "kevin.ilagan@university.edu",
+        "section": "CVE111 - E15",
+        "qz": 79,
+        "lab": 81,
+        "p1": 78,
+        "p2": 80,
+        "fin": 82
+    },
+    {
+        "id": "2023-0110",
+        "last": "Jimenez",
+        "first": "Lara",
+        "email": "lara.jimenez@university.edu",
+        "section": "CVE111 - E15",
+        "qz": 94,
+        "lab": 92,
+        "p1": 95,
+        "p2": 93,
+        "fin": 94
+    },
+    {
+        "id": "2023-0201",
+        "last": "Aquino",
+        "first": "Rafael",
+        "email": "rafael.aquino@university.edu",
+        "section": "CVE111 - B15.1",
+        "qz": 91,
+        "lab": 89,
+        "p1": 92,
+        "p2": 90,
+        "fin": 91
+    },
+    {
+        "id": "2023-0202",
+        "last": "Bautista",
+        "first": "Bianca",
+        "email": "bianca.bautista@university.edu",
+        "section": "CVE111 - B15.1",
+        "qz": 85,
+        "lab": 88,
+        "p1": 86,
+        "p2": 84,
+        "fin": 87
+    },
+    {
+        "id": "2023-0203",
+        "last": "Cruz",
+        "first": "Christian",
+        "email": "christian.cruz@university.edu",
+        "section": "CVE111 - B15.1",
+        "qz": 73,
+        "lab": 75,
+        "p1": 70,
+        "p2": 74,
+        "fin": 76
+    },
+    {
+        "id": "2023-0204",
+        "last": "Domingo",
+        "first": "Diane",
+        "email": "diane.domingo@university.edu",
+        "section": "CVE111 - B15.1",
+        "qz": 96,
+        "lab": 95,
+        "p1": 97,
+        "p2": 96,
+        "fin": 97
+    },
+    {
+        "id": "2023-0205",
+        "last": "Estrella",
+        "first": "Edward",
+        "email": "edward.estrella@university.edu",
+        "section": "CVE111 - B15.1",
+        "qz": 80,
+        "lab": 82,
+        "p1": 81,
+        "p2": 83,
+        "fin": 84
+    },
+    {
+        "id": "2023-0206",
+        "last": "Francisco",
+        "first": "Faith",
+        "email": "faith.francisco@university.edu",
+        "section": "CVE111 - B15.1",
+        "qz": 87,
+        "lab": 86,
+        "p1": 88,
+        "p2": 89,
+        "fin": 88
+    },
+    {
+        "id": "2023-0207",
+        "last": "Gomez",
+        "first": "Gerald",
+        "email": "gerald.gomez@university.edu",
+        "section": "CVE111 - B15.1",
+        "qz": 62,
+        "lab": 65,
+        "p1": 60,
+        "p2": 64,
+        "fin": 66
+    },
+    {
+        "id": "2023-0208",
+        "last": "Hilario",
+        "first": "Hazel",
+        "email": "hazel.hilario@university.edu",
+        "section": "CVE111 - B15.1",
+        "qz": 89,
+        "lab": 91,
+        "p1": 90,
+        "p2": 88,
+        "fin": 90
+    },
+    {
+        "id": "2023-0209",
+        "last": "Ignacio",
+        "first": "Ivan",
+        "email": "ivan.ignacio@university.edu",
+        "section": "CVE111 - B15.1",
+        "qz": 83,
+        "lab": 80,
+        "p1": 82,
+        "p2": 85,
+        "fin": 84
+    },
+    {
+        "id": "2023-0210",
+        "last": "Javier",
+        "first": "Joy",
+        "email": "joy.javier@university.edu",
+        "section": "CVE111 - B15.1",
+        "qz": 93,
+        "lab": 94,
+        "p1": 95,
+        "p2": 92,
+        "fin": 94
+    },
+    {
+        "id": "2023-0301",
+        "last": "Lacsamana",
+        "first": "Adrian",
+        "email": "adrian.lacsamana@university.edu",
+        "section": "CVE111 - N15.2",
+        "qz": 89,
+        "lab": 87,
+        "p1": 90,
+        "p2": 88,
+        "fin": 90
+    },
+    {
+        "id": "2023-0302",
+        "last": "Magno",
+        "first": "Bea",
+        "email": "bea.magno@university.edu",
+        "section": "CVE111 - N15.2",
+        "qz": 84,
+        "lab": 86,
+        "p1": 85,
+        "p2": 83,
+        "fin": 85
+    },
+    {
+        "id": "2023-0303",
+        "last": "Navarro",
+        "first": "Carlo",
+        "email": "carlo.navarro@university.edu",
+        "section": "CVE111 - N15.2",
+        "qz": 78,
+        "lab": 80,
+        "p1": 76,
+        "p2": 79,
+        "fin": 81
+    },
+    {
+        "id": "2023-0304",
+        "last": "Ocampo",
+        "first": "Denise",
+        "email": "denise.ocampo@university.edu",
+        "section": "CVE111 - N15.2",
+        "qz": 93,
+        "lab": 91,
+        "p1": 94,
+        "p2": 92,
+        "fin": 93
+    },
+    {
+        "id": "2023-0305",
+        "last": "Pascual",
+        "first": "Enrico",
+        "email": "enrico.pascual@university.edu",
+        "section": "CVE111 - N15.2",
+        "qz": 81,
+        "lab": 83,
+        "p1": 82,
+        "p2": 80,
+        "fin": 82
+    },
+    {
+        "id": "2023-0306",
+        "last": "Quizon",
+        "first": "Faye",
+        "email": "faye.quizon@university.edu",
+        "section": "CVE111 - N15.2",
+        "qz": 86,
+        "lab": 85,
+        "p1": 87,
+        "p2": 88,
+        "fin": 87
+    },
+    {
+        "id": "2023-0307",
+        "last": "Ramos",
+        "first": "Glenn",
+        "email": "glenn.ramos@university.edu",
+        "section": "CVE111 - N15.2",
+        "qz": 69,
+        "lab": 71,
+        "p1": 68,
+        "p2": 70,
+        "fin": 73
+    },
+    {
+        "id": "2023-0308",
+        "last": "Salazar",
+        "first": "Hannah",
+        "email": "hannah.salazar@university.edu",
+        "section": "CVE111 - N15.2",
+        "qz": 90,
+        "lab": 92,
+        "p1": 91,
+        "p2": 89,
+        "fin": 91
+    },
+    {
+        "id": "2023-0309",
+        "last": "Tolentino",
+        "first": "Isaac",
+        "email": "isaac.tolentino@university.edu",
+        "section": "CVE111 - N15.2",
+        "qz": 82,
+        "lab": 84,
+        "p1": 83,
+        "p2": 81,
+        "fin": 83
+    },
+    {
+        "id": "2023-0310",
+        "last": "Umali",
+        "first": "Janine",
+        "email": "janine.umali@university.edu",
+        "section": "CVE111 - N15.2",
+        "qz": 95,
+        "lab": 96,
+        "p1": 97,
+        "p2": 94,
+        "fin": 96
+    },
+    {
+        "id": "2023-0401",
+        "last": "Valdez",
+        "first": "Aaron",
+        "email": "aaron.valdez@university.edu",
+        "section": "CVE155 - I15",
+        "qz": 90,
+        "lab": 92,
+        "p1": 91,
+        "p2": 89,
+        "fin": 92
+    },
+    {
+        "id": "2023-0402",
+        "last": "Villanueva",
+        "first": "Brenda",
+        "email": "brenda.villanueva@university.edu",
+        "section": "CVE155 - I15",
+        "qz": 86,
+        "lab": 88,
+        "p1": 87,
+        "p2": 85,
+        "fin": 87
+    },
+    {
+        "id": "2023-0403",
+        "last": "Yambao",
+        "first": "Cedric",
+        "email": "cedric.yambao@university.edu",
+        "section": "CVE155 - I15",
+        "qz": 75,
+        "lab": 77,
+        "p1": 72,
+        "p2": 76,
+        "fin": 78
+    },
+    {
+        "id": "2023-0404",
+        "last": "Zamora",
+        "first": "Dianne",
+        "email": "dianne.zamora@university.edu",
+        "section": "CVE155 - I15",
+        "qz": 94,
+        "lab": 95,
+        "p1": 96,
+        "p2": 93,
+        "fin": 95
+    },
+    {
+        "id": "2023-0405",
+        "last": "Abad",
+        "first": "Ezekiel",
+        "email": "ezekiel.abad@university.edu",
+        "section": "CVE155 - I15",
+        "qz": 83,
+        "lab": 81,
+        "p1": 84,
+        "p2": 82,
+        "fin": 84
+    },
+    {
+        "id": "2023-0406",
+        "last": "Beltran",
+        "first": "Franchesca",
+        "email": "franchesca.beltran@university.edu",
+        "section": "CVE155 - I15",
+        "qz": 88,
+        "lab": 89,
+        "p1": 90,
+        "p2": 87,
+        "fin": 89
+    },
+    {
+        "id": "2023-0407",
+        "last": "Corpuz",
+        "first": "Gian",
+        "email": "gian.corpuz@university.edu",
+        "section": "CVE155 - I15",
+        "qz": 65,
+        "lab": 68,
+        "p1": 63,
+        "p2": 66,
+        "fin": 69
+    },
+    {
+        "id": "2023-0408",
+        "last": "David",
+        "first": "Hazel",
+        "email": "hazel.david@university.edu",
+        "section": "CVE155 - I15",
+        "qz": 91,
+        "lab": 93,
+        "p1": 92,
+        "p2": 90,
+        "fin": 92
+    },
+    {
+        "id": "2023-0409",
+        "last": "Enriquez",
+        "first": "Ian",
+        "email": "ian.enriquez@university.edu",
+        "section": "CVE155 - I15",
+        "qz": 80,
+        "lab": 82,
+        "p1": 81,
+        "p2": 83,
+        "fin": 83
+    },
+    {
+        "id": "2023-0410",
+        "last": "Fuentes",
+        "first": "Joyce",
+        "email": "joyce.fuentes@university.edu",
+        "section": "CVE155 - I15",
+        "qz": 96,
+        "lab": 94,
+        "p1": 97,
+        "p2": 95,
+        "fin": 96
+    },
+    {
+        "id": "2022-0501",
+        "last": "Guevarra",
+        "first": "Alvin",
+        "email": "alvin.guevarra@university.edu",
+        "section": "CVE169 - R15",
+        "qz": 88,
+        "lab": 90,
+        "p1": 89,
+        "p2": 87,
+        "fin": 90
+    },
+    {
+        "id": "2022-0502",
+        "last": "Hilario",
+        "first": "Bernadette",
+        "email": "bernadette.hilario@university.edu",
+        "section": "CVE169 - R15",
+        "qz": 85,
+        "lab": 87,
+        "p1": 86,
+        "p2": 84,
+        "fin": 86
+    },
+    {
+        "id": "2022-0503",
+        "last": "Inocencio",
+        "first": "Crispin",
+        "email": "crispin.inocencio@university.edu",
+        "section": "CVE169 - R15",
+        "qz": 77,
+        "lab": 79,
+        "p1": 75,
+        "p2": 78,
+        "fin": 80
+    },
+    {
+        "id": "2022-0504",
+        "last": "Jacinto",
+        "first": "Danica",
+        "email": "danica.jacinto@university.edu",
+        "section": "CVE169 - R15",
+        "qz": 95,
+        "lab": 96,
+        "p1": 97,
+        "p2": 94,
+        "fin": 96
+    },
+    {
+        "id": "2022-0505",
+        "last": "Katigbak",
+        "first": "Emil",
+        "email": "emil.katigbak@university.edu",
+        "section": "CVE169 - R15",
+        "qz": 82,
+        "lab": 84,
+        "p1": 83,
+        "p2": 81,
+        "fin": 83
+    },
+    {
+        "id": "2022-0506",
+        "last": "Laurel",
+        "first": "Florence",
+        "email": "florence.laurel@university.edu",
+        "section": "CVE169 - R15",
+        "qz": 89,
+        "lab": 91,
+        "p1": 90,
+        "p2": 88,
+        "fin": 90
+    },
+    {
+        "id": "2022-0507",
+        "last": "Mendoza",
+        "first": "Gilbert",
+        "email": "gilbert.mendoza@university.edu",
+        "section": "CVE169 - R15",
+        "qz": 71,
+        "lab": 73,
+        "p1": 69,
+        "p2": 72,
+        "fin": 74
+    },
+    {
+        "id": "2022-0508",
+        "last": "Nolasco",
+        "first": "Hazel",
+        "email": "hazel.nolasco@university.edu",
+        "section": "CVE169 - R15",
+        "qz": 92,
+        "lab": 93,
+        "p1": 94,
+        "p2": 91,
+        "fin": 93
+    },
+    {
+        "id": "2022-0509",
+        "last": "Ortega",
+        "first": "Ivan",
+        "email": "ivan.ortega@university.edu",
+        "section": "CVE169 - R15",
+        "qz": 84,
+        "lab": 86,
+        "p1": 85,
+        "p2": 83,
+        "fin": 85
+    },
+    {
+        "id": "2022-0510",
+        "last": "Pineda",
+        "first": "Jocelyn",
+        "email": "jocelyn.pineda@university.edu",
+        "section": "CVE169 - R15",
+        "qz": 93,
+        "lab": 95,
+        "p1": 96,
+        "p2": 92,
+        "fin": 95
+    }
+],
   dailyNotes: {}
 };
 

@@ -77,6 +77,7 @@ function openTermSettingsModal() {
   if (emailInput) {
     emailInput.value = semesterConfig.facultyEmail || '';
   }
+
   document.getElementById('term-settings-modal').classList.remove('hidden');
 }
 
@@ -180,7 +181,6 @@ function saveTermSettings() {
   semesterConfig.facultyEmail = facultyEmail;
 
   applyHeaderBranding();
-
 
   document.getElementById('header-term-title').innerText = semesterConfig.title + ' • Course Planning & Activity Matrix';
   document.getElementById('planner-term-label').innerText = semesterConfig.title + ' Matrix';

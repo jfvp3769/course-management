@@ -71,6 +71,7 @@ function bootBindings() {
   if (window.AppEvents) window.AppEvents.initEventDelegation();
   initColorPickerListeners();
   initDarkModeTheme();
+  if (typeof initColorThemes === 'function') initColorThemes();
   bindBrandingEasterEgg();
 
   const gradeFilter = document.getElementById('gradebook-grade-filter');

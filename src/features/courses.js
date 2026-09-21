@@ -204,7 +204,7 @@ function openManageCoursesModal() {
             <div class="border-t border-slate-200 dark:border-slate-700 pt-2 space-y-1.5">
               <div class="flex items-center justify-between text-[11px] font-bold text-slate-600 dark:text-slate-300">
                 <span>Sections & Scheduled Hours:</span>
-                <button type="button" data-action="openAddSectionModal" data-code="${escapeHtml(sub.code)}" class="text-msu-maroon dark:text-amber-400 hover:underline font-bold text-[11px]">+ Add Section</button>
+                <button type="button" data-action="openAddSectionModal" data-code="${escapeHtml(sub.code)}" class="app-themed-link text-msu-maroon dark:text-amber-400 hover:underline font-bold text-[11px]">+ Add Section</button>
               </div>
               <div class="space-y-1.5">
                 ${sub.sections.map((sec, secIdx) => {

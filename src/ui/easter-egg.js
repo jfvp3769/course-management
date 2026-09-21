@@ -39,7 +39,7 @@ function updateVaultFilterButtons() {
   const tipBtn = document.getElementById('vault-filter-tip');
   const dykBtn = document.getElementById('vault-filter-dyk');
 
-  const activeClass = 'px-3 py-1.5 rounded-lg bg-msu-maroon text-white border border-msu-maroon transition shadow-2xs';
+  const activeClass = 'px-3 py-1.5 rounded-lg app-themed-btn-primary text-white border transition shadow-2xs';
   const inactiveClass = 'px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-600 transition';
 
   if (allBtn) allBtn.className = vaultActiveCategory === 'all' ? activeClass : inactiveClass;

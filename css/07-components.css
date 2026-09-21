@@ -1373,3 +1373,33 @@ body.is-matrix-dragging .matrix-cell-slot > div {
   transition: none !important;
   box-shadow: none !important;
 }
+
+/* Form Controls: Global focus outline and ring normalization */
+input,
+select,
+textarea {
+  outline: none;
+}
+
+input:focus,
+input:focus-visible,
+select:focus,
+select:focus-visible,
+textarea:focus,
+textarea:focus-visible {
+  outline: none !important;
+}
+
+/* Modern webkit date input styling */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.65;
+  transition: opacity 0.15s ease;
+}
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+}
+html.theme-dark input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.85);
+}
+

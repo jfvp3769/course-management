@@ -212,6 +212,15 @@
     switchExportImportTab: (e, target, data) => {
       if (typeof window.switchExportImportTab === 'function') window.switchExportImportTab(data.tab);
     },
+    openUserGuideModal: (e, target, data) => {
+      if (typeof window.openUserGuideModal === 'function') window.openUserGuideModal(data?.tab || 'setup');
+    },
+    closeUserGuideModal: () => {
+      if (typeof window.closeUserGuideModal === 'function') window.closeUserGuideModal();
+    },
+    toggleGuideMinimize: () => {
+      if (typeof window.toggleGuideMinimize === 'function') window.toggleGuideMinimize();
+    },
     switchGuideTab: (e, target) => {
       if (typeof window.switchGuideTab === 'function') window.switchGuideTab(target.value);
     },
@@ -223,6 +232,9 @@
     },
     updateEventTermInputs: (e, target, data) => {
       if (typeof window.updateEventTermInputs === 'function') window.updateEventTermInputs(data.term || target.value);
+    },
+    onGradingScaleScopeChange: (e, target, data) => {
+      if (typeof window.onGradingScaleScopeChange === 'function') window.onGradingScaleScopeChange();
     },
     onGradingScaleModeChange: (e, target, data) => {
       if (typeof window.onGradingScaleModeChange === 'function') window.onGradingScaleModeChange(data.mode || target.value);
@@ -244,6 +256,7 @@
       else if (modalId === 'feedback-modal' && typeof window.closeFeedbackModal === 'function') window.closeFeedbackModal();
       else if (modalId === 'tips-modal' && typeof window.closeTipsModal === 'function') window.closeTipsModal();
       else if (modalId === 'easter-egg-modal' && typeof window.closeEasterEggModal === 'function') window.closeEasterEggModal();
+      else if (modalId === 'theme-settings-modal' && typeof window.closeThemeModal === 'function') window.closeThemeModal();
       else {
         const el = document.getElementById(modalId);
         if (el) el.classList.add('hidden');
@@ -461,6 +474,33 @@
     // UI Theme & Easter Egg
     selectColorTheme: (e, target, data) => {
       if (typeof window.selectColorTheme === 'function') window.selectColorTheme(data.mode, data.theme);
+    },
+    selectHeaderTheme: (e, target, data) => {
+      if (typeof window.selectHeaderTheme === 'function') window.selectHeaderTheme(data.theme || target.dataset.theme);
+    },
+    selectWindowTheme: (e, target, data) => {
+      if (typeof window.selectWindowTheme === 'function') window.selectWindowTheme(data.theme || target.dataset.theme);
+    },
+    onCustomHeaderColorInput: (e, target, data) => {
+      if (typeof window.onCustomHeaderColorInput === 'function') window.onCustomHeaderColorInput(data.type, target.value);
+    },
+    onCustomWindowColorInput: (e, target, data) => {
+      if (typeof window.onCustomWindowColorInput === 'function') window.onCustomWindowColorInput(data.type, target.value);
+    },
+    resetThemePalettes: () => {
+      if (typeof window.resetThemePalettes === 'function') window.resetThemePalettes();
+    },
+    openThemeModal: () => {
+      if (typeof window.openThemeModal === 'function') window.openThemeModal();
+    },
+    closeThemeModal: () => {
+      if (typeof window.closeThemeModal === 'function') window.closeThemeModal();
+    },
+    saveThemeSettings: () => {
+      if (typeof window.saveThemeSettings === 'function') window.saveThemeSettings();
+    },
+    setThemeMode: (e, target, data) => {
+      if (typeof window.setThemeMode === 'function') window.setThemeMode(data.mode || target.dataset.mode);
     },
     clearVaultSearch: () => {
       const input = document.getElementById('vault-search-input');

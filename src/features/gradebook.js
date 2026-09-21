@@ -17,20 +17,47 @@ function autoBalanceSubActivities(category) {
 
 function getActiveGradingScale(sectionKey) {
   if (!courseData.gradingScales) {
-    courseData.gradingScales = { default: JSON.parse(JSON.stringify(DEFAULT_GRADING_SCALE)), sections: {} };
+    courseData.gradingScales = { default: JSON.parse(JSON.stringify(DEFAULT_GRADING_SCALE)), subjects: {}, sections: {} };
   }
-  if (courseData.gradingScales.sections && sectionKey && courseData.gradingScales.sections[sectionKey]) {
-    return {
-      scale: courseData.gradingScales.sections[sectionKey],
-      isDefault: false
-    };
+  if (!courseData.gradingScales.subjects) {
+    courseData.gradingScales.subjects = {};
   }
+  if (!courseData.gradingScales.sections) {
+    courseData.gradingScales.sections = {};
+  }
+
+  if (sectionKey) {
+    // 1. Direct section-level scale override
+    if (courseData.gradingScales.sections[sectionKey]) {
+      return {
+        scale: courseData.gradingScales.sections[sectionKey],
+        isDefault: false,
+        scopeType: 'section',
+        scopeKey: sectionKey
+      };
+    }
+
+    // 2. Subject-level scale inheritance
+    const subCode = sectionKey.includes(' - ') ? sectionKey.split(' - ')[0].trim() : sectionKey.trim();
+    if (subCode && courseData.gradingScales.subjects[subCode]) {
+      return {
+        scale: courseData.gradingScales.subjects[subCode],
+        isDefault: false,
+        scopeType: 'subject',
+        scopeKey: subCode
+      };
+    }
+  }
+
+  // 3. Fallback to default institutional scale
   const defaultScale = (courseData.gradingScales.default && courseData.gradingScales.default.length)
     ? courseData.gradingScales.default
     : DEFAULT_GRADING_SCALE;
   return {
     scale: defaultScale,
-    isDefault: true
+    isDefault: true,
+    scopeType: 'default',
+    scopeKey: '__default__'
   };
 }
 
@@ -149,7 +176,7 @@ function calculateStudentGrade(student, config, sectionKey) {
 }
 
 function renderGradingScaleDrawer(sectionKey) {
-  const { scale, isDefault } = getActiveGradingScale(sectionKey);
+  const { scale, isDefault, scopeType, scopeKey } = getActiveGradingScale(sectionKey);
   const titleEl = document.getElementById('grading-scale-drawer-title');
   const badgeEl = document.getElementById('grading-scale-drawer-badge');
   const gridEl = document.getElementById('grading-scale-cards-grid');
@@ -158,12 +185,15 @@ function renderGradingScaleDrawer(sectionKey) {
     titleEl.innerText = sectionKey ? `Grading Scale: ${sectionKey}` : 'Default Institutional Grading Scale';
   }
   if (badgeEl) {
-    if (isDefault) {
-      badgeEl.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-200 dark:bg-amber-950 dark:text-amber-300 text-amber-900';
-      badgeEl.innerText = 'Default Scale';
-    } else {
+    if (scopeType === 'section') {
       badgeEl.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-200 dark:bg-emerald-950 dark:text-emerald-300 text-emerald-900';
       badgeEl.innerText = 'Custom Section Scale';
+    } else if (scopeType === 'subject') {
+      badgeEl.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-200 dark:bg-indigo-950 dark:text-indigo-300 text-indigo-900';
+      badgeEl.innerText = `Subject Scale (${scopeKey})`;
+    } else {
+      badgeEl.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-200 dark:bg-amber-950 dark:text-amber-300 text-amber-900';
+      badgeEl.innerText = 'Default Scale';
     }
   }
   if (gridEl) {

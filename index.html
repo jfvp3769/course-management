@@ -38,6 +38,54 @@
         } else {
           document.documentElement.classList.remove('theme-dark', 'dark');
         }
+        var ht = localStorage.getItem('faculty_header_theme');
+        var wt = localStorage.getItem('faculty_window_theme');
+        var hPalettes = {
+          maroon: { bg: 'linear-gradient(to right, #4a0000, #800000, #0f172a)', accent: '#daa520', tabText: '#fde047', border: 'rgba(155, 17, 30, 0.6)' },
+          navy: { bg: 'linear-gradient(to right, #0a192f, #1e3a8a, #0f172a)', accent: '#f59e0b', tabText: '#fcd34d', border: 'rgba(30, 58, 138, 0.6)' },
+          sapphire: { bg: 'linear-gradient(to right, #0c2340, #0284c7, #0f172a)', accent: '#38bdf8', tabText: '#7dd3fc', border: 'rgba(2, 132, 199, 0.6)' },
+          emerald: { bg: 'linear-gradient(to right, #022c22, #047857, #064e3b)', accent: '#34d399', tabText: '#6ee7b7', border: 'rgba(4, 120, 87, 0.6)' },
+          purple: { bg: 'linear-gradient(to right, #2e1065, #6d28d9, #1e1b4b)', accent: '#c084fc', tabText: '#d8b4fe', border: 'rgba(109, 40, 217, 0.6)' },
+          slate: { bg: 'linear-gradient(to right, #020617, #1e293b, #0f172a)', accent: '#38bdf8', tabText: '#7dd3fc', border: 'rgba(51, 65, 85, 0.6)' },
+          bronze: { bg: 'linear-gradient(to right, #271406, #78350f, #1c1917)', accent: '#fbbf24', tabText: '#fef08a', border: 'rgba(120, 53, 15, 0.6)' },
+          teal: { bg: 'linear-gradient(to right, #042f2e, #0f766e, #0f172a)', accent: '#2dd4bf', tabText: '#5eead4', border: 'rgba(15, 118, 110, 0.6)' }
+        };
+        var wPalettes = {
+          slate: { light: '#e2e8f0', dark: '#0f172a' },
+          studio: { light: '#f1f5f9', dark: '#18181b' },
+          warm: { light: '#faedd9', dark: '#251a14' },
+          glacier: { light: '#dbeafe', dark: '#0b1d3a' },
+          sage: { light: '#dcfce7', dark: '#062319' },
+          lavender: { light: '#ede9fe', dark: '#1e1233' }
+        };
+        if (ht && hPalettes[ht]) {
+          var hp = hPalettes[ht];
+          document.documentElement.style.setProperty('--app-header-bg', hp.bg);
+          document.documentElement.style.setProperty('--app-header-accent', hp.accent);
+          document.documentElement.style.setProperty('--app-header-tab-text', hp.tabText);
+          document.documentElement.style.setProperty('--app-header-nav-border', hp.border);
+        } else if (ht === 'custom') {
+          var ch = JSON.parse(localStorage.getItem('faculty_header_custom') || '{"primary":"#1e3a8a","accent":"#f59e0b"}');
+          document.documentElement.style.setProperty('--app-header-bg', 'linear-gradient(to right, ' + (ch.primary || '#1e3a8a') + ', #0f172a)');
+          document.documentElement.style.setProperty('--app-header-accent', ch.accent || '#f59e0b');
+          document.documentElement.style.setProperty('--app-header-tab-text', ch.accent || '#f59e0b');
+          document.documentElement.style.setProperty('--app-header-nav-border', 'rgba(255, 255, 255, 0.2)');
+        }
+        if (wt && wPalettes[wt]) {
+          var wp = wPalettes[wt];
+          var curBg = (t === 'dark') ? wp.dark : wp.light;
+          document.documentElement.style.setProperty('--app-window-bg', curBg);
+          document.documentElement.style.setProperty('--app-window-bg-light', wp.light);
+          document.documentElement.style.setProperty('--app-window-bg-dark', wp.dark);
+        } else if (wt === 'custom') {
+          var cw = JSON.parse(localStorage.getItem('faculty_window_custom') || '{"light":"#f1f5f9","dark":"#0b1120"}');
+          var wLight = cw.light || '#f1f5f9';
+          var wDark = cw.dark || '#0b1120';
+          var curBg = (t === 'dark') ? wDark : wLight;
+          document.documentElement.style.setProperty('--app-window-bg', curBg);
+          document.documentElement.style.setProperty('--app-window-bg-light', wLight);
+          document.documentElement.style.setProperty('--app-window-bg-dark', wDark);
+        }
       } catch (e) {}
     })();
   </script>
@@ -102,11 +150,11 @@
   </aside>
 
   <!-- Header Banner -->
-  <header class="bg-gradient-to-r from-msu-darkMaroon via-msu-maroon to-slate-900 text-white shadow-lg sticky top-0 z-30 border-b-2 border-msu-gold">
+  <header id="app-main-header" class="bg-gradient-to-r from-msu-darkMaroon via-msu-maroon to-slate-900 text-white shadow-lg sticky top-0 z-30 border-b-2 border-msu-gold">
     <div class="max-w-7xl xl:max-w-[1440px] 2xl:max-w-[1720px] mx-auto px-3 sm:px-6 py-2.5 flex flex-col lg:flex-row lg:items-center justify-between gap-2.5 lg:gap-4">
       <!-- University Brand & Status Indicator -->
       <div class="flex items-center gap-3 min-w-0">
-        <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-full shadow-md flex items-center justify-center shrink-0 border-2 border-msu-gold overflow-hidden bg-white">
+        <div id="header-school-logo-ring" class="w-10 h-10 sm:w-11 sm:h-11 rounded-full shadow-md flex items-center justify-center shrink-0 border-2 border-msu-gold overflow-hidden bg-white">
           <img id="header-school-logo" src="logo.svg" alt="Official Seal" class="w-full h-full object-cover rounded-full">
           <div id="header-logo-fallback" class="hidden w-full h-full rounded-full bg-amber-400 text-rose-950 font-black text-xs items-center justify-center">EDU</div>
         </div>
@@ -118,46 +166,46 @@
               <span>Saved Offline</span>
             </span>
           </div>
-          <p id="header-term-title" class="text-[11px] sm:text-xs text-amber-100/90 font-medium truncate mt-0.5">Faculty Course Management Portal • AY 2026–2027</p>
+          <p id="header-term-title" class="app-themed-subtitle text-[11px] sm:text-xs font-medium truncate mt-0.5">Faculty Course Management Portal • AY 2026–2027</p>
         </div>
       </div>
 
       <!-- Action Buttons (Responsive Padding, Adaptive Labels & Scroll Protection) -->
       <div class="flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar py-0.5 max-w-full shrink-0">
-        <button type="button" data-action="openTermSettingsModal" class="header-action-btn header-btn-settings bg-white/10 hover:bg-white/20 border border-white/20 text-white shadow-2xs" title="Portal & Semester Settings" aria-label="Portal & Semester Settings">
-          <svg class="w-3.5 h-3.5 text-amber-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        <button type="button" data-action="openTermSettingsModal" class="header-action-btn header-btn-settings bg-white/10 hover:bg-white/20 active:bg-white/25 border border-white/20 hover:border-white/30 shadow-2xs transition backdrop-blur-xs" title="Portal & Semester Settings" aria-label="Portal & Semester Settings">
+          <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
           <span class="header-btn-label">Portal Settings</span>
         </button>
 
-        <button type="button" data-action="openManageCoursesModal" class="header-action-btn header-btn-subjects bg-rose-950/70 hover:bg-rose-900 border border-amber-500/30 text-amber-100 shadow-2xs" title="Manage Subjects" aria-label="Manage Subjects">
-          <svg class="w-3.5 h-3.5 text-amber-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+        <button type="button" data-action="openManageCoursesModal" class="header-action-btn header-btn-subjects bg-white/10 hover:bg-white/20 active:bg-white/25 border border-white/20 hover:border-white/30 shadow-2xs transition backdrop-blur-xs" title="Manage Subjects" aria-label="Manage Subjects">
+          <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
           <span class="header-btn-label">Manage Subjects</span>
         </button>
 
-        <button type="button" data-action="openExportImportModal" class="header-action-btn header-btn-hub bg-emerald-950/70 hover:bg-emerald-900 border border-emerald-500/30 text-emerald-100 shadow-2xs" title="Open Data Export & Import Center" aria-label="Export / Import Hub">
-          <svg class="w-3.5 h-3.5 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
+        <button type="button" data-action="openExportImportModal" class="header-action-btn header-btn-hub bg-white/10 hover:bg-white/20 active:bg-white/25 border border-white/20 hover:border-white/30 shadow-2xs transition backdrop-blur-xs" title="Open Data Export & Import Center" aria-label="Export / Import Hub">
+          <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
           <span class="header-btn-label">Export / Import Hub</span>
         </button>
 
-        <button type="button" data-action="openUserGuideModal" class="header-action-btn header-btn-guide bg-amber-950/70 hover:bg-amber-900 border border-amber-500/30 text-amber-100 shadow-2xs" title="Open Faculty User Guide & Walkthrough" aria-label="User Guide">
-          <svg class="w-3.5 h-3.5 text-amber-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+        <button type="button" data-action="openUserGuideModal" class="header-action-btn header-btn-guide bg-white/10 hover:bg-white/20 active:bg-white/25 border border-white/20 hover:border-white/30 shadow-2xs transition backdrop-blur-xs" title="Open Faculty User Guide & Walkthrough" aria-label="User Guide">
+          <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
           <span class="header-btn-label">User Guide</span>
         </button>
 
-        <button type="button" id="btn-theme-toggle" data-action="toggleDarkModeTheme" class="header-action-btn header-btn-theme bg-white/10 hover:bg-white/20 border border-white/20 text-amber-200 shadow-2xs" title="Toggle Theme" aria-label="Toggle Theme">
+        <button type="button" id="btn-theme-toggle" data-action="openThemeModal" class="header-action-btn header-btn-theme bg-white/10 hover:bg-white/20 active:bg-white/25 border border-white/20 hover:border-white/30 shadow-2xs transition backdrop-blur-xs" title="Visual Theme & Appearance" aria-label="Visual Theme & Appearance">
           <span id="theme-toggle-icon" class="inline-flex items-center justify-center shrink-0">
-            <svg class="w-3.5 h-3.5 text-amber-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+            <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4 4 4 0 014-4c.72 0 1.4.19 2 .53L12 11l4-4a3 3 0 114.24 4.24l-4 4-2.53 3c.34.6.53 1.28.53 2a4 4 0 01-4 4h-2.76z"/></svg>
           </span>
-          <span id="theme-toggle-label" class="header-btn-label">Dark Mode</span>
+          <span id="theme-toggle-label" class="header-btn-label">Theme</span>
         </button>
       </div>
     </div>
 
     <!-- Navigation Tabs & Adaptive Clock -->
-    <nav aria-label="Main Navigation" class="max-w-7xl xl:max-w-[1440px] 2xl:max-w-[1720px] mx-auto px-3 sm:px-6 flex items-center justify-between border-t border-rose-900/60 gap-2 sm:gap-4 overflow-hidden">
+    <nav id="header-main-nav" aria-label="Main Navigation" class="max-w-7xl xl:max-w-[1440px] 2xl:max-w-[1720px] mx-auto px-3 sm:px-6 flex items-center justify-between border-t border-rose-900/60 gap-2 sm:gap-4 overflow-hidden">
       <!-- Horizontally Scrollable Tab Strip -->
       <div class="flex items-center overflow-x-auto no-scrollbar py-0.5 flex-1 min-w-0" role="tablist">
-        <button role="tab" aria-selected="true" aria-controls="tab-content-planner" data-action="switchTab" data-tab="planner" id="tab-btn-planner" class="tab-btn px-3 sm:px-4 py-2.5 text-xs sm:text-sm font-bold border-b-2 border-msu-gold text-amber-200 flex items-center gap-1.5 sm:gap-2 shrink-0">
+        <button role="tab" aria-selected="true" aria-controls="tab-content-planner" data-action="switchTab" data-tab="planner" id="tab-btn-planner" class="tab-btn is-active-tab px-3 sm:px-4 py-2.5 text-xs sm:text-sm font-bold border-b-2 flex items-center gap-1.5 sm:gap-2 shrink-0">
           <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
           <span>Lesson Planner Matrix</span>
         </button>
@@ -180,12 +228,12 @@
       </div>
 
       <!-- Real-time Live Header Clock (Collapses gracefully to only time on narrow viewports) -->
-      <div id="header-live-clock" aria-live="off" class="text-[11px] sm:text-xs font-mono text-amber-200/90 flex items-center gap-1.5 tracking-tight font-medium shrink-0 py-1.5 pl-2">
-        <svg class="w-3.5 h-3.5 text-amber-400 shrink-0 hidden sm:inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      <div id="header-live-clock" aria-live="off" class="text-[11px] sm:text-xs font-mono flex items-center gap-1.5 tracking-tight font-medium shrink-0 py-1.5 pl-2">
+        <svg class="w-3.5 h-3.5 text-current shrink-0 hidden sm:inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
         <span class="hidden xl:inline"><span id="clock-day-text">Tuesday</span>, </span>
         <span class="hidden xl:inline" id="clock-date-text">September 8, 2026</span>
-        <span class="hidden lg:inline text-amber-400/60 font-sans">•</span>
-        <span id="clock-time-text" class="font-bold text-white bg-black/35 px-2 py-0.5 rounded border border-amber-400/20 shadow-2xs whitespace-nowrap">08:55:40 AM</span>
+        <span class="hidden lg:inline text-current opacity-60 font-sans">•</span>
+        <span id="clock-time-text" class="font-bold text-white bg-black/35 px-2 py-0.5 rounded border border-white/20 shadow-2xs whitespace-nowrap">08:55:40 AM</span>
       </div>
     </nav>
   </header>
@@ -1036,20 +1084,129 @@
 
   <!-- ================= MODALS & DIALOGS ================= -->
 
-  <!-- 1. SEMESTER & INSTITUTION SETTINGS MODAL -->
-  <div id="term-settings-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
-    <div class="bg-white dark:bg-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4 border border-slate-200 dark:border-slate-700 max-h-[92vh] flex flex-col text-slate-800 dark:text-slate-100">
-      <div class="flex items-start justify-between shrink-0">
-        <div>
-          <h3 class="font-bold text-base text-slate-900 dark:text-slate-100">Portal & Semester Settings</h3>
-          <p class="text-xs text-slate-500 dark:text-slate-400">Configure institution branding, academic term dates, and faculty email.</p>
+  <!-- 0. THEME & VISUAL APPEARANCE MODAL -->
+  <div id="theme-settings-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden" data-action="closeModalOnBackdrop" data-modal="theme-settings-modal">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl max-w-xl w-full shadow-2xl border border-slate-200 dark:border-slate-700 max-h-[92vh] flex flex-col text-slate-800 dark:text-slate-100 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+      <!-- Themed Gradient Header -->
+      <div class="app-themed-header px-6 py-4 bg-gradient-to-r from-msu-darkMaroon via-msu-maroon to-slate-900 text-white flex items-center justify-between border-b-2 border-msu-gold shrink-0">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-lg shadow-xs">
+            🎨
+          </div>
+          <div>
+            <h3 class="font-extrabold text-base text-white tracking-tight">Theme & Visual Appearance</h3>
+            <p class="app-themed-subtitle text-xs text-amber-200/90 font-medium">Dark mode, header color palettes, and workspace backgrounds</p>
+          </div>
         </div>
-        <button aria-label="Close modal" data-action="closeTermSettingsModal" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-        </button>
+        <button type="button" aria-label="Close modal" data-action="closeThemeModal" class="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-slate-200 hover:text-white text-xs transition" title="Close">✕</button>
       </div>
 
-      <div class="space-y-4 text-xs overflow-y-auto pr-1 flex-1">
+      <div class="p-6 space-y-4 text-xs overflow-y-auto pr-2 flex-1">
+        <!-- Section: Appearance Mode (Light / Dark Switcher) -->
+        <div class="space-y-2.5 bg-slate-50/80 dark:bg-slate-900/80 p-3.5 rounded-xl border border-slate-200 dark:border-slate-700">
+          <div class="flex items-center justify-between">
+            <span class="font-extrabold uppercase tracking-wider text-[11px] text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+              <span>🌗</span> Appearance Mode
+            </span>
+            <span id="theme-modal-mode-badge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200">Light Mode Active</span>
+          </div>
+          <div class="grid grid-cols-2 gap-2.5">
+            <button type="button" id="btn-mode-light" data-action="setThemeMode" data-mode="light"
+              class="p-2.5 rounded-xl border flex items-center justify-center gap-2 font-bold text-xs transition cursor-pointer">
+              <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+              <span>☀️ Light Mode</span>
+            </button>
+            <button type="button" id="btn-mode-dark" data-action="setThemeMode" data-mode="dark"
+              class="p-2.5 rounded-xl border flex items-center justify-center gap-2 font-bold text-xs transition cursor-pointer">
+              <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+              <span>🌙 Dark Mode</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Section: Main Header Color Palette -->
+        <div class="space-y-2.5 bg-slate-50/80 dark:bg-slate-900/80 p-3.5 rounded-xl border border-slate-200 dark:border-slate-700">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-slate-700 dark:text-slate-300 text-xs flex items-center gap-1.5">
+              <span>🏛️</span> Main Header Color Palette
+            </span>
+            <span class="text-[10px] text-slate-400">Live preview applies instantly</span>
+          </div>
+          <div id="setting-header-palette-swatches" class="grid grid-cols-3 sm:grid-cols-5 gap-2">
+            <!-- Rendered dynamically by renderHeaderThemeSwatches() -->
+          </div>
+          <!-- Custom Header Color Pickers -->
+          <div id="setting-header-custom-inputs" class="hidden p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 space-y-2">
+            <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wide block">Custom Header Colors</span>
+            <div class="grid grid-cols-2 gap-3">
+              <div class="flex items-center gap-2">
+                <input type="color" id="setting-header-custom-primary" data-action-input="onCustomHeaderColorInput" data-action-change="onCustomHeaderColorInput" data-type="primary" class="w-8 h-8 rounded border border-slate-300 dark:border-slate-600 cursor-pointer bg-transparent">
+                <label for="setting-header-custom-primary" class="text-[11px] text-slate-600 dark:text-slate-300 font-semibold cursor-pointer">Header Gradient / Main</label>
+              </div>
+              <div class="flex items-center gap-2">
+                <input type="color" id="setting-header-custom-accent" data-action-input="onCustomHeaderColorInput" data-action-change="onCustomHeaderColorInput" data-type="accent" class="w-8 h-8 rounded border border-slate-300 dark:border-slate-600 cursor-pointer bg-transparent">
+                <label for="setting-header-custom-accent" class="text-[11px] text-slate-600 dark:text-slate-300 font-semibold cursor-pointer">Tab Accent / Gold</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section: Main Window Background Palette -->
+        <div class="space-y-2.5 bg-slate-50/80 dark:bg-slate-900/80 p-3.5 rounded-xl border border-slate-200 dark:border-slate-700">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-slate-700 dark:text-slate-300 text-xs flex items-center gap-1.5">
+              <span>🖼️</span> Main Window Background Palette
+            </span>
+            <span class="text-[10px] text-slate-400">Obvious light and dark canvas tones</span>
+          </div>
+          <div id="setting-window-palette-swatches" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-7 gap-2">
+            <!-- Rendered dynamically by renderWindowThemeSwatches() -->
+          </div>
+          <!-- Custom Window Color Pickers -->
+          <div id="setting-window-custom-inputs" class="hidden p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 space-y-2">
+            <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wide block">Custom Window Background</span>
+            <div class="grid grid-cols-2 gap-3">
+              <div class="flex items-center gap-2">
+                <input type="color" id="setting-window-custom-light" data-action-input="onCustomWindowColorInput" data-action-change="onCustomWindowColorInput" data-type="light" class="w-8 h-8 rounded border border-slate-300 dark:border-slate-600 cursor-pointer bg-transparent">
+                <label for="setting-window-custom-light" class="text-[11px] text-slate-600 dark:text-slate-300 font-semibold cursor-pointer">Light Mode Canvas</label>
+              </div>
+              <div class="flex items-center gap-2">
+                <input type="color" id="setting-window-custom-dark" data-action-input="onCustomWindowColorInput" data-action-change="onCustomWindowColorInput" data-type="dark" class="w-8 h-8 rounded border border-slate-300 dark:border-slate-600 cursor-pointer bg-transparent">
+                <label for="setting-window-custom-dark" class="text-[11px] text-slate-600 dark:text-slate-300 font-semibold cursor-pointer">Dark Mode Canvas</label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="p-4 px-6 bg-slate-50 dark:bg-slate-900 border-t border-slate-100 dark:border-slate-700 flex items-center justify-between shrink-0">
+        <button type="button" data-action="resetThemePalettes" class="text-[11px] font-semibold text-slate-500 hover:text-amber-600 dark:text-slate-400 dark:hover:text-amber-400 transition" title="Reset to standard defaults">
+          Reset Defaults
+        </button>
+        <div class="flex items-center gap-2">
+          <button type="button" data-action="closeThemeModal" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl font-semibold text-xs transition">Cancel</button>
+          <button type="button" data-action="saveThemeSettings" class="app-themed-btn-primary px-4 py-2 text-white rounded-xl font-bold text-xs shadow-md transition">Apply & Save Theme</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 1. SEMESTER & INSTITUTION SETTINGS MODAL -->
+  <div id="term-settings-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl max-w-lg w-full shadow-2xl border border-slate-200 dark:border-slate-700 max-h-[92vh] flex flex-col text-slate-800 dark:text-slate-100 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+      <div class="app-themed-header bg-gradient-to-r from-msu-darkMaroon via-msu-maroon to-slate-900 px-5 py-3.5 text-white flex items-center justify-between border-b border-msu-gold/40 shrink-0">
+        <div class="flex items-center gap-2.5">
+          <span class="text-xl">🏛️</span>
+          <div>
+            <h3 class="font-extrabold text-sm sm:text-base tracking-tight leading-tight">Portal & Semester Settings</h3>
+            <p class="app-themed-subtitle text-[11px] text-amber-200/90 font-medium">Configure institution branding, academic term dates, and faculty email.</p>
+          </div>
+        </div>
+        <button type="button" aria-label="Close modal" data-action="closeTermSettingsModal" class="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-slate-300 hover:text-white text-xs transition" title="Close">✕</button>
+      </div>
+
+      <div class="p-5 space-y-4 text-xs overflow-y-auto pr-3 flex-1">
         <!-- Section: Institution Branding -->
         <div class="space-y-3 bg-slate-50/80 dark:bg-slate-900/80 p-3.5 rounded-xl border border-slate-200 dark:border-slate-700">
           <div class="flex items-center gap-1.5 text-slate-800 dark:text-slate-200 font-extrabold uppercase tracking-wider text-[11px]">
@@ -1059,7 +1216,7 @@
 
           <div>
             <label class="font-bold text-slate-700 dark:text-slate-300 block mb-1">School / University Name</label>
-            <input type="text" id="setting-school-name" placeholder="e.g. University Faculty of Engineering" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg p-2.5 text-xs font-semibold focus:ring-2 focus:ring-msu-maroon text-slate-900 dark:text-slate-100">
+            <input type="text" id="setting-school-name" placeholder="e.g. University Faculty of Engineering" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg p-2.5 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-msu-maroon focus:border-msu-maroon dark:focus:ring-amber-500 dark:focus:border-amber-500 text-slate-900 dark:text-slate-100 transition shadow-2xs">
           </div>
 
           <div>
@@ -1089,31 +1246,31 @@
         <div class="space-y-3">
           <div>
             <label class="font-bold text-slate-700 dark:text-slate-300 block mb-1">Term / Semester Title</label>
-            <input type="text" id="setting-term-title" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg p-2.5 text-xs font-semibold focus:ring-2 focus:ring-msu-maroon text-slate-900 dark:text-slate-100">
+            <input type="text" id="setting-term-title" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg p-2.5 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-msu-maroon focus:border-msu-maroon dark:focus:ring-amber-500 dark:focus:border-amber-500 text-slate-900 dark:text-slate-100 transition shadow-2xs">
           </div>
           <div class="grid grid-cols-2 gap-3">
             <div>
               <label class="font-bold text-slate-700 dark:text-slate-300 block mb-1">Semester Start Date</label>
-              <input type="date" id="setting-start-date" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg p-2.5 text-xs font-semibold focus:ring-2 focus:ring-msu-maroon text-slate-900 dark:text-slate-100">
+              <input type="date" id="setting-start-date" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg p-2.5 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-msu-maroon focus:border-msu-maroon dark:focus:ring-amber-500 dark:focus:border-amber-500 text-slate-900 dark:text-slate-100 transition shadow-2xs">
               <span class="text-[10px] text-slate-400 mt-0.5 block">Classes begin</span>
             </div>
             <div>
               <label class="font-bold text-slate-700 dark:text-slate-300 block mb-1">Semester End Date</label>
-              <input type="date" id="setting-end-date" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg p-2.5 text-xs font-semibold focus:ring-2 focus:ring-msu-maroon text-slate-900 dark:text-slate-100">
+              <input type="date" id="setting-end-date" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg p-2.5 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-msu-maroon focus:border-msu-maroon dark:focus:ring-amber-500 dark:focus:border-amber-500 text-slate-900 dark:text-slate-100 transition shadow-2xs">
               <span class="text-[10px] text-slate-400 mt-0.5 block">Last day of term</span>
             </div>
           </div>
           <div>
             <label class="font-bold text-slate-700 dark:text-slate-300 block mb-1">Default Faculty Email / Google Account</label>
-            <input type="email" id="setting-faculty-email" placeholder="e.g. yourname@university.edu" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg p-2.5 text-xs font-semibold focus:ring-2 focus:ring-msu-maroon text-slate-900 dark:text-slate-100">
+            <input type="email" id="setting-faculty-email" placeholder="e.g. yourname@university.edu" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg p-2.5 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-msu-maroon focus:border-msu-maroon dark:focus:ring-amber-500 dark:focus:border-amber-500 text-slate-900 dark:text-slate-100 transition shadow-2xs">
             <span class="text-[10px] text-slate-400 mt-0.5 block">When set, outgoing student emails will automatically open Gmail under this specific logged-in Google account. Leave empty to use system default mail app.</span>
           </div>
         </div>
       </div>
 
-      <div class="flex justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-700 shrink-0">
-        <button data-action="closeTermSettingsModal" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 rounded-xl font-semibold text-xs">Cancel</button>
-        <button data-action="saveTermSettings" class="px-4 py-2 bg-msu-maroon hover:bg-msu-darkMaroon text-white rounded-xl font-bold text-xs shadow-md">Apply & Save Settings</button>
+      <div class="flex justify-end gap-2 p-4 border-t border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 shrink-0">
+        <button data-action="closeTermSettingsModal" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 rounded-xl font-semibold text-xs transition">Cancel</button>
+        <button data-action="saveTermSettings" class="app-themed-btn-primary px-4 py-2 bg-msu-maroon hover:bg-msu-darkMaroon text-white rounded-xl font-bold text-xs shadow-md transition">Apply & Save Settings</button>
       </div>
     </div>
   </div>
@@ -1469,18 +1626,19 @@
 
   <!-- 5. MANAGE COURSES & SECTIONS MODAL -->
   <div id="manage-courses-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 hidden">
-    <div class="bg-white dark:bg-slate-800 rounded-2xl max-w-2xl w-full p-5 sm:p-6 shadow-2xl space-y-4 max-h-[88vh] flex flex-col border border-slate-200 dark:border-slate-700 relative text-slate-800 dark:text-slate-100">
-      <div class="flex items-start justify-between border-b border-slate-200 dark:border-slate-700 pb-3">
-        <div>
-          <h3 class="font-bold text-lg text-slate-900 dark:text-slate-100">Manage Subjects & Sections</h3>
-          <p class="text-xs text-slate-500 dark:text-slate-400">Configure subjects, sections, and class meeting hours.</p>
+    <div class="bg-white dark:bg-slate-800 rounded-2xl max-w-2xl w-full shadow-2xl max-h-[90vh] flex flex-col border border-slate-200 dark:border-slate-700 relative text-slate-800 dark:text-slate-100 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+      <div class="app-themed-header bg-gradient-to-r from-msu-darkMaroon via-msu-maroon to-slate-900 px-5 py-3.5 text-white flex items-center justify-between border-b border-msu-gold/40 shrink-0">
+        <div class="flex items-center gap-2.5">
+          <span class="text-xl">📚</span>
+          <div>
+            <h3 class="font-extrabold text-sm sm:text-base tracking-tight leading-tight">Manage Subjects & Sections</h3>
+            <p class="app-themed-subtitle text-[11px] text-amber-200/90 font-medium">Configure subjects, sections, and class meeting hours.</p>
+          </div>
         </div>
-        <button aria-label="Close modal" data-action="closeManageCoursesModal" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-        </button>
+        <button type="button" aria-label="Close modal" data-action="closeManageCoursesModal" class="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-slate-300 hover:text-white text-xs transition" title="Close">✕</button>
       </div>
 
-      <div class="flex-1 overflow-y-auto space-y-4 pr-1">
+      <div class="p-5 flex-1 overflow-y-auto space-y-4 pr-3">
         <div class="p-3.5 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 space-y-2.5">
           <div class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">+ Add New Subject</div>
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
@@ -1498,7 +1656,7 @@
             <div id="new-course-color-preview" class="p-2.5 rounded-lg border text-xs flex items-center justify-between transition-all"></div>
           </div>
           <div class="flex justify-end">
-            <button data-action="addNewSubject" class="px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 dark:bg-slate-700 dark:hover:bg-slate-600 text-white rounded-lg text-xs font-bold transition">
+            <button data-action="addNewSubject" class="app-themed-btn-primary px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 dark:bg-slate-700 dark:hover:bg-slate-600 text-white rounded-lg text-xs font-bold transition shadow-2xs">
               Add Subject
             </button>
           </div>
@@ -1507,28 +1665,29 @@
         <div class="space-y-3" id="manage-courses-list"></div>
       </div>
 
-      <div class="flex justify-end pt-3 border-t border-slate-200 dark:border-slate-700">
-        <button data-action="closeManageCoursesModal" class="px-5 py-2 bg-slate-800 hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-600 text-white rounded-xl text-xs font-bold">Done</button>
+      <div class="flex justify-end p-4 border-t border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 shrink-0">
+        <button data-action="closeManageCoursesModal" class="app-themed-btn-primary px-6 py-2 text-white rounded-xl text-xs font-bold transition shadow-xs">Done</button>
       </div>
     </div>
   </div>
 
   <!-- 6. EDIT SUBJECT DETAILS MODAL -->
   <div id="edit-course-modal" class="fixed inset-0 z-[80] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
-    <div class="bg-white dark:bg-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100">
-      <div class="flex items-start justify-between">
-        <div>
-          <h3 class="font-bold text-base text-slate-900 dark:text-slate-100">Edit Subject Details</h3>
-          <p class="text-xs text-slate-500 dark:text-slate-400">Update subject code, description, or color theme.</p>
+    <div class="bg-white dark:bg-slate-800 rounded-2xl max-w-md w-full shadow-2xl border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+      <div class="app-themed-header bg-gradient-to-r from-msu-darkMaroon via-msu-maroon to-slate-900 px-5 py-3.5 text-white flex items-center justify-between border-b border-msu-gold/40 shrink-0">
+        <div class="flex items-center gap-2.5">
+          <span class="text-xl">✏️</span>
+          <div>
+            <h3 class="font-extrabold text-sm sm:text-base tracking-tight leading-tight">Edit Subject Details</h3>
+            <p class="app-themed-subtitle text-[11px] text-amber-200/90 font-medium">Update subject code, description, or color theme.</p>
+          </div>
         </div>
-        <button aria-label="Close modal" data-action="closeEditSubjectModal" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-        </button>
+        <button type="button" aria-label="Close modal" data-action="closeEditSubjectModal" class="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-slate-300 hover:text-white text-xs transition" title="Close">✕</button>
       </div>
 
       <input type="hidden" id="edit-course-original-code">
 
-      <div class="space-y-3 text-xs">
+      <div class="p-5 space-y-3 text-xs overflow-y-auto max-h-[75vh]">
         <div>
           <label class="font-bold text-slate-700 dark:text-slate-300 block mb-1">Subject Code</label>
           <input type="text" id="edit-course-code" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-lg p-2 text-xs font-bold uppercase">
@@ -1553,109 +1712,112 @@
         </div>
       </div>
 
-      <div class="flex justify-end gap-2 pt-2">
-        <button data-action="closeEditSubjectModal" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 rounded-xl font-semibold text-xs">Cancel</button>
-        <button data-action="saveEditSubject" class="px-4 py-2 bg-msu-maroon hover:bg-msu-darkMaroon text-white rounded-xl font-bold text-xs shadow-md">Save Changes</button>
+      <div class="flex justify-end gap-2 p-4 border-t border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 shrink-0">
+        <button data-action="closeEditSubjectModal" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 rounded-xl font-semibold text-xs transition">Cancel</button>
+        <button data-action="saveEditSubject" class="app-themed-btn-primary px-4 py-2 bg-msu-maroon hover:bg-msu-darkMaroon text-white rounded-xl font-bold text-xs shadow-md transition">Save Changes</button>
       </div>
     </div>
   </div>
 
   <!-- 6b. ADD SECTION MODAL -->
   <div id="add-section-modal" class="fixed inset-0 z-[80] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
-    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4 border border-slate-200 animate-in fade-in zoom-in-95 duration-150 max-h-[92vh] overflow-y-auto">
-      <div class="flex items-start justify-between">
-        <div>
-          <h3 class="font-bold text-base text-slate-900">Add Section</h3>
-          <p id="add-section-modal-subtitle" class="text-xs text-slate-500">Configure new section for subject.</p>
+    <div class="bg-white dark:bg-slate-800 rounded-2xl max-w-md w-full shadow-2xl border border-slate-200 dark:border-slate-700 animate-in fade-in zoom-in-95 duration-150 max-h-[92vh] flex flex-col overflow-hidden text-slate-800 dark:text-slate-100">
+      <div class="app-themed-header bg-gradient-to-r from-msu-darkMaroon via-msu-maroon to-slate-900 px-5 py-3.5 text-white flex items-center justify-between border-b border-msu-gold/40 shrink-0">
+        <div class="flex items-center gap-2.5">
+          <span class="text-xl">➕</span>
+          <div>
+            <h3 class="font-extrabold text-sm sm:text-base tracking-tight leading-tight">Add Section</h3>
+            <p id="add-section-modal-subtitle" class="app-themed-subtitle text-[11px] text-amber-200/90 font-medium">Configure new section for subject.</p>
+          </div>
         </div>
-        <button type="button" aria-label="Close modal" data-action="closeAddSectionModal" class="text-slate-400 hover:text-slate-600 p-1">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-        </button>
+        <button type="button" aria-label="Close modal" data-action="closeAddSectionModal" class="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-slate-300 hover:text-white text-xs transition" title="Close">✕</button>
       </div>
 
-      <form data-action-submit="submitAddSection" class="space-y-3.5 text-xs">
-        <input type="hidden" id="add-section-course-code">
+      <form data-action-submit="submitAddSection" class="flex flex-col flex-1 overflow-hidden min-h-0">
+        <div class="p-5 space-y-3.5 text-xs overflow-y-auto flex-1">
+          <input type="hidden" id="add-section-course-code">
 
-        <div>
-          <label class="font-bold text-slate-700 block mb-1">Section Name <span class="text-rose-600">*</span></label>
-          <input type="text" id="add-section-name" placeholder="e.g. B16 or Sec 2" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs font-bold text-slate-800 focus:ring-2 focus:ring-msu-maroon focus:bg-white transition" autocomplete="off" required>
-          <p class="text-[11px] text-slate-500 mt-1">Section will appear in the Lesson Matrix, Timetable, and Class List.</p>
-        </div>
-
-        <div>
-          <label class="font-bold text-slate-700 block mb-1">Google Classroom URL <span class="text-slate-400 font-normal">(Optional)</span></label>
-          <input type="url" id="add-section-classroom-url" placeholder="https://classroom.google.com/c/..." class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs font-mono text-slate-800 focus:ring-2 focus:ring-emerald-600 focus:bg-white transition" autocomplete="off">
-          <p class="text-[11px] text-slate-500 mt-1">Direct link so clicking the section launches Google Classroom in a new tab.</p>
-        </div>
-
-        <div class="pt-2 border-t border-slate-200">
-          <div class="flex items-center justify-between mb-2">
-            <label class="font-bold text-slate-800 flex items-center gap-1.5">
-              <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-              Weekly Schedule <span class="text-slate-400 font-normal text-[11px]">(Optional)</span>
-            </label>
-            <span class="text-[10px] text-slate-400">Select days to assign slot</span>
+          <div>
+            <label class="font-bold text-slate-700 dark:text-slate-300 block mb-1">Section Name <span class="text-rose-600">*</span></label>
+            <input type="text" id="add-section-name" placeholder="e.g. B16 or Sec 2" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg p-2 text-xs font-bold text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-msu-maroon focus:bg-white dark:focus:bg-slate-900 transition" autocomplete="off" required>
+            <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Section will appear in the Lesson Matrix, Timetable, and Class List.</p>
           </div>
 
-          <div class="space-y-2.5">
-            <div>
-              <span class="text-[11px] font-semibold text-slate-600 block mb-1">Meeting Days</span>
-              <div class="grid grid-cols-3 gap-2 bg-slate-50 p-2.5 rounded-xl border border-slate-200" id="add-section-days-group">
-                <label class="flex items-center gap-1.5 text-xs font-semibold cursor-pointer">
-                  <input type="checkbox" value="Sunday" class="rounded text-msu-maroon focus:ring-msu-maroon"> Sun
-                </label>
-                <label class="flex items-center gap-1.5 text-xs font-semibold cursor-pointer">
-                  <input type="checkbox" value="Monday" class="rounded text-msu-maroon focus:ring-msu-maroon"> Mon
-                </label>
-                <label class="flex items-center gap-1.5 text-xs font-semibold cursor-pointer">
-                  <input type="checkbox" value="Tuesday" class="rounded text-msu-maroon focus:ring-msu-maroon"> Tue
-                </label>
-                <label class="flex items-center gap-1.5 text-xs font-semibold cursor-pointer">
-                  <input type="checkbox" value="Wednesday" class="rounded text-msu-maroon focus:ring-msu-maroon"> Wed
-                </label>
-                <label class="flex items-center gap-1.5 text-xs font-semibold cursor-pointer">
-                  <input type="checkbox" value="Thursday" class="rounded text-msu-maroon focus:ring-msu-maroon"> Thu
-                </label>
-                <label class="flex items-center gap-1.5 text-xs font-semibold cursor-pointer">
-                  <input type="checkbox" value="Friday" class="rounded text-msu-maroon focus:ring-msu-maroon"> Fri
-                </label>
-                <label class="flex items-center gap-1.5 text-xs font-semibold cursor-pointer">
-                  <input type="checkbox" value="Saturday" class="rounded text-msu-maroon focus:ring-msu-maroon"> Sat
-                </label>
-              </div>
+          <div>
+            <label class="font-bold text-slate-700 dark:text-slate-300 block mb-1">Google Classroom URL <span class="text-slate-400 font-normal">(Optional)</span></label>
+            <input type="url" id="add-section-classroom-url" placeholder="https://classroom.google.com/c/..." class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg p-2 text-xs font-mono text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-emerald-600 focus:bg-white dark:focus:bg-slate-900 transition" autocomplete="off">
+            <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Direct link so clicking the section launches Google Classroom in a new tab.</p>
+          </div>
+
+          <div class="pt-2 border-t border-slate-200 dark:border-slate-700">
+            <div class="flex items-center justify-between mb-2">
+              <label class="font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                Weekly Schedule <span class="text-slate-400 font-normal text-[11px]">(Optional)</span>
+              </label>
+              <span class="text-[10px] text-slate-400">Select days to assign slot</span>
             </div>
 
-            <div class="grid grid-cols-2 gap-2.5">
+            <div class="space-y-2.5">
               <div>
-                <label class="text-[11px] font-semibold text-slate-600 block mb-1">Start Time</label>
-                <input type="time" id="add-section-start-time" value="07:30" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs font-mono font-bold focus:ring-2 focus:ring-msu-maroon">
+                <span class="text-[11px] font-semibold text-slate-600 dark:text-slate-300 block mb-1">Meeting Days</span>
+                <div class="grid grid-cols-3 gap-2 bg-slate-50 dark:bg-slate-900 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700" id="add-section-days-group">
+                  <label class="flex items-center gap-1.5 text-xs font-semibold cursor-pointer">
+                    <input type="checkbox" value="Sunday" class="rounded text-msu-maroon focus:ring-msu-maroon"> Sun
+                  </label>
+                  <label class="flex items-center gap-1.5 text-xs font-semibold cursor-pointer">
+                    <input type="checkbox" value="Monday" class="rounded text-msu-maroon focus:ring-msu-maroon"> Mon
+                  </label>
+                  <label class="flex items-center gap-1.5 text-xs font-semibold cursor-pointer">
+                    <input type="checkbox" value="Tuesday" class="rounded text-msu-maroon focus:ring-msu-maroon"> Tue
+                  </label>
+                  <label class="flex items-center gap-1.5 text-xs font-semibold cursor-pointer">
+                    <input type="checkbox" value="Wednesday" class="rounded text-msu-maroon focus:ring-msu-maroon"> Wed
+                  </label>
+                  <label class="flex items-center gap-1.5 text-xs font-semibold cursor-pointer">
+                    <input type="checkbox" value="Thursday" class="rounded text-msu-maroon focus:ring-msu-maroon"> Thu
+                  </label>
+                  <label class="flex items-center gap-1.5 text-xs font-semibold cursor-pointer">
+                    <input type="checkbox" value="Friday" class="rounded text-msu-maroon focus:ring-msu-maroon"> Fri
+                  </label>
+                  <label class="flex items-center gap-1.5 text-xs font-semibold cursor-pointer">
+                    <input type="checkbox" value="Saturday" class="rounded text-msu-maroon focus:ring-msu-maroon"> Sat
+                  </label>
+                </div>
               </div>
-              <div>
-                <label class="text-[11px] font-semibold text-slate-600 block mb-1">End Time</label>
-                <input type="time" id="add-section-end-time" value="09:00" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs font-mono font-bold focus:ring-2 focus:ring-msu-maroon">
-              </div>
-            </div>
 
-            <div class="grid grid-cols-2 gap-2.5">
-              <div>
-                <label class="text-[11px] font-semibold text-slate-600 block mb-1">Room / Lab</label>
-                <input type="text" id="add-section-room" placeholder="e.g. Eng 201 or Lab 3" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs focus:ring-2 focus:ring-msu-maroon">
+              <div class="grid grid-cols-2 gap-2.5">
+                <div>
+                  <label class="text-[11px] font-semibold text-slate-600 dark:text-slate-300 block mb-1">Start Time</label>
+                  <input type="time" id="add-section-start-time" value="07:30" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-lg p-2 text-xs font-mono font-bold focus:ring-2 focus:ring-msu-maroon">
+                </div>
+                <div>
+                  <label class="text-[11px] font-semibold text-slate-600 dark:text-slate-300 block mb-1">End Time</label>
+                  <input type="time" id="add-section-end-time" value="09:00" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-lg p-2 text-xs font-mono font-bold focus:ring-2 focus:ring-msu-maroon">
+                </div>
               </div>
-              <div>
-                <label class="text-[11px] font-semibold text-slate-600 block mb-1">Class Type</label>
-                <select id="add-section-type" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs font-medium focus:ring-2 focus:ring-msu-maroon">
-                  <option value="Lecture">Lecture</option>
-                  <option value="Laboratory">Laboratory</option>
-                  <option value="Field Work">Field Work</option>
-                </select>
+
+              <div class="grid grid-cols-2 gap-2.5">
+                <div>
+                  <label class="text-[11px] font-semibold text-slate-600 dark:text-slate-300 block mb-1">Room / Lab</label>
+                  <input type="text" id="add-section-room" placeholder="e.g. Eng 201 or Lab 3" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-lg p-2 text-xs focus:ring-2 focus:ring-msu-maroon">
+                </div>
+                <div>
+                  <label class="text-[11px] font-semibold text-slate-600 dark:text-slate-300 block mb-1">Class Type</label>
+                  <select id="add-section-type" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-lg p-2 text-xs font-medium focus:ring-2 focus:ring-msu-maroon">
+                    <option value="Lecture">Lecture</option>
+                    <option value="Laboratory">Laboratory</option>
+                    <option value="Field Work">Field Work</option>
+                  </select>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="flex justify-end gap-2 pt-2 border-t border-slate-100">
-          <button type="button" data-action="closeAddSectionModal" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-semibold text-xs transition">Cancel</button>
-          <button type="submit" class="px-4 py-2 bg-msu-maroon hover:bg-msu-darkMaroon text-white rounded-xl font-bold text-xs shadow-md transition">Add Section</button>
+        <div class="flex justify-end gap-2 p-4 border-t border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 shrink-0">
+          <button type="button" data-action="closeAddSectionModal" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 rounded-xl font-semibold text-xs transition">Cancel</button>
+          <button type="submit" class="app-themed-btn-primary px-4 py-2 bg-msu-maroon hover:bg-msu-darkMaroon text-white rounded-xl font-bold text-xs shadow-md transition">Add Section</button>
         </div>
       </form>
     </div>
@@ -1663,100 +1825,103 @@
 
   <!-- 6c. EDIT SECTION MODAL (Edit Per Section) -->
   <div id="edit-section-modal" class="fixed inset-0 z-[85] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
-    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4 border border-slate-200 animate-in fade-in zoom-in-95 duration-150 max-h-[92vh] overflow-y-auto">
-      <div class="flex items-start justify-between">
-        <div>
-          <h3 class="font-bold text-base text-slate-900">Edit Section</h3>
-          <p id="edit-section-modal-subtitle" class="text-xs text-slate-500">Update section name and schedule.</p>
+    <div class="bg-white dark:bg-slate-800 rounded-2xl max-w-md w-full shadow-2xl border border-slate-200 dark:border-slate-700 animate-in fade-in zoom-in-95 duration-150 max-h-[92vh] flex flex-col overflow-hidden text-slate-800 dark:text-slate-100">
+      <div class="app-themed-header bg-gradient-to-r from-msu-darkMaroon via-msu-maroon to-slate-900 px-5 py-3.5 text-white flex items-center justify-between border-b border-msu-gold/40 shrink-0">
+        <div class="flex items-center gap-2.5">
+          <span class="text-xl">📝</span>
+          <div>
+            <h3 class="font-extrabold text-sm sm:text-base tracking-tight leading-tight">Edit Section</h3>
+            <p id="edit-section-modal-subtitle" class="app-themed-subtitle text-[11px] text-amber-200/90 font-medium">Update section name and schedule.</p>
+          </div>
         </div>
-        <button type="button" aria-label="Close modal" data-action="closeEditSectionModal" class="text-slate-400 hover:text-slate-600 p-1">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-        </button>
+        <button type="button" aria-label="Close modal" data-action="closeEditSectionModal" class="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-slate-300 hover:text-white text-xs transition" title="Close">✕</button>
       </div>
 
-      <form data-action-submit="submitEditSection" class="space-y-3.5 text-xs">
-        <input type="hidden" id="edit-section-course-code">
-        <input type="hidden" id="edit-section-original-name">
+      <form data-action-submit="submitEditSection" class="flex flex-col flex-1 overflow-hidden min-h-0">
+        <div class="p-5 space-y-3.5 text-xs overflow-y-auto flex-1">
+          <input type="hidden" id="edit-section-course-code">
+          <input type="hidden" id="edit-section-original-name">
 
-        <div>
-          <label class="font-bold text-slate-700 block mb-1">Section Name <span class="text-rose-600">*</span></label>
-          <input type="text" id="edit-section-name" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs font-bold text-slate-800 focus:ring-2 focus:ring-msu-maroon focus:bg-white transition" required>
-        </div>
-
-        <div>
-          <label class="font-bold text-slate-700 block mb-1">Google Classroom URL <span class="text-slate-400 font-normal">(Optional)</span></label>
-          <input type="url" id="edit-section-classroom-url" placeholder="https://classroom.google.com/c/..." class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs font-mono text-slate-800 focus:ring-2 focus:ring-emerald-600 focus:bg-white transition" autocomplete="off">
-          <p class="text-[11px] text-slate-500 mt-1">Direct link to launch Google Classroom for this section from your matrix and timetable.</p>
-        </div>
-
-        <div class="pt-2 border-t border-slate-200">
-          <div class="flex items-center justify-between mb-2">
-            <label class="font-bold text-slate-800 flex items-center gap-1.5">
-              <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-              Weekly Schedule
-            </label>
-            <span class="text-[10px] text-slate-400">Select all active meeting days</span>
+          <div>
+            <label class="font-bold text-slate-700 dark:text-slate-300 block mb-1">Section Name <span class="text-rose-600">*</span></label>
+            <input type="text" id="edit-section-name" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg p-2 text-xs font-bold text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-msu-maroon focus:bg-white dark:focus:bg-slate-900 transition" required>
           </div>
 
-          <div class="space-y-2.5">
-            <div>
-              <span class="text-[11px] font-semibold text-slate-600 block mb-1">Meeting Days</span>
-              <div class="grid grid-cols-3 gap-2 bg-slate-50 p-2.5 rounded-xl border border-slate-200" id="edit-section-days-group">
-                <label class="flex items-center gap-1.5 text-xs font-semibold cursor-pointer">
-                  <input type="checkbox" value="Sunday" class="rounded text-msu-maroon focus:ring-msu-maroon"> Sun
-                </label>
-                <label class="flex items-center gap-1.5 text-xs font-semibold cursor-pointer">
-                  <input type="checkbox" value="Monday" class="rounded text-msu-maroon focus:ring-msu-maroon"> Mon
-                </label>
-                <label class="flex items-center gap-1.5 text-xs font-semibold cursor-pointer">
-                  <input type="checkbox" value="Tuesday" class="rounded text-msu-maroon focus:ring-msu-maroon"> Tue
-                </label>
-                <label class="flex items-center gap-1.5 text-xs font-semibold cursor-pointer">
-                  <input type="checkbox" value="Wednesday" class="rounded text-msu-maroon focus:ring-msu-maroon"> Wed
-                </label>
-                <label class="flex items-center gap-1.5 text-xs font-semibold cursor-pointer">
-                  <input type="checkbox" value="Thursday" class="rounded text-msu-maroon focus:ring-msu-maroon"> Thu
-                </label>
-                <label class="flex items-center gap-1.5 text-xs font-semibold cursor-pointer">
-                  <input type="checkbox" value="Friday" class="rounded text-msu-maroon focus:ring-msu-maroon"> Fri
-                </label>
-                <label class="flex items-center gap-1.5 text-xs font-semibold cursor-pointer">
-                  <input type="checkbox" value="Saturday" class="rounded text-msu-maroon focus:ring-msu-maroon"> Sat
-                </label>
-              </div>
+          <div>
+            <label class="font-bold text-slate-700 dark:text-slate-300 block mb-1">Google Classroom URL <span class="text-slate-400 font-normal">(Optional)</span></label>
+            <input type="url" id="edit-section-classroom-url" placeholder="https://classroom.google.com/c/..." class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg p-2 text-xs font-mono text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-emerald-600 focus:bg-white dark:focus:bg-slate-900 transition" autocomplete="off">
+            <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Direct link to launch Google Classroom for this section from your matrix and timetable.</p>
+          </div>
+
+          <div class="pt-2 border-t border-slate-200 dark:border-slate-700">
+            <div class="flex items-center justify-between mb-2">
+              <label class="font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                Weekly Schedule
+              </label>
+              <span class="text-[10px] text-slate-400">Select all active meeting days</span>
             </div>
 
-            <div class="grid grid-cols-2 gap-2.5">
+            <div class="space-y-2.5">
               <div>
-                <label class="text-[11px] font-semibold text-slate-600 block mb-1">Start Time</label>
-                <input type="time" id="edit-section-start-time" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs font-mono font-bold focus:ring-2 focus:ring-msu-maroon">
+                <span class="text-[11px] font-semibold text-slate-600 dark:text-slate-300 block mb-1">Meeting Days</span>
+                <div class="grid grid-cols-3 gap-2 bg-slate-50 dark:bg-slate-900 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700" id="edit-section-days-group">
+                  <label class="flex items-center gap-1.5 text-xs font-semibold cursor-pointer">
+                    <input type="checkbox" value="Sunday" class="rounded text-msu-maroon focus:ring-msu-maroon"> Sun
+                  </label>
+                  <label class="flex items-center gap-1.5 text-xs font-semibold cursor-pointer">
+                    <input type="checkbox" value="Monday" class="rounded text-msu-maroon focus:ring-msu-maroon"> Mon
+                  </label>
+                  <label class="flex items-center gap-1.5 text-xs font-semibold cursor-pointer">
+                    <input type="checkbox" value="Tuesday" class="rounded text-msu-maroon focus:ring-msu-maroon"> Tue
+                  </label>
+                  <label class="flex items-center gap-1.5 text-xs font-semibold cursor-pointer">
+                    <input type="checkbox" value="Wednesday" class="rounded text-msu-maroon focus:ring-msu-maroon"> Wed
+                  </label>
+                  <label class="flex items-center gap-1.5 text-xs font-semibold cursor-pointer">
+                    <input type="checkbox" value="Thursday" class="rounded text-msu-maroon focus:ring-msu-maroon"> Thu
+                  </label>
+                  <label class="flex items-center gap-1.5 text-xs font-semibold cursor-pointer">
+                    <input type="checkbox" value="Friday" class="rounded text-msu-maroon focus:ring-msu-maroon"> Fri
+                  </label>
+                  <label class="flex items-center gap-1.5 text-xs font-semibold cursor-pointer">
+                    <input type="checkbox" value="Saturday" class="rounded text-msu-maroon focus:ring-msu-maroon"> Sat
+                  </label>
+                </div>
               </div>
-              <div>
-                <label class="text-[11px] font-semibold text-slate-600 block mb-1">End Time</label>
-                <input type="time" id="edit-section-end-time" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs font-mono font-bold focus:ring-2 focus:ring-msu-maroon">
-              </div>
-            </div>
 
-            <div class="grid grid-cols-2 gap-2.5">
-              <div>
-                <label class="text-[11px] font-semibold text-slate-600 block mb-1">Room / Lab</label>
-                <input type="text" id="edit-section-room" placeholder="e.g. Eng 201 or Lab 3" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs focus:ring-2 focus:ring-msu-maroon">
+              <div class="grid grid-cols-2 gap-2.5">
+                <div>
+                  <label class="text-[11px] font-semibold text-slate-600 dark:text-slate-300 block mb-1">Start Time</label>
+                  <input type="time" id="edit-section-start-time" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-lg p-2 text-xs font-mono font-bold focus:ring-2 focus:ring-msu-maroon">
+                </div>
+                <div>
+                  <label class="text-[11px] font-semibold text-slate-600 dark:text-slate-300 block mb-1">End Time</label>
+                  <input type="time" id="edit-section-end-time" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-lg p-2 text-xs font-mono font-bold focus:ring-2 focus:ring-msu-maroon">
+                </div>
               </div>
-              <div>
-                <label class="text-[11px] font-semibold text-slate-600 block mb-1">Class Type</label>
-                <select id="edit-section-type" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs font-medium focus:ring-2 focus:ring-msu-maroon">
-                  <option value="Lecture">Lecture</option>
-                  <option value="Laboratory">Laboratory</option>
-                  <option value="Field Work">Field Work</option>
-                </select>
+
+              <div class="grid grid-cols-2 gap-2.5">
+                <div>
+                  <label class="text-[11px] font-semibold text-slate-600 dark:text-slate-300 block mb-1">Room / Lab</label>
+                  <input type="text" id="edit-section-room" placeholder="e.g. Eng 201 or Lab 3" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-lg p-2 text-xs focus:ring-2 focus:ring-msu-maroon">
+                </div>
+                <div>
+                  <label class="text-[11px] font-semibold text-slate-600 dark:text-slate-300 block mb-1">Class Type</label>
+                  <select id="edit-section-type" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-lg p-2 text-xs font-medium focus:ring-2 focus:ring-msu-maroon">
+                    <option value="Lecture">Lecture</option>
+                    <option value="Laboratory">Laboratory</option>
+                    <option value="Field Work">Field Work</option>
+                  </select>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="flex justify-end gap-2 pt-2 border-t border-slate-100">
-          <button type="button" data-action="closeEditSectionModal" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-semibold text-xs transition">Cancel</button>
-          <button type="submit" class="px-4 py-2 bg-msu-maroon hover:bg-msu-darkMaroon text-white rounded-xl font-bold text-xs shadow-md transition">Save Section</button>
+        <div class="flex justify-end gap-2 p-4 border-t border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 shrink-0">
+          <button type="button" data-action="closeEditSectionModal" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 rounded-xl font-semibold text-xs transition">Cancel</button>
+          <button type="submit" class="app-themed-btn-primary px-4 py-2 bg-msu-maroon hover:bg-msu-darkMaroon text-white rounded-xl font-bold text-xs shadow-md transition">Save Section</button>
         </div>
       </form>
     </div>
@@ -1911,7 +2076,7 @@
 
         <div>
           <label class="font-bold text-slate-700 block mb-1">Copy and paste directly from your spreadsheet</label>
-          <textarea id="bulk-paste-area" data-action-input="previewBulkData" rows="6" placeholder="2022-0142&#9;Al-Ghazali&#9;Fatima&#9;fatima.alghazali@university.edu&#10;2023-1105&#9;Santos&#9;Juan&#9;juan.santos@university.edu" class="w-full font-mono text-[11px] bg-slate-50 border border-slate-300 rounded-xl p-2.5 focus:ring-2 focus:ring-msu-maroon"></textarea>
+          <textarea id="bulk-paste-area" data-action-input="previewBulkData" rows="6" placeholder="2023-0101&#9;Alvarez&#9;Marco&#9;marco.alvarez@university.edu&#10;2023-0102&#9;Bernardo&#9;Camille&#9;camille.bernardo@university.edu" class="w-full font-mono text-[11px] bg-slate-50 border border-slate-300 rounded-xl p-2.5 focus:ring-2 focus:ring-msu-maroon"></textarea>
         </div>
 
         <div id="bulk-preview-summary" class="p-2.5 bg-slate-100 rounded-xl text-slate-600 font-medium text-xs">
@@ -1942,21 +2107,21 @@
       <div class="space-y-3 text-xs">
         <div>
           <label class="font-bold text-slate-700 block mb-1">Student ID Number</label>
-          <input type="text" id="stud-id" placeholder="e.g. 2023-0854" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs font-mono font-bold">
+          <input type="text" id="stud-id" placeholder="e.g. 2023-0101" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs font-mono font-bold">
         </div>
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="font-bold text-slate-700 block mb-1">Last Name</label>
-            <input type="text" id="stud-last" placeholder="e.g. Pendatun" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs">
+            <input type="text" id="stud-last" placeholder="e.g. Alvarez" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs">
           </div>
           <div>
             <label class="font-bold text-slate-700 block mb-1">First Name</label>
-            <input type="text" id="stud-first" placeholder="e.g. Datu Ali" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs">
+            <input type="text" id="stud-first" placeholder="e.g. Marco" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs">
           </div>
         </div>
         <div>
           <label class="font-bold text-slate-700 block mb-1">Email Address</label>
-          <input type="email" id="stud-email" placeholder="e.g. ali.pendatun@university.edu" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs">
+          <input type="email" id="stud-email" placeholder="e.g. marco.alvarez@university.edu" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs">
         </div>
         <div>
           <label class="font-bold text-slate-700 block mb-1">Enrolled Section</label>
@@ -2048,11 +2213,11 @@
             <div class="flex items-center gap-3">
               <label class="flex items-center gap-1.5 cursor-pointer">
                 <input type="radio" name="grading-scale-mode" id="grading-scale-mode-default" value="default" data-action-change="onGradingScaleModeChange" data-mode="default" class="text-amber-600 focus:ring-amber-500">
-                <span class="font-bold text-slate-700 dark:text-slate-300">Use Default Grading Scale</span>
+                <span id="grading-scale-mode-default-label" class="font-bold text-slate-700 dark:text-slate-300">Use Default Grading Scale</span>
               </label>
               <label class="flex items-center gap-1.5 cursor-pointer">
                 <input type="radio" name="grading-scale-mode" id="grading-scale-mode-custom" value="custom" data-action-change="onGradingScaleModeChange" data-mode="custom" class="text-amber-600 focus:ring-amber-500">
-                <span class="font-bold text-slate-700 dark:text-slate-300">Customize for this Section</span>
+                <span id="grading-scale-mode-custom-label" class="font-bold text-slate-700 dark:text-slate-300">Customize for this Section</span>
               </label>
             </div>
             <button type="button" id="grading-scale-reset-section-btn" data-action="resetSectionScaleToDefault" class="px-2.5 py-1 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-600 rounded-lg font-bold text-[11px] transition shadow-2xs">
@@ -2213,59 +2378,60 @@
 
   <!-- ================= 17. COMPREHENSIVE EXPORT & IMPORT CENTER MODAL ================= -->
   <div id="export-import-modal" class="fixed inset-0 z-[85] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
-    <div class="bg-white rounded-2xl max-w-3xl w-full p-6 shadow-2xl space-y-4 border border-slate-200 max-h-[92vh] flex flex-col animate-in fade-in zoom-in-95 duration-150">
-      <div class="flex items-start justify-between pb-3 border-b border-slate-200">
-        <div>
-          <h3 class="font-black text-base text-slate-900">Data Management & Export / Import Center</h3>
-          <p class="text-xs text-slate-500 mt-0.5">Export and import individual module datasets or full system backups in CSV and JSON formats.</p>
+    <div class="bg-white dark:bg-slate-800 rounded-2xl max-w-3xl w-full shadow-2xl border border-slate-200 dark:border-slate-700 max-h-[92vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150 text-slate-800 dark:text-slate-100">
+      <div class="app-themed-header bg-gradient-to-r from-msu-darkMaroon via-msu-maroon to-slate-900 px-5 py-3.5 text-white flex items-center justify-between border-b border-msu-gold/40 shrink-0">
+        <div class="flex items-center gap-2.5">
+          <span class="text-xl">💾</span>
+          <div>
+            <h3 class="font-extrabold text-sm sm:text-base tracking-tight leading-tight">Data Management & Export / Import Center</h3>
+            <p class="app-themed-subtitle text-[11px] text-amber-200/90 font-medium">Export and import individual module datasets or full system backups in CSV and JSON formats.</p>
+          </div>
         </div>
-        <button aria-label="Close modal" data-action="closeExportImportModal" class="text-slate-400 hover:text-slate-600 p-1">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-        </button>
+        <button type="button" aria-label="Close modal" data-action="closeExportImportModal" class="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-slate-300 hover:text-white text-xs transition" title="Close">✕</button>
       </div>
 
       <!-- Navigation Sub-tabs -->
-      <div class="flex gap-2 border-b border-slate-200 overflow-x-auto pb-1 text-xs font-bold no-scrollbar">
-        <button data-action="switchExportImportTab" data-tab="planner" id="ei-tab-planner" class="ei-tab px-3 py-1.5 rounded-lg border border-transparent bg-slate-100 text-slate-800 font-bold hover:bg-slate-200 transition">📅 Lesson Matrix</button>
-        <button data-action="switchExportImportTab" data-tab="courses" id="ei-tab-courses" class="ei-tab px-3 py-1.5 rounded-lg border border-transparent text-slate-500 hover:bg-slate-100 transition">📚 Subjects & Sections</button>
-        <button data-action="switchExportImportTab" data-tab="roster" id="ei-tab-roster" class="ei-tab px-3 py-1.5 rounded-lg border border-transparent text-slate-500 hover:bg-slate-100 transition">👥 Student Roster</button>
-        <button data-action="switchExportImportTab" data-tab="grades" id="ei-tab-grades" class="ei-tab px-3 py-1.5 rounded-lg border border-transparent text-slate-500 hover:bg-slate-100 transition">📊 Class Record & Grades</button>
-        <button data-action="switchExportImportTab" data-tab="backup" id="ei-tab-backup" class="ei-tab px-3 py-1.5 rounded-lg border border-transparent text-slate-500 hover:bg-slate-100 transition">💾 Complete Backup</button>
+      <div class="px-5 pt-3 pb-2 border-b border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 flex gap-2 overflow-x-auto text-xs font-bold no-scrollbar shrink-0">
+        <button data-action="switchExportImportTab" data-tab="planner" id="ei-tab-planner" class="ei-tab px-3.5 py-1.5 rounded-lg border border-transparent app-themed-btn-primary text-white font-bold transition shadow-2xs">📅 Lesson Matrix</button>
+        <button data-action="switchExportImportTab" data-tab="courses" id="ei-tab-courses" class="ei-tab px-3.5 py-1.5 rounded-lg border border-transparent text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition">📚 Subjects & Sections</button>
+        <button data-action="switchExportImportTab" data-tab="roster" id="ei-tab-roster" class="ei-tab px-3.5 py-1.5 rounded-lg border border-transparent text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition">👥 Student Roster</button>
+        <button data-action="switchExportImportTab" data-tab="grades" id="ei-tab-grades" class="ei-tab px-3.5 py-1.5 rounded-lg border border-transparent text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition">📊 Class Record & Grades</button>
+        <button data-action="switchExportImportTab" data-tab="backup" id="ei-tab-backup" class="ei-tab px-3.5 py-1.5 rounded-lg border border-transparent text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition">💾 Complete Backup</button>
       </div>
 
       <!-- Modal Body Panels -->
-      <div class="flex-1 overflow-y-auto space-y-4 pr-1 text-xs">
+      <div class="p-5 flex-1 overflow-y-auto space-y-4 pr-3 text-xs">
         <!-- PANEL 1: LESSON PLANNER MATRIX -->
         <div id="ei-panel-planner" class="ei-panel space-y-4">
-          <div class="p-3.5 bg-blue-50/70 border border-blue-200 rounded-xl space-y-1.5">
-            <h4 class="font-extrabold text-blue-950 text-xs flex items-center gap-1.5">
+          <div class="p-3.5 bg-blue-50/70 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900/60 rounded-xl space-y-1.5">
+            <h4 class="font-extrabold text-blue-950 dark:text-blue-200 text-xs flex items-center gap-1.5">
               <span>📅</span> Lesson Planner Matrix Schedule
             </h4>
-            <p class="text-blue-900 leading-relaxed text-[11px]">
+            <p class="text-blue-900 dark:text-blue-300 leading-relaxed text-[11px]">
               Export your planned topics, activity types, sub-exams, and room allocations. You can also import previously exported schedule files to populate or restore matrix entries.
             </p>
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3 flex flex-col justify-between">
+            <div class="p-4 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 space-y-3 flex flex-col justify-between">
               <div>
-                <div class="font-bold text-slate-800 text-xs">Export Planner Schedule</div>
-                <p class="text-slate-500 text-[11px] mt-1">Download schedule containing date, subject, section, topic, activity, and notes.</p>
+                <div class="font-bold text-slate-800 dark:text-slate-100 text-xs">Export Planner Schedule</div>
+                <p class="text-slate-500 dark:text-slate-400 text-[11px] mt-1">Download schedule containing date, subject, section, topic, activity, and notes.</p>
               </div>
               <div class="flex gap-2">
-                <button data-action="exportPlannerScheduleCSV" class="flex-1 px-3 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg font-bold text-xs flex items-center justify-center gap-1 transition">
+                <button data-action="exportPlannerScheduleCSV" class="flex-1 px-3 py-2 bg-slate-900 hover:bg-slate-800 dark:bg-slate-700 dark:hover:bg-slate-600 text-white rounded-lg font-bold text-xs flex items-center justify-center gap-1 transition">
                   <span>Export CSV</span>
                 </button>
-                <button data-action="exportPlannerScheduleJSON" class="flex-1 px-3 py-2 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 rounded-lg font-bold text-xs flex items-center justify-center gap-1 transition">
+                <button data-action="exportPlannerScheduleJSON" class="flex-1 px-3 py-2 bg-white hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-600 rounded-lg font-bold text-xs flex items-center justify-center gap-1 transition">
                   <span>Export JSON</span>
                 </button>
               </div>
             </div>
 
-            <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3 flex flex-col justify-between">
+            <div class="p-4 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 space-y-3 flex flex-col justify-between">
               <div>
-                <div class="font-bold text-slate-800 text-xs">Import Planner Schedule</div>
-                <p class="text-slate-500 text-[11px] mt-1">Upload a CSV or JSON schedule file to merge into the Lesson Planner.</p>
+                <div class="font-bold text-slate-800 dark:text-slate-100 text-xs">Import Planner Schedule</div>
+                <p class="text-slate-500 dark:text-slate-400 text-[11px] mt-1">Upload a CSV or JSON schedule file to merge into the Lesson Planner.</p>
               </div>
               <div>
                 <input type="file" id="ei-planner-file" accept=".csv,.json" data-action-change="importPlannerScheduleFile" class="hidden">
@@ -2280,30 +2446,30 @@
 
         <!-- PANEL 2: SUBJECTS & SECTIONS -->
         <div id="ei-panel-courses" class="ei-panel space-y-4 hidden">
-          <div class="p-3.5 bg-purple-50/70 border border-purple-200 rounded-xl space-y-1.5">
-            <h4 class="font-extrabold text-purple-950 text-xs flex items-center gap-1.5">
+          <div class="p-3.5 bg-purple-50/70 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-900/60 rounded-xl space-y-1.5">
+            <h4 class="font-extrabold text-purple-950 dark:text-purple-200 text-xs flex items-center gap-1.5">
               <span>📚</span> Subjects, Sections & Timetable Schedules
             </h4>
-            <p class="text-purple-900 leading-relaxed text-[11px]">
+            <p class="text-purple-900 dark:text-purple-300 leading-relaxed text-[11px]">
               Export your course catalog, section offerings, color palettes, and weekly class times. Restoring from a backup will recreate your subjects and timetable.
             </p>
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3 flex flex-col justify-between">
+            <div class="p-4 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 space-y-3 flex flex-col justify-between">
               <div>
-                <div class="font-bold text-slate-800 text-xs">Export Subjects Catalog</div>
-                <p class="text-slate-500 text-[11px] mt-1">Save course codes, titles, units, color schemes, and weekly period allocations.</p>
+                <div class="font-bold text-slate-800 dark:text-slate-100 text-xs">Export Subjects Catalog</div>
+                <p class="text-slate-500 dark:text-slate-400 text-[11px] mt-1">Save course codes, titles, units, color schemes, and weekly period allocations.</p>
               </div>
-              <button data-action="exportSubjectsJSON" class="w-full px-3 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg font-bold text-xs flex items-center justify-center gap-1 transition">
+              <button data-action="exportSubjectsJSON" class="w-full px-3 py-2 bg-slate-900 hover:bg-slate-800 dark:bg-slate-700 dark:hover:bg-slate-600 text-white rounded-lg font-bold text-xs flex items-center justify-center gap-1 transition">
                 <span>Export Subjects (JSON)</span>
               </button>
             </div>
 
-            <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3 flex flex-col justify-between">
+            <div class="p-4 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 space-y-3 flex flex-col justify-between">
               <div>
-                <div class="font-bold text-slate-800 text-xs">Import Subjects Catalog</div>
-                <p class="text-slate-500 text-[11px] mt-1">Upload a subjects JSON backup to restore course definitions and weekly timetable.</p>
+                <div class="font-bold text-slate-800 dark:text-slate-100 text-xs">Import Subjects Catalog</div>
+                <p class="text-slate-500 dark:text-slate-400 text-[11px] mt-1">Upload a subjects JSON backup to restore course definitions and weekly timetable.</p>
               </div>
               <div>
                 <input type="file" id="ei-courses-file" accept=".json" data-action-change="importSubjectsJSON" class="hidden">
@@ -2318,33 +2484,33 @@
 
         <!-- PANEL 3: STUDENT ROSTER -->
         <div id="ei-panel-roster" class="ei-panel space-y-4 hidden">
-          <div class="p-3.5 bg-emerald-50/70 border border-emerald-200 rounded-xl space-y-1.5">
-            <h4 class="font-extrabold text-emerald-950 text-xs flex items-center gap-1.5">
+          <div class="p-3.5 bg-emerald-50/70 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/60 rounded-xl space-y-1.5">
+            <h4 class="font-extrabold text-emerald-950 dark:text-emerald-200 text-xs flex items-center gap-1.5">
               <span>👥</span> Student Roster & Class Lists
             </h4>
-            <p class="text-emerald-900 leading-relaxed text-[11px]">
+            <p class="text-emerald-900 dark:text-emerald-300 leading-relaxed text-[11px]">
               Export student demographics across all sections or filter by active section. Import rosters using standard CSV spreadsheets.
             </p>
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3 flex flex-col justify-between">
+            <div class="p-4 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 space-y-3 flex flex-col justify-between">
               <div>
-                <div class="font-bold text-slate-800 text-xs">Export Class List (CSV)</div>
-                <p class="text-slate-500 text-[11px] mt-1">Includes Student ID, Last Name, First Name, Email, and Section.</p>
+                <div class="font-bold text-slate-800 dark:text-slate-100 text-xs">Export Class List (CSV)</div>
+                <p class="text-slate-500 dark:text-slate-400 text-[11px] mt-1">Includes Student ID, Last Name, First Name, Email, and Section.</p>
               </div>
               <div class="space-y-2">
-                <select id="ei-roster-export-section" class="w-full bg-white border border-slate-300 rounded-lg p-1.5 text-xs font-bold text-slate-800"></select>
-                <button data-action="exportRosterCSV" class="w-full px-3 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg font-bold text-xs flex items-center justify-center gap-1 transition">
+                <select id="ei-roster-export-section" class="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg p-1.5 text-xs font-bold text-slate-800 dark:text-slate-200"></select>
+                <button data-action="exportRosterCSV" class="w-full px-3 py-2 bg-slate-900 hover:bg-slate-800 dark:bg-slate-700 dark:hover:bg-slate-600 text-white rounded-lg font-bold text-xs flex items-center justify-center gap-1 transition">
                   <span>Export Roster CSV</span>
                 </button>
               </div>
             </div>
 
-            <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3 flex flex-col justify-between">
+            <div class="p-4 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 space-y-3 flex flex-col justify-between">
               <div>
-                <div class="font-bold text-slate-800 text-xs">Import Class List (CSV)</div>
-                <p class="text-slate-500 text-[11px] mt-1">Upload CSV or paste directly from Excel or Google Sheets into the roster.</p>
+                <div class="font-bold text-slate-800 dark:text-slate-100 text-xs">Import Class List (CSV)</div>
+                <p class="text-slate-500 dark:text-slate-400 text-[11px] mt-1">Upload CSV or paste directly from Excel or Google Sheets into the roster.</p>
               </div>
               <div class="space-y-2">
                 <input type="file" id="ei-roster-file" accept=".csv,.tsv,.txt" data-action-change="importRosterCSVFile" class="hidden">
@@ -2352,7 +2518,7 @@
                   <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
                   <span>Upload CSV File</span>
                 </button>
-                <button data-action="closeAndOpen" data-close="export-import-modal" data-open="bulk-import-modal" class="w-full px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 rounded-lg font-bold text-xs transition">
+                <button data-action="closeAndOpen" data-close="export-import-modal" data-open="bulk-import-modal" class="w-full px-3 py-1.5 bg-white hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-600 rounded-lg font-bold text-xs transition">
                   <span>Or Paste Roster Rows</span>
                 </button>
               </div>
@@ -2362,30 +2528,30 @@
 
         <!-- PANEL 4: CLASS RECORD & GRADES -->
         <div id="ei-panel-grades" class="ei-panel space-y-4 hidden">
-          <div class="p-3.5 bg-amber-50/70 border border-amber-200 rounded-xl space-y-1.5">
-            <h4 class="font-extrabold text-amber-950 text-xs flex items-center gap-1.5">
+          <div class="p-3.5 bg-amber-50/70 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/60 rounded-xl space-y-1.5">
+            <h4 class="font-extrabold text-amber-950 dark:text-amber-200 text-xs flex items-center gap-1.5">
               <span>📊</span> Class Record & Offline Gradebook Sync
             </h4>
-            <p class="text-amber-900 leading-relaxed text-[11px]">
+            <p class="text-amber-900 dark:text-amber-300 leading-relaxed text-[11px]">
               Export full grading sheets for Excel editing. When you're ready, upload the modified CSV to import updated student scores back into the system automatically.
             </p>
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3 flex flex-col justify-between">
+            <div class="p-4 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 space-y-3 flex flex-col justify-between">
               <div>
-                <div class="font-bold text-slate-800 text-xs">Export Class Record (CSV)</div>
-                <p class="text-slate-500 text-[11px] mt-1">Export raw scores, weights, totals, and final grades for the active section.</p>
+                <div class="font-bold text-slate-800 dark:text-slate-100 text-xs">Export Class Record (CSV)</div>
+                <p class="text-slate-500 dark:text-slate-400 text-[11px] mt-1">Export raw scores, weights, totals, and final grades for the active section.</p>
               </div>
-              <button data-action="exportGradebookCSV" class="w-full px-3 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg font-bold text-xs flex items-center justify-center gap-1 transition">
+              <button data-action="exportGradebookCSV" class="w-full px-3 py-2 bg-slate-900 hover:bg-slate-800 dark:bg-slate-700 dark:hover:bg-slate-600 text-white rounded-lg font-bold text-xs flex items-center justify-center gap-1 transition">
                 <span>Export Active Section CSV</span>
               </button>
             </div>
 
-            <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3 flex flex-col justify-between">
+            <div class="p-4 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 space-y-3 flex flex-col justify-between">
               <div>
-                <div class="font-bold text-slate-800 text-xs">Import Scores from CSV</div>
-                <p class="text-slate-500 text-[11px] mt-1">Upload a CSV file containing updated student scores. Columns will be auto-matched to sub-activities by Student ID.</p>
+                <div class="font-bold text-slate-800 dark:text-slate-100 text-xs">Import Scores from CSV</div>
+                <p class="text-slate-500 dark:text-slate-400 text-[11px] mt-1">Upload a CSV file containing updated student scores. Columns will be auto-matched to sub-activities by Student ID.</p>
               </div>
               <div>
                 <input type="file" id="ei-grades-file" accept=".csv" data-action-change="importGradebookScoresCSV" class="hidden">
@@ -2400,31 +2566,31 @@
 
         <!-- PANEL 5: COMPLETE SYSTEM BACKUP -->
         <div id="ei-panel-backup" class="ei-panel space-y-4 hidden">
-          <div class="p-3.5 bg-slate-100 border border-slate-200 rounded-xl space-y-1.5">
-            <h4 class="font-extrabold text-slate-900 text-xs flex items-center gap-1.5">
+          <div class="p-3.5 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl space-y-1.5">
+            <h4 class="font-extrabold text-slate-900 dark:text-slate-100 text-xs flex items-center gap-1.5">
               <span>💾</span> Complete Full System Backup
             </h4>
-            <p class="text-slate-600 leading-relaxed text-[11px]">
+            <p class="text-slate-600 dark:text-slate-400 leading-relaxed text-[11px]">
               Create an all-in-one JSON backup file containing your entire workspace: semester setup, subjects, weekly timetable, academic calendar, lesson planner entries, student rosters, notes, and column sizes.
             </p>
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3 flex flex-col justify-between">
+            <div class="p-4 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 space-y-3 flex flex-col justify-between">
               <div>
-                <div class="font-bold text-slate-800 text-xs">Download Full JSON Backup</div>
-                <p class="text-slate-500 text-[11px] mt-1">Preserves 100% of your current data. Safe to transfer across different computers or browsers.</p>
-                <div id="ei-last-backup-status" class="text-[11px] text-slate-500 font-medium mt-2 flex items-center gap-1"></div>
+                <div class="font-bold text-slate-800 dark:text-slate-100 text-xs">Download Full JSON Backup</div>
+                <p class="text-slate-500 dark:text-slate-400 text-[11px] mt-1">Preserves 100% of your current data. Safe to transfer across different computers or browsers.</p>
+                <div id="ei-last-backup-status" class="text-[11px] text-slate-500 dark:text-slate-400 font-medium mt-2 flex items-center gap-1"></div>
               </div>
-              <button data-action="exportBackupJSON" class="w-full px-3 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg font-bold text-xs flex items-center justify-center gap-1 transition">
+              <button data-action="exportBackupJSON" class="w-full px-3 py-2 bg-slate-900 hover:bg-slate-800 dark:bg-slate-700 dark:hover:bg-slate-600 text-white rounded-lg font-bold text-xs flex items-center justify-center gap-1 transition">
                 <span>Download Backup JSON</span>
               </button>
             </div>
 
-            <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3 flex flex-col justify-between">
+            <div class="p-4 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 space-y-3 flex flex-col justify-between">
               <div>
-                <div class="font-bold text-slate-800 text-xs">Restore from Backup JSON</div>
-                <p class="text-slate-500 text-[11px] mt-1">Upload a previously downloaded JSON backup file to overwrite and restore data.</p>
+                <div class="font-bold text-slate-800 dark:text-slate-100 text-xs">Restore from Backup JSON</div>
+                <p class="text-slate-500 dark:text-slate-400 text-[11px] mt-1">Upload a previously downloaded JSON backup file to overwrite and restore data.</p>
               </div>
               <div>
                 <input type="file" id="ei-backup-file" accept=".json" data-action-change="importBackupAndClose" class="hidden">
@@ -2438,20 +2604,20 @@
         </div>
       </div>
 
-      <div class="flex justify-end pt-3 border-t border-slate-200">
-        <button data-action="closeExportImportModal" class="px-5 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-xs font-bold transition">Close</button>
+      <div class="flex justify-end p-4 border-t border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 shrink-0">
+        <button data-action="closeExportImportModal" class="app-themed-btn-primary px-6 py-2 text-white rounded-xl text-xs font-bold transition shadow-xs">Close</button>
       </div>
     </div>
   </div>
 
   <div id="user-guide-modal" class="fixed bottom-5 right-5 z-[95] pointer-events-none hidden transition-all duration-200">
-    <div id="user-guide-card" class="pointer-events-auto bg-white rounded-2xl w-[94vw] sm:w-[390px] shadow-2xl border-2 border-amber-400/80 overflow-hidden flex flex-col max-h-[85vh] animate-in fade-in slide-in-from-bottom-5 duration-150">
-      <div class="bg-gradient-to-r from-msu-darkMaroon via-msu-maroon to-slate-900 px-4 py-3 text-white flex items-center justify-between shrink-0 border-b border-msu-gold cursor-default select-none">
+    <div id="user-guide-card" class="pointer-events-auto bg-white rounded-2xl w-[94vw] sm:w-[390px] shadow-2xl app-themed-card border-2 border-amber-400/80 overflow-hidden flex flex-col max-h-[85vh] animate-in fade-in slide-in-from-bottom-5 duration-150">
+      <div class="app-themed-header bg-gradient-to-r from-msu-darkMaroon via-msu-maroon to-slate-900 px-4 py-3 text-white flex items-center justify-between shrink-0 border-b border-msu-gold cursor-default select-none">
         <div class="flex items-center gap-2 min-w-0">
           <span class="text-base shrink-0">📖</span>
           <div class="truncate">
             <h3 class="font-extrabold text-xs sm:text-sm leading-tight truncate">Portal Walkthrough</h3>
-            <p class="text-[10px] text-amber-200/90 font-medium leading-tight">Step-by-Step Setup Guide</p>
+            <p class="app-themed-subtitle text-[10px] text-amber-200/90 font-medium leading-tight">Step-by-Step Setup Guide</p>
           </div>
         </div>
         <div class="flex items-center gap-1 shrink-0 ml-2">
@@ -2479,60 +2645,75 @@
 
         <!-- Vertically Middle-Aligned Container with Justified Text -->
         <div class="p-4 overflow-y-auto flex-1 text-sm text-slate-700 leading-relaxed flex flex-col justify-center min-h-[220px]">
-          <!-- Step 1 -->
+          <!-- Step 1: Term Setup & Branding -->
           <div id="guide-panel-setup" class="guide-panel space-y-3 my-auto">
-            <div class="p-3.5 bg-amber-50 rounded-xl border border-amber-200 space-y-1.5">
-              <span class="font-extrabold text-slate-900 text-sm">1. Configure Semester Dates</span>
-              <p class="text-xs sm:text-[13px] text-slate-700 guide-text-justify">Click <strong>Semester Settings</strong> in the header. Set your Term Title, Start Date, and End Date. The engine automatically creates your entire 18-week grid and date rows.</p>
+            <div class="p-3.5 bg-amber-50 dark:bg-amber-950/30 rounded-xl border border-amber-200 dark:border-amber-800/60 space-y-1.5">
+              <span class="font-extrabold text-slate-900 dark:text-amber-200 text-sm">1. Institution Branding & Semester Dates</span>
+              <p class="text-xs sm:text-[13px] text-slate-700 dark:text-slate-300 guide-text-justify">Click <strong>Semester Settings</strong> in the header. Set your School or Department Name, upload your institutional crest or logo, and configure your Term Title, Start Date, and End Date. The engine automatically lays out your complete 18-week semester calendar.</p>
             </div>
-            <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5">
-              <span class="font-extrabold text-slate-900 text-sm">2. Institutional Calendar</span>
-              <p class="text-xs sm:text-[13px] text-slate-700 guide-text-justify">Go to <strong>Academic Calendar Events</strong> (Tab 3) and click <strong>Upload / Replace Calendar &rarr; Load Sample AY 2026–2027 Calendar</strong> to sync verified examination periods and holidays.</p>
+            <div class="p-3.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700 space-y-1.5">
+              <span class="font-extrabold text-slate-900 dark:text-slate-100 text-sm">2. Academic Calendar Synchronization</span>
+              <p class="text-xs sm:text-[13px] text-slate-700 dark:text-slate-300 guide-text-justify">Navigate to <strong>Academic Calendar Events</strong> (Tab 3) and click <strong>Upload / Replace Calendar &rarr; Load Sample AY 2026–2027 Calendar</strong> to instantly load verified midterm/final exam periods and institutional holidays, or import custom CSV/PDF syllabus dates.</p>
             </div>
           </div>
 
-          <!-- Step 2 -->
+          <!-- Step 2: Courses & Timetable -->
           <div id="guide-panel-courses" class="guide-panel space-y-3 my-auto hidden">
-            <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
-              <span class="font-extrabold text-slate-900 text-sm">Courses, Sections & Meeting Hours</span>
-              <p class="text-xs sm:text-[13px] text-slate-700 guide-text-justify">Open <strong>Manage Subjects</strong> from the top bar. Enter Course Code (e.g., <code>CVE112</code>), Title, and select a color theme.</p>
-              <p class="text-xs sm:text-[13px] text-slate-700 guide-text-justify">Under each course, click <strong>+ Add Section</strong> to configure section codes (e.g., <code>E15.1</code>), meeting days, class hours, and room assignments. These synchronize immediately with your Weekly Timetable.</p>
+            <div class="p-3.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700 space-y-2">
+              <span class="font-extrabold text-slate-900 dark:text-slate-100 text-sm">Course Management & Sections</span>
+              <p class="text-xs sm:text-[13px] text-slate-700 dark:text-slate-300 guide-text-justify">Open <strong>Manage Subjects</strong> from the top bar to create Course Codes (e.g., <code>CVE111</code>), Subject Titles, and assign color themes. Under each course, click <strong>+ Add Section</strong> to configure section codes (e.g., <code>B15.1</code>), meeting days, class times, and room assignments.</p>
+            </div>
+            <div class="p-3.5 bg-indigo-50/60 dark:bg-indigo-950/30 rounded-xl border border-indigo-200 dark:border-indigo-800/60 space-y-1.5">
+              <span class="font-extrabold text-indigo-950 dark:text-indigo-200 text-sm">Timetable & Conflict Auditor</span>
+              <p class="text-xs sm:text-[13px] text-slate-700 dark:text-slate-300 guide-text-justify">Switch to <strong>Weekly Timetable</strong> (Tab 2) to view your visual schedule. The built-in <strong>Conflict Auditor</strong> automatically detects room collisions or overlapping section times in real time, alerting you with direct links to resolve conflicts.</p>
             </div>
           </div>
 
-          <!-- Step 3 -->
+          <!-- Step 3: Class Roster & Communication -->
           <div id="guide-panel-roster" class="guide-panel space-y-3 my-auto hidden">
-            <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
-              <span class="font-extrabold text-slate-900 text-sm">Student Roster Enrollment</span>
-              <p class="text-xs sm:text-[13px] text-slate-700 guide-text-justify">Go to <strong>Class List (Roster)</strong> (Tab 4), choose your target section, and click <strong>Paste Class List</strong>.</p>
-              <p class="text-xs sm:text-[13px] text-slate-700 guide-text-justify">Copy your student columns directly from Excel or Google Sheets (<code>ID</code>, <code>Last Name</code>, <code>First Name</code>, <code>Email</code>) and paste them in. You can also broadcast emails to the active section from the sidebar.</p>
+            <div class="p-3.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700 space-y-2">
+              <span class="font-extrabold text-slate-900 dark:text-slate-100 text-sm">Spreadsheet Enrollment & Student Records</span>
+              <p class="text-xs sm:text-[13px] text-slate-700 dark:text-slate-300 guide-text-justify">Go to <strong>Class List (Roster)</strong> (Tab 4), select your section, and click <strong>Paste Class List</strong>. Copy columns directly from Excel or Google Sheets (<code>ID</code>, <code>Last Name</code>, <code>First Name</code>, <code>Email</code>) to enroll entire classes in seconds.</p>
+            </div>
+            <div class="p-3.5 bg-emerald-50/60 dark:bg-emerald-950/30 rounded-xl border border-emerald-200 dark:border-emerald-800/60 space-y-1.5">
+              <span class="font-extrabold text-emerald-950 dark:text-emerald-200 text-sm">Integrated Faculty Communications</span>
+              <p class="text-xs sm:text-[13px] text-slate-700 dark:text-slate-300 guide-text-justify">Use the roster sidebar tools to trigger 1-click individual emails, filtered group notifications, or section BCC broadcasts via your desktop client or configured Google Workspace account.</p>
             </div>
           </div>
 
-          <!-- Step 4 -->
+          <!-- Step 4: Lesson Matrix & Schedule Shifting -->
           <div id="guide-panel-planner" class="guide-panel space-y-3 my-auto hidden">
-            <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
-              <span class="font-extrabold text-slate-900 text-sm">Lesson Pacing & Schedule Shifting</span>
-              <p class="text-xs sm:text-[13px] text-slate-700 guide-text-justify">In the <strong>Lesson Planner Matrix</strong> (Tab 1), click any empty slot (<code>+ Click to plan</code>) to log topics and activity types (Lecture, Lab, Quiz, Exam).</p>
-              <p class="text-xs sm:text-[13px] text-slate-700 guide-text-justify">If a class is suspended, open the slot and click <strong>🚫 Mark "No Class" & Push Forward</strong>. All subsequent planned activities automatically shift forward by one meeting slot, preserving your syllabus sequence.</p>
+            <div class="p-3.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700 space-y-2">
+              <span class="font-extrabold text-slate-900 dark:text-slate-100 text-sm">18-Week Lesson Matrix</span>
+              <p class="text-xs sm:text-[13px] text-slate-700 dark:text-slate-300 guide-text-justify">In the <strong>Lesson Planner Matrix</strong> (Tab 1), plan topics and activity types (Lecture, Lab, Quiz, Exam) across all 18 weeks. Filter by all courses, single subject, or individual section to track your syllabus delivery with drag-and-drop flexibility.</p>
+            </div>
+            <div class="p-3.5 bg-rose-50/60 dark:bg-rose-950/30 rounded-xl border border-rose-200 dark:border-rose-800/60 space-y-1.5">
+              <span class="font-extrabold text-rose-950 dark:text-rose-200 text-sm">Automatic Schedule Shifting</span>
+              <p class="text-xs sm:text-[13px] text-slate-700 dark:text-slate-300 guide-text-justify">When unexpected weather or institutional suspensions occur, open the slot and click <strong>🚫 Mark "No Class" & Push Forward</strong>. All subsequent planned activities automatically shift forward by one meeting slot, preserving your chronological lesson plan.</p>
             </div>
           </div>
 
-          <!-- Step 5 -->
+          <!-- Step 5: Weighted Grades & Radars -->
           <div id="guide-panel-gradebook" class="guide-panel space-y-3 my-auto hidden">
-            <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
-              <span class="font-extrabold text-slate-900 text-sm">Real-Time Weighted Grading</span>
-              <p class="text-xs sm:text-[13px] text-slate-700 guide-text-justify">In <strong>Class Record & Grades</strong> (Tab 5), click <strong>Grading Criteria</strong> to define categories and weight percentages (e.g., Quizzes 20%, Exams 20%). Weights must sum to 100%.</p>
-              <p class="text-xs sm:text-[13px] text-slate-700 guide-text-justify">Enter student marks directly in the grid using arrow keys or Enter. The engine computes weighted totals, official institutional grades (1.00–5.00), and flags students on the <strong>At-Risk Student Radar</strong>.</p>
+            <div class="p-3.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700 space-y-2">
+              <span class="font-extrabold text-slate-900 dark:text-slate-100 text-sm">Dynamic Criteria & Per-Subject Scales</span>
+              <p class="text-xs sm:text-[13px] text-slate-700 dark:text-slate-300 guide-text-justify">In <strong>Class Record & Grades</strong> (Tab 5), click <strong>Grading Criteria</strong> to customize category weights (Quizzes, Exams, Labs). Click <strong>Configure Grading Scale</strong> to set grade equivalence thresholds globally, per Subject (e.g. <code>CVE111</code>), or override per section.</p>
+            </div>
+            <div class="p-3.5 bg-amber-50/60 dark:bg-amber-950/30 rounded-xl border border-amber-200 dark:border-amber-800/60 space-y-1.5">
+              <span class="font-extrabold text-amber-950 dark:text-amber-200 text-sm">Real-Time Computations & Radar Filters</span>
+              <p class="text-xs sm:text-[13px] text-slate-700 dark:text-slate-300 guide-text-justify">Grades calculate automatically upon score entry (1.00–5.00). Click the <strong>At-Risk Student Radar</strong> or <strong>Input Error Radar</strong> badge pills in the header to instantly isolate students who need remediation or entries that require score corrections.</p>
             </div>
           </div>
 
-          <!-- Step 6 -->
+          <!-- Step 6: Data Center & Backups -->
           <div id="guide-panel-backup" class="guide-panel space-y-3 my-auto hidden">
-            <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
-              <span class="font-extrabold text-slate-900 text-sm">Offline Local Storage & Backups</span>
-              <p class="text-xs sm:text-[13px] text-slate-700 guide-text-justify">All data automatically saves to your browser's local storage.</p>
-              <p class="text-xs sm:text-[13px] text-slate-700 guide-text-justify">To migrate data to another computer or safeguard your work, open <strong>Export / Import Hub &rarr; Complete Backup &rarr; Download Backup JSON</strong>. You can restore this file anytime.</p>
+            <div class="p-3.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700 space-y-2">
+              <span class="font-extrabold text-slate-900 dark:text-slate-100 text-sm">Offline Local Storage & Privacy</span>
+              <p class="text-xs sm:text-[13px] text-slate-700 dark:text-slate-300 guide-text-justify">All grades, rosters, schedules, and configurations are stored 100% locally on your device. No student records are ever transmitted over external servers or third-party clouds.</p>
+            </div>
+            <div class="p-3.5 bg-sky-50/60 dark:bg-sky-950/30 rounded-xl border border-sky-200 dark:border-sky-800/60 space-y-1.5">
+              <span class="font-extrabold text-sky-950 dark:text-sky-200 text-sm">Export / Import Hub & Automated Backups</span>
+              <p class="text-xs sm:text-[13px] text-slate-700 dark:text-slate-300 guide-text-justify">Open <strong>Export / Import Hub</strong> to download complete JSON backups or export spreadsheet-ready CSV files for Class Records, Rosters, and Schedules. Built-in reminders prompt you regularly to safeguard your work.</p>
             </div>
           </div>
         </div>
@@ -2544,7 +2725,7 @@
             <button type="button" id="btn-guide-prev" data-action="navigateGuideStep" data-step="-1" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg text-xs border border-slate-300 transition">
               &larr; Prev
             </button>
-            <button type="button" id="btn-guide-next" data-action="navigateGuideStep" data-step="1" class="px-4 py-1.5 bg-msu-maroon hover:bg-msu-darkMaroon text-white font-semibold rounded-lg text-xs transition shadow-2xs">
+            <button type="button" id="btn-guide-next" data-action="navigateGuideStep" data-step="1" class="app-themed-btn-primary px-4 py-1.5 bg-msu-maroon hover:bg-msu-darkMaroon text-white font-semibold rounded-lg text-xs transition shadow-2xs">
               Next &rarr;
             </button>
           </div>
@@ -2564,12 +2745,12 @@
   <!-- Feedback & Bug Report Modal -->
   <div id="feedback-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 hidden" data-action="closeModalOnBackdrop" data-modal="feedback-modal">
     <div class="bg-white dark:bg-slate-800 rounded-2xl max-w-md w-full shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden animate-in fade-in zoom-in-95 duration-150 flex flex-col text-slate-800 dark:text-slate-100">
-      <div class="bg-gradient-to-r from-msu-darkMaroon via-msu-maroon to-slate-900 px-5 py-4 text-white flex items-center justify-between">
+      <div class="app-themed-header bg-gradient-to-r from-msu-darkMaroon via-msu-maroon to-slate-900 px-5 py-4 text-white flex items-center justify-between border-b border-msu-gold">
         <div class="flex items-center gap-2.5">
           <span class="text-lg">💡</span>
           <div>
             <h3 class="font-extrabold text-sm sm:text-base">Report Bug or Suggest Feature</h3>
-            <p class="text-xs text-amber-200/90">Send feedback directly to the development team</p>
+            <p class="app-themed-subtitle text-xs text-amber-200/90">Send feedback directly to the development team</p>
           </div>
         </div>
         <button type="button" aria-label="Close modal" data-action="closeFeedbackModal" class="text-amber-200 hover:text-white p-1 rounded-lg hover:bg-white/10 transition">
@@ -2609,7 +2790,7 @@
 
         <div class="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-700">
           <button type="button" data-action="closeFeedbackModal" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl font-semibold text-xs transition">Cancel</button>
-          <button type="submit" id="feedback-submit-btn" class="px-4 py-2 bg-msu-maroon hover:bg-msu-darkMaroon text-white rounded-xl font-bold text-xs shadow-md transition flex items-center gap-1.5">
+          <button type="submit" id="feedback-submit-btn" class="app-themed-btn-primary px-4 py-2 bg-msu-maroon hover:bg-msu-darkMaroon text-white rounded-xl font-bold text-xs shadow-md transition flex items-center gap-1.5">
             <span>Send Feedback</span>
             <span>✉️</span>
           </button>
@@ -2622,12 +2803,12 @@
   <div id="tips-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 hidden" data-action="closeModalOnBackdrop" data-modal="tips-modal">
     <div class="bg-white dark:bg-slate-800 rounded-2xl max-w-lg w-full shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden animate-in fade-in zoom-in-95 duration-150 flex flex-col text-slate-800 dark:text-slate-100">
       <!-- Gradient Header -->
-      <div class="bg-gradient-to-r from-msu-darkMaroon via-msu-maroon to-slate-900 px-5 py-3.5 text-white flex items-center justify-between border-b border-msu-gold/40">
+      <div class="app-themed-header bg-gradient-to-r from-msu-darkMaroon via-msu-maroon to-slate-900 px-5 py-3.5 text-white flex items-center justify-between border-b border-msu-gold/40">
         <div class="flex items-center gap-2.5">
           <span class="text-xl">💡</span>
           <div>
             <h3 class="font-extrabold text-sm sm:text-base tracking-tight leading-tight">Faculty Portal Quick Tip</h3>
-            <p class="text-[11px] text-amber-200/90 font-medium">Helpful shortcuts & capabilities to streamline your workflow</p>
+            <p class="app-themed-subtitle text-[11px] text-amber-200/90 font-medium">Helpful shortcuts & capabilities to streamline your workflow</p>
           </div>
         </div>
         <button type="button" aria-label="Close modal" data-action="closeTipsModal" class="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-slate-300 hover:text-white text-xs transition" title="Close">✕</button>
@@ -2658,7 +2839,7 @@
         </label>
         <div class="flex items-center gap-2">
           <button type="button" data-action="closeAndOpen" data-close="tips-modal" data-open="user-guide-modal" class="text-xs text-msu-maroon dark:text-amber-400 hover:underline font-semibold pr-1">Full Guide</button>
-          <button type="button" data-action="closeTipsModal" class="px-4 py-1.5 bg-msu-maroon hover:bg-msu-darkMaroon text-white font-bold text-xs rounded-xl shadow-xs transition active:scale-95">Got it!</button>
+          <button type="button" data-action="closeTipsModal" class="app-themed-btn-primary px-4 py-1.5 bg-msu-maroon hover:bg-msu-darkMaroon text-white font-bold text-xs rounded-xl shadow-xs transition active:scale-95">Got it!</button>
         </div>
       </div>
     </div>
@@ -2666,9 +2847,9 @@
 
   <!-- ================= EASTER EGG: SECRET FACULTY KNOWLEDGE VAULT ================= -->
   <div id="easter-egg-tips-modal" class="fixed inset-0 z-[100] bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-5 hidden" data-action="closeModalOnBackdrop" data-modal="easter-egg-modal">
-    <div class="bg-white rounded-2xl max-w-3xl w-full shadow-2xl border border-amber-400/40 overflow-hidden animate-in fade-in zoom-in-95 duration-150 flex flex-col max-h-[90vh]">
+    <div class="bg-white rounded-2xl max-w-3xl w-full shadow-2xl app-themed-card border border-amber-400/40 overflow-hidden animate-in fade-in zoom-in-95 duration-150 flex flex-col max-h-[90vh]">
       <!-- Easter Egg Glowing Gold & Maroon Header -->
-      <div class="bg-gradient-to-r from-msu-darkMaroon via-msu-maroon to-slate-900 px-5 py-4 text-white flex items-center justify-between border-b-2 border-msu-gold shadow-md shrink-0">
+      <div class="app-themed-header bg-gradient-to-r from-msu-darkMaroon via-msu-maroon to-slate-900 px-5 py-4 text-white flex items-center justify-between border-b-2 border-msu-gold shadow-md shrink-0">
         <div class="flex items-center gap-3">
           <div class="w-10 h-10 rounded-xl bg-amber-400/20 border border-amber-300/40 flex items-center justify-center text-2xl shadow-xs">
             ✨
@@ -2678,7 +2859,7 @@
               <h3 class="font-black text-base sm:text-lg tracking-tight text-white">Secret Faculty Knowledge Vault</h3>
               <span class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-400/20 text-amber-300 border border-amber-400/40">Easter Egg</span>
             </div>
-            <p class="text-[11px] sm:text-xs text-amber-200/90 font-medium">Complete compendium of all 25 portal tips, shortcuts & hidden capabilities</p>
+            <p class="app-themed-subtitle text-[11px] sm:text-xs text-amber-200/90 font-medium">Complete compendium of all 25 portal tips, shortcuts & hidden capabilities</p>
           </div>
         </div>
         <button type="button" aria-label="Close modal" data-action="closeEasterEggModal" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-slate-300 hover:text-white text-sm transition" title="Close">✕</button>
@@ -2687,7 +2868,7 @@
       <!-- Controls: Category Filter Tabs & Instant Search -->
       <div class="p-3.5 bg-slate-50 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2.5 shrink-0">
         <div class="flex items-center gap-1.5 text-xs font-bold">
-          <button type="button" id="vault-filter-all" data-action="filterVaultTips" data-category="all" class="px-3 py-1.5 rounded-lg bg-msu-maroon text-white border border-msu-maroon transition shadow-2xs">All (25)</button>
+          <button type="button" id="vault-filter-all" data-action="filterVaultTips" data-category="all" class="app-themed-btn-primary px-3 py-1.5 rounded-lg bg-msu-maroon text-white border border-msu-maroon transition shadow-2xs">All (25)</button>
           <button type="button" id="vault-filter-tip" data-action="filterVaultTips" data-category="Tip" class="px-3 py-1.5 rounded-lg bg-white text-slate-700 hover:bg-slate-100 border border-slate-300 transition">📌 Quick Tips (14)</button>
           <button type="button" id="vault-filter-dyk" data-action="filterVaultTips" data-category="Did You Know?" class="px-3 py-1.5 rounded-lg bg-white text-slate-700 hover:bg-slate-100 border border-slate-300 transition">💡 Did You Know? (11)</button>
         </div>
@@ -2708,7 +2889,7 @@
           <span>🏆</span>
           <span><b>Secret Unlocked:</b> Tap School Logo 5x or press Konami code (<kbd class="px-1 py-0.5 bg-slate-200 rounded font-mono text-[10px]">↑↑↓↓←→←→BA</kbd>) anytime!</span>
         </div>
-        <button type="button" data-action="closeEasterEggModal" class="px-4 py-1.5 bg-msu-maroon hover:bg-msu-darkMaroon text-white font-bold rounded-xl shadow-xs transition active:scale-95">Close Vault</button>
+        <button type="button" data-action="closeEasterEggModal" class="app-themed-btn-primary px-4 py-1.5 bg-msu-maroon hover:bg-msu-darkMaroon text-white font-bold rounded-xl shadow-xs transition active:scale-95">Close Vault</button>
       </div>
     </div>
   </div>

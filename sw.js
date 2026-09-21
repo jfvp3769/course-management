@@ -17,14 +17,22 @@
  * Bump CACHE_NAME on every release; `activate` purges older caches.
  * ========================================================================== */
 
-const CACHE_NAME = 'faculty-course-manager-v2.30';
+const CACHE_NAME = 'faculty-course-manager-v2.35';
 
 const SHELL = [
   './',
   './index.html',
   './logo.svg',
   './manifest.json',
-  './styles.css',
+  './css/01-tokens.css',
+  './css/02-dark-components.css',
+  './css/03-dark-grades.css',
+  './css/04-dark-planner.css',
+  './css/05-dark-gradebook.css',
+  './css/07-components.css',
+  './css/08-dark-modals.css',
+  './css/09-responsive.css',
+  './css/10-components.css',
   './tailwind.cdn.js',
   './pdf.min.js',
   './pdf.worker.min.js'

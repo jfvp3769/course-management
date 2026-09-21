@@ -5,9 +5,10 @@
  * ======================================================================== */
 
 function openUserGuideModal(tabId = 'setup') {
+  const targetTab = (typeof tabId === 'string' && typeof GUIDE_STEPS !== 'undefined' && GUIDE_STEPS.includes(tabId)) ? tabId : 'setup';
   const modal = document.getElementById('user-guide-modal');
   if (!modal) return;
-  switchGuideTab(tabId);
+  switchGuideTab(targetTab);
   modal.classList.remove('hidden');
 }
 
@@ -17,17 +18,20 @@ function closeUserGuideModal() {
 }
 
 function switchGuideTab(tabId) {
+  const targetTab = (typeof tabId === 'string' && typeof GUIDE_STEPS !== 'undefined' && GUIDE_STEPS.includes(tabId)) ? tabId : 'setup';
   const select = document.getElementById('guide-step-select');
-  if (select && select.value !== tabId) {
-    select.value = tabId;
+  if (select && select.value !== targetTab) {
+    select.value = targetTab;
   }
-  GUIDE_STEPS.forEach(t => {
-    const panel = document.getElementById('guide-panel-' + t);
-    if (panel) {
-      if (t === tabId) panel.classList.remove('hidden');
-      else panel.classList.add('hidden');
-    }
-  });
+  if (typeof GUIDE_STEPS !== 'undefined' && Array.isArray(GUIDE_STEPS)) {
+    GUIDE_STEPS.forEach(t => {
+      const panel = document.getElementById('guide-panel-' + t);
+      if (panel) {
+        if (t === targetTab) panel.classList.remove('hidden');
+        else panel.classList.add('hidden');
+      }
+    });
+  }
 }
 
 function navigateGuideStep(direction) {
