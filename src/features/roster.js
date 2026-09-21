@@ -91,7 +91,7 @@ function renderStudentRoster() {
     const res = s._gradeResult || { total: 0, msu: { grade: '—', class: 'bg-slate-100 text-slate-600', status: 'Pending' } };
     const gradeText = res.msu.grade;
     const gradeBadgeClass = res.msu.class || 'bg-slate-100 text-slate-700 border-slate-300';
-    const mailtoSubject = encodeURIComponent(`MSU-GSC Academic Notice: ${s.section}`);
+    const mailtoSubject = encodeURIComponent(`Academic Notice: ${s.section}`);
 
     return `
           <tr data-student-id="${escapeHtml(s.id)}" data-section="${escapeHtml(s.section)}" data-grade="${escapeHtml(gradeText)}" data-email="${escapeHtml(s.email)}" class="bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700/60 transition border-b border-slate-200 dark:border-slate-700">
@@ -297,7 +297,7 @@ function previewBulkData() {
       const id = parts[0].trim();
       const last = parts[1].trim();
       const first = parts[2].trim();
-      const email = parts[3] ? parts[3].trim() : (first.toLowerCase() + '.' + last.toLowerCase() + '@msugensan.edu.ph');
+      const email = parts[3] ? parts[3].trim() : (first.toLowerCase() + '.' + last.toLowerCase() + '@university.edu');
 
       if (id && last) {
         parsedBulkStudents.push({ id, last, first, email });
@@ -390,7 +390,7 @@ function saveSingleStudent() {
     id,
     last,
     first,
-    email: email || (first.toLowerCase() + '.' + last.toLowerCase() + '@msugensan.edu.ph'),
+    email: email || (first.toLowerCase() + '.' + last.toLowerCase() + '@university.edu'),
     section,
     dateAdded: new Date().toISOString().slice(0, 10),
     qz: 85,

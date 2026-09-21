@@ -97,11 +97,12 @@ function resetSectionScaleToDefault() {
   showToast(`Reset ${currentEditingScaleScope} to default scale.`);
 }
 
-function restoreOfficialMsuScale() {
-  currentEditingScaleData = deepClone(DEFAULT_MSU_SCALE);
+function restoreDefaultGradingScale() {
+  currentEditingScaleData = deepClone(DEFAULT_GRADING_SCALE || DEFAULT_MSU_SCALE);
   renderGradingScaleInputs();
-  showToast("Reset to default grading scale (95.56% - 60.00%).");
+  showToast("Reset to default institutional grading scale (95.56% - 60.00%).");
 }
+const restoreOfficialMsuScale = restoreDefaultGradingScale; // Backward compatibility alias
 
 function updateGradingScaleItemMin(grade, val) {
   const item = currentEditingScaleData.find(i => i.grade === grade);
@@ -189,7 +190,7 @@ function saveGradingScaleModal() {
   }
 
   if (!courseData.gradingScales) {
-    courseData.gradingScales = { default: JSON.parse(JSON.stringify(DEFAULT_MSU_SCALE)), sections: {} };
+    courseData.gradingScales = { default: JSON.parse(JSON.stringify(DEFAULT_GRADING_SCALE || DEFAULT_MSU_SCALE)), sections: {} };
   }
 
   if (currentEditingScaleScope === '__default__') {

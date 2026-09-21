@@ -79,10 +79,11 @@ setTimeout(() => {
     ['jsAttr helper present', () => window.__probe('typeof jsAttr') === 'function'],
     // --- regression tests for the bugs fixed in this refactor ---
     ['Render.after persists + repaints', () => {
-      window.localStorage.removeItem('MSU_GSC_COURSE_MANAGER_DATA_V2');
+      const key = window.__probe('STORAGE_KEY');
+      window.localStorage.removeItem(key);
       window.__probe("plannerEntries['2026-08-10__CVE112__B15.1'].topic = 'SMOKE TEST TOPIC'");
       window.Render.after('lesson', { immediate: true });
-      return !!window.localStorage.getItem('MSU_GSC_COURSE_MANAGER_DATA_V2') &&
+      return !!window.localStorage.getItem(key) &&
              g('matrix-body').innerHTML.includes('SMOKE TEST TOPIC');
     }],
     ['apostrophe in section does not break handlers', () => {

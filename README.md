@@ -1,13 +1,13 @@
-# MSU-GSC Course & Lesson Manager (v2.2.0)
+# Faculty Course & Lesson Manager (v2.3.0)
 
 [![Offline Ready](https://img.shields.io/badge/Offline-100%25%20Ready-success?style=flat-square&logo=pwa)](file:///p:/apps/msu-course-manager-v2/index.html)
 [![Zero Build](https://img.shields.io/badge/Build%20Step-Zero%20Bundler-blue?style=flat-square)](file:///p:/apps/msu-course-manager-v2/index.html)
 [![Architecture](https://img.shields.io/badge/Architecture-Modular%20Vanilla%20JS-amber?style=flat-square)](file:///p:/apps/msu-course-manager-v2/src/)
-[![License: Academic](https://img.shields.io/badge/License-MSU--GSC%20Faculty-maroon?style=flat-square)](file:///p:/apps/msu-course-manager-v2/LICENSE)
+[![License: Academic](https://img.shields.io/badge/License-Faculty%20Academic%20Open-emerald?style=flat-square)](file:///p:/apps/msu-course-manager-v2/README.md)
 
-A high-performance, offline-first faculty portal and academic management system tailored for the faculty of **Mindanao State University – General Santos City (MSU-GSC)**.
+A high-performance, offline-first faculty portal and academic productivity system designed for university and college educators across institutions.
 
-Designed for complete local privacy and zero server dependencies, it allows instructors to plan semester syllabus matrices, audit timetable room conflicts, track lost teaching days, manage student rosters, and calculate institutional grades (1.00–5.00) directly inside the browser.
+Engineered with an uncompromising commitment to local privacy and zero server dependencies, it empowers instructors to plan semester syllabus matrices, audit timetable room collisions, track lost instructional days due to calendar events, manage student rosters, and calculate institutional grades (supporting 1.00–5.00, letter grades, and custom scales) directly inside any modern web browser.
 
 ---
 
@@ -15,117 +15,131 @@ Designed for complete local privacy and zero server dependencies, it allows inst
 1. [Project Overview](#project-overview)
 2. [Key Capabilities & Workspaces](#key-capabilities--workspaces)
    - [1. Lesson Planner Matrix](#1-lesson-planner-matrix)
-   - [2. Weekly Timetable & Conflict Auditor](#2-weekly-timetable--conflict-auditor)
-   - [3. Academic Calendar & Lost Days Impact](#3-academic-calendar--lost-days-impact)
-   - [4. Class List (Roster) & Communications](#4-class-list-roster--communications)
-   - [5. Class Record & Gradebook](#5-class-record--gradebook)
-   - [6. Data Center & Vault](#6-data-center--vault)
+   - [2. Weekly Timetable & Room Conflict Auditor](#2-weekly-timetable--room-conflict-auditor)
+   - [3. Academic Calendar & Lost Days Engine](#3-academic-calendar--lost-days-engine)
+   - [4. Class List (Roster) & Faculty Communications](#4-class-list-roster--faculty-communications)
+   - [5. Class Record & Offline Gradebook](#5-class-record--offline-gradebook)
+   - [6. Data Center, Vault & Custom Branding](#6-data-center-vault--custom-branding)
 3. [Quick Start & Instructions](#quick-start--instructions)
-4. [Architecture & Code Organization](#architecture--code-organization)
-5. [Event Delegation Engine](#event-delegation-engine)
-6. [Offline & Service Worker Operation](#offline--service-worker-operation)
-7. [Version History & Changelog](#version-history--changelog)
+4. [Keyboard Shortcuts](#keyboard-shortcuts)
+5. [Architecture & Code Organization](#architecture--code-organization)
+6. [Event Delegation Engine](#event-delegation-engine)
+7. [Offline PWA & Service Worker Operation](#offline-pwa--service-worker-operation)
+8. [Data Privacy & Backward Compatibility Migration](#data-privacy--backward-compatibility-migration)
+9. [Version History & Changelog](#version-history--changelog)
+10. [License & Attribution](#license--attribution)
 
 ---
 
 ## Project Overview
 
-Modern academic environments demand reliable digital tooling that works regardless of campus internet availability. The **MSU-GSC Course & Lesson Manager** provides:
-- **Zero Build, Zero Bundler**: No Node build step, Webpack, Vite, or Babel required.
-- **Double-Click Executable (`file:///`)**: Runs natively by double-clicking `index.html` from Windows Explorer, macOS Finder, or Linux file managers.
-- **GitHub Pages Ready**: Fully static, deployable directly to GitHub Pages or any static CDN.
-- **Client-Side Persistence**: Stores all courses, lesson topics, timetable slots, student records, and grades in `localStorage` with automated periodic backup reminders and complete JSON/CSV export capabilities.
-- **Institutional Compliance**: Built-in support for the official MSU-GSC 11-tier grading scale (1.00, 1.25, 1.50, 1.75, 2.00, 2.25, 2.50, 2.75, 3.00, INC, 5.00).
+Modern academic environments demand reliable digital tools that remain fully functional regardless of campus network outages or slow connections. The **Faculty Course & Lesson Manager** provides:
+
+- **Zero Build, Zero Bundler**: No Node.js build step, Webpack, Vite, or Babel required. Edit any HTML, CSS, or JS file and refresh your browser.
+- **Double-Click Executable (`file:///`)**: Runs natively by double-clicking `index.html` straight from Windows Explorer, macOS Finder, or Linux file managers.
+- **Universal Multi-School Compatibility**: Flexible for any higher education institution, college, or polytechnic. Easily customize the institution name, department header, and school emblem in Portal Settings.
+- **Client-Side Data Sovereignty**: All courses, syllabi, rosters, schedules, and grades stay 100% on the user's computer in browser `localStorage`. No cloud data collection, no account logins, and no tracking.
+- **Automated Data Protection**: Includes periodic data safety backup reminders and comprehensive JSON import/export with schema validation.
+- **Flexible Grading Compliance**: Ships with standard institutional numeric scales (1.00 to 5.00) and allows custom cutoffs, custom labels, and section-specific grading scales.
 
 ---
 
 ## Key Capabilities & Workspaces
 
 ### 1. Lesson Planner Matrix
-- **Matrix View**: Calendar grid mapping class dates to individual course sections with weekday vs. weekend visual rhythm.
-- **Interactive Drag & Drop**: Drag lecture topic cards across calendar dates and sections to reschedule topics seamlessly.
-- **Multi-Level Undo/Redo**: 50-step action history (`Ctrl+Z` / `Ctrl+Y`) for confident planning and quick reversals.
-- **Column Resizing**: Smooth drag-resizing on course column dividers with double-click reset.
-- **Syllabus Backlog**: Stashes unassigned topics and activities in a dedicated drawer for flexible assignment.
-- **Subject Pace & Pacing Stats**: Sidebar metrics monitoring curriculum completion percentages and upcoming deadlines.
+- **Matrix Grid View**: Interactive calendar grid mapping each teaching date across all course sections with distinctive weekday vs. weekend visual rhythm.
+- **Interactive Drag & Drop**: Drag lecture cards, exam checkpoints, and laboratory sessions across calendar dates and sections to easily reschedule lessons.
+- **Multi-Level Undo/Redo Engine**: 50-step action history (`Ctrl+Z` / `Ctrl+Y`) for confident planning and instant reversal of mistakes.
+- **Interactive Column Resizing**: Drag column dividers to adjust course section widths, with a double-click reset to restore default balanced widths.
+- **Syllabus Backlog Drawer**: Stashes unassigned syllabus topics and learning outcomes in a dedicated slide-out drawer for flexible schedule planning.
+- **Curriculum Pacing & Progress**: Real-time sidebar metrics tracking curriculum completion percentages, assigned lesson count, and upcoming topics.
 
-### 2. Weekly Timetable & Conflict Auditor
-- **Visual Timetable Grid**: 7:00 AM – 6:00 PM weekly grid displaying subject meeting hours, classroom assignments, and color-coded courses.
-- **Automated Conflict Auditor**: Detects overlapping class hours and room collisions across sections in real time.
-- **Faculty Teaching Load Summary**: Summarizes lecture units, lab contact hours, and daily load distribution.
-- **Today's Pocket Agenda**: Day-by-day quick picker showing class schedules at a glance.
+### 2. Weekly Timetable & Room Conflict Auditor
+- **Weekly Schedule Grid**: 7:00 AM – 6:00 PM weekly grid displaying subject meeting hours, classroom assignments, section tags, and color-coded course badges.
+- **Automated Collision & Conflict Auditor**: Instantly detects and warns of overlapping class hours or double-booked rooms across courses in real time.
+- **Faculty Teaching Load Summary**: Accurately summarizes total lecture units, laboratory contact hours, and daily teaching load distributions.
+- **Today's Pocket Agenda**: Day-by-day quick agenda filter allowing instructors to view today's schedule at a glance during busy teaching days.
 
-### 3. Academic Calendar & Lost Days Impact
+### 3. Academic Calendar & Lost Days Engine
 - **Semester Timeline**: Full academic calendar tracking institutional holidays, exam periods, midterms, and university events.
-- **Lost Teaching Days Engine**: Automatically tallies holiday collisions per section and displays lost instructional hours.
-- **Event Distribution**: Color-coded categorization (Holidays, Exams, Milestones, Activities) with single-click filtering.
-- **No-Class Overrides**: Configure university-wide or section-specific suspensions with custom reasons.
+- **Lost Teaching Days Impact Engine**: Automatically checks calendar events against scheduled class meeting days, quantifying lost instructional hours per course section.
+- **Event Distribution & Filtering**: Categorizes events (Holidays, Exams, Milestones, Activities) with single-click filtering and inset highlight rings.
+- **No-Class Overrides**: Configure school-wide suspensions, local weather disruptions, or course-specific class cancellations with custom reasons.
 
-### 4. Class List (Roster) & Communications
-- **Student Roster Management**: ID, Last Name, First Name, Gender, Email, and Section assignment.
-- **Enrollment Meters**: Real-time capacity and breakdown progress bars per section.
-- **Duplicate ID Auditor**: Detects and highlights student ID anomalies across roster entries.
-- **One-Click Broadcast Emailing**: Generates pre-addressed `mailto:` BCC email drafts targeting active search results, failing students, or entire sections.
-- **CSV Roster Import/Export**: Import class lists from standard spreadsheet CSV files with multi-column autodetection.
+### 4. Class List (Roster) & Faculty Communications
+- **Student Roster Management**: ID, Last Name, First Name, Gender, Email, and Section assignment with instant sorting and multi-column search.
+- **Enrollment Capacity Meters**: Live capacity and gender breakdown progress meters per course section.
+- **Duplicate ID Auditor**: Detects and flags duplicate student ID anomalies across roster entries.
+- **One-Click Broadcast Emailing**: Generates pre-addressed `mailto:` BCC email drafts targeting active search results, failing students, or entire sections with a single click.
+- **RFC 4180 CSV Import/Export**: Import rosters from university SIS spreadsheet exports or copy-paste directly from Excel/Google Sheets.
 
-### 5. Class Record & Gradebook
-- **Real-Time Weighted Grading**: Dynamic calculations supporting weighted categories (e.g., Quizzes 20%, Labs 20%, Prelims 20%, Midterms 20%, Finals 20%) and custom sub-activities with arbitrary max scores.
-- **Institutional MSU Scale**: Dynamic conversion to official MSU numeric grades (1.00–5.00) with status flags (Passed, Failed, Incomplete, Dropped, Withdrawn).
-- **Interactive Radar Cohort Filtering (New in v2.2)**:
-  - **At-Risk Student Radar Badge (`[ X At-Risk ]`)**: One-click filtering of the table to students with grades $> 3.00$, INC, or failing. Re-click toggles back to all students.
-  - **Input Error Radar Badge (`[ X Errors ]`)**: One-click filtering to students with score validation issues (over-max items, negative numbers, or invalid inputs).
-- **Class Standing & Analytics**: Average, median, pass rate percentages, standard deviation ($\sigma$), score range spread, and high/low performer recognition.
-- **Grade Distribution Histogram**: Switch between 5 grouped summary tiers (Superior, Very Good, Passing, Incomplete, Failed) or the full 11-grade MSU institutional scale with single-click cohort filtering.
-- **Spreadsheet Editing & Keyboard Navigation**: Arrow-key grid navigation, in-place reactive score recalculation, category collapsing, and CSV Gradebook export.
+### 5. Class Record & Offline Gradebook
+- **Dynamic Weighted Grading**: Fully customizable weighted grading categories (e.g., Quizzes 20%, Laboratory 20%, Midterm Exam 30%, Final Project 30%) with arbitrary sub-activities and max scores.
+- **Institutional Scale Evaluation**: Real-time conversion to official numeric grades (1.00–5.00) with automatic academic status flags (Passed, Incomplete, Failed, Dropped).
+- **Interactive Radar Cohort Filtering**:
+  - **At-Risk Student Radar Badge (`[ X At-Risk ]`)**: Single-click filtering to isolate students with failing, near-failing, or incomplete grades ($> 3.00$, INC, 5.00). Re-clicking restores the full class list.
+  - **Input Error Radar Badge (`[ X Errors ]`)**: Single-click filtering to highlight students with score entry anomalies (scores exceeding max points, negative values, or invalid inputs).
+- **Class Standing Analytics**: Instant calculation of section average, median, pass rate percentages, standard deviation ($\sigma$), score distribution spread, and high/low performer cards.
+- **Grade Distribution Histogram**: Toggle between 5 grouped tiers (Superior, Very Good, Passing, Incomplete, Failed) or the full 11-grade institutional scale.
+- **Spreadsheet Keyboard Navigation**: Arrow-key and Enter-key grid navigation, in-place reactive recalculation, category collapsing, and CSV Class Record export.
 
-### 6. Data Center & Vault
-- **Complete Backup & Restore**: One-click JSON export/import of the entire portal database with backup structure validation and orphaned student record cleanup.
-- **Grading Scale Editor**: Customize section or course-level cutoff scales with descending monotonic validation ($1.00 > 1.25 > \dots > 3.00$).
-- **Branding & Easter Egg Vault**: Custom institutional logos, dark/light theme switching, and secret mini-games.
+### 6. Data Center, Vault & Custom Branding
+- **Complete Portal Backup & Restore**: One-click JSON backup export and restore of the entire portal database with schema validation and orphaned student record cleanup.
+- **Monotonic Grading Scale Editor**: Customize section or course-level cutoff scales with descending monotonic validation ($1.00 > 1.25 > \dots > 3.00$).
+- **Custom Institutional Branding**: Set your school or department name, upload custom SVG/PNG institution logos, and customize course color badges.
+- **Dark / Light Theme Sync**: High-contrast theme tailored for late-night grading sessions and bright lecture halls.
 
 ---
 
 ## Quick Start & Instructions
 
 ### Running Locally (Offline Mode)
-No dependencies or installations are necessary:
+No dependencies, Node.js, or terminal installations are necessary:
 1. Download or clone this repository:
    ```bash
    git clone https://github.com/jfvp3769/course-management.git
    ```
-2. Navigate to the project folder and double-click [`index.html`](file:///p:/apps/msu-course-manager-v2/index.html) to open directly in any modern browser (Microsoft Edge, Google Chrome, Mozilla Firefox, Safari).
+2. Open the project folder and double-click [`index.html`](file:///p:/apps/msu-course-manager-v2/index.html) to run directly in any modern browser (Google Chrome, Microsoft Edge, Mozilla Firefox, Safari, Brave).
 
 ### Running via Local HTTP Server (Optional)
-If you prefer running through a local web server (e.g., to enable full PWA service worker background features):
+If you prefer running via a local web server (e.g., to enable full Progressive Web App service worker caching features):
 ```bash
-# Python 3
+# Using Python 3
 python -m http.server 8000
 
-# Node.js
+# Or using Node.js
 npx serve .
 ```
-Then navigate to `http://localhost:8000` in your browser.
+Then open `http://localhost:8000` in your web browser.
 
-### Helpful Keyboard Shortcuts
-- `Ctrl + Z`: Undo last lesson planner change
-- `Ctrl + Y` or `Ctrl + Shift + Z`: Redo last lesson planner change
-- `Arrow Keys / Enter`: Navigate between cells in Gradebook spreadsheet view
-- `Esc`: Close open modals or drawers
+---
+
+## Keyboard Shortcuts
+
+| Shortcut | Action | Where Applicable |
+|---|---|---|
+| `Ctrl + Z` | Undo last lesson planner change | Lesson Planner Matrix |
+| `Ctrl + Y` or `Ctrl + Shift + Z` | Redo last lesson planner change | Lesson Planner Matrix |
+| `Arrow Keys` (`↑ ↓ ← →`) | Navigate adjacent cells in spreadsheet | Class Record Gradebook |
+| `Enter` | Move down to next student row | Class Record Gradebook |
+| `Tab` / `Shift + Tab` | Move right / left between activity columns | Class Record Gradebook |
+| `Esc` | Close any active modal dialog or drawer | Global |
 
 ---
 
 ## Architecture & Code Organization
 
-The codebase follows an offline-first modular architecture with zero external compilation:
+The application follows an offline-first modular architecture with zero external compilation:
 
 ```
-msu-course-manager-v2/
+course-management/
 ├── index.html                   # Core application markup & ordered classic scripts
 ├── manifest.json                # PWA manifest
 ├── sw.js                        # Offline service worker cache & update manager
+├── logo.svg                     # Vector academic emblem (universal default)
 ├── css/
 │   ├── 00-index.css             # CSS architecture catalog & load manifest
-│   ├── 01-tokens.css            # MSU Maroon/Gold color tokens, surfaces, borders
+│   ├── 01-tokens.css            # Academic Crimson/Gold design tokens, surfaces, borders
 │   ├── 02-dark-components.css   # Dark theme surface & widget styling
 │   ├── 03-dark-grades.css       # Dark theme grade badges & distribution styles
 │   ├── 04-dark-planner.css      # Dark theme matrix cells & cards
@@ -194,20 +208,45 @@ In v2.1.0+, all inline `onclick`, `onchange`, `oninput`, and `onkeydown` attribu
 
 ---
 
-## Offline & Service Worker Operation
+## Offline PWA & Service Worker Operation
 
 The application uses an enhanced Service Worker ([`sw.js`](file:///p:/apps/msu-course-manager-v2/sw.js)) configured with:
 - **Resilient Cache Strategy**: Caches application assets individually so missing optional assets do not abort installation.
-- **Network-First for Navigations**: Ensures that online deployments automatically fetch the newest application code while falling back seamlessly to cache when offline.
-- **Local Cache Reset**: Updates to version `msu-gsc-manager-v2.20` automatically purge obsolete asset versions.
+- **Network-First for Navigations**: Ensures online deployments fetch the newest code while falling back seamlessly to cache when offline.
+- **Cache Lifecycle Management**: Updates to cache name `faculty-course-manager-v2.30` automatically purge obsolete asset versions.
+
+---
+
+## Data Privacy & Backward Compatibility Migration
+
+All user data is stored entirely on the client side via the browser's `localStorage` engine:
+- **Primary Storage Key**: `FACULTY_COURSE_MANAGER_DATA_V2`
+- **Legacy Migration Support**: The portal automatically detects existing data stored under legacy keys (e.g. `MSU_GSC_COURSE_MANAGER_DATA_V2`), migrating all courses, rosters, grades, and custom scales forward seamlessly with **zero data loss**.
+- **Cross-Version Backup Compatibility**: Backup JSON files exported from previous versions remain fully valid and can be imported at any time.
 
 ---
 
 ## Version History & Changelog
 
-### Version 2.2.0 (September 2026) — *Current Release*
+### Version 2.3.0 (September 2026) — *Current Release*
+- **Universal Institution & Multi-School Support**:
+  - Removed hardcoded institutional restrictions; the portal is now universally applicable to faculty from any college, university, or academic institution.
+  - Default portal title updated to `"University Faculty Portal"` with customizable school name and logo uploading in Portal Settings.
+  - Added new clean, vector academic SVG emblem ([`logo.svg`](file:///p:/apps/msu-course-manager-v2/logo.svg)) featuring a laurel wreath, graduation cap, and open book.
+  - Universal student email placeholders (`@university.edu`) across single enrollment, bulk paste, and settings.
+  - Generalized export filenames (`Faculty_Course_Manager_Backup_YYYY-MM-DD.json`, `Class_Record_*.csv`, etc.).
+- **Zero-Loss Data Migration Engine**:
+  - Implemented dual-key fallback (`FACULTY_COURSE_MANAGER_DATA_V2` with legacy `MSU_GSC_COURSE_MANAGER_DATA_V2` detection) ensuring seamless, automatic migration for existing users.
+  - Preserved dual-key compatibility for UI preferences (`faculty_dark_mode`, `faculty_main_win_h_*`, `faculty_last_backup_time`).
+  - Generalized backup structure validator accepting both `academicCalendarEvents` and legacy event structures.
+- **Technical Debt & Polish Remediations**:
+  - **Grading Scale Monotonic Validation**: Added strictly descending cutoff validation ($1.00 > 1.25 > 1.50 > \dots > 3.00$) in [`src/features/grading-scale.js`](file:///p:/apps/msu-course-manager-v2/src/features/grading-scale.js) before saving.
+  - **Smooth double-rAF Scrolling**: Migrated remaining jump and highlight `setTimeout(..., 50)` delays to double `requestAnimationFrame` for smooth scrolling on lower-end devices.
+  - **Dead File Cleanup**: Removed empty legacy stylesheet `css/06-dark-grading-modals.css`.
+
+### Version 2.2.0 (September 2026)
 - **Interactive Radar Cohort Filtering**:
-  - Upper-right badge pills in the Gradebook sidebar (`[ X At-Risk ]` and `[ X Errors ]`) are now interactive buttons.
+  - Upper-right badge pills in the Gradebook sidebar (`[ X At-Risk ]` and `[ X Errors ]`) upgraded to interactive filter buttons.
   - Clicking `[ X At-Risk ]` filters the table exclusively to students with failing or non-passing grades ($> 3.00$, INC, 5.00).
   - Clicking `[ X Errors ]` filters the table to students with score validation issues (over-max values, negative entries, invalid characters).
   - Clicking an active badge pill toggles off the filter, restoring the full roster view.
@@ -218,12 +257,6 @@ The application uses an enhanced Service Worker ([`sw.js`](file:///p:/apps/msu-c
 - **Visual Inset Ring Enhancements**:
   - Replaced outer outline rings with `ring-2 ring-inset` across Event Distribution category buttons and High Score / Low Score performer cards.
   - Completely eliminated container boundary clipping and sibling card border occlusion.
-- **Grading Scale Monotonic Validation**:
-  - Enforced strictly descending cutoff validation ($1.00 > 1.25 > 1.50 > \dots > 3.00$) in [`src/features/grading-scale.js`](file:///p:/apps/msu-course-manager-v2/src/features/grading-scale.js) before saving.
-- **Smooth double-rAF Scrolling**:
-  - Migrated remaining jump and highlight `setTimeout(..., 50)` delays to double `requestAnimationFrame` for buttery-smooth scrolling on all devices.
-- **Dead File Cleanup**:
-  - Removed empty legacy stylesheet `css/06-dark-grading-modals.css`.
 
 ### Version 2.1.0 (September 2026)
 - **Centralized Event Delegation (`src/core/events.js`)**:
@@ -249,10 +282,11 @@ The application uses an enhanced Service Worker ([`sw.js`](file:///p:/apps/msu-c
   - Overhauled offline caching to prevent asset 404 installation aborts.
 
 ### Version 1.0.0 (Initial Release)
-- Prototype all-in-one MSU Course & Lesson Manager with spreadsheet matrix, timetable, calendar, roster, and local storage.
+- Prototype all-in-one Course & Lesson Manager with spreadsheet matrix, timetable, calendar, roster, and local storage.
 
 ---
 
 ## License & Attribution
-Developed for the faculty and administration of **Mindanao State University – General Santos City**.  
+
+Developed for university, college, and higher education educators worldwide. Open academic productivity software.  
 All rights reserved © 2026.

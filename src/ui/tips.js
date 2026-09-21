@@ -79,13 +79,13 @@ function closeTipsModal() {
   const checkbox = document.getElementById('tips-hide-today-checkbox');
   if (checkbox && checkbox.checked) {
     const todayStr = new Date().toLocaleDateString('en-CA');
-    localStorage.setItem('msu_hide_tips_date', todayStr);
+    localStorage.setItem('faculty_hide_tips_date', todayStr);
   }
 }
 
 function checkDailyTipsOnStartup() {
   try {
-    const savedDate = localStorage.getItem('msu_hide_tips_date');
+    const savedDate = localStorage.getItem('faculty_hide_tips_date') || localStorage.getItem('msu_hide_tips_date');
     const todayStr = new Date().toLocaleDateString('en-CA');
     if (savedDate === todayStr) {
       return; // Hidden for today

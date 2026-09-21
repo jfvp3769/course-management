@@ -8,7 +8,8 @@
 function recordBackupCompleted() {
   try {
     const now = Date.now();
-    localStorage.setItem('msu_last_backup_time', String(now));
+    localStorage.setItem('faculty_last_backup_time', String(now));
+    localStorage.removeItem('faculty_backup_reminder_snoozed_until');
     localStorage.removeItem('msu_backup_reminder_snoozed_until');
   } catch (e) {
     console.warn("Could not save backup timestamp:", e);
@@ -19,7 +20,7 @@ function recordBackupCompleted() {
 
 function formatLastBackupTime() {
   try {
-    const last = localStorage.getItem('msu_last_backup_time');
+    const last = localStorage.getItem('faculty_last_backup_time') || localStorage.getItem('msu_last_backup_time');
     if (!last) return 'No backup saved yet on this device';
     const lastTs = parseInt(last, 10);
     if (isNaN(lastTs) || lastTs <= 0) return 'No backup saved yet on this device';
@@ -43,7 +44,7 @@ function updateBackupStatusUI() {
   const statusEl = document.getElementById('ei-last-backup-status');
   if (statusEl) {
     const text = formatLastBackupTime();
-    const last = localStorage.getItem('msu_last_backup_time');
+    const last = localStorage.getItem('faculty_last_backup_time') || localStorage.getItem('msu_last_backup_time');
     const icon = last ? '🕒 ' : '⚠️ ';
     statusEl.innerHTML = `${icon}<span>${escapeHtml(text)}</span>`;
   }
@@ -51,12 +52,12 @@ function updateBackupStatusUI() {
 
 function checkBackupReminder() {
   try {
-    const snoozedUntil = localStorage.getItem('msu_backup_reminder_snoozed_until');
+    const snoozedUntil = localStorage.getItem('faculty_backup_reminder_snoozed_until') || localStorage.getItem('msu_backup_reminder_snoozed_until');
     if (snoozedUntil && Date.now() < parseInt(snoozedUntil, 10)) {
       return; // Currently snoozed
     }
 
-    const lastBackup = localStorage.getItem('msu_last_backup_time');
+    const lastBackup = localStorage.getItem('faculty_last_backup_time') || localStorage.getItem('msu_last_backup_time');
     let shouldRemind = false;
     let daysSince = 0;
 
@@ -70,9 +71,9 @@ function checkBackupReminder() {
         }
       }
     } else {
-      let firstInstalled = localStorage.getItem('msu_app_first_installed_time');
+      let firstInstalled = localStorage.getItem('faculty_app_first_installed_time') || localStorage.getItem('msu_app_first_installed_time');
       if (!firstInstalled) {
-        const rawStored = localStorage.getItem(STORAGE_KEY);
+        const rawStored = localStorage.getItem(STORAGE_KEY) || (typeof LEGACY_STORAGE_KEY !== 'undefined' ? localStorage.getItem(LEGACY_STORAGE_KEY) : null);
         if (rawStored) {
           try {
             const parsed = JSON.parse(rawStored);
@@ -84,7 +85,7 @@ function checkBackupReminder() {
         if (!firstInstalled) {
           firstInstalled = String(Date.now());
         }
-        localStorage.setItem('msu_app_first_installed_time', firstInstalled);
+        localStorage.setItem('faculty_app_first_installed_time', firstInstalled);
       }
 
       const firstTs = parseInt(firstInstalled, 10);
@@ -127,13 +128,13 @@ function dismissBackupReminderBanner(snoozeDefault = false) {
     banner.classList.add('translate-y-16', 'opacity-0', 'pointer-events-none');
   }
   if (snoozeDefault) {
-    localStorage.setItem('msu_backup_reminder_snoozed_until', String(Date.now() + 24 * 60 * 60 * 1000));
+    localStorage.setItem('faculty_backup_reminder_snoozed_until', String(Date.now() + 24 * 60 * 60 * 1000));
   }
 }
 
 function snoozeBackupReminder(days = 3) {
   const snoozeMs = days * 24 * 60 * 60 * 1000;
-  localStorage.setItem('msu_backup_reminder_snoozed_until', String(Date.now() + snoozeMs));
+  localStorage.setItem('faculty_backup_reminder_snoozed_until', String(Date.now() + snoozeMs));
   dismissBackupReminderBanner(false);
   showToast(`Backup reminder snoozed for ${days} days`);
 }

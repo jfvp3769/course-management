@@ -14,6 +14,7 @@ function saveAppState(immediate = false) {
 
   const doSave = () => {
     try {
+      const calEvts = (typeof academicCalendarEvents !== 'undefined' ? academicCalendarEvents : msuCalendarEvents);
       const payload = {
         version: 2,
         updatedAt: new Date().toISOString(),
@@ -21,7 +22,8 @@ function saveAppState(immediate = false) {
         courseData,
         columnWidths,
         weeklyTimetable,
-        msuCalendarEvents,
+        academicCalendarEvents: calEvts,
+        msuCalendarEvents: calEvts,
         plannerEntries,
         studentRoster,
         dailyNotes,
@@ -96,7 +98,13 @@ function cleanupOrphanedStudents() {
 
 function loadAppState() {
   try {
-    const stored = localStorage.getItem(STORAGE_KEY);
+    let stored = localStorage.getItem(STORAGE_KEY);
+    if (!stored && typeof LEGACY_STORAGE_KEY !== 'undefined') {
+      stored = localStorage.getItem(LEGACY_STORAGE_KEY);
+      if (stored) {
+        try { localStorage.setItem(STORAGE_KEY, stored); } catch (e) {}
+      }
+    }
     if (stored) {
       const parsed = JSON.parse(stored);
       if (parsed.semesterConfig) {
@@ -105,7 +113,11 @@ function loadAppState() {
       if (parsed.courseData) courseData = parsed.courseData;
       if (parsed.columnWidths) columnWidths = parsed.columnWidths;
       if (parsed.weeklyTimetable) weeklyTimetable = parsed.weeklyTimetable;
-      if (parsed.msuCalendarEvents) msuCalendarEvents = parsed.msuCalendarEvents;
+      const calEvts = parsed.academicCalendarEvents || parsed.msuCalendarEvents;
+      if (calEvts) {
+        msuCalendarEvents = calEvts;
+        if (typeof academicCalendarEvents !== 'undefined') academicCalendarEvents = calEvts;
+      }
       if (parsed.plannerEntries) plannerEntries = parsed.plannerEntries;
       if (parsed.studentRoster) studentRoster = parsed.studentRoster;
       if (parsed.dailyNotes) dailyNotes = parsed.dailyNotes;
@@ -122,6 +134,7 @@ function loadAppState() {
 }
 
 function exportBackupJSON() {
+  const calEvts = (typeof academicCalendarEvents !== 'undefined' ? academicCalendarEvents : msuCalendarEvents);
   const payload = {
     version: 2,
     exportedAt: new Date().toISOString(),
@@ -129,7 +142,8 @@ function exportBackupJSON() {
     courseData,
     columnWidths,
     weeklyTimetable,
-    msuCalendarEvents,
+    academicCalendarEvents: calEvts,
+    msuCalendarEvents: calEvts,
     plannerEntries,
     studentRoster,
     dailyNotes,
@@ -140,7 +154,7 @@ function exportBackupJSON() {
   const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(payload, null, 2));
   const a = document.createElement('a');
   a.setAttribute('href', dataStr);
-  a.setAttribute('download', 'MSU_Course_Manager_Backup_' + new Date().toISOString().slice(0, 10) + '.json');
+  a.setAttribute('download', 'Faculty_Course_Manager_Backup_' + new Date().toISOString().slice(0, 10) + '.json');
   a.click();
   recordBackupCompleted();
   showToast("Data backup file exported!");
@@ -165,8 +179,9 @@ function validateBackupStructure(data) {
   if (data.studentRoster && !Array.isArray(data.studentRoster)) {
     errors.push('studentRoster must be an array');
   }
-  if (data.msuCalendarEvents && !Array.isArray(data.msuCalendarEvents)) {
-    errors.push('msuCalendarEvents must be an array');
+  const calArray = data.academicCalendarEvents || data.msuCalendarEvents;
+  if (calArray && !Array.isArray(calArray)) {
+    errors.push('academicCalendarEvents must be an array');
   }
   if (data.plannerEntries && (typeof data.plannerEntries !== 'object' || Array.isArray(data.plannerEntries))) {
     errors.push('plannerEntries must be an object');
@@ -200,7 +215,11 @@ function importBackupJSON(event) {
       courseData = data.courseData;
       columnWidths = data.columnWidths || columnWidths;
       weeklyTimetable = data.weeklyTimetable || weeklyTimetable;
-      msuCalendarEvents = data.msuCalendarEvents || msuCalendarEvents;
+      const calEvts = data.academicCalendarEvents || data.msuCalendarEvents;
+      if (calEvts) {
+        msuCalendarEvents = calEvts;
+        if (typeof academicCalendarEvents !== 'undefined') academicCalendarEvents = calEvts;
+      }
       plannerEntries = data.plannerEntries || plannerEntries;
       studentRoster = data.studentRoster || studentRoster;
       dailyNotes = data.dailyNotes || dailyNotes;
@@ -228,13 +247,18 @@ function requestResetToDefaults() {
     "This will restore all subjects, schedules, calendar events, and rosters to initial demo state. Any custom additions will be lost.",
     () => {
       localStorage.removeItem(STORAGE_KEY);
+      if (typeof LEGACY_STORAGE_KEY !== 'undefined') {
+        localStorage.removeItem(LEGACY_STORAGE_KEY);
+      }
       semesterConfig = JSON.parse(JSON.stringify(DEFAULT_DATA.semesterConfig));
       applyHeaderBranding();
 
       courseData = JSON.parse(JSON.stringify(DEFAULT_DATA.courseData));
       columnWidths = JSON.parse(JSON.stringify(DEFAULT_DATA.columnWidths));
       weeklyTimetable = JSON.parse(JSON.stringify(DEFAULT_DATA.weeklyTimetable));
-      msuCalendarEvents = JSON.parse(JSON.stringify(DEFAULT_DATA.msuCalendarEvents));
+      const defCal = DEFAULT_DATA.academicCalendarEvents || DEFAULT_DATA.msuCalendarEvents;
+      msuCalendarEvents = JSON.parse(JSON.stringify(defCal));
+      if (typeof academicCalendarEvents !== 'undefined') academicCalendarEvents = msuCalendarEvents;
       plannerEntries = JSON.parse(JSON.stringify(DEFAULT_DATA.plannerEntries));
       studentRoster = JSON.parse(JSON.stringify(DEFAULT_DATA.studentRoster));
       dailyNotes = JSON.parse(JSON.stringify(DEFAULT_DATA.dailyNotes));
@@ -246,7 +270,7 @@ function requestResetToDefaults() {
       semesterDates = generateSemesterDateList();
       Render.views('everything');
       closeTermSettingsModal();
-      showToast("Data restored to verified defaults.");
+      showToast("Data restored to initial defaults.");
     }
   );
 }

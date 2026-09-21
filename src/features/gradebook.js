@@ -1,8 +1,8 @@
 /* ===========================================================================
  * GRADEBOOK
  * ---------------------------------------------------------------------------
- * The class record grid: score entry, weighted grade computation, MSU scale
- * mapping, category collapse/reorder and CSV export.
+ * The class record grid: score entry, weighted grade computation, institutional
+ * scale mapping, category collapse/reorder and CSV export.
  * ======================================================================== */
 
 function autoBalanceSubActivities(category) {
@@ -17,7 +17,7 @@ function autoBalanceSubActivities(category) {
 
 function getActiveGradingScale(sectionKey) {
   if (!courseData.gradingScales) {
-    courseData.gradingScales = { default: JSON.parse(JSON.stringify(DEFAULT_MSU_SCALE)), sections: {} };
+    courseData.gradingScales = { default: JSON.parse(JSON.stringify(DEFAULT_GRADING_SCALE)), sections: {} };
   }
   if (courseData.gradingScales.sections && sectionKey && courseData.gradingScales.sections[sectionKey]) {
     return {
@@ -27,14 +27,14 @@ function getActiveGradingScale(sectionKey) {
   }
   const defaultScale = (courseData.gradingScales.default && courseData.gradingScales.default.length)
     ? courseData.gradingScales.default
-    : DEFAULT_MSU_SCALE;
+    : DEFAULT_GRADING_SCALE;
   return {
     scale: defaultScale,
     isDefault: true
   };
 }
 
-function getMsuGrade(total, statusOverride, sectionKey) {
+function getInstitutionalGrade(total, statusOverride, sectionKey) {
   if (statusOverride === 'WDRW') return { grade: "WDRW", status: "Withdrawn", class: "text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-[#1e293b] border-slate-300 dark:border-slate-600 font-bold" };
   if (statusOverride === 'DRP') return { grade: "DRP", status: "Dropped", class: "text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-[#1e293b] border-slate-300 dark:border-slate-600 font-bold" };
   if (statusOverride === 'INC') return { grade: "INC", status: "Incomplete", class: "text-orange-700 dark:text-orange-200 bg-orange-100 dark:bg-[#431407] border-orange-300 dark:border-orange-600 font-bold" };
@@ -63,6 +63,8 @@ function getMsuGrade(total, statusOverride, sectionKey) {
   }
   return { grade: "5.00", status: "Failed", class: "text-rose-800 dark:text-rose-200 bg-rose-100 dark:bg-[#3b0d18] border-rose-300 dark:border-rose-600 font-black" };
 }
+
+const getMsuGrade = getInstitutionalGrade; // Backward compatibility alias
 
 function getGradingConfig(sectionKey) {
   if (!courseData.gradingConfigs) courseData.gradingConfigs = {};
@@ -136,12 +138,13 @@ function calculateStudentGrade(student, config, sectionKey) {
   });
 
   finalWeightedPercent = Math.round(finalWeightedPercent * 100) / 100;
-  const msu = getMsuGrade(finalWeightedPercent, student.statusOverride, sectionKey);
+  const institutionalGrade = getInstitutionalGrade(finalWeightedPercent, student.statusOverride, sectionKey);
 
   return {
     categoryTotals,
     total: finalWeightedPercent,
-    msu
+    institutionalGrade,
+    msu: institutionalGrade
   };
 }
 
@@ -152,7 +155,7 @@ function renderGradingScaleDrawer(sectionKey) {
   const gridEl = document.getElementById('grading-scale-cards-grid');
 
   if (titleEl) {
-    titleEl.innerText = sectionKey ? `Grading Scale: ${sectionKey}` : 'Default MSU-GSC Grading Scale';
+    titleEl.innerText = sectionKey ? `Grading Scale: ${sectionKey}` : 'Default Institutional Grading Scale';
   }
   if (badgeEl) {
     if (isDefault) {
@@ -740,7 +743,7 @@ function renderGradebook() {
       if (weightAlertMsg) {
         const diff = Math.round(Math.abs(100 - totalCatWeight) * 100) / 100;
         const diffDesc = totalCatWeight < 100 ? `${diff}% short of 100%` : `${diff}% over 100%`;
-        weightAlertMsg.innerHTML = `Total activity weight currently adds up to <strong class="underline decoration-rose-500 font-black text-rose-950">${totalCatWeight}%</strong> (${diffDesc}). Final grades and MSU scale evaluation cannot be computed accurately until categories add up to exactly 100%.`;
+        weightAlertMsg.innerHTML = `Total activity weight currently adds up to <strong class="underline decoration-rose-500 font-black text-rose-950">${totalCatWeight}%</strong> (${diffDesc}). Final grades and institutional scale evaluation cannot be computed accurately until categories add up to exactly 100%.`;
       }
     } else {
       weightAlertEl.classList.add('hidden');
@@ -1033,7 +1036,7 @@ function exportGradebookCSV() {
   const url = window.URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.setAttribute('href', url);
-  a.setAttribute('download', 'MSU_Class_Record_' + (selectedSec ? selectedSec.replace(/[^a-zA-Z0-9_-]/g, '_') + '_' : '') + new Date().toISOString().slice(0, 10) + '.csv');
+  a.setAttribute('download', 'Class_Record_' + (selectedSec ? selectedSec.replace(/[^a-zA-Z0-9_-]/g, '_') + '_' : '') + new Date().toISOString().slice(0, 10) + '.csv');
   a.click();
   showToast("Class Record CSV exported!");
 }

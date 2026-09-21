@@ -80,138 +80,139 @@ const MAIN_WINDOW_CONFIGS = [
 
 function autoResizeContentWindows() {
   MAIN_WINDOW_CONFIGS.forEach(({ wrapperId, tabId }) => {
-const el = document.getElementById(wrapperId);
-if (!el) return;
+    const el = document.getElementById(wrapperId);
+    if (!el) return;
 
-// Check if user set a manual height override for this tab
-const savedH = localStorage.getItem('msu_main_win_h_' + tabId);
-if (savedH) {
-  const numH = parseInt(savedH, 10);
-  if (!isNaN(numH) && numH >= 240) {
-    el.style.height = numH + 'px';
-    el.style.maxHeight = 'none';
-    return;
-  }
-}
+    // Check if user set a manual height override for this tab
+    const savedH = localStorage.getItem('faculty_main_win_h_' + tabId) || localStorage.getItem('msu_main_win_h_' + tabId);
+    if (savedH) {
+      const numH = parseInt(savedH, 10);
+      if (!isNaN(numH) && numH >= 240) {
+        el.style.height = numH + 'px';
+        el.style.maxHeight = 'none';
+        return;
+      }
+    }
 
-// Only compute viewport-fit if the tab is currently visible
-const tabSection = document.getElementById('tab-content-' + tabId);
-if (tabSection && tabSection.classList.contains('hidden')) {
-  return;
-}
+    // Only compute viewport-fit if the tab is currently visible
+    const tabSection = document.getElementById('tab-content-' + tabId);
+    if (tabSection && tabSection.classList.contains('hidden')) {
+      return;
+    }
 
-const rect = el.getBoundingClientRect();
-if (rect.top > 0) {
-  // 36px breathing room for bottom margin, 14px resizer bar, and page padding
-  const bottomBuffer = 36;
-  const targetH = Math.max(280, Math.floor(window.innerHeight - rect.top - bottomBuffer));
-  el.style.height = targetH + 'px';
-  el.style.maxHeight = 'none';
-}
+    const rect = el.getBoundingClientRect();
+    if (rect.top > 0) {
+      // 36px breathing room for bottom margin, 14px resizer bar, and page padding
+      const bottomBuffer = 36;
+      const targetH = Math.max(280, Math.floor(window.innerHeight - rect.top - bottomBuffer));
+      el.style.height = targetH + 'px';
+      el.style.maxHeight = 'none';
+    }
   });
 
   if (typeof initAllDualScrollbars === 'function') {
-initAllDualScrollbars();
+    initAllDualScrollbars();
   }
 }
 
 function initMainWindowResizers() {
   const resizers = document.querySelectorAll('.main-table-bottom-resizer');
   resizers.forEach(resizer => {
-if (resizer._initialized) return;
-resizer._initialized = true;
+    if (resizer._initialized) return;
+    resizer._initialized = true;
 
-const targetId = resizer.getAttribute('data-target');
-const tabId = resizer.getAttribute('data-tab') || 'planner';
-const targetEl = document.getElementById(targetId);
-if (!targetEl) return;
+    const targetId = resizer.getAttribute('data-target');
+    const tabId = resizer.getAttribute('data-tab') || 'planner';
+    const targetEl = document.getElementById(targetId);
+    if (!targetEl) return;
 
-// Apply saved custom height on initialization if present
-const savedH = localStorage.getItem('msu_main_win_h_' + tabId);
-if (savedH) {
-  const numH = parseInt(savedH, 10);
-  if (!isNaN(numH) && numH >= 240) {
-    targetEl.style.height = numH + 'px';
-    targetEl.style.maxHeight = 'none';
-  }
-}
-
-resizer.addEventListener('pointerdown', (e) => {
-  e.preventDefault();
-  e.stopPropagation();
-
-  const startY = e.clientY;
-  const startH = targetEl.getBoundingClientRect().height;
-  const minH = 240;
-  const maxH = Math.max(minH, Math.floor(window.innerHeight * 0.94));
-
-  try {
-    resizer.setPointerCapture(e.pointerId);
-  } catch (err) {}
-
-  document.body.classList.add('resizing-main-window-active');
-  resizer.parentElement?.classList.add('main-window-resizing');
-
-  let targetH = startH;
-  let rafId = null;
-
-  const applyHeight = () => {
-    rafId = null;
-    targetEl.style.height = targetH + 'px';
-    targetEl.style.maxHeight = 'none';
-    if (typeof initAllDualScrollbars === 'function') {
-      initAllDualScrollbars();
-    }
-  };
-
-  const onPointerMove = (moveEv) => {
-    const deltaY = moveEv.clientY - startY;
-    targetH = Math.min(maxH, Math.max(minH, Math.round(startH + deltaY)));
-    if (!rafId) {
-      rafId = requestAnimationFrame(applyHeight);
-    }
-  };
-
-  const onPointerUp = () => {
-    if (rafId) {
-      cancelAnimationFrame(rafId);
-      applyHeight();
-    }
-    try {
-      if (resizer.hasPointerCapture(e.pointerId)) {
-        resizer.releasePointerCapture(e.pointerId);
+    // Apply saved custom height on initialization if present
+    const savedH = localStorage.getItem('faculty_main_win_h_' + tabId) || localStorage.getItem('msu_main_win_h_' + tabId);
+    if (savedH) {
+      const numH = parseInt(savedH, 10);
+      if (!isNaN(numH) && numH >= 240) {
+        targetEl.style.height = numH + 'px';
+        targetEl.style.maxHeight = 'none';
       }
-    } catch (err) {}
-
-    window.removeEventListener('pointermove', onPointerMove);
-    window.removeEventListener('pointerup', onPointerUp);
-    window.removeEventListener('pointercancel', onPointerUp);
-    resizer.removeEventListener('lostpointercapture', onPointerUp);
-
-    document.body.classList.remove('resizing-main-window-active');
-    resizer.parentElement?.classList.remove('main-window-resizing');
-
-    if (targetEl.style.height) {
-      localStorage.setItem('msu_main_win_h_' + tabId, parseInt(targetEl.style.height, 10));
     }
-  };
 
-  window.addEventListener('pointermove', onPointerMove, { passive: true });
-  window.addEventListener('pointerup', onPointerUp);
-  window.addEventListener('pointercancel', onPointerUp);
-  resizer.addEventListener('lostpointercapture', onPointerUp);
-});
+    resizer.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
 
-// Double-click resets to automatic responsive viewport-fit
-resizer.addEventListener('dblclick', (e) => {
-  e.stopPropagation();
-  localStorage.removeItem('msu_main_win_h_' + tabId);
-  targetEl.style.height = '';
-  autoResizeContentWindows();
-  if (typeof showToast === 'function') {
-    showToast('Reset window to auto-fit viewport height.', '✓');
-  }
-});
+      const startY = e.clientY;
+      const startH = targetEl.getBoundingClientRect().height;
+      const minH = 240;
+      const maxH = Math.max(minH, Math.floor(window.innerHeight * 0.94));
+
+      try {
+        resizer.setPointerCapture(e.pointerId);
+      } catch (err) {}
+
+      document.body.classList.add('resizing-main-window-active');
+      resizer.parentElement?.classList.add('main-window-resizing');
+
+      let targetH = startH;
+      let rafId = null;
+
+      const applyHeight = () => {
+        rafId = null;
+        targetEl.style.height = targetH + 'px';
+        targetEl.style.maxHeight = 'none';
+        if (typeof initAllDualScrollbars === 'function') {
+          initAllDualScrollbars();
+        }
+      };
+
+      const onPointerMove = (moveEv) => {
+        const deltaY = moveEv.clientY - startY;
+        targetH = Math.min(maxH, Math.max(minH, Math.round(startH + deltaY)));
+        if (!rafId) {
+          rafId = requestAnimationFrame(applyHeight);
+        }
+      };
+
+      const onPointerUp = () => {
+        if (rafId) {
+          cancelAnimationFrame(rafId);
+          applyHeight();
+        }
+        try {
+          if (resizer.hasPointerCapture(e.pointerId)) {
+            resizer.releasePointerCapture(e.pointerId);
+          }
+        } catch (err) {}
+
+        window.removeEventListener('pointermove', onPointerMove);
+        window.removeEventListener('pointerup', onPointerUp);
+        window.removeEventListener('pointercancel', onPointerUp);
+        resizer.removeEventListener('lostpointercapture', onPointerUp);
+
+        document.body.classList.remove('resizing-main-window-active');
+        resizer.parentElement?.classList.remove('main-window-resizing');
+
+        if (targetEl.style.height) {
+          localStorage.setItem('faculty_main_win_h_' + tabId, parseInt(targetEl.style.height, 10));
+        }
+      };
+
+      window.addEventListener('pointermove', onPointerMove, { passive: true });
+      window.addEventListener('pointerup', onPointerUp);
+      window.addEventListener('pointercancel', onPointerUp);
+      resizer.addEventListener('lostpointercapture', onPointerUp);
+    });
+
+    // Double-click resets to automatic responsive viewport-fit
+    resizer.addEventListener('dblclick', (e) => {
+      e.stopPropagation();
+      localStorage.removeItem('faculty_main_win_h_' + tabId);
+      localStorage.removeItem('msu_main_win_h_' + tabId);
+      targetEl.style.height = '';
+      autoResizeContentWindows();
+      if (typeof showToast === 'function') {
+        showToast('Reset window to auto-fit viewport height.', '✓');
+      }
+    });
   });
 }
 

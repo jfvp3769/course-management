@@ -202,7 +202,7 @@ function sendIndividualStudentEmail(email, section, firstName = '', lastName = '
     showToast("Student does not have an email address recorded.", "⚠️");
     return;
   }
-  const subject = `MSU-GSC Academic Notice: ${section}`;
+  const subject = `Academic Notice: ${section}`;
   dispatchEmail({ to: email, subject });
   const targetAccount = semesterConfig.facultyEmail ? ` via ${semesterConfig.facultyEmail}` : '';
   showToast(`Composing email to ${firstName || email}${targetAccount}...`, '✉️');
@@ -219,7 +219,7 @@ function emailFilteredStudentsBCC() {
   }
 
   const gradeContext = gradeFilter !== 'all' ? ` [Grade: ${gradeFilter}]` : '';
-  const subject = `MSU-GSC Academic Notice: ${secFilter}${gradeContext}`;
+  const subject = `Academic Notice: ${secFilter}${gradeContext}`;
 
   dispatchEmail({ bcc: emails.join(','), subject });
   const targetAccount = semesterConfig.facultyEmail ? ` from ${semesterConfig.facultyEmail}` : '';
@@ -237,7 +237,7 @@ function emailSectionBCC() {
     return;
   }
 
-  const subject = `MSU-GSC Course Announcement: ${selectedSec || 'All Sections'}`;
+  const subject = `Course Announcement: ${selectedSec || 'All Sections'}`;
   dispatchEmail({ bcc: emails.join(','), subject });
   const targetAccount = semesterConfig.facultyEmail ? ` from ${semesterConfig.facultyEmail}` : '';
   showToast(`Drafting announcement to all ${emails.length} students in ${selectedSec || 'all sections'}${targetAccount}.`, '📢');

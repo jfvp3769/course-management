@@ -2,15 +2,16 @@
  * CONSTANTS & SEED DATA
  * ---------------------------------------------------------------------------
  * Every frozen value in the app: storage key, colour palettes, section accent
- * cycles, the default MSU grading scale, and the AY 2026-2027 seed dataset.
+ * cycles, the default institutional grading scale, and the AY 2026-2027 seed dataset.
  * Previously these were scattered across nine places in app.js.
  * ======================================================================== */
 
 /* =========================================================
-   MSU-GSC COURSE & LESSON MANAGER - HIGH PERFORMANCE ENGINE
+   FACULTY COURSE & LESSON MANAGER - HIGH PERFORMANCE ENGINE
    ========================================================= */
 
-const STORAGE_KEY = 'MSU_GSC_COURSE_MANAGER_DATA_V2';
+const STORAGE_KEY = 'FACULTY_COURSE_MANAGER_DATA_V2';
+const LEGACY_STORAGE_KEY = 'MSU_GSC_COURSE_MANAGER_DATA_V2';
 
 const COLOR_PALETTES = {
   blue: {
@@ -154,10 +155,10 @@ const sectionBadgeBorders = [
   'border-msu-maroon text-rose-950 bg-rose-100/90'
 ];
 
-// Default Seed Data Verified from MSU-GSC AY 2026-2027 Calendar
+// Default Seed Data for Academic Year 2026-2027
 const DEFAULT_DATA = {
   semesterConfig: {
-    schoolName: "Mindanao State University - General Santos",
+    schoolName: "University Faculty Portal",
     schoolLogo: "",
     title: "1st Semester, Academic Year 2026–2027",
     startDate: "2026-08-10",
@@ -219,14 +220,14 @@ const DEFAULT_DATA = {
     { course: "CVE113", section: "J15", day: "Thursday", startTime: "10:30", endTime: "12:00", room: "Eng 301", type: "Lecture" },
     { course: "CVE169", section: "Main", day: "Friday", startTime: "08:00", endTime: "11:00", room: "CAD Lab", type: "Laboratory" }
   ],
-  msuCalendarEvents: [
+  academicCalendarEvents: [
     { num: 1, activity: "Regular Registration (Freshmen)", firstSem: "July 1 – 31, 2026", secondSem: "—", summer: "—", dateKey: "", isNoClass: false, type: "admin" },
     { num: 2, activity: "First Day of Report to Office of Faculty Members", firstSem: "August 3, 2026", secondSem: "January 4, 2027", summer: "—", dateKey: "2026-08-03", isNoClass: false, type: "admin" },
     { num: 3, activity: "General Faculty Assembly & Planning Conference", firstSem: "August 3, 2026", secondSem: "January 11, 2027", summer: "June 7, 2027", dateKey: "2026-08-03", isNoClass: false, type: "admin" },
     { num: 4, activity: "Regular Registration (Old Students/Returning)", firstSem: "August 3 – 7, 2026", secondSem: "January 11 – 15, 2027", summer: "June 7 – 8, 2027", dateKey: "2026-08-07", isNoClass: false, type: "admin" },
     { num: 5, activity: "START OF CLASSES (Undergraduate Students)", firstSem: "August 10, 2026", secondSem: "January 18, 2027", summer: "June 9, 2027", dateKey: "2026-08-10", isNoClass: false, type: "milestone" },
     { num: 6, activity: "Start of Classes (Graduate Students)", firstSem: "August 17, 2026", secondSem: "January 25, 2027", summer: "—", dateKey: "2026-08-17", isNoClass: false, type: "milestone" },
-    { num: 7, activity: "MSU SYSTEM FOUNDATION DAY (Charter Day)", firstSem: "September 1, 2026", secondSem: "—", summer: "—", dateKey: "2026-09-01", isNoClass: true, type: "holiday" },
+    { num: 7, activity: "INSTITUTIONAL FOUNDATION DAY (Charter Day)", firstSem: "September 1, 2026", secondSem: "—", summer: "—", dateKey: "2026-09-01", isNoClass: true, type: "holiday" },
     { num: 8, activity: "FIRST PRELIMINARY EXAMINATIONS", firstSem: "September 10 – 11, 2026", secondSem: "February 18 – 19, 2027", summer: "—", dateKey: "2026-09-10", isNoClass: false, type: "exam" },
     { num: 9, activity: "First Prelim Examinations (Day 2)", firstSem: "September 11, 2026", secondSem: "February 19, 2027", summer: "—", dateKey: "2026-09-11", isNoClass: false, type: "exam" },
     { num: 10, activity: "INTRAMURALS WEEK (Sports & Cultural Festival)", firstSem: "October 1 – 3, 2026", secondSem: "—", summer: "—", dateKey: "2026-10-01", isNoClass: true, type: "activity" },
@@ -252,14 +253,17 @@ const DEFAULT_DATA = {
     "2026-08-14__CVE169__Main": { topic: "Capstone Project Group Formulation", activity: "Brainstorming of Project Titles & Advisers", type: "Laboratory", status: "Planned", notes: "Submit 3 title proposals" }
   },
   studentRoster: [
-    { id: "2022-0142", last: "Al-Ghazali", first: "Fatima", email: "fatima.alghazali@msugensan.edu.ph", section: "CVE112 - B15.1", qz: 92, lab: 88, p1: 89, p2: 91, fin: 90 },
-    { id: "2023-0854", last: "Pendatun", first: "Datu Ali", email: "ali.pendatun@msugensan.edu.ph", section: "CVE112 - B15.1", qz: 85, lab: 84, p1: 82, p2: 86, fin: 88 },
-    { id: "2023-1105", last: "Santos", first: "Juan", email: "juan.santos@msugensan.edu.ph", section: "CVE112 - B15.1", qz: 78, lab: 80, p1: 75, p2: 79, fin: 82 },
-    { id: "2023-1490", last: "Campos", first: "Maria", email: "maria.campos@msugensan.edu.ph", section: "CVE112 - E15", qz: 95, lab: 92, p1: 94, p2: 96, fin: 95 },
-    { id: "2022-0912", last: "Dimalanta", first: "Karlo", email: "karlo.dimalanta@msugensan.edu.ph", section: "CVE113 - J15", qz: 88, lab: 90, p1: 86, p2: 89, fin: 91 }
+    { id: "2022-0142", last: "Al-Ghazali", first: "Fatima", email: "fatima.alghazali@university.edu", section: "CVE112 - B15.1", qz: 92, lab: 88, p1: 89, p2: 91, fin: 90 },
+    { id: "2023-0854", last: "Pendatun", first: "Datu Ali", email: "ali.pendatun@university.edu", section: "CVE112 - B15.1", qz: 85, lab: 84, p1: 82, p2: 86, fin: 88 },
+    { id: "2023-1105", last: "Santos", first: "Juan", email: "juan.santos@university.edu", section: "CVE112 - B15.1", qz: 78, lab: 80, p1: 75, p2: 79, fin: 82 },
+    { id: "2023-1490", last: "Campos", first: "Maria", email: "maria.campos@university.edu", section: "CVE112 - E15", qz: 95, lab: 92, p1: 94, p2: 96, fin: 95 },
+    { id: "2022-0912", last: "Dimalanta", first: "Karlo", email: "karlo.dimalanta@university.edu", section: "CVE113 - J15", qz: 88, lab: 90, p1: 86, p2: 89, fin: 91 }
   ],
   dailyNotes: {}
 };
+
+// Legacy backward-compatibility alias
+DEFAULT_DATA.msuCalendarEvents = DEFAULT_DATA.academicCalendarEvents;
 
 // Active Application State
 
@@ -267,7 +271,7 @@ const DEFAULT_DATA = {
 const monthNamesFull = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
 
-const DEFAULT_MSU_SCALE = [
+const DEFAULT_GRADING_SCALE = [
   { grade: "1.00", min: 95.56, desc: "Excellent", class: "text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-[#063526] border-emerald-300 dark:border-emerald-600 font-black", status: "Passed" },
   { grade: "1.25", min: 91.11, desc: "Very Good", class: "text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-[#063526] border-emerald-300 dark:border-emerald-600 font-bold", status: "Passed" },
   { grade: "1.50", min: 86.67, desc: "Very Good", class: "text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-[#063526] border-emerald-300 dark:border-emerald-600 font-bold", status: "Passed" },
@@ -280,6 +284,8 @@ const DEFAULT_MSU_SCALE = [
   { grade: "INC", min: 30.00, desc: "Incomplete", class: "text-orange-700 dark:text-orange-200 bg-orange-100 dark:bg-[#431407] border-orange-300 dark:border-orange-600 font-black", status: "Incomplete" },
   { grade: "5.00", min: 0.00, desc: "Failed", class: "text-rose-800 dark:text-rose-200 bg-rose-100 dark:bg-[#3b0d18] border-rose-300 dark:border-rose-600 font-black", status: "Failed" }
 ];
+
+const DEFAULT_MSU_SCALE = DEFAULT_GRADING_SCALE; // Backward compatibility alias
 
 const DEFAULT_GRADING_CONFIG = {
   categories: [

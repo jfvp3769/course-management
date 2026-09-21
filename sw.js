@@ -1,5 +1,5 @@
 /* =============================================================================
- * SERVICE WORKER - offline shell for the MSU-GSC Course & Lesson Manager
+ * SERVICE WORKER - offline shell for the Faculty Course & Lesson Manager
  * -----------------------------------------------------------------------------
  * Changes from the previous version:
  *
@@ -7,9 +7,7 @@
  *      split. It is now generated from the same module order index.html uses.
  *
  *   2. `cache.addAll()` rejects the WHOLE install if any single entry 404s.
- *      The old list included "./msu-logo.png", which is optional, so a missing
- *      logo silently disabled offline support entirely. Assets are now cached
- *      individually and a miss is logged rather than fatal.
+ *      Assets are cached individually and a miss is logged rather than fatal.
  *
  *   3. The old fetch handler was cache-first with no revalidation, so a user
  *      who had ever loaded the app could never receive an update. Navigations
@@ -19,11 +17,12 @@
  * Bump CACHE_NAME on every release; `activate` purges older caches.
  * ========================================================================== */
 
-const CACHE_NAME = 'msu-gsc-manager-v2.00';
+const CACHE_NAME = 'faculty-course-manager-v2.30';
 
 const SHELL = [
   './',
   './index.html',
+  './logo.svg',
   './manifest.json',
   './styles.css',
   './tailwind.cdn.js',

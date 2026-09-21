@@ -354,12 +354,12 @@ function _renderClassPerformanceWidget(statsContent, statsBadge, studentGrades, 
           <div class="py-1 px-1 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
             <div class="text-[8px] font-extrabold text-slate-400 uppercase tracking-wider">Average</div>
             <div class="text-xs font-extrabold text-slate-900 dark:text-slate-100 leading-tight my-0.5 font-mono">${avgTotal.toFixed(1)}%</div>
-            <div class="inline-block px-1 py-0.2 rounded text-[8.5px] font-bold font-mono bg-amber-100 dark:bg-amber-900/40 text-amber-900 dark:text-amber-200 border border-amber-200/80 dark:border-amber-700/60 mx-auto" title="MSU Equivalent: ${escapeHtml(avgMsu.status)}">${escapeHtml(avgMsu.grade)}</div>
+            <div class="inline-block px-1 py-0.2 rounded text-[8.5px] font-bold font-mono bg-amber-100 dark:bg-amber-900/40 text-amber-900 dark:text-amber-200 border border-amber-200/80 dark:border-amber-700/60 mx-auto" title="Institutional Equivalent: ${escapeHtml(avgMsu.status)}">${escapeHtml(avgMsu.grade)}</div>
           </div>
           <div class="py-1 px-1 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
             <div class="text-[8px] font-extrabold text-slate-400 uppercase tracking-wider">Median</div>
             <div class="text-xs font-extrabold text-slate-900 dark:text-slate-100 leading-tight my-0.5 font-mono">${medianTotal.toFixed(1)}%</div>
-            <div class="inline-block px-1 py-0.2 rounded text-[8.5px] font-bold font-mono bg-sky-100 dark:bg-sky-900/40 text-sky-900 dark:text-sky-200 border border-sky-200/80 dark:border-sky-700/60 mx-auto" title="MSU Equivalent: ${escapeHtml(medianMsu.status)}">${escapeHtml(medianMsu.grade)}</div>
+            <div class="inline-block px-1 py-0.2 rounded text-[8.5px] font-bold font-mono bg-sky-100 dark:bg-sky-900/40 text-sky-900 dark:text-sky-200 border border-sky-200/80 dark:border-sky-700/60 mx-auto" title="Institutional Equivalent: ${escapeHtml(medianMsu.status)}">${escapeHtml(medianMsu.grade)}</div>
           </div>
           <div class="py-1 px-1 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
             <div class="text-[8px] font-extrabold text-slate-400 uppercase tracking-wider">Pass Rate</div>
@@ -489,7 +489,7 @@ function _renderGradeDistributionHistogram(distCont, studentGrades, selectedSec)
 
   let buckets = {};
   if (gradeDistScaleMode === 'full') {
-    // Full 11-grade institutional MSU grading scale
+    // Full institutional grading scale
     const { scale } = getActiveGradingScale(selectedSec);
     scale.forEach(item => {
       let color = 'bg-slate-400 dark:bg-slate-400';

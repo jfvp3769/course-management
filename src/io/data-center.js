@@ -107,7 +107,7 @@ function exportPlannerScheduleCSV() {
   const url = window.URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.setAttribute('href', url);
-  a.setAttribute('download', 'MSU_Lesson_Schedule_' + new Date().toISOString().slice(0, 10) + '.csv');
+  a.setAttribute('download', 'Lesson_Schedule_' + new Date().toISOString().slice(0, 10) + '.csv');
   a.click();
   showToast("Lesson Planner Matrix CSV exported!");
 }
@@ -122,7 +122,7 @@ function exportPlannerScheduleJSON() {
   const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(payload, null, 2));
   const a = document.createElement('a');
   a.setAttribute('href', dataStr);
-  a.setAttribute('download', 'MSU_Lesson_Schedule_' + new Date().toISOString().slice(0, 10) + '.json');
+  a.setAttribute('download', 'Lesson_Schedule_' + new Date().toISOString().slice(0, 10) + '.json');
   a.click();
   showToast("Lesson Planner Matrix JSON exported!");
 }
@@ -189,7 +189,7 @@ function exportSubjectsJSON() {
   const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(payload, null, 2));
   const a = document.createElement('a');
   a.setAttribute('href', dataStr);
-  a.setAttribute('download', 'MSU_Subjects_Timetable_' + new Date().toISOString().slice(0, 10) + '.json');
+  a.setAttribute('download', 'Subjects_Timetable_' + new Date().toISOString().slice(0, 10) + '.json');
   a.click();
   showToast("Subjects & Timetable exported!");
 }
@@ -240,7 +240,7 @@ function exportRosterCSV() {
   const url = window.URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.setAttribute('href', url);
-  a.setAttribute('download', 'MSU_Student_Roster_' + (selectedSec ? selectedSec.replace(/[^a-zA-Z0-9_-]/g, '_') + '_' : '') + new Date().toISOString().slice(0, 10) + '.csv');
+  a.setAttribute('download', 'Student_Roster_' + (selectedSec ? selectedSec.replace(/[^a-zA-Z0-9_-]/g, '_') + '_' : '') + new Date().toISOString().slice(0, 10) + '.csv');
   a.click();
   showToast("Student Roster CSV exported!");
 }
@@ -263,7 +263,7 @@ function importRosterCSVFile(event) {
           const id = parts[0];
           const last = parts[1];
           const first = parts[2];
-          const email = parts[3] ? parts[3] : (first.toLowerCase() + '.' + last.toLowerCase() + '@msugensan.edu.ph');
+          const email = parts[3] ? parts[3] : (first.toLowerCase() + '.' + last.toLowerCase() + '@university.edu');
           const section = parts[4] ? parts[4] : 'Main';
 
           if (id && last) {

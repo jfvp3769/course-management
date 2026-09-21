@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <linearGradient id="crestBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#800000" />
+      <stop offset="100%" stop-color="#4A0000" />
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FCD34D" />
+      <stop offset="50%" stop-color="#DAA520" />
+      <stop offset="100%" stop-color="#B8860B" />
+    </linearGradient>
+    <linearGradient id="innerShine" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.15" />
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0" />
+    </linearGradient>
+  </defs>
+
+  <!-- Base Circle with Border -->
+  <circle cx="64" cy="64" r="62" fill="url(#crestBg)" stroke="url(#goldGrad)" stroke-width="4" />
+  <circle cx="64" cy="64" r="56" fill="none" stroke="url(#goldGrad)" stroke-width="1.5" stroke-dasharray="3,2" opacity="0.8" />
+  <circle cx="64" cy="64" r="53" fill="url(#innerShine)" />
+
+  <!-- Laurel Wreath Left -->
+  <g fill="url(#goldGrad)" opacity="0.9">
+    <path d="M 28 62 C 27 50 33 38 42 30 C 40 36 38 44 38 52 C 34 54 30 58 28 62 Z" />
+    <path d="M 24 74 C 24 64 28 55 35 48 C 34 56 36 64 40 70 C 34 70 28 72 24 74 Z" />
+    <path d="M 28 88 C 26 78 31 68 38 60 C 38 68 41 76 46 82 C 40 83 34 85 28 88 Z" />
+    <path d="M 38 100 C 34 92 38 82 46 76 C 45 84 49 91 55 96 C 48 97 42 99 38 100 Z" />
+  </g>
+
+  <!-- Laurel Wreath Right -->
+  <g fill="url(#goldGrad)" opacity="0.9">
+    <path d="M 100 62 C 101 50 95 38 86 30 C 88 36 90 44 90 52 C 94 54 98 58 100 62 Z" />
+    <path d="M 104 74 C 104 64 100 55 93 48 C 94 56 92 64 88 70 C 94 70 100 72 104 74 Z" />
+    <path d="M 100 88 C 102 78 97 68 90 60 C 90 68 87 76 82 82 C 88 83 94 85 100 88 Z" />
+    <path d="M 90 100 C 94 92 90 82 82 76 C 83 84 79 91 73 96 C 80 97 86 99 90 100 Z" />
+  </g>
+
+  <!-- Three Top Stars -->
+  <g fill="url(#goldGrad)">
+    <polygon points="64,18 66,22 71,22 67,25 68,30 64,27 60,30 61,25 57,22 62,22" />
+    <polygon points="50,22 51.5,25 55,25 52,27 53,31 50,29 47,31 48,27 45,25 48.5,25" />
+    <polygon points="78,22 79.5,25 83,25 80,27 81,31 78,29 75,31 76,27 73,25 76.5,25" />
+  </g>
+
+  <!-- Mortarboard (Academic Cap) -->
+  <g id="mortarboard">
+    <!-- Cap Diamond Top -->
+    <polygon points="64,36 92,47 64,57 36,47" fill="url(#goldGrad)" stroke="#4A0000" stroke-width="1" />
+    <!-- Cap Skull Base -->
+    <path d="M 46 51 L 46 60 C 46 66 54 70 64 70 C 74 70 82 66 82 60 L 82 51 C 77 54 71 56 64 56 C 57 56 51 54 46 51 Z" fill="#DAA520" />
+    <!-- Tassel -->
+    <path d="M 64 46 C 72 47 80 50 82 55 L 84 68 C 84 70 86 72 88 72 C 86 70 86 67 85 64 L 84 54 C 81 48 73 45 64 45 Z" fill="#FFFBEB" />
+    <circle cx="64" cy="46" r="2.5" fill="#FFFBEB" />
+    <!-- Tassel Fringe -->
+    <rect x="85" y="68" width="4" height="7" rx="1.5" fill="#FCD34D" />
+  </g>
+
+  <!-- Open Book of Knowledge -->
+  <g id="open-book">
+    <!-- Book Base / Cover Shadow -->
+    <path d="M 64 78 C 55 74 44 75 36 78 L 36 95 C 44 92 55 91 64 95 C 73 91 84 92 92 95 L 92 78 C 84 75 73 74 64 78 Z" fill="#2E0202" />
+    <!-- Book Left Page -->
+    <path d="M 63 79 C 55 75.5 45 76.5 38 79.5 L 38 93.5 C 45 90.5 55 89.5 63 93 Z" fill="#FFFDF5" stroke="url(#goldGrad)" stroke-width="1" />
+    <!-- Book Right Page -->
+    <path d="M 65 79 C 73 75.5 83 76.5 90 79.5 L 90 93.5 C 83 90.5 73 89.5 65 93 Z" fill="#FFFDF5" stroke="url(#goldGrad)" stroke-width="1" />
+    <!-- Book Spine Center -->
+    <line x1="64" y1="78" x2="64" y2="94" stroke="url(#goldGrad)" stroke-width="1.5" />
+    <!-- Page Text Lines Left -->
+    <line x1="43" y1="83" x2="58" y2="81.5" stroke="#B8860B" stroke-width="1" stroke-linecap="round" opacity="0.6" />
+    <line x1="43" y1="86.5" x2="58" y2="85" stroke="#B8860B" stroke-width="1" stroke-linecap="round" opacity="0.6" />
+    <line x1="43" y1="90" x2="55" y2="88.5" stroke="#B8860B" stroke-width="1" stroke-linecap="round" opacity="0.6" />
+    <!-- Page Text Lines Right -->
+    <line x1="69" y1="81.5" x2="84" y2="83" stroke="#B8860B" stroke-width="1" stroke-linecap="round" opacity="0.6" />
+    <line x1="69" y1="85" x2="84" y2="86.5" stroke="#B8860B" stroke-width="1" stroke-linecap="round" opacity="0.6" />
+    <line x1="72" y1="88.5" x2="84" y2="90" stroke="#B8860B" stroke-width="1" stroke-linecap="round" opacity="0.6" />
+  </g>
+</svg>

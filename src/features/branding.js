@@ -7,7 +7,7 @@
 function applyHeaderBranding() {
   const defaultSchool = (DEFAULT_DATA.semesterConfig && DEFAULT_DATA.semesterConfig.schoolName)
     ? DEFAULT_DATA.semesterConfig.schoolName
-    : "Mindanao State University - General Santos";
+    : "University Faculty Portal";
   const sName = (semesterConfig && semesterConfig.schoolName) ? semesterConfig.schoolName : defaultSchool;
 
   const headerNameEl = document.getElementById('header-school-name');
@@ -34,14 +34,14 @@ function applyHeaderBranding() {
       logoImg.classList.remove('scale-[1.38]');
       logoImg.classList.add('scale-100');
     } else {
-      logoImg.src = 'msu-logo.png';
-      logoImg.classList.add('scale-[1.38]');
-      logoImg.classList.remove('scale-100');
+      logoImg.src = 'logo.svg';
+      logoImg.classList.remove('scale-[1.38]');
+      logoImg.classList.add('scale-100');
     }
   }
 
   if (fallbackEl) {
-    const initials = sName.split(/\s+/).map(w => w[0]).filter(c => /[A-Za-z0-9]/.test(c)).slice(0, 3).join('').toUpperCase() || 'MSU';
+    const initials = sName.split(/\s+/).map(w => w[0]).filter(c => /[A-Za-z0-9]/.test(c)).slice(0, 3).join('').toUpperCase() || 'EDU';
     fallbackEl.textContent = initials;
   }
 }
@@ -53,7 +53,7 @@ function openTermSettingsModal() {
   if (schoolNameInput) {
     schoolNameInput.value = (semesterConfig && semesterConfig.schoolName)
       ? semesterConfig.schoolName
-      : (DEFAULT_DATA.semesterConfig.schoolName || "Mindanao State University - General Santos");
+      : (DEFAULT_DATA.semesterConfig.schoolName || "University Faculty Portal");
   }
 
   const logoPreview = document.getElementById('setting-logo-preview');
@@ -62,8 +62,8 @@ function openTermSettingsModal() {
       logoPreview.src = tempUploadedLogo;
       logoPreview.classList.remove('scale-[1.38]');
     } else {
-      logoPreview.src = 'msu-logo.png';
-      logoPreview.classList.add('scale-[1.38]');
+      logoPreview.src = 'logo.svg';
+      logoPreview.classList.remove('scale-[1.38]');
     }
   }
 
@@ -144,12 +144,12 @@ function resetDefaultLogo() {
   tempUploadedLogo = "";
   const preview = document.getElementById('setting-logo-preview');
   if (preview) {
-    preview.src = 'msu-logo.png';
-    preview.classList.add('scale-[1.38]');
+    preview.src = 'logo.svg';
+    preview.classList.remove('scale-[1.38]');
   }
   const fileInput = document.getElementById('setting-logo-file');
   if (fileInput) fileInput.value = '';
-  showToast("Reset to official MSU seal.", "ℹ️");
+  showToast("Reset to default institutional emblem.", "ℹ️");
 }
 
 function saveTermSettings() {
@@ -169,7 +169,7 @@ function saveTermSettings() {
     return;
   }
 
-  semesterConfig.schoolName = schoolName || (DEFAULT_DATA.semesterConfig.schoolName || "Mindanao State University - General Santos");
+  semesterConfig.schoolName = schoolName || (DEFAULT_DATA.semesterConfig.schoolName || "University Faculty Portal");
   if (tempUploadedLogo !== undefined) {
     semesterConfig.schoolLogo = tempUploadedLogo;
   }

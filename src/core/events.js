@@ -1,6 +1,6 @@
 /* =============================================================================
  * src/core/events.js
- * Centralized Event Delegation & Action Registry for MSU-GSC Course Manager
+ * Centralized Event Delegation & Action Registry for Faculty Course & Lesson Manager
  * -----------------------------------------------------------------------------
  * Eliminates inline on* handlers from HTML and template strings.
  * Dispatches UI interactions via data-action attributes on document level.

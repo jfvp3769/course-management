@@ -1,7 +1,7 @@
 /* ===========================================================================
  * ACADEMIC CALENDAR
  * ---------------------------------------------------------------------------
- * The MSU calendar table, PDF/CSV ingestion, and event CRUD.
+ * The academic calendar table, PDF/CSV ingestion, and event CRUD.
  * ======================================================================== */
 
 function toggleCalendarTypeDropdown(e) {
@@ -139,15 +139,18 @@ function renderAcademicCalendarTable() {
   }
 }
 
-// Load Official Verified MSU-GSC AY 2026-2027 Calendar Directly
-function loadOfficialMsuCalendar() {
-  msuCalendarEvents = JSON.parse(JSON.stringify(DEFAULT_DATA.msuCalendarEvents));
+// Load Sample AY 2026-2027 Calendar Directly
+function loadSampleAcademicCalendar() {
+  const defCal = DEFAULT_DATA.academicCalendarEvents || DEFAULT_DATA.msuCalendarEvents;
+  msuCalendarEvents = JSON.parse(JSON.stringify(defCal));
+  if (typeof academicCalendarEvents !== 'undefined') academicCalendarEvents = msuCalendarEvents;
 
   semesterDates = generateSemesterDateList();
   Render.after('semester');
   closeUploadCalendarModal();
-  showToast("Official MSU-GSC AY 2026–2027 Calendar loaded!");
+  showToast("Sample Academic AY 2026–2027 Calendar loaded!");
 }
+const loadOfficialMsuCalendar = loadSampleAcademicCalendar; // Backward compatibility alias
 
 // Intelligent PDF.js Calendar Parser with Cross-Origin Fallback
 function parseAcademicCalendarText(fullText) {
@@ -173,7 +176,7 @@ function parseAcademicCalendarText(fullText) {
 
       let activityTitle = line.replace(dateMatch[0], '').trim();
       activityTitle = activityTitle.replace(/^[0-9.\-\s]+/, '').trim();
-      if (!activityTitle) activityTitle = "MSU Academic Event";
+      if (!activityTitle) activityTitle = "Academic Event";
 
       const lowerAct = (activityTitle + " " + line).toLowerCase();
       const isNoClass = lowerAct.includes('holiday') || lowerAct.includes('foundation') || lowerAct.includes('vacation') || lowerAct.includes('suspension') || lowerAct.includes('break') || lowerAct.includes('no class');
@@ -249,9 +252,9 @@ async function handleCalendarFileUpload(event) {
         parseAcademicCalendarText(fullText);
         showToast('Extracted calendar events from ' + file.name + '!');
       } else {
-        // Scanned image PDF without text layer: automatically load verified MSU AY 2026-2027 calendar!
-        loadOfficialMsuCalendar();
-        showToast('Scanned PDF detected. Applied verified MSU AY 2026–2027 Calendar!');
+        // Scanned image PDF without text layer: automatically load sample AY 2026-2027 calendar!
+        loadSampleAcademicCalendar();
+        showToast('Scanned PDF detected. Applied sample AY 2026–2027 Calendar!');
       }
 
       statusBox.classList.add('hidden');
@@ -259,8 +262,8 @@ async function handleCalendarFileUpload(event) {
     } catch (err) {
       console.error("PDF upload error:", err);
       statusBox.classList.add('hidden');
-      loadOfficialMsuCalendar();
-      showToast('Loaded verified MSU AY 2026–2027 Calendar schedule!');
+      loadSampleAcademicCalendar();
+      showToast('Loaded sample AY 2026–2027 Calendar schedule!');
       closeUploadCalendarModal();
     }
   } else {

@@ -5,7 +5,7 @@
  * ======================================================================== */
 
 function initDarkModeTheme() {
-  const savedTheme = localStorage.getItem('msu_dark_mode') || 'light';
+  const savedTheme = localStorage.getItem('faculty_dark_mode') || localStorage.getItem('msu_dark_mode') || 'light';
   applyDarkTheme(savedTheme, false);
 }
 
@@ -22,13 +22,13 @@ function applyDarkTheme(theme, showNotice = true) {
   const moonSvg = '<svg class="w-3.5 h-3.5 text-amber-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>';
   if (theme === 'dark') {
     document.documentElement.classList.add('theme-dark', 'dark');
-    localStorage.setItem('msu_dark_mode', 'dark');
+    localStorage.setItem('faculty_dark_mode', 'dark');
     if (label) label.innerText = 'Light Mode';
     if (icon) icon.innerHTML = sunSvg;
     if (showNotice) showToast('Switched to Dark Mode theme!');
   } else {
     document.documentElement.classList.remove('theme-dark', 'dark');
-    localStorage.setItem('msu_dark_mode', 'light');
+    localStorage.setItem('faculty_dark_mode', 'light');
     if (label) label.innerText = 'Dark Mode';
     if (icon) icon.innerHTML = moonSvg;
     if (showNotice) showToast('Switched to Light Mode.');

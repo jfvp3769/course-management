@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MSU-GSC Course & Lesson Manager</title>
+  <title>Faculty Course & Lesson Manager</title>
   <!-- Local Offline Tailwind JIT Script -->
   <script src="tailwind.cdn.js"></script>
   <!-- Local Offline PDF.js Core & Worker -->
@@ -32,7 +32,7 @@
     <script>
     (function() {
       try {
-        var t = localStorage.getItem('msu_dark_mode');
+        var t = localStorage.getItem('faculty_dark_mode') || localStorage.getItem('msu_dark_mode');
         if (t === 'dark') {
           document.documentElement.classList.add('theme-dark', 'dark');
         } else {
@@ -107,12 +107,12 @@
       <!-- University Brand & Status Indicator -->
       <div class="flex items-center gap-3 min-w-0">
         <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-full shadow-md flex items-center justify-center shrink-0 border-2 border-msu-gold overflow-hidden bg-white">
-          <img id="header-school-logo" src="msu-logo.png" alt="Official Seal" class="w-full h-full object-cover scale-[1.38] rounded-full">
-          <div id="header-logo-fallback" class="hidden w-full h-full rounded-full bg-amber-400 text-rose-950 font-black text-xs items-center justify-center">MSU</div>
+          <img id="header-school-logo" src="logo.svg" alt="Official Seal" class="w-full h-full object-cover rounded-full">
+          <div id="header-logo-fallback" class="hidden w-full h-full rounded-full bg-amber-400 text-rose-950 font-black text-xs items-center justify-center">EDU</div>
         </div>
         <div class="min-w-0 flex-1">
           <div class="flex items-center gap-2 flex-wrap">
-            <h1 id="header-school-name" class="text-sm sm:text-base lg:text-lg font-extrabold tracking-tight truncate leading-tight">Mindanao State University - General Santos</h1>
+            <h1 id="header-school-name" class="text-sm sm:text-base lg:text-lg font-extrabold tracking-tight truncate leading-tight">University Faculty Portal</h1>
             <span id="save-status-indicator" class="bg-emerald-950/40 hover:bg-emerald-950/60 text-emerald-300/90 border border-emerald-500/25 text-[10px] font-medium tracking-wide px-2.5 py-0.5 rounded-full flex items-center gap-1.5 shrink-0 transition-all shadow-2xs backdrop-blur-xs select-none" title="All changes are automatically saved to local browser storage">
               <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0 shadow-[0_0_6px_rgba(52,211,153,0.8)]"></span>
               <span>Saved Offline</span>
@@ -1021,7 +1021,7 @@
                   <span>Grade Curve Distribution</span>
                   <div class="flex items-center gap-0.5 bg-slate-100 dark:bg-slate-800 p-0.5 rounded-lg border border-slate-200 dark:border-slate-700 select-none">
                     <button type="button" id="btn-grade-dist-grouped" data-action="setGradeDistScaleMode" data-mode="grouped" class="px-1.5 py-0.5 rounded text-[9px] font-bold transition bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 shadow-2xs" title="Grouped into 5 summary tiers">Tiers</button>
-                    <button type="button" id="btn-grade-dist-full" data-action="setGradeDistScaleMode" data-mode="full" class="px-1.5 py-0.5 rounded text-[9px] font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition" title="Show full 11-grade MSU institutional scale">Full Scale</button>
+                    <button type="button" id="btn-grade-dist-full" data-action="setGradeDistScaleMode" data-mode="full" class="px-1.5 py-0.5 rounded text-[9px] font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition" title="Show full institutional grading scale">Full Scale</button>
                   </div>
                 </div>
                 <div id="gradebook-grade-distribution" class="space-y-0.5 text-xs"></div>
@@ -1059,14 +1059,14 @@
 
           <div>
             <label class="font-bold text-slate-700 dark:text-slate-300 block mb-1">School / University Name</label>
-            <input type="text" id="setting-school-name" placeholder="e.g. Mindanao State University - General Santos" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg p-2.5 text-xs font-semibold focus:ring-2 focus:ring-msu-maroon text-slate-900 dark:text-slate-100">
+            <input type="text" id="setting-school-name" placeholder="e.g. University Faculty of Engineering" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg p-2.5 text-xs font-semibold focus:ring-2 focus:ring-msu-maroon text-slate-900 dark:text-slate-100">
           </div>
 
           <div>
             <label class="font-bold text-slate-700 dark:text-slate-300 block mb-1">School / Department Logo</label>
             <div class="flex items-center gap-3 bg-white dark:bg-slate-900 p-2.5 rounded-lg border border-slate-200 dark:border-slate-700">
               <div class="w-12 h-12 rounded-full border-2 border-msu-gold bg-white flex items-center justify-center overflow-hidden shrink-0 shadow-xs">
-                <img id="setting-logo-preview" src="msu-logo.png" alt="Logo Preview" class="w-full h-full object-cover scale-[1.38] rounded-full">
+                <img id="setting-logo-preview" src="logo.svg" alt="Logo Preview" class="w-full h-full object-cover rounded-full">
               </div>
               <div class="flex-1 min-w-0 space-y-1.5">
                 <div class="flex items-center gap-2 flex-wrap">
@@ -1105,7 +1105,7 @@
           </div>
           <div>
             <label class="font-bold text-slate-700 dark:text-slate-300 block mb-1">Default Faculty Email / Google Account</label>
-            <input type="email" id="setting-faculty-email" placeholder="e.g. yourname@msugensan.edu.ph" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg p-2.5 text-xs font-semibold focus:ring-2 focus:ring-msu-maroon text-slate-900 dark:text-slate-100">
+            <input type="email" id="setting-faculty-email" placeholder="e.g. yourname@university.edu" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg p-2.5 text-xs font-semibold focus:ring-2 focus:ring-msu-maroon text-slate-900 dark:text-slate-100">
             <span class="text-[10px] text-slate-400 mt-0.5 block">When set, outgoing student emails will automatically open Gmail under this specific logged-in Google account. Leave empty to use system default mail app.</span>
           </div>
         </div>
@@ -1842,7 +1842,7 @@
       <div class="flex items-start justify-between">
         <div>
           <h3 class="font-bold text-base text-slate-900">Upload Campus Academic Calendar</h3>
-          <p class="text-xs text-slate-500">Directly upload the MSU Academic Calendar PDF or CSV file.</p>
+          <p class="text-xs text-slate-500">Directly upload your Institutional Academic Calendar PDF or CSV file.</p>
         </div>
         <button aria-label="Close modal" data-action="closeUploadCalendarModal" class="text-slate-400 hover:text-slate-600 p-1">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
@@ -1853,22 +1853,22 @@
         <div class="border-2 border-dashed border-slate-300 hover:border-msu-maroon rounded-2xl p-5 text-center bg-slate-50 transition cursor-pointer" data-action="clickTarget" data-target="calendar-file-input">
           <svg class="w-8 h-8 text-slate-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
           <div class="font-bold text-slate-800">Click to select PDF or CSV calendar</div>
-          <div class="text-[11px] text-slate-500 mt-1">Accepts MSU Academic Calendar AY 2026-2027</div>
+          <div class="text-[11px] text-slate-500 mt-1">Accepts Academic Calendar AY 2026–2027</div>
           <input type="file" id="calendar-file-input" accept=".pdf,.csv,.json,.txt" class="hidden" data-action-change="handleCalendarFileUpload">
         </div>
 
-        <!-- Quick 1-Click Load for MSU-GSC Calendar -->
+        <!-- Quick 1-Click Load for Sample Academic Calendar -->
         <div class="p-3 bg-amber-50/80 border border-amber-200 rounded-xl space-y-2">
           <div class="flex items-center justify-between">
-            <span class="font-extrabold text-amber-950 text-xs">Official MSU-GSC Academic Calendar (AY 2026–2027)</span>
-            <span class="px-2 py-0.5 rounded text-[10px] font-black bg-msu-maroon text-white">Verified</span>
+            <span class="font-extrabold text-amber-950 text-xs">Sample Academic Calendar (AY 2026–2027)</span>
+            <span class="px-2 py-0.5 rounded text-[10px] font-black bg-msu-maroon text-white">Sample</span>
           </div>
           <p class="text-[11px] text-amber-900/80 leading-relaxed">
-            Instantly load all official milestones (First/Second Prelims, Finals, Charter Day, Intramurals, Semestral Break, and Grade Deadlines) verified from the Campus Academic Calendar document.
+            Instantly load standard milestones (First/Second Prelims, Finals, Charter Day, Intramurals, Semestral Break, and Grade Deadlines) configured for the Academic Calendar.
           </p>
           <button type="button" data-action="loadOfficialMsuCalendar" class="w-full py-2 px-3 bg-gradient-to-r from-msu-maroon to-rose-900 hover:from-msu-darkMaroon hover:to-rose-950 text-amber-200 font-bold rounded-lg text-xs flex items-center justify-center gap-1.5 shadow-sm transition">
             <svg class="w-4 h-4 text-msu-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            <span>Load Official MSU-GSC AY 2026–2027 Calendar</span>
+            <span>Load Sample AY 2026–2027 Calendar</span>
           </button>
         </div>
 
@@ -1879,7 +1879,7 @@
 
         <div>
           <label class="font-bold text-slate-700 block mb-1">Or Paste CSV Calendar Events</label>
-          <textarea id="paste-calendar-raw" rows="4" placeholder="Date(YYYY-MM-DD), Event Title, IsNoClass(true/false)&#10;2026-09-01, MSU Foundation Day, true&#10;2026-09-10, First Preliminary Examinations, false" class="w-full font-mono text-[11px] bg-slate-50 border border-slate-300 rounded-xl p-2.5"></textarea>
+          <textarea id="paste-calendar-raw" rows="4" placeholder="Date(YYYY-MM-DD), Event Title, IsNoClass(true/false)&#10;2026-09-01, Institutional Foundation Day, true&#10;2026-09-10, First Preliminary Examinations, false" class="w-full font-mono text-[11px] bg-slate-50 border border-slate-300 rounded-xl p-2.5"></textarea>
         </div>
       </div>
 
@@ -1911,7 +1911,7 @@
 
         <div>
           <label class="font-bold text-slate-700 block mb-1">Copy and paste directly from your spreadsheet</label>
-          <textarea id="bulk-paste-area" data-action-input="previewBulkData" rows="6" placeholder="2022-0142&#9;Al-Ghazali&#9;Fatima&#9;fatima.alghazali@msugensan.edu.ph&#10;2023-1105&#9;Santos&#9;Juan&#9;juan.santos@msugensan.edu.ph" class="w-full font-mono text-[11px] bg-slate-50 border border-slate-300 rounded-xl p-2.5 focus:ring-2 focus:ring-msu-maroon"></textarea>
+          <textarea id="bulk-paste-area" data-action-input="previewBulkData" rows="6" placeholder="2022-0142&#9;Al-Ghazali&#9;Fatima&#9;fatima.alghazali@university.edu&#10;2023-1105&#9;Santos&#9;Juan&#9;juan.santos@university.edu" class="w-full font-mono text-[11px] bg-slate-50 border border-slate-300 rounded-xl p-2.5 focus:ring-2 focus:ring-msu-maroon"></textarea>
         </div>
 
         <div id="bulk-preview-summary" class="p-2.5 bg-slate-100 rounded-xl text-slate-600 font-medium text-xs">
@@ -1956,7 +1956,7 @@
         </div>
         <div>
           <label class="font-bold text-slate-700 block mb-1">Email Address</label>
-          <input type="email" id="stud-email" placeholder="e.g. ali.pendatun@msugensan.edu.ph" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs">
+          <input type="email" id="stud-email" placeholder="e.g. ali.pendatun@university.edu" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs">
         </div>
         <div>
           <label class="font-bold text-slate-700 block mb-1">Enrolled Section</label>
@@ -2364,7 +2364,7 @@
         <div id="ei-panel-grades" class="ei-panel space-y-4 hidden">
           <div class="p-3.5 bg-amber-50/70 border border-amber-200 rounded-xl space-y-1.5">
             <h4 class="font-extrabold text-amber-950 text-xs flex items-center gap-1.5">
-              <span>📊</span> MSU Class Record & Offline Gradebook Sync
+              <span>📊</span> Class Record & Offline Gradebook Sync
             </h4>
             <p class="text-amber-900 leading-relaxed text-[11px]">
               Export full grading sheets for Excel editing. When you're ready, upload the modified CSV to import updated student scores back into the system automatically.
@@ -2487,7 +2487,7 @@
             </div>
             <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5">
               <span class="font-extrabold text-slate-900 text-sm">2. Institutional Calendar</span>
-              <p class="text-xs sm:text-[13px] text-slate-700 guide-text-justify">Go to <strong>Academic Calendar Events</strong> (Tab 3) and click <strong>Upload / Replace Calendar &rarr; Load Official MSU-GSC AY 2026–2027 Calendar</strong> to sync verified examination periods and holidays.</p>
+              <p class="text-xs sm:text-[13px] text-slate-700 guide-text-justify">Go to <strong>Academic Calendar Events</strong> (Tab 3) and click <strong>Upload / Replace Calendar &rarr; Load Sample AY 2026–2027 Calendar</strong> to sync verified examination periods and holidays.</p>
             </div>
           </div>
 
@@ -2523,7 +2523,7 @@
             <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
               <span class="font-extrabold text-slate-900 text-sm">Real-Time Weighted Grading</span>
               <p class="text-xs sm:text-[13px] text-slate-700 guide-text-justify">In <strong>Class Record & Grades</strong> (Tab 5), click <strong>Grading Criteria</strong> to define categories and weight percentages (e.g., Quizzes 20%, Exams 20%). Weights must sum to 100%.</p>
-              <p class="text-xs sm:text-[13px] text-slate-700 guide-text-justify">Enter student marks directly in the grid using arrow keys or Enter. The engine computes weighted totals, official MSU grades (1.00–5.00), and flags students on the <strong>At-Risk Student Radar</strong>.</p>
+              <p class="text-xs sm:text-[13px] text-slate-700 guide-text-justify">Enter student marks directly in the grid using arrow keys or Enter. The engine computes weighted totals, official institutional grades (1.00–5.00), and flags students on the <strong>At-Risk Student Radar</strong>.</p>
             </div>
           </div>
 
@@ -2604,7 +2604,7 @@
 
         <div>
           <label class="font-bold text-slate-700 dark:text-slate-300 block mb-1">Your Email (Optional, for follow-ups)</label>
-          <input type="email" id="feedback-sender-email" placeholder="youremail@msugensan.edu.ph" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-lg p-2 text-xs">
+          <input type="email" id="feedback-sender-email" placeholder="youremail@university.edu" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-lg p-2 text-xs">
         </div>
 
         <div class="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-700">
