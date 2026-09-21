@@ -10,7 +10,7 @@ function jumpToCalendarEvent(idx) {
   if (calendarTypeFilter !== 'all') {
     setCalendarTypeFilter('all');
   }
-  setTimeout(() => {
+  requestAnimationFrame(() => requestAnimationFrame(() => {
     const row = document.getElementById('cal-event-row-' + idx);
     const wrapper = document.getElementById('calendar-scroll-wrapper');
     if (row && wrapper) {
@@ -30,7 +30,7 @@ function jumpToCalendarEvent(idx) {
       row.classList.add('row-flash-highlight');
       setTimeout(() => row.classList.remove('row-flash-highlight'), 2200);
     }
-  }, 60);
+  }));
 }
 
 function updateCalendarSidebar() {
@@ -57,7 +57,7 @@ function updateCalendarSidebar() {
         const title = ev.activity || ev.title || 'University Event';
         const dateStr = ev.firstSem || ev.sem1 || ev.dateKey || '—';
         return `
-              <div onclick="jumpToCalendarEvent(${originalIdx >= 0 ? originalIdx : 0})" title="Click to view event in calendar table"
+              <div data-action="jumpToCalendarEvent" data-idx="${originalIdx >= 0 ? originalIdx : 0}" title="Click to view event in calendar table"
                 class="p-2 bg-slate-50 hover:bg-rose-50/70 border border-slate-200 hover:border-rose-300 rounded-lg space-y-0.5 cursor-pointer transition group">
                 <div class="font-bold text-slate-800 group-hover:text-rose-900 text-[11px] truncate">
                   <span class="truncate">${escapeHtml(title)}</span>
@@ -155,13 +155,13 @@ function updateCalendarSidebar() {
       lostDaysList.innerHTML = `
             <div class="space-y-1.5">
               ${items.map(it => `
-                <div onclick="openLostDaysModal('${jsAttr(it.course)}', '${jsAttr(it.sec)}')"
+                <div data-action="openLostDaysModal" data-course="${escapeHtml(it.course)}" data-section="${escapeHtml(it.sec)}"
                   title="Click to view detailed lost teaching dates for ${escapeHtml(it.course)} (${escapeHtml(it.sec)})"
-                  class="p-2 ${it.lostCount > 0 ? 'bg-amber-50/70 border-amber-200 hover:bg-amber-100 hover:border-amber-300' : 'bg-slate-50 border-slate-200 hover:bg-slate-100'} border rounded-lg flex items-center justify-between text-xs cursor-pointer transition group shadow-2xs">
+                  class="p-2 ${it.lostCount > 0 ? 'bg-amber-50/70 dark:bg-[#1a1c24] border-amber-200 dark:border-amber-900/60 hover:bg-amber-100/80 dark:hover:bg-[#252834] hover:border-amber-300 dark:hover:border-amber-600/70' : 'bg-slate-50 dark:bg-[#151922] border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-[#1d2330]'} border rounded-lg flex items-center justify-between text-xs cursor-pointer transition group shadow-2xs">
                   <div class="flex items-center gap-1.5 min-w-0">
-                    <span class="font-bold text-slate-800 text-[11px] group-hover:text-msu-maroon transition truncate">${escapeHtml(it.course)} - ${escapeHtml(it.sec)}</span>
+                    <span class="font-bold text-slate-800 dark:text-slate-100 text-[11px] group-hover:text-msu-maroon dark:group-hover:text-amber-400 transition truncate">${escapeHtml(it.course)} - ${escapeHtml(it.sec)}</span>
                   </div>
-                  <span class="text-[10px] font-bold ${it.lostCount > 0 ? 'text-amber-900 bg-amber-100' : 'text-slate-600 bg-slate-200'} px-1.5 py-0.5 rounded shrink-0">
+                  <span class="text-[10px] font-bold ${it.lostCount > 0 ? 'text-amber-900 dark:text-amber-300 bg-amber-100 dark:bg-amber-950/80 border border-amber-200 dark:border-amber-800/80' : 'text-slate-600 dark:text-slate-400 bg-slate-200 dark:bg-slate-800 border border-slate-300 dark:border-slate-700'} px-2 py-0.5 rounded-md shrink-0">
                     ${it.lostCount} / ${it.totalMeetings} Days Lost (${it.pct}%)
                   </span>
                 </div>
@@ -180,32 +180,49 @@ function updateCalendarSidebar() {
     });
 
     const activeFilter = calendarTypeFilter;
-    const getRing = (type) => (activeFilter === type ? 'ring-2 ring-slate-800 ring-offset-1 shadow-sm' : '');
+    const getFilterBtnStyle = (type, activeColor, baseColor, borderColor) => {
+      if (activeFilter === type) {
+        return `p-2 ${activeColor} rounded-lg ring-2 ring-inset shadow-xs text-center transition cursor-pointer relative z-10`;
+      }
+      return `p-2 ${baseColor} rounded-lg border ${borderColor} text-center transition cursor-pointer`;
+    };
 
     distCont.innerHTML = `
-          <button onclick="setCalendarTypeFilter('${activeFilter === 'holiday' ? 'all' : 'holiday'}')" 
-            class="p-2 bg-rose-50 hover:bg-rose-100 rounded-lg border border-rose-200 text-center transition cursor-pointer ${getRing('holiday')}"
-            title="Filter by Holidays">
-            <div class="font-black text-rose-800 text-xs">${counts.holiday}</div>
-            <div class="text-[10px] text-rose-600 font-semibold">Holidays 🔍</div>
+          <button type="button" data-action="setCalendarTypeFilter" data-filter="${activeFilter === 'holiday' ? 'all' : 'holiday'}" 
+            class="${getFilterBtnStyle('holiday', 'bg-rose-100 dark:bg-[#3b0d1b] ring-rose-500 dark:ring-rose-400', 'bg-rose-50 hover:bg-rose-100/80 dark:bg-[#2d0a14] dark:hover:bg-[#3b0d1b]', 'border-rose-200 dark:border-[#9f1239]')}"
+            title="${activeFilter === 'holiday' ? 'Active Filter (Holidays): Click to reset' : 'Filter by Holidays'}">
+            <div class="font-black text-rose-800 dark:text-[#fb7185] text-xs">${counts.holiday}</div>
+            <div class="text-[10px] text-rose-600 dark:text-[#fda4af] font-semibold flex items-center justify-center gap-0.5">
+              <span>Holidays</span>
+              <span>${activeFilter === 'holiday' ? '✕' : '🔍'}</span>
+            </div>
           </button>
-          <button onclick="setCalendarTypeFilter('${activeFilter === 'exam' ? 'all' : 'exam'}')" 
-            class="p-2 bg-amber-50 hover:bg-amber-100 rounded-lg border border-amber-200 text-center transition cursor-pointer ${getRing('exam')}"
-            title="Filter by Exams">
-            <div class="font-black text-amber-900 text-xs">${counts.exam}</div>
-            <div class="text-[10px] text-amber-700 font-semibold">Exams 🔍</div>
+          <button type="button" data-action="setCalendarTypeFilter" data-filter="${activeFilter === 'exam' ? 'all' : 'exam'}" 
+            class="${getFilterBtnStyle('exam', 'bg-amber-100 dark:bg-[#3d2205] ring-amber-500 dark:ring-amber-400', 'bg-amber-50 hover:bg-amber-100/80 dark:bg-[#2b1803] dark:hover:bg-[#3d2205]', 'border-amber-200 dark:border-[#b45309]')}"
+            title="${activeFilter === 'exam' ? 'Active Filter (Exams): Click to reset' : 'Filter by Exams'}">
+            <div class="font-black text-amber-900 dark:text-[#fbbf24] text-xs">${counts.exam}</div>
+            <div class="text-[10px] text-amber-700 dark:text-[#fde68a] font-semibold flex items-center justify-center gap-0.5">
+              <span>Exams</span>
+              <span>${activeFilter === 'exam' ? '✕' : '🔍'}</span>
+            </div>
           </button>
-          <button onclick="setCalendarTypeFilter('${activeFilter === 'milestone' ? 'all' : 'milestone'}')" 
-            class="p-2 bg-emerald-50 hover:bg-emerald-100 rounded-lg border border-emerald-200 text-center transition cursor-pointer ${getRing('milestone')}"
-            title="Filter by Milestones">
-            <div class="font-black text-emerald-800 text-xs">${counts.milestone}</div>
-            <div class="text-[10px] text-emerald-600 font-semibold">Milestones 🔍</div>
+          <button type="button" data-action="setCalendarTypeFilter" data-filter="${activeFilter === 'milestone' ? 'all' : 'milestone'}" 
+            class="${getFilterBtnStyle('milestone', 'bg-emerald-100 dark:bg-[#093b2c] ring-emerald-500 dark:ring-emerald-400', 'bg-emerald-50 hover:bg-emerald-100/80 dark:bg-[#06291e] dark:hover:bg-[#093b2c]', 'border-emerald-200 dark:border-[#047857]')}"
+            title="${activeFilter === 'milestone' ? 'Active Filter (Milestones): Click to reset' : 'Filter by Milestones'}">
+            <div class="font-black text-emerald-800 dark:text-[#34d399] text-xs">${counts.milestone}</div>
+            <div class="text-[10px] text-emerald-600 dark:text-[#a7f3d0] font-semibold flex items-center justify-center gap-0.5">
+              <span>Milestones</span>
+              <span>${activeFilter === 'milestone' ? '✕' : '🔍'}</span>
+            </div>
           </button>
-          <button onclick="setCalendarTypeFilter('${activeFilter === 'activity' ? 'all' : 'activity'}')" 
-            class="p-2 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200 text-center transition cursor-pointer ${getRing('activity')}"
-            title="Filter by Activities">
-            <div class="font-black text-blue-900 text-xs">${counts.activity}</div>
-            <div class="text-[10px] text-blue-600 font-semibold">Activities 🔍</div>
+          <button type="button" data-action="setCalendarTypeFilter" data-filter="${activeFilter === 'activity' ? 'all' : 'activity'}" 
+            class="${getFilterBtnStyle('activity', 'bg-blue-100 dark:bg-[#142a4d] ring-blue-500 dark:ring-blue-400', 'bg-blue-50 hover:bg-blue-100/80 dark:bg-[#0e1e38] dark:hover:bg-[#142a4d]', 'border-blue-200 dark:border-[#1d4ed8]')}"
+            title="${activeFilter === 'activity' ? 'Active Filter (Activities): Click to reset' : 'Filter by Activities'}">
+            <div class="font-black text-blue-900 dark:text-[#60a5fa] text-xs">${counts.activity}</div>
+            <div class="text-[10px] text-blue-600 dark:text-[#bfdbfe] font-semibold flex items-center justify-center gap-0.5">
+              <span>Activities</span>
+              <span>${activeFilter === 'activity' ? '✕' : '🔍'}</span>
+            </div>
           </button>
         `;
   }

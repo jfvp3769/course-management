@@ -39,7 +39,7 @@ function initializeCurrentWeekView() {
 }
 
 function scrollToPresentWeekOnLoad() {
-  setTimeout(() => {
+  requestAnimationFrame(() => requestAnimationFrame(() => {
     const targetEntry = semesterDates.find(d => d.weekNumber === currentWeekViewIndex && d.dayOfWeek === 'Sun') ||
                         semesterDates.find(d => d.weekNumber === currentWeekViewIndex);
     if (targetEntry) {
@@ -48,5 +48,5 @@ function scrollToPresentWeekOnLoad() {
         scrollMatrixToRow(targetRow, 'auto');
       }
     }
-  }, 60);
+  }));
 }

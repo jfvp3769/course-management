@@ -94,25 +94,25 @@ function renderStudentRoster() {
     const mailtoSubject = encodeURIComponent(`MSU-GSC Academic Notice: ${s.section}`);
 
     return `
-          <tr data-student-id="${escapeHtml(s.id)}" data-section="${escapeHtml(s.section)}" data-grade="${escapeHtml(gradeText)}" data-email="${escapeHtml(s.email)}" class="hover:bg-slate-50 transition border-b border-slate-200">
-            <td class="py-2.5 px-4 font-mono font-bold text-slate-800">${escapeHtml(s.id)}</td>
-            <td class="py-2.5 px-4 font-bold text-slate-900">${escapeHtml(s.last)}</td>
-            <td class="py-2.5 px-4 text-slate-700 font-medium">${escapeHtml(s.first)}</td>
-            <td class="py-2.5 px-4 text-slate-500 font-mono text-[11px]">${escapeHtml(s.email)}</td>
+          <tr data-student-id="${escapeHtml(s.id)}" data-section="${escapeHtml(s.section)}" data-grade="${escapeHtml(gradeText)}" data-email="${escapeHtml(s.email)}" class="bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700/60 transition border-b border-slate-200 dark:border-slate-700">
+            <td class="py-2.5 px-4 font-mono font-bold text-slate-800 dark:text-slate-100">${escapeHtml(s.id)}</td>
+            <td class="py-2.5 px-4 font-bold text-slate-900 dark:text-slate-100">${escapeHtml(s.last)}</td>
+            <td class="py-2.5 px-4 text-slate-700 dark:text-slate-200 font-medium">${escapeHtml(s.first)}</td>
+            <td class="py-2.5 px-4 text-slate-500 dark:text-slate-400 font-mono text-[11px]">${escapeHtml(s.email)}</td>
             <td class="py-2.5 px-3 text-center whitespace-nowrap">
               <span class="grade-msu-cell inline-block px-2 py-0.5 rounded font-mono font-black text-xs border ${gradeBadgeClass}" title="Weighted Score: ${res.total.toFixed(2)}% • Status: ${escapeHtml(res.msu.status)}">
                 ${escapeHtml(gradeText)}
               </span>
             </td>
-            <td class="py-2.5 px-4 font-mono text-[11px] text-slate-600 font-semibold">${escapeHtml(s.dateAdded || '2026-08-10')}</td>
+            <td class="py-2.5 px-4 font-mono text-[11px] text-slate-600 dark:text-slate-400 font-semibold">${escapeHtml(s.dateAdded || '2026-08-10')}</td>
             <td class="py-2.5 px-4 text-center whitespace-nowrap">
               <div class="flex items-center justify-center gap-2">
-                <button type="button" onclick="sendIndividualStudentEmail('${jsAttr(s.email)}', '${jsAttr(s.section)}', '${jsAttr(s.first)}', '${jsAttr(s.last)}')" class="roster-email-btn text-blue-600 hover:text-blue-800 font-semibold text-xs hover:underline inline-flex items-center gap-1 cursor-pointer" title="Send email to ${escapeHtml(s.first)} ${escapeHtml(s.last)} (${escapeHtml(s.email)})">
-                  <svg class="w-3.5 h-3.5 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                <button type="button" data-action="sendIndividualStudentEmail" data-email="${escapeHtml(s.email)}" data-section="${escapeHtml(s.section)}" data-first="${escapeHtml(s.first)}" data-last="${escapeHtml(s.last)}" class="roster-email-btn text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-semibold text-xs hover:underline inline-flex items-center gap-1 cursor-pointer" title="Send email to ${escapeHtml(s.first)} ${escapeHtml(s.last)} (${escapeHtml(s.email)})">
+                  <svg class="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
                   <span>Email</span>
                 </button>
-                <span class="text-slate-300">|</span>
-                <button onclick="removeStudent('${jsAttr(s.id)}', '${jsAttr(s.section)}')" class="text-rose-600 hover:text-rose-800 font-semibold text-xs hover:underline cursor-pointer">
+                <span class="text-slate-300 dark:text-slate-600">|</span>
+                <button type="button" data-action="removeStudent" data-id="${escapeHtml(s.id)}" data-section="${escapeHtml(s.section)}" class="text-rose-600 hover:text-rose-800 dark:text-rose-400 dark:hover:text-rose-300 font-semibold text-xs hover:underline cursor-pointer">
                   Remove
                 </button>
               </div>
@@ -144,7 +144,7 @@ function filterStudentTable() {
             `;
       } else {
         rosterClassroomContainer.innerHTML = `
-              <button type="button" onclick="openClassroomModal('${jsAttr(code)}', '${jsAttr(sec)}')" class="p-1.5 bg-slate-50 hover:bg-emerald-50 text-slate-500 hover:text-emerald-700 border border-dashed border-slate-300 hover:border-emerald-300 rounded-lg text-xs flex items-center justify-center transition shrink-0 group" title="Link Google Classroom for ${escapeHtml(secFilter)}">
+              <button type="button" data-action="openClassroomModal" data-course="${escapeHtml(code)}" data-section="${escapeHtml(sec)}" class="p-1.5 bg-slate-50 hover:bg-emerald-50 text-slate-500 hover:text-emerald-700 border border-dashed border-slate-300 hover:border-emerald-300 rounded-lg text-xs flex items-center justify-center transition shrink-0 group" title="Link Google Classroom for ${escapeHtml(secFilter)}">
                 <svg class="w-4 h-4 text-slate-500 group-hover:text-emerald-600 transition" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/></svg>
               </button>
             `;

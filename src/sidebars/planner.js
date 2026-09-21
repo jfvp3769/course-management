@@ -19,7 +19,7 @@ function jumpToMatrixDate(dateKey, courseCode = '', section = '', isMilestone = 
     renderMatrixTable();
   }
 
-  setTimeout(() => {
+  requestAnimationFrame(() => requestAnimationFrame(() => {
     const wrapper = document.getElementById('matrix-scroll-wrapper');
     const thead = document.getElementById('matrix-head');
     const theadHeight = (thead && typeof thead.offsetHeight === 'number' && !isNaN(thead.offsetHeight)) ? thead.offsetHeight : 86;
@@ -134,7 +134,7 @@ function jumpToMatrixDate(dateKey, courseCode = '', section = '', isMilestone = 
     } else {
       showToast('Date ' + dateKey + ' not in current view.', '⚠️');
     }
-  }, 50);
+  }));
 }
 
 window.jumpToMatrixDate = jumpToMatrixDate;
@@ -392,7 +392,7 @@ function _renderRadarDispatchCard(radarData) {
     if (radarStatusBadge) {
       radarStatusBadge.className = isOngoing
         ? 'text-[10px] font-black px-1.5 py-0.5 rounded bg-emerald-500 text-white animate-pulse shadow-2xs'
-        : 'text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-50 text-amber-900 border border-amber-300 shadow-2xs';
+        : 'text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-50 dark:bg-amber-950/80 text-amber-900 dark:text-amber-300 border border-amber-300 dark:border-amber-800 shadow-2xs';
       radarStatusBadge.innerText = isOngoing
         ? (upcomingToday.isSpecialSession ? '⚡ Special In Progress' : 'Class In Progress')
         : (upcomingToday.isSpecialSession ? `⚡ Special in ${countdownText}` : `Starts in ${countdownText}`);
@@ -401,31 +401,31 @@ function _renderRadarDispatchCard(radarData) {
     const classroomLink = (typeof getClassroomLink === 'function') ? getClassroomLink(upcomingToday.course, upcomingToday.section) : '';
     dispatchCardEl.innerHTML = `
           <div id="planner-radar-active-card"
-            class="p-2.5 rounded-xl border ${isOngoing ? 'bg-emerald-50 border-emerald-300 text-emerald-950' : (upcomingToday.isSpecialSession ? 'bg-amber-50/70 border-amber-300 text-amber-950' : 'bg-slate-50 border-slate-200 text-slate-900')} space-y-1.5 cursor-pointer transition hover:border-emerald-400 hover:shadow-xs group"
+            class="p-2.5 rounded-xl border ${isOngoing ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-800 text-emerald-950 dark:text-emerald-100' : (upcomingToday.isSpecialSession ? 'bg-amber-50/70 dark:bg-amber-950/40 border-amber-300 dark:border-amber-800 text-amber-950 dark:text-amber-100' : 'bg-slate-50 dark:bg-slate-800/80 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100')} space-y-1.5 cursor-pointer transition hover:border-emerald-400 hover:shadow-xs group"
             title="${classroomLink ? `Open Google Classroom for ${escapeHtml(upcomingToday.course)} ${escapeHtml(upcomingToday.section)} in new tab` : 'Click to jump to today in matrix'}">
             <div class="flex items-center justify-between gap-1.5">
               <span class="font-black text-xs flex items-center gap-1.5 min-w-0">
                 <span class="truncate">${escapeHtml(upcomingToday.course)} (${escapeHtml(upcomingToday.section)})</span>
-                ${upcomingToday.isSpecialSession ? '<span class="text-[8px] font-extrabold px-1.5 py-0.2 rounded bg-amber-200 text-amber-900 border border-amber-300 uppercase tracking-tight shrink-0">⚡ Special</span>' : ''}
-                <svg class="w-3.5 h-3.5 ${classroomLink ? 'text-emerald-700' : 'text-slate-400'} shrink-0 group-hover:scale-110 transition" viewBox="0 0 24 24" fill="currentColor" title="${classroomLink ? 'Google Classroom Linked' : 'Google Classroom Not Configured'}">
+                ${upcomingToday.isSpecialSession ? '<span class="text-[8px] font-extrabold px-1.5 py-0.2 rounded bg-amber-200 dark:bg-amber-950 text-amber-900 dark:text-amber-200 border border-amber-300 dark:border-amber-800 uppercase tracking-tight shrink-0">⚡ Special</span>' : ''}
+                <svg class="w-3.5 h-3.5 ${classroomLink ? 'text-emerald-700 dark:text-emerald-400' : 'text-slate-400 dark:text-slate-500'} shrink-0 group-hover:scale-110 transition" viewBox="0 0 24 24" fill="currentColor" title="${classroomLink ? 'Google Classroom Linked' : 'Google Classroom Not Configured'}">
                   <path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/>
                 </svg>
               </span>
-              <span class="font-mono font-bold text-[10px] shrink-0">${formatTime12(upcomingToday.startTime)} - ${formatTime12(upcomingToday.endTime)}</span>
+              <span class="font-mono font-bold text-[10px] text-slate-600 dark:text-slate-300 shrink-0">${formatTime12(upcomingToday.startTime)} - ${formatTime12(upcomingToday.endTime)}</span>
             </div>
             ${upcomingToday.topic ? `
-              <div class="text-[11px] font-semibold text-slate-700 leading-tight break-words" title="${escapeHtml(upcomingToday.topic)}">
+              <div class="text-[11px] font-semibold text-slate-700 dark:text-slate-200 leading-tight break-words" title="${escapeHtml(upcomingToday.topic)}">
                 ${escapeHtml(upcomingToday.topic)}
               </div>
             ` : ''}
             ${upcomingToday.activity && upcomingToday.activity !== upcomingToday.topic ? `
-              <div class="text-[10px] text-slate-500 truncate" title="${escapeHtml(upcomingToday.activity)}">
+              <div class="text-[10px] text-slate-500 dark:text-slate-400 truncate" title="${escapeHtml(upcomingToday.activity)}">
                 🎯 ${escapeHtml(upcomingToday.activity)}
               </div>
             ` : ''}
-            <div class="flex items-center justify-between text-[11px] text-slate-600">
+            <div class="flex items-center justify-between text-[11px] text-slate-600 dark:text-slate-400">
               <span class="truncate">${escapeHtml(upcomingToday.room || 'TBA')} • ${escapeHtml(upcomingToday.type || 'Lecture')}</span>
-              ${classroomLink ? `<span class="text-[10px] font-bold text-emerald-700 group-hover:underline shrink-0 ml-1">Classroom ↗</span>` : ''}
+              ${classroomLink ? `<span class="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 group-hover:underline shrink-0 ml-1">Classroom ↗</span>` : ''}
             </div>
           </div>
         `;
@@ -445,35 +445,35 @@ function _renderRadarDispatchCard(radarData) {
     const dayBadgeText = isTmrw ? 'Tomorrow' : (lookaheadClass.diffDays <= 6 ? lookaheadClass.dayName : lookaheadClass.dateKey);
 
     if (radarStatusBadge) {
-      radarStatusBadge.className = 'text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-50 text-blue-800 border border-blue-200';
+      radarStatusBadge.className = 'text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-50 dark:bg-blue-950/80 text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-800';
       radarStatusBadge.innerText = isTmrw ? 'Next: Tomorrow' : `Next: ${lookaheadClass.dayName.substring(0, 3)}`;
     }
 
     const classroomLink = (typeof getClassroomLink === 'function') ? getClassroomLink(lookaheadClass.course, lookaheadClass.section) : '';
     dispatchCardEl.innerHTML = `
           <div id="planner-radar-lookahead-card"
-            class="p-2.5 rounded-xl border bg-blue-50/60 border-blue-200/90 text-slate-900 space-y-1.5 cursor-pointer transition hover:border-blue-400 hover:shadow-xs group"
+            class="p-2.5 rounded-xl border bg-blue-50/60 dark:bg-[#0e1e38] border-blue-200/90 dark:border-blue-800/80 text-slate-900 dark:text-slate-100 space-y-1.5 cursor-pointer transition hover:border-blue-400 dark:hover:border-blue-600 hover:shadow-xs group"
             title="Click to jump to ${lookaheadClass.dateKey} in matrix">
             <div class="flex items-center justify-between gap-1.5">
               <span class="font-black text-xs flex items-center gap-1.5 min-w-0">
-                <span class="text-[9px] font-black px-1.5 py-0.2 rounded bg-blue-200 text-blue-900 border border-blue-300 uppercase tracking-tight shrink-0">Next Up</span>
+                <span class="text-[9px] font-black px-1.5 py-0.2 rounded bg-blue-200 dark:bg-blue-900 text-blue-900 dark:text-blue-200 border border-blue-300 dark:border-blue-700 uppercase tracking-tight shrink-0">Next Up</span>
                 <span class="truncate">${escapeHtml(lookaheadClass.course)} (${escapeHtml(lookaheadClass.section)})</span>
-                ${lookaheadClass.isSpecialSession ? '<span class="text-[8px] font-extrabold px-1 rounded bg-amber-200 text-amber-900 border border-amber-300 uppercase shrink-0">⚡ Special</span>' : ''}
+                ${lookaheadClass.isSpecialSession ? '<span class="text-[8px] font-extrabold px-1 rounded bg-amber-200 dark:bg-amber-950 text-amber-900 dark:text-amber-200 border border-amber-300 dark:border-amber-800 uppercase shrink-0">⚡ Special</span>' : ''}
               </span>
-              <span class="font-mono font-bold text-[10px] text-blue-900 shrink-0">${formatTime12(lookaheadClass.startTime)}</span>
+              <span class="font-mono font-bold text-[10px] text-blue-900 dark:text-blue-300 shrink-0">${formatTime12(lookaheadClass.startTime)}</span>
             </div>
-            <div class="text-[10px] text-slate-500 font-semibold flex items-center gap-1">
+            <div class="text-[10px] text-slate-500 dark:text-slate-400 font-semibold flex items-center gap-1">
               <span>📅 ${dayBadgeText} (${lookaheadClass.dateKey})</span>
               <span>• Rm ${escapeHtml(lookaheadClass.room || 'TBA')}</span>
             </div>
             ${lookaheadClass.topic ? `
-              <div class="text-[11px] font-semibold text-slate-700 leading-tight truncate" title="${escapeHtml(lookaheadClass.topic)}">
+              <div class="text-[11px] font-semibold text-slate-700 dark:text-slate-200 leading-tight truncate" title="${escapeHtml(lookaheadClass.topic)}">
                 ${escapeHtml(lookaheadClass.topic)}
               </div>
             ` : ''}
-            <div class="flex items-center justify-between text-[10px] text-slate-600 pt-0.5">
-              <span class="text-blue-700 font-semibold group-hover:underline">View in Matrix ➔</span>
-              ${classroomLink ? `<a href="${classroomLink}" target="_blank" onclick="event.stopPropagation()" class="font-bold text-emerald-700 hover:underline">Classroom ↗</a>` : ''}
+            <div class="flex items-center justify-between text-[10px] text-slate-600 dark:text-slate-400 pt-0.5">
+              <span class="text-blue-700 dark:text-blue-400 font-semibold group-hover:underline">View in Matrix ➔</span>
+              ${classroomLink ? `<a href="${classroomLink}" target="_blank" data-action="noop" data-stop-propagation="true" class="font-bold text-emerald-700 dark:text-emerald-400 hover:underline">Classroom ↗</a>` : ''}
             </div>
           </div>
         `;
@@ -486,13 +486,13 @@ function _renderRadarDispatchCard(radarData) {
     }
   } else {
     if (radarStatusBadge) {
-      radarStatusBadge.className = 'text-[10px] font-semibold px-1.5 py-0.5 rounded bg-slate-100 text-slate-600';
+      radarStatusBadge.className = 'text-[10px] font-semibold px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300';
       radarStatusBadge.innerText = 'Term Done';
     }
     dispatchCardEl.innerHTML = `
-          <div class="p-3 bg-slate-50 border border-dashed border-slate-200 rounded-xl text-center text-slate-500 text-[11px] space-y-1">
-            <div class="font-bold text-slate-700">🎉 No more scheduled classes</div>
-            <div class="text-[10px] text-slate-400">All planned classes for this term have concluded.</div>
+          <div class="p-3 bg-slate-50 dark:bg-slate-800/60 border border-dashed border-slate-200 dark:border-slate-700 rounded-xl text-center text-slate-500 dark:text-slate-400 text-[11px] space-y-1">
+            <div class="font-bold text-slate-700 dark:text-slate-200">🎉 No more scheduled classes</div>
+            <div class="text-[10px] text-slate-400 dark:text-slate-500">All planned classes for this term have concluded.</div>
           </div>
         `;
   }
@@ -705,9 +705,9 @@ function _renderHorizonTimeline(displayList, currentTotalMinutes) {
 
     // School Calendar Milestone card
     if (item.isSchoolMilestone) {
-      const clickAttr = item.dateKey ? `onclick="jumpToMatrixDate('${jsAttr(item.dateKey)}', '', '', true)"` : '';
+      const clickAttr = item.dateKey ? `data-action="jumpToMatrixDate" data-date="${escapeHtml(item.dateKey)}" data-is-school="true"` : '';
       let milestoneTypeLabel = 'School Milestone';
-      let milestoneBg = 'bg-gradient-to-r from-amber-50/90 via-orange-50/70 to-amber-50/90 border-2 border-amber-300 ring-1 ring-amber-200/60 shadow-2xs';
+      let milestoneBg = 'bg-gradient-to-r from-amber-50/90 via-orange-50/70 to-amber-50/90 dark:from-[#2b1803] dark:to-[#382005] border-2 border-amber-300 dark:border-amber-700 ring-1 ring-amber-200/60 dark:ring-amber-900/40 shadow-2xs text-amber-900 dark:text-amber-200';
       if (item.type === 'exam') {
         milestoneTypeLabel = 'Major Exam Period';
       } else if (item.type === 'holiday' || item.isNoClass) {
@@ -719,12 +719,12 @@ function _renderHorizonTimeline(displayList, currentTotalMinutes) {
               class="p-2.5 rounded-xl ${milestoneBg} flex items-start justify-between gap-2.5 ${cursorClass}">
               <div class="min-w-0 flex-1 space-y-1">
                 <div class="flex items-center gap-1.5 flex-wrap">
-                  <span class="text-[9px] font-black px-1.5 py-0.5 rounded bg-amber-200 text-amber-950 border border-amber-300 flex items-center gap-1 shrink-0">
+                  <span class="text-[9px] font-black px-1.5 py-0.5 rounded bg-amber-200 dark:bg-amber-900/60 text-amber-950 dark:text-amber-200 border border-amber-300 dark:border-amber-700 flex items-center gap-1 shrink-0">
                     ⭐ ${milestoneTypeLabel}
                   </span>
-                  <span class="text-[10px] font-bold text-amber-800 font-mono">${escapeHtml(item.dateKey || item.activity)}</span>
+                  <span class="text-[10px] font-bold text-amber-800 dark:text-amber-300 font-mono">${escapeHtml(item.dateKey || item.activity)}</span>
                 </div>
-                <div class="font-bold text-slate-900 text-xs leading-snug break-words">
+                <div class="font-bold text-slate-900 dark:text-amber-100 text-xs leading-snug break-words">
                   <span>${escapeHtml(item.topic)}</span>
                 </div>
               </div>
@@ -734,7 +734,7 @@ function _renderHorizonTimeline(displayList, currentTotalMinutes) {
     }
 
     // Planned Matrix Activity card
-    const clickAttr = item.dateKey ? `onclick="jumpToMatrixDate('${jsAttr(item.dateKey)}', '${jsAttr(item.course || '')}', '${jsAttr(item.section || '')}')"` : '';
+    const clickAttr = item.dateKey ? `data-action="jumpToMatrixDate" data-date="${escapeHtml(item.dateKey)}" data-course="${escapeHtml(item.course || '')}" data-section="${escapeHtml(item.section || '')}"` : '';
     let typeColor = 'bg-blue-100 text-blue-800 border-blue-200';
     if (item.type === 'Quiz') {
       typeColor = 'bg-purple-100 text-purple-800 border-purple-200';
@@ -763,21 +763,21 @@ function _renderHorizonTimeline(displayList, currentTotalMinutes) {
 
     return `
           <div ${clickAttr} title="${item.dateKey ? 'Click to jump to ' + item.dateKey + ' in matrix' : ''}"
-            class="p-2.5 bg-slate-50 hover:bg-indigo-50/50 rounded-xl border border-slate-200 hover:border-indigo-200 flex items-start justify-between gap-2.5 ${cursorClass}">
+            class="p-2.5 bg-slate-50 dark:bg-[#141d2b] hover:bg-indigo-50/50 dark:hover:bg-[#1a2638] rounded-xl border border-slate-200 dark:border-slate-700 hover:border-indigo-200 dark:hover:border-indigo-700/60 flex items-start justify-between gap-2.5 ${cursorClass}">
             <div class="min-w-0 flex-1 space-y-1">
               <div class="flex items-center gap-1.5 flex-wrap">
-                <span class="text-[10px] font-extrabold text-slate-700 bg-white px-1.5 py-0.5 rounded border border-slate-200 shrink-0">
+                <span class="text-[10px] font-extrabold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-700 shrink-0">
                   ${escapeHtml(item.course)} (${escapeHtml(item.section)})
                 </span>
                 ${typeBadge}
-                <span class="text-[10px] text-slate-500 font-mono">${escapeHtml(item.dateKey)}</span>
+                <span class="text-[10px] text-slate-500 dark:text-slate-400 font-mono">${escapeHtml(item.dateKey)}</span>
                 ${timeBadge}
                 ${roomBadge}
               </div>
-              <div class="font-bold text-slate-800 text-xs leading-snug break-words">
+              <div class="font-bold text-slate-800 dark:text-slate-100 text-xs leading-snug break-words">
                 <span>${escapeHtml(item.topic)}</span>
               </div>
-              ${item.activity && item.activity !== item.topic ? `<div class="text-[11px] text-slate-500 truncate">${escapeHtml(item.activity)}</div>` : ''}
+              ${item.activity && item.activity !== item.topic ? `<div class="text-[11px] text-slate-500 dark:text-slate-400 truncate">${escapeHtml(item.activity)}</div>` : ''}
             </div>
             <div class="shrink-0 pt-0.5">${daysBadge}</div>
           </div>
@@ -800,21 +800,21 @@ function _renderTeachingPacingStats(todayStr, currentTotalMinutes) {
     }
 
     pacingStats.innerHTML = `
-          <div class="p-2 bg-slate-50 rounded-lg border border-slate-200">
-            <div class="text-sm font-black text-slate-900">${stats.totalTeachingDays}</div>
-            <div class="text-[10px] text-slate-500 font-semibold">Teaching Days</div>
+          <div class="p-2 bg-slate-50 dark:bg-[#141d2b] rounded-lg border border-slate-200 dark:border-slate-700">
+            <div class="text-sm font-black text-slate-900 dark:text-slate-100">${stats.totalTeachingDays}</div>
+            <div class="text-[10px] text-slate-500 dark:text-slate-400 font-semibold">Teaching Days</div>
           </div>
-          <div class="p-2 bg-emerald-50 rounded-lg border border-emerald-200">
-            <div class="text-sm font-black text-emerald-800">${stats.heldTeachingDays}</div>
-            <div class="text-[10px] text-emerald-600 font-semibold">Held / Conducted</div>
+          <div class="p-2 bg-emerald-50 dark:bg-[#062d22] rounded-lg border border-emerald-200 dark:border-emerald-700">
+            <div class="text-sm font-black text-emerald-800 dark:text-emerald-400">${stats.heldTeachingDays}</div>
+            <div class="text-[10px] text-emerald-600 dark:text-emerald-200 font-semibold">Held / Conducted</div>
           </div>
-          <div class="p-2 bg-rose-50 rounded-lg border border-rose-200">
-            <div class="text-sm font-black text-rose-800">${stats.noClassDays}</div>
-            <div class="text-[10px] text-rose-600 font-semibold">No Class / Off</div>
+          <div class="p-2 bg-rose-50 dark:bg-[#3b0712] rounded-lg border border-rose-200 dark:border-rose-700">
+            <div class="text-sm font-black text-rose-800 dark:text-rose-400">${stats.noClassDays}</div>
+            <div class="text-[10px] text-rose-600 dark:text-rose-200 font-semibold">No Class / Off</div>
           </div>
-          <div class="p-2 bg-amber-50 rounded-lg border border-amber-200">
-            <div class="text-sm font-black text-amber-900">${stats.remainingDays}</div>
-            <div class="text-[10px] text-amber-700 font-semibold">Remaining Days</div>
+          <div class="p-2 bg-amber-50 dark:bg-[#2e1a05] rounded-lg border border-amber-200 dark:border-amber-700">
+            <div class="text-sm font-black text-amber-900 dark:text-amber-400">${stats.remainingDays}</div>
+            <div class="text-[10px] text-amber-700 dark:text-amber-200 font-semibold">Remaining Days</div>
           </div>
         `;
   }
@@ -869,13 +869,13 @@ function _renderTeachingPacingStats(todayStr, currentTotalMinutes) {
       subjectPaceList.innerHTML = '<div class="text-slate-400 italic text-[11px] py-2 text-center">No sections configured.</div>';
     } else {
       subjectPaceList.innerHTML = paceItems.map(it => `
-            <div class="p-2 bg-slate-50 border border-slate-200 rounded-lg space-y-1">
+            <div class="p-2 bg-slate-50 dark:bg-[#141d2b] border border-slate-200 dark:border-slate-700 rounded-lg space-y-1">
               <div class="flex items-center justify-between">
-                <span class="font-bold text-slate-800 text-[11px]">${escapeHtml(it.course)} (${escapeHtml(it.sec)})</span>
-                <span class="font-mono text-[10px] font-bold text-indigo-700">${it.doneMtgs} / ${it.totalMtgs} mtgs (${it.pct}%)</span>
+                <span class="font-bold text-slate-800 dark:text-slate-100 text-[11px]">${escapeHtml(it.course)} (${escapeHtml(it.sec)})</span>
+                <span class="font-mono text-[10px] font-bold text-indigo-700 dark:text-indigo-300">${it.doneMtgs} / ${it.totalMtgs} mtgs (${it.pct}%)</span>
               </div>
-              <div class="w-full bg-slate-200 rounded-full h-1.5 overflow-hidden">
-                <div class="bg-indigo-600 h-full rounded-full transition-all duration-300" style="width: ${it.pct}%"></div>
+              <div class="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-1.5 overflow-hidden">
+                <div class="bg-indigo-600 dark:bg-indigo-500 h-full rounded-full transition-all duration-300" style="width: ${it.pct}%"></div>
               </div>
             </div>
           `).join('');

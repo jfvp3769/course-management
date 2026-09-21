@@ -44,7 +44,7 @@ function renderWeeklyTimetable() {
       const classroomLink = getClassroomLink(slot.course, slot.section);
 
       const card = document.createElement('div');
-      card.className = `absolute left-1 right-1 rounded-xl ${cardPadding} border shadow-xs transition hover:shadow-md hover:z-20 cursor-pointer overflow-hidden flex flex-col justify-between ${hasOverlap ? 'border-rose-500 ring-2 ring-rose-400 bg-rose-50 text-rose-950' : (sub.color || 'bg-blue-50 border-blue-300 text-blue-950')} ${accentBarClass}`;
+      card.className = `absolute left-1 right-1 rounded-xl ${cardPadding} border shadow-xs transition hover:shadow-md hover:z-20 cursor-pointer overflow-hidden flex flex-col justify-between ${hasOverlap ? 'border-rose-500 ring-2 ring-rose-400 bg-rose-50 dark:bg-[#2d0e19] text-rose-950 dark:text-rose-100' : (sub.color || 'bg-blue-50 dark:bg-[#0e203c] border-blue-300 dark:border-[#2563eb] text-blue-950 dark:text-blue-100')} ${accentBarClass}`;
       card.style.top = topOffsetPx + 'px';
       card.style.height = heightPx + 'px';
 
@@ -59,12 +59,12 @@ function renderWeeklyTimetable() {
                 <div class="flex items-center gap-1 shrink-0">
                   ${hasOverlap ? '<span class="text-[8px] px-1 py-0.5 rounded font-black bg-rose-600 text-white uppercase animate-pulse">Overlap</span>' : ''}
                   ${classroomLink ? `
-                    <a href="${escapeHtml(classroomLink)}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()" class="inline-flex items-center gap-1 text-[9px] px-1.5 py-0.5 rounded font-black bg-white/95 hover:bg-emerald-50 text-slate-800 hover:text-emerald-800 border border-slate-300/80 hover:border-emerald-400 uppercase shadow-2xs transition group leading-none" title="Open Google Classroom for ${escapeHtml(slot.course)} ${escapeHtml(slot.section)} in new tab (${escapeHtml(classroomLink)})">
+                    <a href="${escapeHtml(classroomLink)}" target="_blank" rel="noopener noreferrer" data-action="noop" data-stop-propagation="true" class="inline-flex items-center gap-1 text-[9px] px-1.5 py-0.5 rounded font-black bg-white/95 dark:bg-slate-900/90 hover:bg-emerald-50 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-100 hover:text-emerald-800 dark:hover:text-emerald-300 border border-slate-300/80 dark:border-slate-700 hover:border-emerald-400 uppercase shadow-2xs transition group leading-none" title="Open Google Classroom for ${escapeHtml(slot.course)} ${escapeHtml(slot.section)} in new tab (${escapeHtml(classroomLink)})">
                       <span>${escapeHtml(slot.section)}</span>
-                      <svg class="w-2.5 h-2.5 text-emerald-600 shrink-0 group-hover:scale-110 transition" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/></svg>
+                      <svg class="w-2.5 h-2.5 text-emerald-600 dark:text-emerald-400 shrink-0 group-hover:scale-110 transition" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/></svg>
                     </a>
                   ` : `
-                    <button type="button" onclick="event.stopPropagation(); openClassroomModal('${jsAttr(slot.course)}', '${jsAttr(slot.section)}')" class="inline-flex items-center gap-0.5 text-[9px] px-1.5 py-0.5 rounded font-black bg-white/90 hover:bg-slate-100 text-slate-800 border border-slate-300/80 uppercase shadow-2xs transition leading-none" title="Click section to link Google Classroom for ${escapeHtml(slot.course)} ${escapeHtml(slot.section)}">
+                    <button type="button" data-action="openClassroomModal" data-stop-propagation="true" data-course="${escapeHtml(slot.course)}" data-section="${escapeHtml(slot.section)}" class="inline-flex items-center gap-0.5 text-[9px] px-1.5 py-0.5 rounded font-black bg-white/90 dark:bg-slate-900/90 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-100 border border-slate-300/80 dark:border-slate-700 uppercase shadow-2xs transition leading-none" title="Click section to link Google Classroom for ${escapeHtml(slot.course)} ${escapeHtml(slot.section)}">
                       <span>${escapeHtml(slot.section)}</span>
                     </button>
                   `}
@@ -72,9 +72,9 @@ function renderWeeklyTimetable() {
               </div>
               <div class="text-[10px] font-semibold opacity-90 truncate leading-tight">${escapeHtml(sub.title || slot.course)}</div>
             </div>
-            <div class="flex items-center justify-between ${isCompact ? 'text-[9px] pt-0.5' : 'text-[10px] mt-1 pt-1'} font-mono font-bold leading-tight border-t border-slate-900/10 whitespace-nowrap overflow-hidden gap-1">
+            <div class="flex items-center justify-between ${isCompact ? 'text-[9px] pt-0.5' : 'text-[10px] mt-1 pt-1'} font-mono font-bold leading-tight border-t border-slate-900/10 dark:border-white/10 whitespace-nowrap overflow-hidden gap-1">
               <span class="truncate">${formatTime12(slot.startTime)} - ${formatTime12(slot.endTime)}</span>
-              <span class="${isCompact ? 'px-1 py-0.2 text-[8.5px]' : 'px-1.5 py-0.5'} rounded bg-white/80 border border-slate-300/70 font-sans shrink-0 leading-none">${escapeHtml(slot.room)}</span>
+              <span class="${isCompact ? 'px-1 py-0.2 text-[8.5px]' : 'px-1.5 py-0.5'} rounded bg-white/80 dark:bg-slate-900/80 text-slate-800 dark:text-slate-200 border border-slate-300/70 dark:border-slate-700 font-sans shrink-0 leading-none">${escapeHtml(slot.room)}</span>
             </div>
           `;
 

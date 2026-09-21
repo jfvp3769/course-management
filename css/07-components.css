@@ -37,10 +37,60 @@
   box-shadow: 4px 0 6px -2px rgba(0, 0, 0, 0.08);
   border-right: 2px solid var(--slate-300) !important;
 }
-.matrix-row-weekend td.sticky-col-day,
-.matrix-row-weekend td.sticky-col-date,
-.matrix-row-weekend td.sticky-col-progress {
-  background-color: var(--slate-300) !important;
+/* Weekend Rows - Light Mode: Calibrated Cool Slate Wash with Refined Amber Accent */
+html:not(.theme-dark) tr.matrix-row-weekend,
+html:not(.theme-dark) .matrix-row-weekend {
+  background-color: #e8edf3 !important;
+}
+html:not(.theme-dark) tr.matrix-row-weekend > td,
+html:not(.theme-dark) .matrix-row-weekend > td {
+  background-color: #e8edf3 !important;
+  border-color: #d1d9e2 !important;
+}
+html:not(.theme-dark) tr.matrix-row-weekend > td.sticky-col-day,
+html:not(.theme-dark) .matrix-row-weekend > td.sticky-col-day {
+  background-color: #dce3ec !important;
+  border-left: 2.5px solid #d97706 !important;
+}
+html:not(.theme-dark) tr.matrix-row-weekend > td.sticky-col-date,
+html:not(.theme-dark) tr.matrix-row-weekend > td.sticky-col-progress,
+html:not(.theme-dark) .matrix-row-weekend > td.sticky-col-date,
+html:not(.theme-dark) .matrix-row-weekend > td.sticky-col-progress {
+  background-color: #dce3ec !important;
+  border-color: #c4cfdc !important;
+}
+html:not(.theme-dark) tr.matrix-row-weekend > td.sticky-col-date,
+html:not(.theme-dark) .matrix-row-weekend > td.sticky-col-date {
+  color: #78350f !important;
+  font-weight: 700 !important;
+}
+
+/* Weekend Rows - Dark Mode: Calibrated Slate-Blue (#182234) with Refined Amber Accent */
+html.theme-dark tr.matrix-row-weekend,
+html.theme-dark .matrix-row-weekend {
+  background-color: #182234 !important;
+}
+html.theme-dark tr.matrix-row-weekend > td,
+html.theme-dark .matrix-row-weekend > td {
+  background-color: #182234 !important;
+  border-color: #243247 !important;
+}
+html.theme-dark tr.matrix-row-weekend > td.sticky-col-day,
+html.theme-dark .matrix-row-weekend > td.sticky-col-day {
+  background-color: #111826 !important;
+  border-left: 2.5px solid #f59e0b !important;
+}
+html.theme-dark tr.matrix-row-weekend > td.sticky-col-date,
+html.theme-dark tr.matrix-row-weekend > td.sticky-col-progress,
+html.theme-dark .matrix-row-weekend > td.sticky-col-date,
+html.theme-dark .matrix-row-weekend > td.sticky-col-progress {
+  background-color: #111826 !important;
+  border-color: #243247 !important;
+}
+html.theme-dark tr.matrix-row-weekend > td.sticky-col-date,
+html.theme-dark .matrix-row-weekend > td.sticky-col-date {
+  color: #fde047 !important;
+  font-weight: 700 !important;
 }
 .sticky-header-day {
   position: sticky;
@@ -138,26 +188,30 @@ body::-webkit-scrollbar {
   scrollbar-width: none !important;  /* Firefox */
 }
 
-/* Permanent Current Date Highlight (Light Mode) */
-.row-today-active {
+/* Permanent Current Date Highlight (Light Mode Only) */
+html:not(.theme-dark) tr.row-today-active,
+html:not(.theme-dark) .row-today-active {
   background-color: var(--yellow-100) !important;
   border-left: 4px solid var(--msu-maroon) !important;
   box-shadow: inset 0 1px 0 var(--yellow-300), inset 0 -1px 0 var(--yellow-300);
 }
-.row-today-active > td {
+html:not(.theme-dark) .row-today-active > td {
   background-color: var(--yellow-100) !important;
 }
-.row-today-active > td.sticky-col-day,
-.row-today-active > td.sticky-col-date,
-.row-today-active > td.sticky-col-progress {
+html:not(.theme-dark) .row-today-active > td.sticky-col-day,
+html:not(.theme-dark) .row-today-active > td.sticky-col-date,
+html:not(.theme-dark) .row-today-active > td.sticky-col-progress {
   background-color: var(--yellow-200) !important;
 }
-.row-today-active > td.sticky-col-day span {
+html:not(.theme-dark) .row-today-active > td.sticky-col-day {
+  border-left: 5px solid var(--msu-maroon) !important;
+}
+html:not(.theme-dark) .row-today-active > td.sticky-col-day span {
   background-color: var(--msu-maroon) !important;
   color: var(--white) !important;
   font-weight: 800 !important;
 }
-.row-today-active > td.sticky-col-date {
+html:not(.theme-dark) .row-today-active > td.sticky-col-date {
   color: var(--yellow-900) !important;
   font-weight: 800 !important;
 }
@@ -166,65 +220,76 @@ body::-webkit-scrollbar {
   0%, 100% { background-color: var(--yellow-100); }
   50% { background-color: var(--yellow-300); }
 }
-.row-today-pulse {
+html:not(.theme-dark) .row-today-pulse {
   animation: todayJumpPulse 0.9s ease-in-out 2;
 }
 
 /* Permanent Current Date Highlight (Dark Mode Override - Luminous Gold) */
+html.theme-dark tr.row-today-active,
 html.theme-dark .row-today-active {
-  background-color: #433306 !important;
-  border-left: 4px solid #facc15 !important;
-  box-shadow: inset 0 2px 0 rgba(250, 204, 21, 0.45), inset 0 -2px 0 rgba(250, 204, 21, 0.45) !important;
+  background-color: #241d08 !important;
+  border-left: 4px solid #eab308 !important;
+  box-shadow: inset 0 2px 0 rgba(234, 179, 8, 0.45), inset 0 -2px 0 rgba(234, 179, 8, 0.45) !important;
 }
 
+html.theme-dark tr.row-today-active > td,
 html.theme-dark .row-today-active > td {
-  background-color: #433306 !important;
-  border-color: #634b0a !important;
+  background-color: #241d08 !important;
+  border-color: #4d3a08 !important;
 }
 
+html.theme-dark tr.row-today-active > td.sticky-col-day,
+html.theme-dark tr.row-today-active > td.sticky-col-date,
+html.theme-dark tr.row-today-active > td.sticky-col-progress,
 html.theme-dark .row-today-active > td.sticky-col-day,
 html.theme-dark .row-today-active > td.sticky-col-date,
 html.theme-dark .row-today-active > td.sticky-col-progress {
-  background-color: #503d07 !important;
-  border-color: #78590c !important;
+  background-color: #2e240a !important;
+  border-color: #5c450a !important;
+}
+html.theme-dark tr.row-today-active > td.sticky-col-day,
+html.theme-dark .row-today-active > td.sticky-col-day {
+  border-left: 5px solid #eab308 !important;
 }
 
+html.theme-dark tr.row-today-active > td.sticky-col-day span,
 html.theme-dark .row-today-active > td.sticky-col-day span {
   background-color: #800000 !important;
   color: #fef08a !important;
-  border: 1.5px solid #facc15 !important;
-  box-shadow: 0 0 8px rgba(250, 204, 21, 0.35) !important;
+  border: 1.5px solid #eab308 !important;
+  box-shadow: 0 0 8px rgba(234, 179, 8, 0.35) !important;
   font-weight: 800 !important;
 }
 
+html.theme-dark tr.row-today-active > td.sticky-col-date,
 html.theme-dark .row-today-active > td.sticky-col-date {
   color: #fef08a !important;
   font-weight: 900 !important;
-  text-shadow: 0 0 6px rgba(250, 204, 21, 0.3) !important;
+  text-shadow: 0 0 6px rgba(234, 179, 8, 0.3) !important;
 }
 
-/* Unplanned "+ Click to plan" Slots in Active Row Under Dark Mode */
+/* Unplanned "+ Click to plan" / "+ Weekend Session" Slots in Active Row Under Dark Mode */
 html.theme-dark .row-today-active .matrix-cell-slot > div.border-dashed {
-  background-color: #352804 !important;
-  border-color: #85610a !important;
+  background-color: #1a1403 !important;
+  border-color: #5c450a !important;
   color: #fef08a !important;
 }
 
 html.theme-dark .row-today-active .matrix-cell-slot:hover > div.border-dashed {
-  background-color: #523e07 !important;
-  border-color: #facc15 !important;
+  background-color: #382a05 !important;
+  border-color: #eab308 !important;
   color: #ffffff !important;
 }
 
 /* Dark Mode Jump Pulse Animation */
 @keyframes todayJumpPulseDark {
-  0%, 100% { background-color: #433306; }
-  50% { background-color: #78590c; box-shadow: 0 0 16px rgba(250, 204, 21, 0.6); }
+  0%, 100% { background-color: #241d08; }
+  50% { background-color: #5c450a; box-shadow: 0 0 16px rgba(234, 179, 8, 0.6); }
 }
 
 html.theme-dark .row-today-pulse,
 html.theme-dark .row-today-pulse > td {
-  animation: todayJumpPulseDark 0.9s ease-in-out 2 !important;
+  animation: todayJumpPulseDark 0.9s ease-in-out 2;
 }
 
 .timetable-hour-slot {
@@ -358,29 +423,63 @@ html.theme-dark .row-today-pulse > td {
 }
 
 /* Professional Alternating Row Zebra Striping & Solid Backgrounds */
-.grade-row-even {
-  background-color: var(--white);
+html:not(.theme-dark) #gradebook-table-body tr.grade-row-even,
+html:not(.theme-dark) #gradebook-table-body tr.grade-row-even > td {
+  background-color: #ffffff !important;
 }
-.grade-row-odd {
-  background-color: var(--slate-50);
+html:not(.theme-dark) #gradebook-table-body tr.grade-row-odd,
+html:not(.theme-dark) #gradebook-table-body tr.grade-row-odd > td {
+  background-color: #f1f5f9 !important;
 }
-.grade-row-even td.sticky-grade-col-1,
-.grade-row-even td.sticky-grade-col-2,
-.grade-row-even td.sticky-grade-col-3 {
-  background-color: var(--white) !important;
+
+html:not(.theme-dark) #gradebook-table-body tr.grade-row-even td.sticky-grade-col-1,
+html:not(.theme-dark) #gradebook-table-body tr.grade-row-even td.sticky-grade-col-2,
+html:not(.theme-dark) #gradebook-table-body tr.grade-row-even td.sticky-grade-col-3 {
+  background-color: #ffffff !important;
 }
-.grade-row-odd td.sticky-grade-col-1,
-.grade-row-odd td.sticky-grade-col-2,
-.grade-row-odd td.sticky-grade-col-3 {
-  background-color: var(--slate-50) !important;
+html:not(.theme-dark) #gradebook-table-body tr.grade-row-odd td.sticky-grade-col-1,
+html:not(.theme-dark) #gradebook-table-body tr.grade-row-odd td.sticky-grade-col-2,
+html:not(.theme-dark) #gradebook-table-body tr.grade-row-odd td.sticky-grade-col-3 {
+  background-color: #f1f5f9 !important;
 }
-#gradebook-table-body tr:hover {
-  background-color: var(--blue-50) !important;
+
+/* Dark Mode Gradebook Zebra Striping (Elevated Slate-900 / Slate-800) */
+html.theme-dark #gradebook-table-body tr.grade-row-even,
+html.theme-dark #gradebook-table-body tr.grade-row-even > td {
+  background-color: #0f172a !important;
 }
-#gradebook-table-body tr:hover td.sticky-grade-col-1,
-#gradebook-table-body tr:hover td.sticky-grade-col-2,
-#gradebook-table-body tr:hover td.sticky-grade-col-3 {
-  background-color: var(--blue-50) !important;
+html.theme-dark #gradebook-table-body tr.grade-row-odd,
+html.theme-dark #gradebook-table-body tr.grade-row-odd > td {
+  background-color: #1e293b !important;
+}
+
+html.theme-dark #gradebook-table-body tr.grade-row-even td.sticky-grade-col-1,
+html.theme-dark #gradebook-table-body tr.grade-row-even td.sticky-grade-col-2,
+html.theme-dark #gradebook-table-body tr.grade-row-even td.sticky-grade-col-3 {
+  background-color: #0f172a !important;
+}
+html.theme-dark #gradebook-table-body tr.grade-row-odd td.sticky-grade-col-1,
+html.theme-dark #gradebook-table-body tr.grade-row-odd td.sticky-grade-col-2,
+html.theme-dark #gradebook-table-body tr.grade-row-odd td.sticky-grade-col-3 {
+  background-color: #1e293b !important;
+}
+
+/* Hover States Across Entire Row Including Frozen Sticky Panes */
+html:not(.theme-dark) #gradebook-table-body tr:hover,
+html:not(.theme-dark) #gradebook-table-body tr:hover > td,
+html:not(.theme-dark) #gradebook-table-body tr:hover td.sticky-grade-col-1,
+html:not(.theme-dark) #gradebook-table-body tr:hover td.sticky-grade-col-2,
+html:not(.theme-dark) #gradebook-table-body tr:hover td.sticky-grade-col-3 {
+  background-color: #e8f1fd !important;
+}
+
+html.theme-dark #gradebook-table-body tr:hover,
+html.theme-dark #gradebook-table-body tr:hover > td,
+html.theme-dark #gradebook-table-body tr:hover td.sticky-grade-col-1,
+html.theme-dark #gradebook-table-body tr:hover td.sticky-grade-col-2,
+html.theme-dark #gradebook-table-body tr:hover td.sticky-grade-col-3 {
+  background-color: #24344d !important;
+  color: #f8fafc !important;
 }
 
 /* App-wide Snappy & Smooth Animations */
@@ -635,9 +734,9 @@ html.theme-dark tr.row-flash-highlight td[class*="bg-"],
 html.theme-dark tr.row-flash-highlight td.sticky-grade-col-1,
 html.theme-dark tr.row-flash-highlight td.sticky-grade-col-2,
 html.theme-dark tr.row-flash-highlight td.sticky-grade-col-3 {
-  background-color: #854d0e !important;
-  color: #fef08a !important;
-  transition: background-color 0.25s ease, color 0.25s ease !important;
+  background-color: #854d0e;
+  color: #fef08a;
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 /* Student Name Cell Pulsing Halo */
@@ -702,10 +801,10 @@ tr.row-flash-highlight td.sticky-grade-col-3 {
 }
 
 html.theme-dark .activity-navigated-highlight {
-  background-color: #2e1a05 !important;
-  border-color: #f59e0b !important;
-  color: #fef3c7 !important;
-  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.5) !important;
+  background-color: #2e1a05;
+  border-color: #f59e0b;
+  color: #fef3c7;
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.5);
 }
 
 /* Walkthrough Guide Justified Text */
@@ -809,18 +908,18 @@ html.theme-dark .tab-sidebar > [id^="timetable-widget-"],
 html.theme-dark .tab-sidebar > [id^="calendar-widget-"],
 html.theme-dark .tab-sidebar > [id^="roster-widget-"],
 html.theme-dark .tab-sidebar > [id^="gradebook-widget-"] {
-  box-shadow: 2px 4px 14px -1px rgba(0, 0, 0, 0.55), 1px 2px 4px -1px rgba(0, 0, 0, 0.35) !important;
-  border: 1px solid #334155 !important;
+  box-shadow: 2px 4px 14px -1px rgba(0, 0, 0, 0.55), 1px 2px 4px -1px rgba(0, 0, 0, 0.35);
+  border: 1px solid #334155;
 }
 
 /* --- Full-Width Bottom Resizer Bar for Sidebar Widgets --- */
 .widget-bottom-resizer {
-  position: relative;
-  width: calc(100% + 1.75rem) !important;
-  margin-left: -0.875rem !important;
-  margin-right: -0.875rem !important;
-  margin-bottom: -0.875rem !important;
-  margin-top: auto !important;
+  position: absolute !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  margin: 0 !important;
   height: 12px !important;
   display: flex !important;
   align-items: center !important;
@@ -831,7 +930,7 @@ html.theme-dark .tab-sidebar > [id^="gradebook-widget-"] {
   z-index: 25;
   padding: 0 !important;
   border-top: 1px solid rgba(226, 232, 240, 0.95) !important;
-  background-color: rgba(248, 250, 252, 0.9) !important;
+  background-color: rgba(248, 250, 252, 0.95) !important;
   border-radius: 0 0 0.75rem 0.75rem !important;
   transition: background-color 0.2s ease, border-color 0.2s ease !important;
   flex-shrink: 0 !important;
@@ -875,23 +974,23 @@ html.theme-dark .tab-sidebar > [id^="gradebook-widget-"] {
 
 html.theme-dark .widget-bottom-resizer {
   border-top: 1px solid #334155 !important;
-  background-color: rgba(15, 23, 42, 0.7) !important;
+  background-color: #141b2a !important;
 }
 
 html.theme-dark .widget-bottom-resizer:hover,
 html.theme-dark .widget-resizing .widget-bottom-resizer {
-  background-color: rgba(245, 158, 11, 0.18) !important;
-  border-top-color: rgba(245, 158, 11, 0.65) !important;
+  background-color: #1e293b !important;
+  border-top-color: #d97706 !important;
 }
 
 html.theme-dark .widget-resizer-grip {
-  background-color: #475569;
+  background-color: #475569 !important;
 }
 
 html.theme-dark .widget-bottom-resizer:hover .widget-resizer-grip,
 html.theme-dark .widget-resizing .widget-resizer-grip {
   background-color: #f59e0b !important;
-  box-shadow: 0 0 10px rgba(245, 158, 11, 0.7);
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.7) !important;
 }
 
 body.resizing-widget-active {
@@ -957,23 +1056,23 @@ body.resizing-widget-active {
 
 html.theme-dark .main-table-bottom-resizer {
   border-top: 1px solid #334155 !important;
-  background-color: rgba(15, 23, 42, 0.85) !important;
+  background-color: #141b2a !important;
 }
 
 html.theme-dark .main-table-bottom-resizer:hover,
 html.theme-dark .main-window-resizing .main-table-bottom-resizer {
-  background-color: rgba(245, 158, 11, 0.18) !important;
-  border-top-color: rgba(245, 158, 11, 0.65) !important;
+  background-color: #1e293b !important;
+  border-top-color: #d97706 !important;
 }
 
 html.theme-dark .main-resizer-grip {
-  background-color: #475569;
+  background-color: #475569 !important;
 }
 
 html.theme-dark .main-table-bottom-resizer:hover .main-resizer-grip,
 html.theme-dark .main-window-resizing .main-resizer-grip {
   background-color: #f59e0b !important;
-  box-shadow: 0 0 10px rgba(245, 158, 11, 0.7);
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.7) !important;
 }
 
 body.resizing-main-window-active {
@@ -983,13 +1082,17 @@ body.resizing-main-window-active {
 
 /* Inner scroll areas for sidebar widgets with dynamic heights */
 .tab-sidebar > div[id] #planner-milestones-list,
+.tab-sidebar > div[id] #planner-pacing-stats,
 .tab-sidebar > div[id] #planner-subject-pace-list,
 .tab-sidebar > div[id] #timetable-load-scroll-container,
 .tab-sidebar > div[id] #timetable-conflicts-container,
 .tab-sidebar > div[id] #timetable-today-agenda,
 .tab-sidebar > div[id] #calendar-upcoming-deadlines,
 .tab-sidebar > div[id] #calendar-lost-days-list,
+.tab-sidebar > div[id] #calendar-events-distribution,
 .tab-sidebar > div[id] #roster-sections-breakdown,
+.tab-sidebar > div[id] #roster-communications-actions,
+.tab-sidebar > div[id] #roster-health-status,
 .tab-sidebar > div[id] #gradebook-errors-list,
 .tab-sidebar > div[id] #gradebook-atrisk-list,
 .tab-sidebar > div[id] #gradebook-stats-scroll-container {
@@ -1010,16 +1113,16 @@ body.resizing-main-window-active {
   user-select: none;
 }
 html.theme-dark .radar-filter-pill:not(.bg-msu-maroon) {
-  background-color: #1e293b !important;
-  color: #94a3b8 !important;
-  border: 1px solid #334155 !important;
+  background-color: #1e293b;
+  color: #94a3b8;
+  border: 1px solid #334155;
 }
 html.theme-dark .radar-filter-pill:not(.bg-msu-maroon):hover {
-  background-color: #334155 !important;
-  color: #f1f5f9 !important;
+  background-color: #334155;
+  color: #f1f5f9;
 }
 html.theme-dark #planner-radar-filter-pills {
-  border-color: #334155 !important;
+  border-color: #334155;
 }
 
 /* Fixed-grid metric cards: prevent stretching into hollow tall blocks when resized */
@@ -1043,39 +1146,39 @@ html.theme-dark #planner-radar-filter-pills {
 }
 
 html.theme-dark #gradebook-widget-stats .bg-slate-50 {
-  background-color: #0f172a !important;
-  border-color: #334155 !important;
+  background-color: #0f172a;
+  border-color: #334155;
 }
 html.theme-dark #gradebook-widget-stats .bg-slate-100 {
-  background-color: #1e293b !important;
-  border-color: #334155 !important;
+  background-color: #1e293b;
+  border-color: #334155;
 }
 html.theme-dark #gradebook-widget-stats .bg-slate-200 {
-  background-color: #334155 !important;
+  background-color: #334155;
 }
 html.theme-dark #gradebook-widget-stats .text-slate-900,
 html.theme-dark #gradebook-widget-stats .text-slate-800,
 html.theme-dark #gradebook-widget-stats .text-slate-700 {
-  color: #f1f5f9 !important;
+  color: #f1f5f9;
 }
 html.theme-dark #gradebook-widget-stats .text-slate-500,
 html.theme-dark #gradebook-widget-stats .text-slate-400 {
-  color: #94a3b8 !important;
+  color: #94a3b8;
 }
 html.theme-dark #gradebook-widget-stats .border-slate-100 {
-  border-color: #334155 !important;
+  border-color: #334155;
 }
 html.theme-dark #gradebook-widget-stats #btn-grade-dist-grouped,
 html.theme-dark #gradebook-widget-stats #btn-grade-dist-full {
-  border-color: #334155 !important;
+  border-color: #334155;
 }
 html.theme-dark #gradebook-widget-stats .hover\:bg-slate-100:hover {
-  background-color: rgba(51, 65, 85, 0.4) !important;
+  background-color: rgba(51, 65, 85, 0.4);
 }
 
 html.theme-dark div[id$="-modal"] > div {
-  box-shadow: var(--dark-modal-shadow) !important;
-  border: 1px solid #475569 !important;
+  box-shadow: var(--dark-modal-shadow);
+  border: 1px solid #475569;
 }
 
 /* Primary display cards across all tabs (Excludes transparent layout wrappers) */
@@ -1090,21 +1193,21 @@ html.theme-dark .tab-main-window > div.bg-white,
 html.theme-dark .tab-main-window .bg-white.rounded-xl,
 html.theme-dark .tab-main-window .bg-white.rounded-2xl,
 html.theme-dark #matrix-scroll-wrapper {
-  box-shadow: var(--dark-surface-shadow) !important;
-  border: 1px solid #334155 !important;
+  box-shadow: var(--dark-surface-shadow);
+  border: 1px solid #334155;
 }
 
 /* Ensure layout wrappers remain completely borderless and unshadowed */
 .tab-main-window > .w-full,
 html.theme-dark .tab-main-window > .w-full {
-  border: none !important;
-  box-shadow: none !important;
-  background: transparent !important;
+  border: none;
+  box-shadow: none;
+  background: transparent;
 }
 
 .widget-drag-handle {
-  cursor: grab !important;
-  user-select: none !important;
+  cursor: grab;
+  user-select: none;
 }
 
 .widget-drag-handle * {
@@ -1114,8 +1217,18 @@ html.theme-dark .tab-main-window > .w-full {
 .widget-drag-handle button,
 .widget-drag-handle a,
 .widget-drag-handle input,
-.widget-drag-handle select {
-  pointer-events: auto;
+.widget-drag-handle select,
+.widget-drag-handle [data-action],
+.widget-drag-handle [role="button"],
+.widget-drag-handle .pointer-events-auto {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+}
+
+.widget-drag-handle [data-action]:disabled,
+.widget-drag-handle button:disabled,
+.widget-drag-handle .cursor-default {
+  cursor: default !important;
 }
 
 .widget-drag-handle:active {
@@ -1142,38 +1255,38 @@ html.theme-dark .tab-main-window > .w-full {
 
 /* Floating User Guide Modal Dark Mode */
 html.theme-dark #user-guide-card {
-  background-color: #1e293b !important;
-  color: #f8fafc !important;
-  border-color: #b45309 !important;
+  background-color: #1e293b;
+  color: #f8fafc;
+  border-color: #b45309;
 }
 html.theme-dark #user-guide-modal .bg-slate-50 {
-  background-color: #0f172a !important;
-  border-color: #334155 !important;
+  background-color: #0f172a;
+  border-color: #334155;
 }
 html.theme-dark #user-guide-modal .bg-amber-50 {
-  background-color: #2b1803 !important;
-  border-color: #78350f !important;
+  background-color: #2b1803;
+  border-color: #78350f;
 }
 html.theme-dark #user-guide-modal .border-slate-200 {
-  border-color: #334155 !important;
+  border-color: #334155;
 }
 html.theme-dark #user-guide-modal .text-slate-900,
 html.theme-dark #user-guide-modal .text-slate-800 {
-  color: #f8fafc !important;
+  color: #f8fafc;
 }
 html.theme-dark #user-guide-modal .text-slate-700,
 html.theme-dark #user-guide-modal .text-slate-600 {
-  color: #cbd5e1 !important;
+  color: #cbd5e1;
 }
 html.theme-dark #user-guide-modal #guide-step-select {
-  background-color: #0f172a !important;
-  color: #f8fafc !important;
-  border-color: #334155 !important;
+  background-color: #0f172a;
+  color: #f8fafc;
+  border-color: #334155;
 }
 html.theme-dark #user-guide-modal button[onclick*="navigateGuideStep"] {
-  background-color: #1e293b !important;
-  border-color: #475569 !important;
-  color: #e2e8f0 !important;
+  background-color: #1e293b;
+  border-color: #475569;
+  color: #e2e8f0;
 }
 
 .widget-drag-over {
@@ -1194,4 +1307,69 @@ html.theme-dark #user-guide-modal button[onclick*="navigateGuideStep"] {
   opacity: 0.35 !important;
   transform: scale(0.98) !important;
   box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* ==========================================================================
+   Lesson Matrix Drag & Drop
+   ========================================================================== */
+.matrix-card-dragging {
+  opacity: 0.45 !important;
+  transform: scale(0.97) !important;
+  box-shadow: 0 0 0 2px #d97706 !important;
+  cursor: grabbing !important;
+}
+
+.matrix-cell-drag-over {
+  outline: 2px dashed #2563eb !important;
+  outline-offset: -2px;
+  background-color: rgba(37, 99, 235, 0.12) !important;
+  transition: background-color 0.15s ease;
+}
+
+html.theme-dark .matrix-cell-drag-over {
+  outline: 2px dashed #60a5fa !important;
+  background-color: rgba(96, 165, 250, 0.2) !important;
+}
+
+.matrix-cell-drag-over-swap {
+  outline: 2px dashed #d97706 !important;
+  outline-offset: -2px;
+  background-color: rgba(217, 119, 6, 0.15) !important;
+  transition: background-color 0.15s ease;
+}
+
+html.theme-dark .matrix-cell-drag-over-swap {
+  outline: 2px dashed #fbbf24 !important;
+  background-color: rgba(251, 191, 36, 0.25) !important;
+}
+
+.matrix-drag-grip {
+  cursor: grab;
+  user-select: none;
+}
+
+.matrix-drag-grip:active {
+  cursor: grabbing;
+}
+
+/* Optimization: High-performance silky-smooth drag & drop */
+body.is-matrix-dragging {
+  cursor: grabbing !important;
+  user-select: none !important;
+}
+
+/* Prevent inner child elements from triggering dragleave/dragenter flicker */
+body.is-matrix-dragging .matrix-cell-slot * {
+  pointer-events: none !important;
+}
+
+/* Disable card hover scaling and heavy transitions while dragging across the matrix */
+body.is-matrix-dragging .matrix-cell-slot {
+  transition: none !important;
+}
+
+body.is-matrix-dragging .matrix-cell-slot > div {
+  transform: none !important;
+  transition: none !important;
+  box-shadow: none !important;
 }

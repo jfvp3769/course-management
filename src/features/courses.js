@@ -171,40 +171,40 @@ function openManageCoursesModal() {
     const safeSub = sub.code.replace(/[^a-zA-Z0-9_-]/g, '_');
 
     return `
-          <div id="manage-subject-card-${safeSub}" class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-2.5 transition-shadow">
+          <div id="manage-subject-card-${safeSub}" class="p-3.5 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 space-y-2.5 transition-shadow">
             <div class="flex items-center justify-between gap-2.5">
               <div class="flex items-center gap-2.5 min-w-0 flex-1">
                 <!-- Leftmost Stacked Reorder Arrows -->
-                <div class="inline-flex flex-col border border-slate-300 rounded-md overflow-hidden bg-white shadow-2xs shrink-0 select-none">
-                  <button type="button" onclick="moveSubjectOrder(${subIdx}, -1)" ${isFirstSub ? 'disabled' : ''} class="w-5 h-3.5 flex items-center justify-center hover:bg-slate-100 text-slate-600 hover:text-slate-900 border-b border-slate-200 transition ${isFirstSub ? 'opacity-20 cursor-not-allowed pointer-events-none' : 'cursor-pointer active:scale-95'}" title="Move ${escapeHtml(sub.code)} Up (Shift Left in Matrix)">
+                <div class="inline-flex flex-col border border-slate-300 dark:border-slate-600 rounded-md overflow-hidden bg-white dark:bg-slate-800 shadow-2xs shrink-0 select-none">
+                  <button type="button" data-action="moveSubjectOrder" data-sub-idx="${subIdx}" data-dir="-1" ${isFirstSub ? 'disabled' : ''} class="w-5 h-3.5 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 border-b border-slate-200 dark:border-slate-700 transition ${isFirstSub ? 'opacity-20 cursor-not-allowed pointer-events-none' : 'cursor-pointer active:scale-95'}" title="Move ${escapeHtml(sub.code)} Up (Shift Left in Matrix)">
                     <svg class="w-2.5 h-2.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7"/></svg>
                   </button>
-                  <button type="button" onclick="moveSubjectOrder(${subIdx}, 1)" ${isLastSub ? 'disabled' : ''} class="w-5 h-3.5 flex items-center justify-center hover:bg-slate-100 text-slate-600 hover:text-slate-900 transition ${isLastSub ? 'opacity-20 cursor-not-allowed pointer-events-none' : 'cursor-pointer active:scale-95'}" title="Move ${escapeHtml(sub.code)} Down (Shift Right in Matrix)">
+                  <button type="button" data-action="moveSubjectOrder" data-sub-idx="${subIdx}" data-dir="1" ${isLastSub ? 'disabled' : ''} class="w-5 h-3.5 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 transition ${isLastSub ? 'opacity-20 cursor-not-allowed pointer-events-none' : 'cursor-pointer active:scale-95'}" title="Move ${escapeHtml(sub.code)} Down (Shift Right in Matrix)">
                     <svg class="w-2.5 h-2.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
                   </button>
                 </div>
                 <div class="min-w-0 flex-1">
                   <div class="flex items-center gap-2 flex-wrap">
-                    <span class="font-extrabold text-sm text-slate-900">${escapeHtml(sub.code)}</span>
+                    <span class="font-extrabold text-sm text-slate-900 dark:text-slate-100">${escapeHtml(sub.code)}</span>
                     <span class="text-[10px] font-bold px-2 py-0.5 rounded ${sub.headerBg}">${sub.units} Units</span>
                   </div>
-                  <div class="text-xs text-slate-600 font-medium truncate">${escapeHtml(sub.title)}</div>
+                  <div class="text-xs text-slate-600 dark:text-slate-300 font-medium truncate">${escapeHtml(sub.title)}</div>
                 </div>
               </div>
               <div class="flex items-center gap-1.5 shrink-0">
-                <button onclick="openEditSubjectModal('${jsAttr(sub.code)}')" class="px-2.5 py-1 bg-white hover:bg-slate-100 border border-slate-300 rounded-lg text-slate-700 font-semibold text-xs flex items-center gap-1">
+                <button type="button" data-action="openEditSubjectModal" data-code="${escapeHtml(sub.code)}" class="px-2.5 py-1 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-700 dark:text-slate-200 font-semibold text-xs flex items-center gap-1">
                   ✎ Edit Details
                 </button>
-                <button onclick="requestRemoveSubject('${jsAttr(sub.code)}')" class="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-lg text-rose-700 font-semibold text-xs">
+                <button type="button" data-action="requestRemoveSubject" data-code="${escapeHtml(sub.code)}" class="px-2.5 py-1 bg-rose-50 dark:bg-rose-500/15 hover:bg-rose-100 dark:hover:bg-rose-500/25 border border-rose-200 dark:border-rose-500/35 rounded-lg text-rose-700 dark:text-rose-300 font-semibold text-xs">
                   Delete
                 </button>
               </div>
             </div>
 
-            <div class="border-t border-slate-200 pt-2 space-y-1.5">
-              <div class="flex items-center justify-between text-[11px] font-bold text-slate-600">
+            <div class="border-t border-slate-200 dark:border-slate-700 pt-2 space-y-1.5">
+              <div class="flex items-center justify-between text-[11px] font-bold text-slate-600 dark:text-slate-300">
                 <span>Sections & Scheduled Hours:</span>
-                <button onclick="openAddSectionModal('${jsAttr(sub.code)}')" class="text-msu-maroon hover:underline font-bold text-[11px]">+ Add Section</button>
+                <button type="button" data-action="openAddSectionModal" data-code="${escapeHtml(sub.code)}" class="text-msu-maroon dark:text-amber-400 hover:underline font-bold text-[11px]">+ Add Section</button>
               </div>
               <div class="space-y-1.5">
                 ${sub.sections.map((sec, secIdx) => {
@@ -215,29 +215,29 @@ function openManageCoursesModal() {
               const safeSec = sec.replace(/[^a-zA-Z0-9_-]/g, '_');
 
               return `
-                    <div id="manage-sec-row-${safeSub}__${safeSec}" class="bg-white p-2.5 rounded-lg border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs ${accentBar} transition-shadow">
+                    <div id="manage-sec-row-${safeSub}__${safeSec}" class="bg-white dark:bg-slate-800 p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs ${accentBar} transition-shadow">
                       <div class="flex items-center gap-2.5 min-w-0 flex-1">
                         <!-- Leftmost Stacked Reorder Arrows -->
-                        <div class="inline-flex flex-col border border-slate-300 rounded-md overflow-hidden bg-white shadow-2xs shrink-0 select-none">
-                          <button type="button" onclick="moveSectionOrder(${subIdx}, ${secIdx}, -1)" ${isFirstSec ? 'disabled' : ''} class="w-5 h-3.5 flex items-center justify-center hover:bg-slate-100 text-slate-600 hover:text-slate-900 border-b border-slate-200 transition ${isFirstSec ? 'opacity-20 cursor-not-allowed pointer-events-none' : 'cursor-pointer active:scale-95'}" title="Move Section ${escapeHtml(sec)} Up (Shift Left in Matrix)">
+                        <div class="inline-flex flex-col border border-slate-300 dark:border-slate-600 rounded-md overflow-hidden bg-white dark:bg-slate-800 shadow-2xs shrink-0 select-none">
+                          <button type="button" data-action="moveSectionOrder" data-sub-idx="${subIdx}" data-sec-idx="${secIdx}" data-dir="-1" ${isFirstSec ? 'disabled' : ''} class="w-5 h-3.5 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 border-b border-slate-200 dark:border-slate-700 transition ${isFirstSec ? 'opacity-20 cursor-not-allowed pointer-events-none' : 'cursor-pointer active:scale-95'}" title="Move Section ${escapeHtml(sec)} Up (Shift Left in Matrix)">
                             <svg class="w-2.5 h-2.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7"/></svg>
                           </button>
-                          <button type="button" onclick="moveSectionOrder(${subIdx}, ${secIdx}, 1)" ${isLastSec ? 'disabled' : ''} class="w-5 h-3.5 flex items-center justify-center hover:bg-slate-100 text-slate-600 hover:text-slate-900 transition ${isLastSec ? 'opacity-20 cursor-not-allowed pointer-events-none' : 'cursor-pointer active:scale-95'}" title="Move Section ${escapeHtml(sec)} Down (Shift Right in Matrix)">
+                          <button type="button" data-action="moveSectionOrder" data-sub-idx="${subIdx}" data-sec-idx="${secIdx}" data-dir="1" ${isLastSec ? 'disabled' : ''} class="w-5 h-3.5 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 transition ${isLastSec ? 'opacity-20 cursor-not-allowed pointer-events-none' : 'cursor-pointer active:scale-95'}" title="Move Section ${escapeHtml(sec)} Down (Shift Right in Matrix)">
                             <svg class="w-2.5 h-2.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
                           </button>
                         </div>
-                        <span class="font-extrabold text-xs bg-slate-100 text-slate-800 px-2.5 py-1 rounded-md border border-slate-300 shrink-0">${escapeHtml(sec)}</span>
-                        <div class="text-[11px] text-slate-600 font-medium truncate">
+                        <span class="font-extrabold text-xs bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-200 px-2.5 py-1 rounded-md border border-slate-300 dark:border-slate-600 shrink-0">${escapeHtml(sec)}</span>
+                        <div class="text-[11px] text-slate-600 dark:text-slate-300 font-medium truncate">
                           ${secSlots.length > 0 
-                        ? secSlots.map(s => `<span class="inline-block mr-2 font-mono text-slate-700 font-semibold">${escapeHtml(s.day.substring(0,3))} ${formatTime12(s.startTime)}–${formatTime12(s.endTime)} (${escapeHtml(s.room)})</span>`).join('') 
-                        : '<span class="text-slate-400 italic font-sans">No schedule assigned yet</span>'}
+                        ? secSlots.map(s => `<span class="inline-block mr-2 font-mono text-slate-700 dark:text-slate-200 font-semibold">${escapeHtml(s.day.substring(0,3))} ${formatTime12(s.startTime)}–${formatTime12(s.endTime)} (${escapeHtml(s.room)})</span>`).join('') 
+                        : '<span class="text-slate-400 dark:text-slate-500 italic font-sans">No schedule assigned yet</span>'}
                         </div>
                       </div>
                       <div class="flex items-center gap-1.5 shrink-0 ml-auto">
-                        <button type="button" onclick="openEditSectionModal('${jsAttr(sub.code)}', '${jsAttr(sec)}')" class="px-2.5 py-1 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 rounded-lg font-semibold text-xs flex items-center gap-1 transition shadow-2xs">
+                        <button type="button" data-action="openEditSectionModal" data-code="${escapeHtml(sub.code)}" data-sec="${escapeHtml(sec)}" class="px-2.5 py-1 bg-white dark:bg-slate-700 hover:bg-slate-100 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-600 rounded-lg font-semibold text-xs flex items-center gap-1 transition shadow-2xs">
                           ✎ Edit Section
                         </button>
-                        <button type="button" onclick="requestRemoveSection('${jsAttr(sub.code)}', '${jsAttr(sec)}')" class="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-lg text-rose-700 font-semibold text-xs transition">
+                        <button type="button" data-action="requestRemoveSection" data-code="${escapeHtml(sub.code)}" data-sec="${escapeHtml(sec)}" class="px-2.5 py-1 bg-rose-50 dark:bg-rose-500/15 hover:bg-rose-100 dark:hover:bg-rose-500/25 border border-rose-200 dark:border-rose-500/35 rounded-lg text-rose-700 dark:text-rose-300 font-semibold text-xs transition">
                           Remove
                         </button>
                       </div>

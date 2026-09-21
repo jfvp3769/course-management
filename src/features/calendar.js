@@ -91,11 +91,11 @@ function renderAcademicCalendarTable() {
 
   tbody.innerHTML = filtered.map(({ evt, idx }) => {
     const typeMetaMap = {
-      admin: { text: 'Administrative', class: 'bg-slate-100 text-slate-700 border-slate-300' },
-      exam: { text: 'Major Examination', class: 'bg-amber-100 text-amber-800 border-amber-300' },
-      milestone: { text: 'Term Milestone', class: 'bg-emerald-100 text-emerald-800 border-emerald-300' },
-      activity: { text: 'University Activity', class: 'bg-blue-100 text-blue-800 border-blue-300' },
-      holiday: { text: 'Holiday / Suspended', class: 'bg-rose-100 text-rose-800 border-rose-300' }
+      admin: { text: 'Administrative', class: 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-700' },
+      exam: { text: 'Major Examination', class: 'bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 border-amber-300 dark:border-amber-700' },
+      milestone: { text: 'Term Milestone', class: 'bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700' },
+      activity: { text: 'University Activity', class: 'bg-blue-100 dark:bg-blue-950/80 text-blue-800 dark:text-blue-300 border-blue-300 dark:border-blue-700' },
+      holiday: { text: 'Holiday / Suspended', class: 'bg-rose-100 dark:bg-rose-950/80 text-rose-800 dark:text-rose-300 border-rose-300 dark:border-rose-700' }
     };
 
     const currentMeta = typeMetaMap[evt.type] || typeMetaMap.admin;
@@ -104,29 +104,29 @@ function renderAcademicCalendarTable() {
     const showNoClassTag = !!evt.isNoClass && evt.type !== 'holiday';
 
     return `
-          <tr id="cal-event-row-${idx}" class="hover:bg-slate-50 transition border-b border-slate-200">
+          <tr id="cal-event-row-${idx}" class="hover:bg-slate-50 dark:hover:bg-slate-800/60 transition border-b border-slate-200 dark:border-slate-700">
             <td class="py-2.5 px-3 text-center">
               <div class="flex items-center justify-center gap-1.5 flex-wrap">
                 <span class="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${badgeClass}">
                   ${statusText}
                 </span>
                 ${showNoClassTag ? `
-                  <span class="inline-block px-1.5 py-0.2 rounded-full text-[9px] font-black bg-rose-100 text-rose-800 border border-rose-300 shadow-2xs" title="Class sessions suspended">
+                  <span class="inline-block px-1.5 py-0.2 rounded-full text-[9px] font-black bg-rose-100 dark:bg-rose-950 dark:text-rose-200 text-rose-800 border border-rose-300 dark:border-rose-700 shadow-2xs" title="Class sessions suspended">
                     No Class
                   </span>
                 ` : ''}
               </div>
             </td>
-            <td class="py-2.5 px-4 font-bold text-slate-800">${escapeHtml(evt.activity)}</td>
-            <td class="py-2.5 px-4 font-semibold text-msu-maroon bg-amber-50/40 border-x border-amber-200/60">${escapeHtml(evt.firstSem || '—')}</td>
-            <td class="py-2.5 px-4 font-semibold text-blue-900 bg-blue-50/20 border-r border-blue-200/60">${escapeHtml(evt.secondSem || '—')}</td>
-            <td class="py-2.5 px-4 font-semibold text-emerald-900 bg-emerald-50/20 border-r border-emerald-200/60">${escapeHtml(evt.summer || '—')}</td>
+            <td class="py-2.5 px-4 font-bold text-slate-800 dark:text-slate-100">${escapeHtml(evt.activity)}</td>
+            <td class="py-2.5 px-4 font-semibold text-msu-maroon dark:text-rose-300 bg-amber-50/40 dark:bg-slate-800/60 border-x border-amber-200/60 dark:border-slate-700">${escapeHtml(evt.firstSem || '—')}</td>
+            <td class="py-2.5 px-4 font-semibold text-blue-900 dark:text-blue-300 bg-blue-50/20 dark:bg-slate-800/40 border-r border-blue-200/60 dark:border-slate-700">${escapeHtml(evt.secondSem || '—')}</td>
+            <td class="py-2.5 px-4 font-semibold text-emerald-900 dark:text-emerald-300 bg-emerald-50/20 dark:bg-slate-800/40 border-r border-emerald-200/60 dark:border-slate-700">${escapeHtml(evt.summer || '—')}</td>
             <td class="py-2.5 px-3 text-center">
               <div class="flex items-center justify-center gap-1.5">
-                <button onclick="openEditCalendarEvent(${idx})" title="Edit event" class="p-1.5 text-slate-500 hover:text-msu-maroon hover:bg-slate-100 rounded-lg transition">
+                <button type="button" data-action="openEditCalendarEvent" data-idx="${idx}" title="Edit event" class="p-1.5 text-slate-500 dark:text-slate-400 hover:text-msu-maroon dark:hover:text-rose-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
                 </button>
-                <button onclick="deleteCalendarEventByIndex(${idx})" title="Delete event" class="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition">
+                <button type="button" data-action="deleteCalendarEventByIndex" data-idx="${idx}" title="Delete event" class="p-1.5 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-lg transition">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                 </button>
               </div>

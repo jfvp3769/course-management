@@ -65,7 +65,7 @@ function renderEasterEggTipsList() {
           <div class="py-12 text-center text-slate-400 dark:text-slate-500 space-y-2">
             <span class="text-3xl">🔍</span>
             <p class="text-sm font-semibold">No tips match "${escapeHtml(vaultSearchTerm)}"</p>
-            <button type="button" onclick="document.getElementById('vault-search-input').value=''; searchVaultTips();" class="text-xs text-msu-maroon hover:underline font-bold">Clear search filter</button>
+            <button type="button" data-action="clearVaultSearch" class="text-xs text-msu-maroon hover:underline font-bold">Clear search filter</button>
           </div>
         `;
     return;

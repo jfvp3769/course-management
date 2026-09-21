@@ -68,6 +68,7 @@ function bootLayout() {
 /* ---------- 4. listeners ------------------------------------------------ */
 
 function bootBindings() {
+  if (window.AppEvents) window.AppEvents.initEventDelegation();
   initColorPickerListeners();
   initDarkModeTheme();
   bindBrandingEasterEgg();

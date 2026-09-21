@@ -93,10 +93,10 @@ aside[id^="sidebar-"],
 html.theme-dark .tab-sidebar,
 html.theme-dark .tab-sidebar-expanded,
 html.theme-dark aside[id^="sidebar-"] {
-  background: transparent !important;
-  background-color: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
+  background: transparent;
+  background-color: transparent;
+  border: none;
+  box-shadow: none;
 }
 
 /* --- Inner Scroll Wrappers (Clean Overflow Only - Styled by Outer Card) --- */
@@ -111,19 +111,19 @@ html.theme-dark aside[id^="sidebar-"] {
 /* --- Main Content Window / Table Cards (Light & Dark Theme Explicit) --- */
 .main-table-card,
 .tab-main-window .main-table-card {
-  background-color: #ffffff !important;
-  border: 1px solid #e2e8f0 !important;
-  border-radius: 0.75rem !important;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.05) !important;
-  overflow: hidden !important;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
 }
 
 html.theme-dark .main-table-card,
 html.theme-dark .tab-main-window .main-table-card {
-  background-color: #1e293b !important;
-  border: 1px solid #334155 !important;
-  border-radius: 0.75rem !important;
-  box-shadow: var(--dark-surface-shadow) !important;
+  background-color: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 0.75rem;
+  box-shadow: var(--dark-surface-shadow);
 }
 
 /* --- Dynamic Viewport Auto-Resizing for Main Tab Content Windows --- */
@@ -157,20 +157,20 @@ html.theme-dark .tab-main-window .main-table-card {
 }
 
 html.theme-dark .main-table-scroll-wrapper::-webkit-scrollbar-track {
-  background: rgba(15, 23, 42, 0.75) !important;
-  border-top: 1px solid rgba(51, 65, 85, 0.7) !important;
+  background: rgba(15, 23, 42, 0.75);
+  border-top: 1px solid rgba(51, 65, 85, 0.7);
 }
 
 html.theme-dark .main-table-scroll-wrapper::-webkit-scrollbar-thumb {
-  background-color: #475569 !important;
-  border: 2px solid transparent !important;
-  background-clip: padding-box !important;
+  background-color: #475569;
+  border: 2px solid transparent;
+  background-clip: padding-box;
 }
 
 html.theme-dark .main-table-scroll-wrapper::-webkit-scrollbar-thumb:hover {
-  background-color: #64748b !important;
-  border: 2px solid transparent !important;
-  background-clip: padding-box !important;
+  background-color: #64748b;
+  border: 2px solid transparent;
+  background-clip: padding-box;
 }
 
 @media print {
@@ -183,109 +183,129 @@ overflow: visible !important;
 
 /* --- Synchronized Top Horizontal Scrollbar (Matching Bottom Scrollbar Design) --- */
 .dual-top-scroll {
-  overflow-x: auto !important;
-  overflow-y: hidden !important;
-  height: 12px !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  background-color: transparent !important;
-  border: none !important;
-  border-radius: 0 !important;
-  box-shadow: none !important;
-  line-height: 0 !important;
-  font-size: 0 !important;
-  scrollbar-width: thin !important;
-  scrollbar-color: var(--slate-300) transparent !important;
+  overflow-x: auto;
+  overflow-y: hidden;
+  height: 12px;
+  margin: 0;
+  padding: 0;
+  background-color: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  line-height: 0;
+  font-size: 0;
+  scrollbar-width: thin;
+  scrollbar-color: var(--slate-300) transparent;
 }
 
 .dual-top-scroll > div {
-  height: 1px !important;
-  line-height: 0 !important;
-  font-size: 0 !important;
+  height: 1px;
+  line-height: 0;
+  font-size: 0;
 }
 
 html.theme-dark .dual-top-scroll {
-  background-color: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  scrollbar-color: #334155 transparent !important;
+  background-color: transparent;
+  border: none;
+  box-shadow: none;
+  scrollbar-color: #334155 transparent;
 }
 
 .dual-top-scroll::-webkit-scrollbar {
-  height: 12px !important;
+  height: 12px;
 }
 
 .dual-top-scroll::-webkit-scrollbar-track {
-  background: transparent !important;
+  background: transparent;
 }
 
 .dual-top-scroll::-webkit-scrollbar-thumb {
-  background-color: var(--slate-300) !important;
-  border-radius: 9999px !important;
-  border: 2px solid transparent !important;
-  background-clip: padding-box !important;
+  background-color: var(--slate-300);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
 }
 
 .dual-top-scroll::-webkit-scrollbar-thumb:hover {
-  background-color: var(--slate-400) !important;
-  border: 2px solid transparent !important;
-  background-clip: padding-box !important;
+  background-color: var(--slate-400);
+  border: 2px solid transparent;
+  background-clip: padding-box;
 }
 
 html.theme-dark .dual-top-scroll::-webkit-scrollbar-track {
-  background: #0f172a !important;
+  background: #0f172a;
 }
 
 html.theme-dark .dual-top-scroll::-webkit-scrollbar-thumb {
-  background-color: #334155 !important;
-  border: 2px solid transparent !important;
-  background-clip: padding-box !important;
+  background-color: #334155;
+  border: 2px solid transparent;
+  background-clip: padding-box;
 }
 
 html.theme-dark .dual-top-scroll::-webkit-scrollbar-thumb:hover {
-  background-color: #475569 !important;
-  border: 2px solid transparent !important;
-  background-clip: padding-box !important;
+  background-color: #475569;
+  border: 2px solid transparent;
+  background-clip: padding-box;
 }
 
 /* --- Student Roster Rows & Headers Theme Assurance --- */
 #student-table-body tr {
-  background-color: #ffffff !important;
+  background-color: #ffffff;
 }
 
 #student-table-body tr:hover {
-  background-color: #f8fafc !important;
+  background-color: #f8fafc;
 }
 
 html.theme-dark #student-table-body tr {
-  background-color: #1e293b !important;
+  background-color: #1e293b;
 }
 
 html.theme-dark #student-table-body tr:hover {
-  background-color: #24344d !important;
+  background-color: #24344d;
 }
 
 #roster-table thead,
 #roster-table thead tr,
 #roster-table thead th {
-  background-color: #f1f5f9 !important;
-  color: #334155 !important;
-  border-color: #cbd5e1 !important;
+  background-color: #f1f5f9;
+  color: #334155;
+  border-color: #cbd5e1;
 }
 
 html.theme-dark #roster-table thead,
 html.theme-dark #roster-table thead tr,
 html.theme-dark #roster-table thead th {
-  background-color: #0f172a !important;
-  color: #e2e8f0 !important;
-  border-color: #334155 !important;
+  background-color: #0f172a;
+  color: #e2e8f0;
+  border-color: #334155;
 }
 
-/* --- Gradebook Rows Theme Assurance --- */
-#gradebook-table-body tr {
+/* --- Gradebook Rows Theme Assurance & Zebra Striping --- */
+html:not(.theme-dark) #gradebook-table-body tr.grade-row-even,
+html:not(.theme-dark) #gradebook-table-body tr.grade-row-even > td {
   background-color: #ffffff !important;
 }
+html:not(.theme-dark) #gradebook-table-body tr.grade-row-odd,
+html:not(.theme-dark) #gradebook-table-body tr.grade-row-odd > td {
+  background-color: #f1f5f9 !important;
+}
 
-html.theme-dark #gradebook-table-body tr {
+html.theme-dark #gradebook-table-body tr.grade-row-even,
+html.theme-dark #gradebook-table-body tr.grade-row-even > td {
+  background-color: #0f172a !important;
+}
+html.theme-dark #gradebook-table-body tr.grade-row-odd,
+html.theme-dark #gradebook-table-body tr.grade-row-odd > td {
   background-color: #1e293b !important;
+}
+
+/* Flash highlight safety */
+#gradebook-table-body tr.row-flash-highlight > td {
+  background-color: #fef08a !important;
+  color: #713f12 !important;
+}
+html.theme-dark #gradebook-table-body tr.row-flash-highlight > td {
+  background-color: #854d0e !important;
+  color: #fef08a !important;
 }

@@ -56,7 +56,7 @@ function openLessonModal(dateKey, subject, section, isWeekend) {
   if (shiftContainer) {
     if (isOutOfSchedule) {
       shiftContainer.innerHTML = `
-            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-50 text-amber-800 border border-amber-200 text-xs font-semibold">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800/80 text-xs font-semibold">
               <span>⚡</span>
               <span>${isWeekend ? 'Weekend Session' : 'Special / Makeup Session'} (Out-of-Schedule)</span>
             </span>
@@ -64,7 +64,7 @@ function openLessonModal(dateKey, subject, section, isWeekend) {
     } else if (isNoClass) {
       const wasPushed = entry ? (entry.pushedForward !== false) : true;
       shiftContainer.innerHTML = `
-            <button type="button" id="btn-remove-noclass-shift" onclick="removeNoClassFromModal()" class="h-9 px-3.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white rounded-lg font-bold text-xs inline-flex items-center gap-1.5 shadow-sm transition" title="${wasPushed ? "Remove 'No Class' on this day and revert all subsequent planned meetings back to their original schedule" : "Remove 'No Class' marker on this day"}">
+            <button type="button" id="btn-remove-noclass-shift" data-action="removeNoClassFromModal" class="h-9 px-3.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white rounded-xl font-bold text-xs inline-flex items-center gap-1.5 shadow-sm transition" title="${wasPushed ? "Remove 'No Class' on this day and revert all subsequent planned meetings back to their original schedule" : "Remove 'No Class' marker on this day"}">
               <span class="text-sm font-black">↺</span>
               <span>${wasPushed ? 'Remove "No Class" & Revert Schedule' : 'Remove "No Class"'}</span>
             </button>
@@ -76,18 +76,20 @@ function openLessonModal(dateKey, subject, section, isWeekend) {
         : 'Mark this empty day as No Class (no schedule shift)';
 
       shiftContainer.innerHTML = `
-            <button type="button" id="btn-mark-noclass-shift" onclick="markMeetingAsNoClassAndShift()" class="h-9 px-3 bg-rose-50 hover:bg-rose-100 active:scale-95 text-rose-700 rounded-lg font-bold text-xs border border-rose-300 inline-flex items-center gap-1.5 transition shadow-2xs" title="${markBtnTitle}">
+            <button type="button" id="btn-mark-noclass-shift" data-action="markMeetingAsNoClassAndShift" class="h-9 px-3 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/50 active:scale-95 text-rose-700 dark:text-rose-300 rounded-xl font-bold text-xs border border-rose-300 dark:border-rose-800/80 inline-flex items-center gap-1.5 transition shadow-2xs" title="${markBtnTitle}">
               <span>🚫</span>
               <span>${markBtnText}</span>
             </button>
-            <button type="button" id="btn-pullback-schedule" onclick="pullBackScheduleFromModal()" class="h-9 px-3 bg-slate-50 hover:bg-slate-100 active:scale-95 text-slate-700 rounded-lg font-bold text-xs border border-slate-300 inline-flex items-center gap-1.5 transition shadow-2xs" title="Pull Back to Prev Slot: Move this activity and subsequent schedule back to previous meeting slot">
-              <span>◀</span>
-              <span>Prev Slot</span>
-            </button>
-            <button type="button" id="btn-movelast-schedule" onclick="moveToNextViableSlotFromModal()" class="h-9 px-3 bg-slate-50 hover:bg-slate-100 active:scale-95 text-slate-700 rounded-lg font-bold text-xs border border-slate-300 inline-flex items-center gap-1.5 transition shadow-2xs" title="Move to Next Viable Slot: Move this activity forward to next meeting slot">
-              <span>Next Slot</span>
-              <span>▶</span>
-            </button>
+            <div class="inline-flex items-center rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/80 p-0.5 shadow-2xs gap-0.5">
+              <button type="button" id="btn-pullback-schedule" data-action="pullBackScheduleFromModal" class="h-8 px-2.5 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold inline-flex items-center gap-1 transition active:scale-95 shadow-2xs border border-slate-200/80 dark:border-slate-700" title="Pull Back to Prev Slot: Move this activity and subsequent schedule back to previous meeting slot">
+                <span>◀</span>
+                <span>Prev Slot</span>
+              </button>
+              <button type="button" id="btn-movelast-schedule" data-action="moveToNextViableSlotFromModal" class="h-8 px-2.5 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold inline-flex items-center gap-1 transition active:scale-95 shadow-2xs border border-slate-200/80 dark:border-slate-700" title="Move to Next Viable Slot: Move this activity forward to next meeting slot">
+                <span>Next Slot</span>
+                <span>▶</span>
+              </button>
+            </div>
           `;
     }
   }
@@ -218,6 +220,7 @@ function undoPlannerAction() {
   if (plannerRedoStack.length > MAX_PLANNER_HISTORY) plannerRedoStack.shift();
 
   plannerEntries = deepClone(last.entries);
+  saveAppState();
   Render.after('lessonUndo');
   showToast('Undid: ' + last.name + '. Schedule restored!', '↺');
 }
@@ -237,6 +240,7 @@ function redoPlannerAction() {
   if (plannerUndoStack.length > MAX_PLANNER_HISTORY) plannerUndoStack.shift();
 
   plannerEntries = deepClone(next.entries);
+  saveAppState();
   Render.after('lessonUndo');
   showToast('Redid: ' + next.name + '. Changes reapplied!', '↻');
 }

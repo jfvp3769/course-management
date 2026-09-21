@@ -64,7 +64,7 @@ function renderNoClassChips() {
   container.innerHTML = noClassSelectedDays.map(d => `
         <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-rose-100 text-rose-800 border border-rose-200">
           <span>${d}</span>
-          <button type="button" onclick="removeNoClassDay('${jsAttr(d)}')" class="text-rose-600 hover:text-rose-900 font-extrabold text-sm leading-none">&times;</button>
+          <button type="button" data-action="removeNoClassDay" data-date="${escapeHtml(d)}" class="text-rose-600 hover:text-rose-900 font-extrabold text-sm leading-none">&times;</button>
         </span>
       `).join('');
 }

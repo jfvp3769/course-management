@@ -15,99 +15,99 @@ const STORAGE_KEY = 'MSU_GSC_COURSE_MANAGER_DATA_V2';
 const COLOR_PALETTES = {
   blue: {
     name: 'Blue',
-    color: 'bg-blue-50/90 border-blue-300 text-blue-950',
+    color: 'bg-blue-50/90 dark:bg-[#0e203c] border-blue-300 dark:border-blue-600 text-blue-950 dark:text-blue-100',
     headerBg: 'bg-blue-600 text-white',
-    badgeBg: 'bg-blue-100 text-blue-800 border-blue-300'
+    badgeBg: 'bg-blue-100 dark:bg-[#0f274a] text-blue-800 dark:text-blue-200 border-blue-300 dark:border-blue-600'
   },
   emerald: {
     name: 'Emerald',
-    color: 'bg-emerald-50/90 border-emerald-300 text-emerald-950',
+    color: 'bg-emerald-50/90 dark:bg-[#072a1e] border-emerald-300 dark:border-emerald-600 text-emerald-950 dark:text-emerald-100',
     headerBg: 'bg-emerald-700 text-white',
-    badgeBg: 'bg-emerald-100 text-emerald-800 border-emerald-300'
+    badgeBg: 'bg-emerald-100 dark:bg-[#063526] text-emerald-800 dark:text-emerald-200 border-emerald-300 dark:border-emerald-600'
   },
   amber: {
     name: 'Amber',
-    color: 'bg-amber-50/90 border-amber-300 text-amber-950',
+    color: 'bg-amber-50/90 dark:bg-[#2b1803] border-amber-300 dark:border-amber-600 text-amber-950 dark:text-amber-100',
     headerBg: 'bg-amber-600 text-white',
-    badgeBg: 'bg-amber-100 text-amber-800 border-amber-300'
+    badgeBg: 'bg-amber-100 dark:bg-[#3b2306] text-amber-800 dark:text-amber-200 border-amber-300 dark:border-amber-600'
   },
   purple: {
     name: 'Purple',
-    color: 'bg-purple-50/90 border-purple-300 text-purple-950',
+    color: 'bg-purple-50/90 dark:bg-[#240e3b] border-purple-300 dark:border-purple-600 text-purple-950 dark:text-purple-100',
     headerBg: 'bg-purple-700 text-white',
-    badgeBg: 'bg-purple-100 text-purple-800 border-purple-300'
+    badgeBg: 'bg-purple-100 dark:bg-[#2b1245] text-purple-800 dark:text-purple-200 border-purple-300 dark:border-purple-600'
   },
   teal: {
     name: 'Teal',
-    color: 'bg-teal-50/90 border-teal-300 text-teal-950',
+    color: 'bg-teal-50/90 dark:bg-[#072a1e] border-teal-300 dark:border-teal-600 text-teal-950 dark:text-teal-100',
     headerBg: 'bg-teal-700 text-white',
-    badgeBg: 'bg-teal-100 text-teal-800 border-teal-300'
+    badgeBg: 'bg-teal-100 dark:bg-[#063526] text-teal-800 dark:text-teal-200 border-teal-300 dark:border-teal-600'
   },
   rose: {
     name: 'Rose',
-    color: 'bg-rose-50/90 border-rose-300 text-rose-950',
+    color: 'bg-rose-50/90 dark:bg-[#2d0e19] border-rose-300 dark:border-rose-600 text-rose-950 dark:text-rose-100',
     headerBg: 'bg-rose-700 text-white',
-    badgeBg: 'bg-rose-100 text-rose-800 border-rose-300'
+    badgeBg: 'bg-rose-100 dark:bg-[#3b0d18] text-rose-800 dark:text-rose-200 border-rose-300 dark:border-rose-600'
   },
   indigo: {
     name: 'Indigo',
-    color: 'bg-indigo-50/90 border-indigo-300 text-indigo-950',
+    color: 'bg-indigo-50/90 dark:bg-[#0e203c] border-indigo-300 dark:border-indigo-600 text-indigo-950 dark:text-indigo-100',
     headerBg: 'bg-indigo-700 text-white',
-    badgeBg: 'bg-indigo-100 text-indigo-800 border-indigo-300'
+    badgeBg: 'bg-indigo-100 dark:bg-[#1f1b4d] text-indigo-800 dark:text-indigo-200 border-indigo-300 dark:border-indigo-600'
   },
   cyan: {
     name: 'Cyan',
-    color: 'bg-cyan-50/90 border-cyan-300 text-cyan-950',
+    color: 'bg-cyan-50/90 dark:bg-[#0e203c] border-cyan-300 dark:border-cyan-600 text-cyan-950 dark:text-cyan-100',
     headerBg: 'bg-cyan-700 text-white',
-    badgeBg: 'bg-cyan-100 text-cyan-800 border-cyan-300'
+    badgeBg: 'bg-cyan-100 dark:bg-[#0f274a] text-cyan-800 dark:text-cyan-200 border-cyan-300 dark:border-cyan-600'
   },
   orange: {
     name: 'Orange',
-    color: 'bg-orange-50/90 border-orange-300 text-orange-950',
+    color: 'bg-orange-50/90 dark:bg-[#2b1803] border-orange-300 dark:border-orange-600 text-orange-950 dark:text-orange-100',
     headerBg: 'bg-orange-600 text-white',
-    badgeBg: 'bg-orange-100 text-orange-800 border-orange-300'
+    badgeBg: 'bg-orange-100 dark:bg-[#431407] text-orange-800 dark:text-orange-200 border-orange-300 dark:border-orange-600'
   },
   slate: {
     name: 'Slate',
-    color: 'bg-slate-100/90 border-slate-400 text-slate-900',
+    color: 'bg-slate-100/90 dark:bg-[#141d2b] border-slate-400 dark:border-slate-600 text-slate-900 dark:text-slate-100',
     headerBg: 'bg-slate-700 text-white',
-    badgeBg: 'bg-slate-200 text-slate-800 border-slate-400'
+    badgeBg: 'bg-slate-200 dark:bg-[#1e293b] text-slate-800 dark:text-slate-300 border-slate-400 dark:border-slate-600'
   },
   lime: {
     name: 'Lime',
-    color: 'bg-lime-50/90 border-lime-300 text-lime-950',
+    color: 'bg-lime-50/90 dark:bg-[#072a1e] border-lime-300 dark:border-lime-600 text-lime-950 dark:text-lime-100',
     headerBg: 'bg-lime-700 text-white',
-    badgeBg: 'bg-lime-100 text-lime-800 border-lime-300'
+    badgeBg: 'bg-lime-100 dark:bg-[#063526] text-lime-800 dark:text-lime-200 border-lime-300 dark:border-lime-600'
   },
   sky: {
     name: 'Sky',
-    color: 'bg-sky-50/90 border-sky-300 text-sky-950',
+    color: 'bg-sky-50/90 dark:bg-[#0e203c] border-sky-300 dark:border-sky-600 text-sky-950 dark:text-sky-100',
     headerBg: 'bg-sky-700 text-white',
-    badgeBg: 'bg-sky-100 text-sky-800 border-sky-300'
+    badgeBg: 'bg-sky-100 dark:bg-[#0f274a] text-sky-800 dark:text-sky-200 border-sky-300 dark:border-sky-600'
   },
   pink: {
     name: 'Pink',
-    color: 'bg-pink-50/90 border-pink-300 text-pink-950',
+    color: 'bg-pink-50/90 dark:bg-[#240e3b] border-pink-300 dark:border-pink-600 text-pink-950 dark:text-pink-100',
     headerBg: 'bg-pink-700 text-white',
-    badgeBg: 'bg-pink-100 text-pink-800 border-pink-300'
+    badgeBg: 'bg-pink-100 dark:bg-[#2b1245] text-pink-800 dark:text-pink-200 border-pink-300 dark:border-pink-600'
   },
   fuchsia: {
     name: 'Fuchsia',
-    color: 'bg-fuchsia-50/90 border-fuchsia-300 text-fuchsia-950',
+    color: 'bg-fuchsia-50/90 dark:bg-[#240e3b] border-fuchsia-300 dark:border-fuchsia-600 text-fuchsia-950 dark:text-fuchsia-100',
     headerBg: 'bg-fuchsia-700 text-white',
-    badgeBg: 'bg-fuchsia-100 text-fuchsia-800 border-fuchsia-300'
+    badgeBg: 'bg-fuchsia-100 dark:bg-[#2b1245] text-fuchsia-800 dark:text-fuchsia-200 border-fuchsia-300 dark:border-fuchsia-600'
   },
   red: {
     name: 'Red',
-    color: 'bg-red-50/90 border-red-300 text-red-950',
+    color: 'bg-red-50/90 dark:bg-[#2d0e19] border-red-300 dark:border-red-600 text-red-950 dark:text-red-100',
     headerBg: 'bg-red-700 text-white',
-    badgeBg: 'bg-red-100 text-red-800 border-red-300'
+    badgeBg: 'bg-red-100 dark:bg-[#3b0d18] text-red-800 dark:text-red-200 border-red-300 dark:border-red-600'
   },
   maroon: {
     name: 'Maroon',
-    color: 'bg-rose-50/90 border-rose-300 text-rose-950',
+    color: 'bg-rose-50/90 dark:bg-[#2d0e19] border-rose-300 dark:border-rose-600 text-rose-950 dark:text-rose-100',
     headerBg: 'bg-msu-maroon text-white',
-    badgeBg: 'bg-rose-100 text-rose-900 border-rose-300'
+    badgeBg: 'bg-rose-100 dark:bg-[#3b0d18] text-rose-900 dark:text-rose-200 border-rose-300 dark:border-rose-600'
   }
 };
 
@@ -268,17 +268,17 @@ const monthNamesFull = ["January", "February", "March", "April", "May", "June", 
 
 
 const DEFAULT_MSU_SCALE = [
-  { grade: "1.00", min: 95.56, desc: "Excellent", class: "text-emerald-700 bg-emerald-50 border-emerald-300 font-black", status: "Passed" },
-  { grade: "1.25", min: 91.11, desc: "Very Good", class: "text-emerald-700 bg-emerald-50 border-emerald-300 font-bold", status: "Passed" },
-  { grade: "1.50", min: 86.67, desc: "Very Good", class: "text-emerald-700 bg-emerald-50 border-emerald-300 font-bold", status: "Passed" },
-  { grade: "1.75", min: 82.22, desc: "Good", class: "text-emerald-700 bg-emerald-50 border-emerald-300 font-bold", status: "Passed" },
-  { grade: "2.00", min: 77.78, desc: "Good", class: "text-blue-700 bg-blue-50 border-blue-300 font-bold", status: "Passed" },
-  { grade: "2.25", min: 73.33, desc: "Satisfactory", class: "text-blue-700 bg-blue-50 border-blue-300 font-bold", status: "Passed" },
-  { grade: "2.50", min: 68.89, desc: "Satisfactory", class: "text-blue-700 bg-blue-50 border-blue-300 font-bold", status: "Passed" },
-  { grade: "2.75", min: 64.44, desc: "Fair", class: "text-amber-700 bg-amber-50 border-amber-300 font-bold", status: "Passed" },
-  { grade: "3.00", min: 60.00, desc: "Pass", class: "text-amber-700 bg-amber-50 border-amber-300 font-bold", status: "Passed" },
-  { grade: "INC", min: 30.00, desc: "Incomplete", class: "text-orange-700 bg-orange-100 border-orange-300 font-black", status: "Incomplete" },
-  { grade: "5.00", min: 0.00, desc: "Failed", class: "text-rose-800 bg-rose-100 border-rose-300 font-black", status: "Failed" }
+  { grade: "1.00", min: 95.56, desc: "Excellent", class: "text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-[#063526] border-emerald-300 dark:border-emerald-600 font-black", status: "Passed" },
+  { grade: "1.25", min: 91.11, desc: "Very Good", class: "text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-[#063526] border-emerald-300 dark:border-emerald-600 font-bold", status: "Passed" },
+  { grade: "1.50", min: 86.67, desc: "Very Good", class: "text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-[#063526] border-emerald-300 dark:border-emerald-600 font-bold", status: "Passed" },
+  { grade: "1.75", min: 82.22, desc: "Good", class: "text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-[#063526] border-emerald-300 dark:border-emerald-600 font-bold", status: "Passed" },
+  { grade: "2.00", min: 77.78, desc: "Good", class: "text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-[#0f274a] border-blue-300 dark:border-blue-600 font-bold", status: "Passed" },
+  { grade: "2.25", min: 73.33, desc: "Satisfactory", class: "text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-[#0f274a] border-blue-300 dark:border-blue-600 font-bold", status: "Passed" },
+  { grade: "2.50", min: 68.89, desc: "Satisfactory", class: "text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-[#0f274a] border-blue-300 dark:border-blue-600 font-bold", status: "Passed" },
+  { grade: "2.75", min: 64.44, desc: "Fair", class: "text-amber-700 dark:text-amber-200 bg-amber-50 dark:bg-[#3b2306] border-amber-300 dark:border-amber-600 font-bold", status: "Passed" },
+  { grade: "3.00", min: 60.00, desc: "Pass", class: "text-amber-700 dark:text-amber-200 bg-amber-50 dark:bg-[#3b2306] border-amber-300 dark:border-amber-600 font-bold", status: "Passed" },
+  { grade: "INC", min: 30.00, desc: "Incomplete", class: "text-orange-700 dark:text-orange-200 bg-orange-100 dark:bg-[#431407] border-orange-300 dark:border-orange-600 font-black", status: "Incomplete" },
+  { grade: "5.00", min: 0.00, desc: "Failed", class: "text-rose-800 dark:text-rose-200 bg-rose-100 dark:bg-[#3b0d18] border-rose-300 dark:border-rose-600 font-black", status: "Failed" }
 ];
 
 const DEFAULT_GRADING_CONFIG = {

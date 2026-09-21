@@ -9,7 +9,7 @@ function saveAppState(immediate = false) {
   clearTimeout(saveTimeout);
   const indicator = document.getElementById('save-status-indicator');
   if (indicator) {
-    indicator.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping"></span><span>Saving...</span>';
+    indicator.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0 animate-pulse shadow-[0_0_6px_rgba(251,191,36,0.8)]"></span><span class="tracking-wide">Saving...</span>';
   }
 
   const doSave = () => {
@@ -31,12 +31,12 @@ function saveAppState(immediate = false) {
       };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
       if (indicator) {
-        indicator.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span><span>Saved Offline</span>';
+        indicator.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0 shadow-[0_0_6px_rgba(52,211,153,0.8)]"></span><span class="tracking-wide">Saved Offline</span>';
       }
     } catch (e) {
       console.error("Storage error:", e);
       if (indicator) {
-        indicator.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span><span>Save Failed</span>';
+        indicator.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-rose-400 shrink-0 shadow-[0_0_6px_rgba(244,63,94,0.8)]"></span><span class="tracking-wide">Save Failed</span>';
       }
     }
   };
@@ -146,6 +146,40 @@ function exportBackupJSON() {
   showToast("Data backup file exported!");
 }
 
+function validateBackupStructure(data) {
+  const errors = [];
+  if (!data || typeof data !== 'object') {
+    return ['Backup file must contain a valid JSON object.'];
+  }
+  if (!data.semesterConfig || typeof data.semesterConfig !== 'object') {
+    errors.push('Missing or invalid semesterConfig');
+  }
+  if (!data.courseData || typeof data.courseData !== 'object') {
+    errors.push('Missing or invalid courseData');
+  } else if (!Array.isArray(data.courseData.subjects)) {
+    errors.push('courseData.subjects must be an array');
+  }
+  if (data.weeklyTimetable && !Array.isArray(data.weeklyTimetable)) {
+    errors.push('weeklyTimetable must be an array');
+  }
+  if (data.studentRoster && !Array.isArray(data.studentRoster)) {
+    errors.push('studentRoster must be an array');
+  }
+  if (data.msuCalendarEvents && !Array.isArray(data.msuCalendarEvents)) {
+    errors.push('msuCalendarEvents must be an array');
+  }
+  if (data.plannerEntries && (typeof data.plannerEntries !== 'object' || Array.isArray(data.plannerEntries))) {
+    errors.push('plannerEntries must be an object');
+  }
+  if (data.dailyNotes && (typeof data.dailyNotes !== 'object' || Array.isArray(data.dailyNotes))) {
+    errors.push('dailyNotes must be an object');
+  }
+  if (data.syllabusBacklog && !Array.isArray(data.syllabusBacklog)) {
+    errors.push('syllabusBacklog must be an array');
+  }
+  return errors;
+}
+
 function importBackupJSON(event) {
   const file = event.target.files[0];
   if (!file) return;
@@ -154,27 +188,31 @@ function importBackupJSON(event) {
   reader.onload = (e) => {
     try {
       const data = JSON.parse(e.target.result);
-      if (data.semesterConfig && data.courseData) {
-        semesterConfig = Object.assign({}, DEFAULT_DATA.semesterConfig, data.semesterConfig);
-        applyHeaderBranding();
-
-        courseData = data.courseData;
-        columnWidths = data.columnWidths || columnWidths;
-        weeklyTimetable = data.weeklyTimetable || weeklyTimetable;
-        msuCalendarEvents = data.msuCalendarEvents || msuCalendarEvents;
-        plannerEntries = data.plannerEntries || plannerEntries;
-        studentRoster = data.studentRoster || studentRoster;
-        dailyNotes = data.dailyNotes || dailyNotes;
-
-        saveAppState();
-        semesterDates = generateSemesterDateList();
-        Render.views('everything');
-        recordBackupCompleted();
-        showToast("Backup imported and restored successfully!");
-        closeTermSettingsModal();
-      } else {
-        showToast("Invalid backup file structure.", "⚠️");
+      const validationErrors = validateBackupStructure(data);
+      if (validationErrors.length > 0) {
+        showToast("Invalid backup: " + validationErrors[0], "⚠️");
+        return;
       }
+
+      semesterConfig = Object.assign({}, DEFAULT_DATA.semesterConfig, data.semesterConfig);
+      applyHeaderBranding();
+
+      courseData = data.courseData;
+      columnWidths = data.columnWidths || columnWidths;
+      weeklyTimetable = data.weeklyTimetable || weeklyTimetable;
+      msuCalendarEvents = data.msuCalendarEvents || msuCalendarEvents;
+      plannerEntries = data.plannerEntries || plannerEntries;
+      studentRoster = data.studentRoster || studentRoster;
+      dailyNotes = data.dailyNotes || dailyNotes;
+      syllabusBacklog = data.syllabusBacklog || [];
+
+      cleanupOrphanedStudents();
+      saveAppState();
+      semesterDates = generateSemesterDateList();
+      Render.views('everything');
+      recordBackupCompleted();
+      showToast("Backup imported and restored successfully!");
+      closeTermSettingsModal();
     } catch (err) {
       console.error(err);
       showToast("Error parsing backup JSON file.", "⚠️");

@@ -76,6 +76,24 @@ function updateSidebarToggleButton(tabId, isCollapsed) {
   }
 }
 
+const MIN_WIDGET_HEIGHTS = {
+  'planner-widget-next-activities': 130,
+  'planner-widget-teaching-days': 185,
+  'planner-widget-subject-pace': 130,
+  'timetable-widget-load': 200,
+  'timetable-widget-conflicts': 100,
+  'timetable-widget-today': 165,
+  'calendar-widget-deadlines': 130,
+  'calendar-widget-lost-days': 130,
+  'calendar-widget-distribution': 160,
+  'roster-widget-enrollment': 130,
+  'roster-widget-communications': 210,
+  'roster-widget-health': 95,
+  'gradebook-widget-errors': 100,
+  'gradebook-widget-atrisk': 100,
+  'gradebook-widget-stats': 130
+};
+
 function initDraggableSidebarWidgets(sidebarId) {
   const sidebar = document.getElementById(sidebarId);
   if (!sidebar) return;
@@ -97,12 +115,13 @@ function initDraggableSidebarWidgets(sidebarId) {
     }
   } catch (err) {}
 
-  // 2. Restore saved user-resized heights
+  // 2. Restore saved user-resized heights with safe minimum validation
   widgets.forEach(w => {
     const savedHeight = localStorage.getItem(`widget_height_${w.id}`);
     if (savedHeight) {
       const numH = parseInt(savedHeight, 10);
-      if ((w.id === 'planner-widget-next-activities' && numH < 120) || numH < 70) {
+      const minRequired = MIN_WIDGET_HEIGHTS[w.id] || 85;
+      if (isNaN(numH) || numH < minRequired) {
         w.style.height = '';
         localStorage.removeItem(`widget_height_${w.id}`);
       } else {
@@ -137,6 +156,9 @@ function initDraggableSidebarWidgets(sidebarId) {
     if (handle) {
       // Double-click header to reset custom height back to default
       handle.addEventListener('dblclick', (e) => {
+        if (e.target.closest('[data-action], button, a, select, input, [role="button"], .pointer-events-auto')) {
+          return;
+        }
         e.stopPropagation();
         if (w.style.height) {
           w.style.height = '';
@@ -145,7 +167,23 @@ function initDraggableSidebarWidgets(sidebarId) {
         }
       });
 
+      // Temporarily disable draggable attribute when mouse is pressed on interactive child elements
+      handle.addEventListener('mousedown', (e) => {
+        if (e.target.closest('[data-action], button, a, select, input, [role="button"], .pointer-events-auto')) {
+          handle.setAttribute('draggable', 'false');
+        }
+      });
+      const restoreDraggable = () => {
+        handle.setAttribute('draggable', 'true');
+      };
+      handle.addEventListener('mouseup', restoreDraggable);
+      handle.addEventListener('mouseleave', restoreDraggable);
+
       handle.addEventListener('dragstart', (e) => {
+        if (e.target.closest('[data-action], button, a, select, input, [role="button"], .pointer-events-auto')) {
+          e.preventDefault();
+          return;
+        }
         if (e.dataTransfer) {
           e.dataTransfer.setData('text/plain', w.id);
           e.dataTransfer.effectAllowed = 'move';
@@ -193,7 +231,7 @@ function initDraggableSidebarWidgets(sidebarId) {
         e.stopPropagation();
         const startY = e.clientY;
         const startH = w.getBoundingClientRect().height;
-        const minH = (w.id === 'planner-widget-next-activities') ? 110 : 70;
+        const minH = MIN_WIDGET_HEIGHTS[w.id] || 85;
         const maxH = Math.max(minH, Math.floor(window.innerHeight * 0.88));
 
         try {

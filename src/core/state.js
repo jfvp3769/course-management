@@ -80,3 +80,7 @@ let logoTapCount = 0;
 let logoTapTimer = null;
 
 let konamiIndex = 0;
+
+// Lesson Matrix Drag & Drop state
+let draggedMatrixCard = null; // { cellKey, dateKey, course, section, entry }
+let isDraggingMatrixCard = false;

@@ -41,6 +41,8 @@ function onGradingScaleScopeChange() {
 
   const toggleContainer = document.getElementById('grading-scale-section-toggle-container');
   const hintEl = document.getElementById('grading-scale-scope-hint');
+  const errorEl = document.getElementById('grading-scale-error-msg');
+  if (errorEl) errorEl.classList.add('hidden');
 
   if (scope === '__default__') {
     if (toggleContainer) toggleContainer.classList.add('hidden');
@@ -105,6 +107,8 @@ function updateGradingScaleItemMin(grade, val) {
   const item = currentEditingScaleData.find(i => i.grade === grade);
   if (item) {
     item.min = parseFloat(val) || 0;
+    const errorEl = document.getElementById('grading-scale-error-msg');
+    if (errorEl) errorEl.classList.add('hidden');
   }
 }
 
@@ -115,25 +119,25 @@ function renderGradingScaleInputs() {
 
   container.innerHTML = currentEditingScaleData.filter(item => item.grade !== '5.00').map(item => {
     return `
-          <div class="p-2.5 rounded-xl border ${item.grade === 'INC' ? 'border-orange-200 bg-orange-50/40' : 'border-slate-200 bg-slate-50/60'} space-y-1">
+          <div class="p-2.5 rounded-xl border ${item.grade === 'INC' ? 'border-orange-200 dark:border-orange-900/60 bg-orange-50/40 dark:bg-orange-950/40' : 'border-slate-200 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-900/60'} space-y-1">
             <div class="flex items-center justify-between">
-              <span class="font-black text-sm ${item.grade === 'INC' ? 'text-orange-700' : (parseFloat(item.grade) <= 1.75 ? 'text-emerald-700' : (parseFloat(item.grade) <= 2.50 ? 'text-blue-700' : 'text-amber-700'))}">${item.grade}</span>
-              <span class="text-[10px] text-slate-500 font-sans font-medium">${escapeHtml(item.desc || item.status || '')}</span>
+              <span class="font-black text-sm ${item.grade === 'INC' ? 'text-orange-700 dark:text-orange-400' : (parseFloat(item.grade) <= 1.75 ? 'text-emerald-700 dark:text-emerald-400' : (parseFloat(item.grade) <= 2.50 ? 'text-blue-700 dark:text-blue-400' : 'text-amber-700 dark:text-amber-400'))}">${item.grade}</span>
+              <span class="text-[10px] text-slate-500 dark:text-slate-400 font-sans font-medium">${escapeHtml(item.desc || item.status || '')}</span>
             </div>
             <div class="flex items-center gap-1">
-              <span class="text-[10px] font-bold text-slate-400">Min:</span>
-              <input type="number" min="0" max="100" step="any" ${isReadOnly ? 'disabled' : ''} value="${item.min}" oninput="updateGradingScaleItemMin('${jsAttr(item.grade)}', this.value)" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs font-mono font-bold text-slate-800 ${isReadOnly ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'focus:ring-2 focus:ring-amber-500'}">
-              <span class="text-xs font-bold text-slate-500">%</span>
+              <span class="text-[10px] font-bold text-slate-400 dark:text-slate-500">Min:</span>
+              <input type="number" min="0" max="100" step="any" ${isReadOnly ? 'disabled' : ''} value="${item.min}" data-action-input="updateGradingScaleItemMin" data-grade="${escapeHtml(item.grade)}" class="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded px-2 py-1 text-xs font-mono font-bold text-slate-800 dark:text-slate-100 ${isReadOnly ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed' : 'focus:ring-2 focus:ring-amber-500'}">
+              <span class="text-xs font-bold text-slate-500 dark:text-slate-400">%</span>
             </div>
           </div>
         `;
   }).join('') + `
-        <div class="p-2.5 rounded-xl border border-rose-200 bg-rose-50/40 space-y-1">
+        <div class="p-2.5 rounded-xl border border-rose-200 dark:border-rose-900/60 bg-rose-50/40 dark:bg-rose-950/40 space-y-1">
           <div class="flex items-center justify-between">
-            <span class="font-black text-sm text-rose-700">5.00</span>
-            <span class="text-[10px] text-rose-600 font-sans font-medium">Failed</span>
+            <span class="font-black text-sm text-rose-700 dark:text-rose-400">5.00</span>
+            <span class="text-[10px] text-rose-600 dark:text-rose-400 font-sans font-medium">Failed</span>
           </div>
-          <div class="text-[11px] text-slate-500 font-sans pt-1">
+          <div class="text-[11px] text-slate-500 dark:text-slate-400 font-sans pt-1">
             Automatic for all scores below INC
           </div>
         </div>
@@ -143,6 +147,46 @@ function renderGradingScaleInputs() {
 function saveGradingScaleModal() {
   const errorEl = document.getElementById('grading-scale-error-msg');
   if (errorEl) errorEl.classList.add('hidden');
+
+  // Monotonic validation: ensure thresholds are valid numbers and strictly descending
+  if (currentEditingScaleScope === '__default__' || currentEditingScaleMode === 'custom') {
+    // 1. Check all entries are numbers in 0-100 range
+    for (let i = 0; i < currentEditingScaleData.length; i++) {
+      const item = currentEditingScaleData[i];
+      if (item.grade === '5.00') continue; // 5.00 is always 0.00
+      if (typeof item.min !== 'number' || isNaN(item.min) || item.min < 0 || item.min > 100) {
+        if (errorEl) {
+          errorEl.innerText = `Invalid percentage for grade ${item.grade}: must be a number between 0 and 100.`;
+          errorEl.classList.remove('hidden');
+        }
+        showToast(`Invalid threshold for grade ${item.grade}.`, '⚠️');
+        return;
+      }
+    }
+
+    // 2. Check monotonic descending order (1.00 > 1.25 > 1.50 > ... > 3.00 > INC > 0)
+    for (let i = 0; i < currentEditingScaleData.length - 1; i++) {
+      const higher = currentEditingScaleData[i];
+      const lower = currentEditingScaleData[i + 1];
+      if (lower.grade === '5.00') {
+        if (higher.min <= 0) {
+          if (errorEl) {
+            errorEl.innerText = `Threshold for ${higher.grade} (${higher.min}%) must be strictly greater than 0%.`;
+            errorEl.classList.remove('hidden');
+          }
+          showToast(`Threshold for ${higher.grade} must be > 0%.`, '⚠️');
+          return;
+        }
+      } else if (higher.min <= lower.min) {
+        if (errorEl) {
+          errorEl.innerText = `Inconsistent grading scale: threshold for ${higher.grade} (${higher.min}%) must be strictly higher than ${lower.grade} (${lower.min}%).`;
+          errorEl.classList.remove('hidden');
+        }
+        showToast(`Scale error: ${higher.grade} must be higher than ${lower.grade}.`, '⚠️');
+        return;
+      }
+    }
+  }
 
   if (!courseData.gradingScales) {
     courseData.gradingScales = { default: JSON.parse(JSON.stringify(DEFAULT_MSU_SCALE)), sections: {} };

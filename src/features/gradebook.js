@@ -35,9 +35,9 @@ function getActiveGradingScale(sectionKey) {
 }
 
 function getMsuGrade(total, statusOverride, sectionKey) {
-  if (statusOverride === 'WDRW') return { grade: "WDRW", status: "Withdrawn", class: "text-slate-700 bg-slate-100 border-slate-300 font-bold" };
-  if (statusOverride === 'DRP') return { grade: "DRP", status: "Dropped", class: "text-slate-700 bg-slate-100 border-slate-300 font-bold" };
-  if (statusOverride === 'INC') return { grade: "INC", status: "Incomplete", class: "text-orange-700 bg-orange-100 border-orange-300 font-bold" };
+  if (statusOverride === 'WDRW') return { grade: "WDRW", status: "Withdrawn", class: "text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-[#1e293b] border-slate-300 dark:border-slate-600 font-bold" };
+  if (statusOverride === 'DRP') return { grade: "DRP", status: "Dropped", class: "text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-[#1e293b] border-slate-300 dark:border-slate-600 font-bold" };
+  if (statusOverride === 'INC') return { grade: "INC", status: "Incomplete", class: "text-orange-700 dark:text-orange-200 bg-orange-100 dark:bg-[#431407] border-orange-300 dark:border-orange-600 font-bold" };
 
   const num = parseFloat(total) || 0;
   const { scale } = getActiveGradingScale(sectionKey);
@@ -47,12 +47,12 @@ function getMsuGrade(total, statusOverride, sectionKey) {
     if (num >= item.min) {
       let badgeClass = item.class;
       if (!badgeClass) {
-        if (item.grade === '1.00') badgeClass = "text-emerald-700 bg-emerald-50 border-emerald-300 font-black";
-        else if (parseFloat(item.grade) <= 1.75) badgeClass = "text-emerald-700 bg-emerald-50 border-emerald-300 font-bold";
-        else if (parseFloat(item.grade) <= 2.50) badgeClass = "text-blue-700 bg-blue-50 border-blue-300 font-bold";
-        else if (parseFloat(item.grade) <= 3.00) badgeClass = "text-amber-700 bg-amber-50 border-amber-300 font-bold";
-        else if (item.grade === 'INC') badgeClass = "text-orange-700 bg-orange-100 border-orange-300 font-black";
-        else badgeClass = "text-rose-800 bg-rose-100 border-rose-300 font-black";
+        if (item.grade === '1.00') badgeClass = "text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-[#063526] border-emerald-300 dark:border-emerald-600 font-black";
+        else if (parseFloat(item.grade) <= 1.75) badgeClass = "text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-[#063526] border-emerald-300 dark:border-emerald-600 font-bold";
+        else if (parseFloat(item.grade) <= 2.50) badgeClass = "text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-[#0f274a] border-blue-300 dark:border-blue-600 font-bold";
+        else if (parseFloat(item.grade) <= 3.00) badgeClass = "text-amber-700 dark:text-amber-200 bg-amber-50 dark:bg-[#3b2306] border-amber-300 dark:border-amber-600 font-bold";
+        else if (item.grade === 'INC') badgeClass = "text-orange-700 dark:text-orange-200 bg-orange-100 dark:bg-[#431407] border-orange-300 dark:border-orange-600 font-black";
+        else badgeClass = "text-rose-800 dark:text-rose-200 bg-rose-100 dark:bg-[#3b0d18] border-rose-300 dark:border-rose-600 font-black";
       }
       return {
         grade: item.grade,
@@ -61,7 +61,7 @@ function getMsuGrade(total, statusOverride, sectionKey) {
       };
     }
   }
-  return { grade: "5.00", status: "Failed", class: "text-rose-800 bg-rose-100 border-rose-300 font-black" };
+  return { grade: "5.00", status: "Failed", class: "text-rose-800 dark:text-rose-200 bg-rose-100 dark:bg-[#3b0d18] border-rose-300 dark:border-rose-600 font-black" };
 }
 
 function getGradingConfig(sectionKey) {
@@ -156,23 +156,23 @@ function renderGradingScaleDrawer(sectionKey) {
   }
   if (badgeEl) {
     if (isDefault) {
-      badgeEl.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-200 text-amber-900';
+      badgeEl.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-200 dark:bg-amber-950 dark:text-amber-300 text-amber-900';
       badgeEl.innerText = 'Default Scale';
     } else {
-      badgeEl.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-200 text-emerald-900';
+      badgeEl.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-200 dark:bg-emerald-950 dark:text-emerald-300 text-emerald-900';
       badgeEl.innerText = 'Custom Section Scale';
     }
   }
   if (gridEl) {
     gridEl.innerHTML = scale.map(item => `
-          <div class="p-1.5 rounded bg-white border ${item.grade === '5.00' ? 'border-rose-300' : (item.grade === 'INC' ? 'border-orange-300' : (parseFloat(item.grade) <= 1.75 ? 'border-emerald-300' : (parseFloat(item.grade) <= 2.50 ? 'border-blue-300' : 'border-amber-300')))}">
-            <div class="text-[10px] text-slate-500 font-sans">${item.min.toFixed(2)}%</div>
-            <div class="font-black text-xs ${item.grade === '5.00' ? 'text-rose-700' : (item.grade === 'INC' ? 'text-orange-700' : (parseFloat(item.grade) <= 1.75 ? 'text-emerald-700' : (parseFloat(item.grade) <= 2.50 ? 'text-blue-700' : 'text-amber-700')))}">${item.grade}</div>
+          <div class="p-1.5 rounded bg-white dark:bg-slate-900 border ${item.grade === '5.00' ? 'border-rose-300 dark:border-rose-800' : (item.grade === 'INC' ? 'border-orange-300 dark:border-orange-800' : (parseFloat(item.grade) <= 1.75 ? 'border-emerald-300 dark:border-emerald-800' : (parseFloat(item.grade) <= 2.50 ? 'border-blue-300 dark:border-blue-800' : 'border-amber-300 dark:border-amber-800')))}">
+            <div class="text-[10px] text-slate-500 dark:text-slate-400 font-sans">${item.min.toFixed(2)}%</div>
+            <div class="font-black text-xs ${item.grade === '5.00' ? 'text-rose-700 dark:text-rose-400' : (item.grade === 'INC' ? 'text-orange-700 dark:text-orange-400' : (parseFloat(item.grade) <= 1.75 ? 'text-emerald-700 dark:text-emerald-400' : (parseFloat(item.grade) <= 2.50 ? 'text-blue-700 dark:text-blue-400' : 'text-amber-700 dark:text-amber-400')))}">${item.grade}</div>
           </div>
         `).join('') + `
-          <div class="p-1.5 rounded bg-white border border-slate-300">
-            <div class="text-[10px] text-slate-500 font-sans">Special</div>
-            <div class="font-bold text-slate-700 text-xs">WDRW / DRP</div>
+          <div class="p-1.5 rounded bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700">
+            <div class="text-[10px] text-slate-500 dark:text-slate-400 font-sans">Special</div>
+            <div class="font-bold text-slate-700 dark:text-slate-300 text-xs">WDRW / DRP</div>
           </div>
         `;
   }
@@ -304,20 +304,20 @@ function _renderGradebookHeader(thead, config, categoryPalette, isUnbalanced, to
   if (!thead) return;
 
   let tier1Html = `
-        <tr class="border-b border-slate-300 text-slate-700 font-bold bg-slate-100">
-          <th rowspan="2" onclick="toggleGradebookSort('default')" class="sticky-grade-head-1 py-2.5 px-2 text-center border-r border-slate-200 bg-slate-100 cursor-pointer select-none hover:bg-slate-200 transition" title="Click to reset to default student roster order">
+        <tr class="border-b border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-bold bg-slate-100 dark:bg-slate-900">
+          <th rowspan="2" data-action="toggleGradebookSort" data-sort="default" class="sticky-grade-head-1 py-2.5 px-2 text-center border-r border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-900 text-slate-700 dark:text-slate-200 cursor-pointer select-none hover:bg-slate-200 dark:hover:bg-slate-800 transition" title="Click to reset to default student roster order">
             <div class="flex items-center justify-center gap-0.5">
               <span>#</span>
               ${getGradebookSortIndicator('default')}
             </div>
           </th>
-          <th rowspan="2" onclick="toggleGradebookSort('id')" class="sticky-grade-head-2 py-2.5 px-2.5 border-r border-slate-200 whitespace-nowrap bg-slate-100 cursor-pointer select-none hover:bg-slate-200 transition" title="Click to sort by Student ID (Ascending/Descending)">
+          <th rowspan="2" data-action="toggleGradebookSort" data-sort="id" class="sticky-grade-head-2 py-2.5 px-2.5 border-r border-slate-200 dark:border-slate-700 whitespace-nowrap bg-slate-100 dark:bg-slate-900 text-slate-700 dark:text-slate-200 cursor-pointer select-none hover:bg-slate-200 dark:hover:bg-slate-800 transition" title="Click to sort by Student ID (Ascending/Descending)">
             <div class="flex items-center justify-center gap-1">
               <span>Student ID</span>
               ${getGradebookSortIndicator('id')}
             </div>
           </th>
-          <th rowspan="2" onclick="toggleGradebookSort('name')" class="sticky-grade-head-3 py-2.5 px-3 border-r border-slate-200 whitespace-nowrap bg-slate-100 cursor-pointer select-none hover:bg-slate-200 transition" title="Click to sort by Student Name (A-Z / Z-A)">
+          <th rowspan="2" data-action="toggleGradebookSort" data-sort="name" class="sticky-grade-head-3 py-2.5 px-3 border-r border-slate-200 dark:border-slate-700 whitespace-nowrap bg-slate-100 dark:bg-slate-900 text-slate-700 dark:text-slate-200 cursor-pointer select-none hover:bg-slate-200 dark:hover:bg-slate-800 transition" title="Click to sort by Student Name (A-Z / Z-A)">
             <div class="flex items-center justify-center gap-1">
               <span>Student Name</span>
               ${getGradebookSortIndicator('name')}
@@ -326,7 +326,7 @@ function _renderGradebookHeader(thead, config, categoryPalette, isUnbalanced, to
       `;
 
   let tier2Html = `
-        <tr class="border-b border-slate-300 text-slate-600 font-medium bg-slate-50 text-[11px]">
+        <tr class="border-b border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-medium bg-slate-50 dark:bg-slate-900 text-[11px]">
       `;
 
   config.categories.forEach((cat, catIdx) => {
@@ -335,15 +335,15 @@ function _renderGradebookHeader(thead, config, categoryPalette, isUnbalanced, to
 
     if (isCollapsed) {
       tier1Html += `
-            <th colspan="1" draggable="true" ondragstart="handleCategoryDragStart(event, ${catIdx})" ondragover="event.preventDefault(); this.classList.add('grade-cat-drag-over')" ondragleave="this.classList.remove('grade-cat-drag-over')" ondrop="handleCategoryDrop(event, ${catIdx})" onclick="toggleGradebookCategoryCollapse('${jsAttr(cat.id)}')" class="cursor-grab active:cursor-grabbing py-2.5 px-2 text-center font-extrabold ${catTheme.tier1} ${catTheme.groupBorder} select-none hover:brightness-95 transition-all" title="Click to expand ${escapeHtml(cat.name)} sub-activities (or drag to reorder)">
+            <th colspan="1" draggable="true" data-action-dragstart="handleCategoryDragStart" data-cat-idx="${catIdx}" data-action-dragover="handleCategoryDragOver" data-action-dragleave="handleCategoryDragLeave" data-action-drop="handleCategoryDrop" data-action="toggleGradebookCategoryCollapse" data-cat-id="${escapeHtml(cat.id)}" class="cursor-grab active:cursor-grabbing py-2.5 px-2 text-center font-extrabold ${catTheme.tier1} ${catTheme.groupBorder} select-none hover:brightness-95 transition-all" title="Click to expand ${escapeHtml(cat.name)} sub-activities (or drag to reorder)">
               <div class="flex items-center justify-center gap-1.5">
                 <span class="text-xs tracking-tight">${escapeHtml(cat.name)} (${cat.weight}%)</span>
-                <span class="text-[11px] font-bold text-slate-500">▸</span>
+                <span class="text-[11px] font-bold text-slate-500 dark:text-slate-400">▸</span>
               </div>
             </th>
           `;
       tier2Html += `
-            <th onclick="toggleGradebookSort('cat_${cat.id}')" class="py-1.5 px-2 text-center whitespace-nowrap text-slate-700 font-bold text-[10.5px] ${catTheme.tier2} ${catTheme.groupBorder} cursor-pointer select-none hover:brightness-95 transition" title="Click to sort by ${escapeHtml(cat.name)} Subtotal %">
+            <th data-action="toggleGradebookSort" data-sort="cat_${escapeHtml(cat.id)}" class="py-1.5 px-2 text-center whitespace-nowrap text-slate-700 dark:text-slate-200 font-bold text-[10.5px] ${catTheme.tier2} ${catTheme.groupBorder} cursor-pointer select-none hover:brightness-95 transition" title="Click to sort by ${escapeHtml(cat.name)} Subtotal %">
               <div class="flex items-center justify-center gap-0.5">
                 <span>Subtotal %</span>
                 ${getGradebookSortIndicator('cat_' + cat.id)}
@@ -353,30 +353,30 @@ function _renderGradebookHeader(thead, config, categoryPalette, isUnbalanced, to
     } else {
       const subCount = (cat.subActivities && cat.subActivities.length > 0) ? cat.subActivities.length : 1;
       tier1Html += `
-            <th colspan="${subCount}" draggable="true" ondragstart="handleCategoryDragStart(event, ${catIdx})" ondragover="event.preventDefault(); this.classList.add('grade-cat-drag-over')" ondragleave="this.classList.remove('grade-cat-drag-over')" ondrop="handleCategoryDrop(event, ${catIdx})" onclick="toggleGradebookCategoryCollapse('${jsAttr(cat.id)}')" class="cursor-grab active:cursor-grabbing py-2.5 px-2 text-center font-extrabold ${catTheme.tier1} ${catTheme.groupBorder} select-none hover:brightness-95 transition-all" title="Click to collapse ${escapeHtml(cat.name)} sub-activities (or drag to reorder)">
+            <th colspan="${subCount}" draggable="true" data-action-dragstart="handleCategoryDragStart" data-cat-idx="${catIdx}" data-action-dragover="handleCategoryDragOver" data-action-dragleave="handleCategoryDragLeave" data-action-drop="handleCategoryDrop" data-action="toggleGradebookCategoryCollapse" data-cat-id="${escapeHtml(cat.id)}" class="cursor-grab active:cursor-grabbing py-2.5 px-2 text-center font-extrabold ${catTheme.tier1} ${catTheme.groupBorder} select-none hover:brightness-95 transition-all" title="Click to collapse ${escapeHtml(cat.name)} sub-activities (or drag to reorder)">
               <div class="flex items-center justify-center gap-1.5">
                 <span class="text-xs tracking-tight">${escapeHtml(cat.name)} (${cat.weight}%)</span>
-                ${(cat.subActivities && cat.subActivities.length > 0) ? `<span class="text-[11px] font-bold text-slate-500">▾</span>` : ''}
+                ${(cat.subActivities && cat.subActivities.length > 0) ? `<span class="text-[11px] font-bold text-slate-500 dark:text-slate-400">▾</span>` : ''}
               </div>
             </th>
           `;
       if (cat.subActivities && cat.subActivities.length > 0) {
         cat.subActivities.forEach((sub, subIdx) => {
           const isLast = (subIdx === cat.subActivities.length - 1);
-          const borderClass = isLast ? catTheme.groupBorder : 'border-r border-slate-200';
+          const borderClass = isLast ? catTheme.groupBorder : 'border-r border-slate-200 dark:border-slate-700';
           tier2Html += `
-                <th onclick="toggleGradebookSort('sub_${sub.id}')" class="py-1.5 px-1.5 text-center whitespace-nowrap ${catTheme.tier2} ${borderClass} cursor-pointer select-none hover:brightness-95 transition" title="Click to sort by ${escapeHtml(sub.name)} score (Highest/Lowest)">
+                <th data-action="toggleGradebookSort" data-sort="sub_${escapeHtml(sub.id)}" class="py-1.5 px-1.5 text-center whitespace-nowrap ${catTheme.tier2} ${borderClass} cursor-pointer select-none hover:brightness-95 transition" title="Click to sort by ${escapeHtml(sub.name)} score (Highest/Lowest)">
                   <div class="flex items-center justify-center gap-0.5">
-                    <span class="font-bold text-slate-800 text-[11px]">${escapeHtml(sub.name)}</span>
+                    <span class="font-bold text-slate-800 dark:text-slate-100 text-[11px]">${escapeHtml(sub.name)}</span>
                     ${getGradebookSortIndicator('sub_' + sub.id)}
                   </div>
-                  <div class="text-[9.5px] text-slate-500 font-mono font-normal">${sub.maxScore} pts • ${sub.weight}%</div>
+                  <div class="text-[9.5px] text-slate-500 dark:text-slate-400 font-mono font-normal">${sub.maxScore} pts • ${sub.weight}%</div>
                 </th>
               `;
         });
       } else {
         tier2Html += `
-              <th class="py-1.5 px-1.5 text-center italic text-slate-400 ${catTheme.tier2} ${catTheme.groupBorder}">No items</th>
+              <th class="py-1.5 px-1.5 text-center italic text-slate-400 dark:text-slate-500 ${catTheme.tier2} ${catTheme.groupBorder}">No items</th>
             `;
       }
     }
@@ -384,28 +384,28 @@ function _renderGradebookHeader(thead, config, categoryPalette, isUnbalanced, to
 
   if (isUnbalanced) {
     tier1Html += `
-          <th class="py-2 px-2 text-center border-r border-rose-300 bg-rose-100/90 text-rose-950 font-extrabold whitespace-nowrap" title="Total activity percentage must equal 100%">
+          <th class="py-2 px-2 text-center border-r border-rose-300 dark:border-rose-700 bg-rose-100/90 dark:bg-rose-950 text-rose-950 dark:text-rose-200 font-extrabold whitespace-nowrap" title="Total activity percentage must equal 100%">
             <span class="inline-flex items-center gap-1 text-[11px] bg-rose-600 text-white px-2 py-0.5 rounded-full font-black animate-pulse shadow-2xs">
               ⚠️ Sum: ${totalCatWeight}% (≠ 100%)
             </span>
           </th>
         `;
     tier2Html += `
-          <th class="py-1.5 px-1.5 text-center border-r border-rose-200 bg-rose-50 text-[10px] text-rose-700 font-bold whitespace-nowrap">
+          <th class="py-1.5 px-1.5 text-center border-r border-rose-200 dark:border-rose-800 bg-rose-50 dark:bg-rose-950/70 text-[10px] text-rose-700 dark:text-rose-300 font-bold whitespace-nowrap">
             Weight Error
           </th>
         `;
   }
 
   tier1Html += `
-          <th rowspan="2" onclick="toggleGradebookSort('total')" class="py-2.5 px-2 text-center bg-slate-200 font-black border-r border-slate-300 min-w-[85px] cursor-pointer select-none hover:bg-slate-300 transition" title="Click to sort by Total Percentage (Highest/Lowest)">
+          <th rowspan="2" data-action="toggleGradebookSort" data-sort="total" class="py-2.5 px-2 text-center bg-slate-200 dark:bg-slate-900 font-black border-r border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 min-w-[85px] cursor-pointer select-none hover:bg-slate-300 dark:hover:bg-slate-800 transition" title="Click to sort by Total Percentage (Highest/Lowest)">
             <div class="flex items-center justify-center gap-1">
               <span>Total %</span>
               ${getGradebookSortIndicator('total')}
             </div>
           </th>
-          <th rowspan="2" class="py-2.5 px-2 text-center bg-slate-200 font-black border-r border-slate-300 min-w-[85px]">Final Grade</th>
-          <th rowspan="2" class="py-2.5 px-2 text-center bg-slate-100 border-l border-slate-200 font-bold min-w-[105px]">Status</th>
+          <th rowspan="2" class="py-2.5 px-2 text-center bg-slate-200 dark:bg-slate-900 font-black border-r border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 min-w-[85px]">Final Grade</th>
+          <th rowspan="2" class="py-2.5 px-2 text-center bg-slate-100 dark:bg-slate-900 border-l border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 font-bold min-w-[105px]">Status</th>
         </tr>
       `;
   tier2Html += `</tr>`;
@@ -491,8 +491,12 @@ function _renderGradebookStudentRows(tbody, filtered, config, selectedSec, grade
     const gradeResult = gradeCache.get(s.id) || calculateStudentGrade(s, config, selectedSec);
     let colIdx = 0;
     const isEven = (rowIdx % 2 === 0);
-    const rowClass = isEven ? 'grade-row-even bg-white' : 'grade-row-odd bg-slate-50/70';
-    const stickyCellBg = isEven ? 'bg-white' : 'bg-slate-50';
+    const rowClass = isEven
+      ? 'grade-row-even bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100'
+      : 'grade-row-odd bg-[#f1f5f9] dark:bg-[#1e293b] text-slate-800 dark:text-slate-100';
+    const stickyCellBg = isEven
+      ? 'bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100'
+      : 'bg-[#f1f5f9] dark:bg-[#1e293b] text-slate-800 dark:text-slate-100';
 
     let cellsHtml = '';
     config.categories.forEach((cat, catIdx) => {
@@ -512,10 +516,10 @@ function _renderGradebookStudentRows(tbody, filtered, config, selectedSec, grade
             const val = getStudentScore(s, sub.id, cat.id, maxScore);
             const numVal = parseFloat(val);
             const isOverMax = !isNaN(numVal) && numVal > maxScore;
-            const inputClass = isOverMax ? 'border-rose-500 bg-rose-50 text-rose-700 ring-2 ring-rose-400 font-black' : 'bg-white border-slate-300';
+            const inputClass = isOverMax ? 'border-rose-500 dark:border-rose-600 bg-rose-50 dark:bg-rose-950 text-rose-700 dark:text-rose-300 ring-2 ring-rose-400 font-black' : 'bg-white dark:bg-slate-950 border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100';
             const inputTitle = isOverMax ? `⚠️ Warning: Score (${val}) exceeds maximum possible items (${maxScore})!` : `Score (max ${maxScore})`;
             const isLast = (subIdx === cat.subActivities.length - 1);
-            const cellBorder = isLast ? catTheme.groupBorder : 'border-r border-slate-100';
+            const cellBorder = isLast ? catTheme.groupBorder : 'border-r border-slate-200/80 dark:border-slate-700/60';
 
             cellsHtml += `
                   <td class="py-2 px-1 text-center ${cellBorder}">
@@ -526,37 +530,37 @@ function _renderGradebookStudentRows(tbody, filtered, config, selectedSec, grade
                       data-col="${colIdx}"
                       value="${val}"
                       title="${inputTitle}"
-                      onfocus="this.select()"
-                      onkeydown="handleGradeGridKey(event, ${rowIdx}, ${colIdx})"
-                      oninput="updateDynamicScore('${jsAttr(s.id)}', '${jsAttr(sub.id)}', this.value)"
-                      onchange="updateDynamicScore('${jsAttr(s.id)}', '${jsAttr(sub.id)}', this.value, true)"
-                      onblur="updateDynamicScore('${jsAttr(s.id)}', '${jsAttr(sub.id)}', this.value, true)"
+                      data-action-focus="selectOnFocus"
+                      data-action-keydown="handleGradeGridKey"
+                      data-action-input="updateDynamicScore"
+                      data-action-change="updateDynamicScoreCommit"
+                      data-action-blur="updateDynamicScoreCommit"
                       class="grade-cell-input w-14 text-center font-mono font-bold rounded py-1 text-xs focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition border ${inputClass}">
                   </td>
                 `;
             colIdx++;
           });
         } else {
-          cellsHtml += `<td class="py-2 px-1 text-center text-slate-300 ${catTheme.groupBorder}">—</td>`;
+          cellsHtml += `<td class="py-2 px-1 text-center text-slate-300 dark:text-slate-600 ${catTheme.groupBorder}">—</td>`;
         }
       }
     });
 
     return `
-          <tr id="grade-row-${escapeHtml(s.id)}" data-student-id="${escapeHtml(s.id)}" class="${rowClass} hover:bg-blue-50/40 transition border-b border-slate-200 group">
-            <td class="sticky-grade-col-1 py-2.5 px-2 font-mono text-slate-400 text-center border-r border-slate-200 ${stickyCellBg}">${rowIdx + 1}</td>
-            <td class="sticky-grade-col-2 py-2.5 px-2.5 font-mono font-bold text-slate-800 border-r border-slate-200 whitespace-nowrap ${stickyCellBg}">${escapeHtml(s.id)}</td>
-            <td class="sticky-grade-col-3 py-2.5 px-3 font-bold text-slate-900 border-r border-slate-200 whitespace-nowrap ${stickyCellBg} overflow-hidden" title="${escapeHtml(s.last)}, ${escapeHtml(s.first)}">
+          <tr id="grade-row-${escapeHtml(s.id)}" data-student-id="${escapeHtml(s.id)}" class="${rowClass} hover:bg-blue-50/60 dark:hover:bg-[#24344d] transition border-b border-slate-200 dark:border-slate-700 group">
+            <td class="sticky-grade-col-1 py-2.5 px-2 font-mono text-slate-400 dark:text-slate-400 text-center border-r border-slate-200 dark:border-slate-700 ${stickyCellBg}">${rowIdx + 1}</td>
+            <td class="sticky-grade-col-2 py-2.5 px-2.5 font-mono font-bold text-slate-800 dark:text-slate-100 border-r border-slate-200 dark:border-slate-700 whitespace-nowrap ${stickyCellBg}">${escapeHtml(s.id)}</td>
+            <td class="sticky-grade-col-3 py-2.5 px-3 font-bold text-slate-900 dark:text-slate-100 border-r border-slate-200 dark:border-slate-700 whitespace-nowrap ${stickyCellBg} overflow-hidden" title="${escapeHtml(s.last)}, ${escapeHtml(s.first)}">
               <div class="truncate max-w-[216px]">${escapeHtml(s.last)}, ${escapeHtml(s.first)}</div>
             </td>
             ${cellsHtml}
-            ${isUnbalanced ? '<td class="py-2 px-1 text-center border-r border-rose-200 bg-rose-50/40 text-rose-600 font-bold text-xs" title="Total weight does not equal 100%">⚠️</td>' : ''}
-            <td class="py-2.5 px-2 text-center font-extrabold text-xs font-mono text-slate-800 bg-slate-100/90 border-r border-slate-200 grade-total-cell">${(parseFloat(gradeResult.total) || 0).toFixed(2)}%</td>
-            <td class="py-2.5 px-2 text-center border-r border-slate-200 bg-amber-50/70">
+            ${isUnbalanced ? '<td class="py-2 px-1 text-center border-r border-rose-200 dark:border-rose-800 bg-rose-50/40 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 font-bold text-xs" title="Total weight does not equal 100%">⚠️</td>' : ''}
+            <td class="py-2.5 px-2 text-center font-extrabold text-xs font-mono text-slate-800 dark:text-slate-200 ${stickyCellBg} border-r border-slate-200 dark:border-slate-700 grade-total-cell">${(parseFloat(gradeResult.total) || 0).toFixed(2)}%</td>
+            <td class="py-2.5 px-2 text-center border-r border-slate-200 dark:border-slate-700 ${stickyCellBg}">
               <span class="grade-msu-cell inline-block px-2 py-0.5 rounded font-mono font-black text-xs border ${gradeResult.msu.class}">${gradeResult.msu.grade}</span>
             </td>
-            <td class="py-2.5 px-2 text-center ${stickyCellBg} border-l border-slate-200">
-              <select onchange="updateGradeStatusOverride('${jsAttr(s.id)}', this.value)" class="grade-status-select text-[11px] font-bold rounded border border-slate-300 px-1 py-1 bg-white focus:ring-1 focus:ring-msu-maroon ${gradeResult.msu.status === 'Passed' ? 'text-emerald-700' : (gradeResult.msu.status === 'Incomplete' ? 'text-orange-700' : (gradeResult.msu.status === 'Withdrawn' || gradeResult.msu.status === 'Dropped' ? 'text-slate-600' : 'text-rose-700'))}">
+            <td class="py-2.5 px-2 text-center ${stickyCellBg} border-l border-slate-200 dark:border-slate-700">
+              <select data-action-change="updateGradeStatusOverride" data-student="${escapeHtml(s.id)}" class="grade-status-select text-[11px] font-bold rounded border border-slate-300 dark:border-slate-600 px-1 py-1 bg-white dark:bg-slate-900 dark:text-slate-100 focus:ring-1 focus:ring-msu-maroon ${gradeResult.msu.status === 'Passed' ? 'text-emerald-700 dark:text-emerald-400' : (gradeResult.msu.status === 'Incomplete' ? 'text-orange-700 dark:text-orange-400' : (gradeResult.msu.status === 'Withdrawn' || gradeResult.msu.status === 'Dropped' ? 'text-slate-600 dark:text-slate-400' : 'text-rose-700 dark:text-rose-400'))}">
                 <option value="" ${!s.statusOverride ? 'selected' : ''}>Auto (${gradeResult.msu.status})</option>
                 <option value="INC" ${s.statusOverride === 'INC' ? 'selected' : ''}>INC</option>
                 <option value="WDRW" ${s.statusOverride === 'WDRW' ? 'selected' : ''}>WDRW</option>
@@ -597,7 +601,7 @@ function _renderGradebookFooter(tfoot, filtered, config, selectedSec, gradeCache
       });
       const catAvg = filtered.length > 0 ? (catSum / filtered.length) : 0;
       footCellsHtml += `
-            <td class="py-2.5 px-2 text-center font-mono font-black text-xs ${catTheme.groupBorder} bg-slate-100" title="Class Average for ${escapeHtml(cat.name)}">
+            <td class="py-2.5 px-2 text-center font-mono font-black text-xs ${catTheme.groupBorder} bg-slate-100 dark:bg-slate-900" title="Class Average for ${escapeHtml(cat.name)}">
               <span class="inline-block px-2 py-0.5 rounded-full text-xs font-bold ${catTheme.badge}">${catAvg.toFixed(2)}%</span>
             </td>
           `;
@@ -612,38 +616,38 @@ function _renderGradebookFooter(tfoot, filtered, config, selectedSec, gradeCache
           const avgScore = filtered.length > 0 ? (subScoreSum / filtered.length) : 0;
           const avgPct = (avgScore / maxScore) * 100;
           const isLast = (subIdx === cat.subActivities.length - 1);
-          const cellBorder = isLast ? catTheme.groupBorder : 'border-r border-slate-200';
+          const cellBorder = isLast ? catTheme.groupBorder : 'border-r border-slate-200 dark:border-slate-700';
 
           footCellsHtml += `
-                <td class="py-2 px-1 text-center font-mono text-[11px] ${cellBorder} bg-slate-100" title="${escapeHtml(sub.name)}: Avg ${avgScore.toFixed(1)} / ${maxScore} (${avgPct.toFixed(2)}%)">
-                  <div class="font-bold text-slate-800">${avgScore.toFixed(1)}</div>
-                  <div class="text-[9.5px] text-slate-500 font-normal">${avgPct.toFixed(2)}%</div>
+                <td class="py-2 px-1 text-center font-mono text-[11px] ${cellBorder} bg-slate-100 dark:bg-slate-900" title="${escapeHtml(sub.name)}: Avg ${avgScore.toFixed(1)} / ${maxScore} (${avgPct.toFixed(2)}%)">
+                  <div class="font-bold text-slate-800 dark:text-slate-100">${avgScore.toFixed(1)}</div>
+                  <div class="text-[9.5px] text-slate-500 dark:text-slate-400 font-normal">${avgPct.toFixed(2)}%</div>
                 </td>
               `;
         });
       } else {
-        footCellsHtml += `<td class="py-2 px-1 text-center text-slate-400 ${catTheme.groupBorder} bg-slate-100">—</td>`;
+        footCellsHtml += `<td class="py-2 px-1 text-center text-slate-400 dark:text-slate-500 ${catTheme.groupBorder} bg-slate-100 dark:bg-slate-900">—</td>`;
       }
     }
   });
 
   tfoot.innerHTML = `
-        <tr class="border-t-2 border-slate-300 bg-slate-100 text-slate-800">
-          <td class="sticky-grade-foot-1 py-2.5 px-2 text-center font-mono font-bold text-slate-400 border-r border-slate-200 bg-slate-100">—</td>
-          <td class="sticky-grade-foot-2 py-2.5 px-2.5 font-mono font-black text-slate-800 border-r border-slate-200 whitespace-nowrap bg-slate-100 uppercase tracking-wider text-[11px]">AVERAGE</td>
-          <td class="sticky-grade-foot-3 py-2.5 px-3 font-bold text-slate-800 border-r border-slate-200 whitespace-nowrap bg-slate-100 text-xs">
+        <tr class="border-t-2 border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-100">
+          <td class="sticky-grade-foot-1 py-2.5 px-2 text-center font-mono font-bold text-slate-400 dark:text-slate-400 border-r border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-900">—</td>
+          <td class="sticky-grade-foot-2 py-2.5 px-2.5 font-mono font-black text-slate-800 dark:text-slate-100 border-r border-slate-200 dark:border-slate-700 whitespace-nowrap bg-slate-100 dark:bg-slate-900 uppercase tracking-wider text-[11px]">AVERAGE</td>
+          <td class="sticky-grade-foot-3 py-2.5 px-3 font-bold text-slate-800 dark:text-slate-100 border-r border-slate-200 dark:border-slate-700 whitespace-nowrap bg-slate-100 dark:bg-slate-900 text-xs">
             Class Mean (${filtered.length} Students)
           </td>
           ${footCellsHtml}
-          ${isUnbalanced ? '<td class="py-2 px-1 text-center border-r border-rose-200 bg-rose-50 text-rose-600 font-bold text-xs">—</td>' : ''}
-          <td class="py-2.5 px-2 text-center font-black text-xs font-mono text-slate-900 bg-slate-200 border-r border-slate-300">
+          ${isUnbalanced ? '<td class="py-2 px-1 text-center border-r border-rose-200 dark:border-rose-800 bg-rose-50 dark:bg-rose-950/70 text-rose-600 dark:text-rose-400 font-bold text-xs">—</td>' : ''}
+          <td class="py-2.5 px-2 text-center font-black text-xs font-mono text-slate-900 dark:text-slate-100 bg-slate-200 dark:bg-slate-900 border-r border-slate-300 dark:border-slate-700">
             ${classAvgTotal.toFixed(2)}%
           </td>
-          <td class="py-2.5 px-2 text-center border-r border-slate-200 bg-amber-100/80">
+          <td class="py-2.5 px-2 text-center border-r border-slate-200 dark:border-slate-700 bg-amber-100/80 dark:bg-slate-900">
             <span class="grade-msu-cell inline-block px-2 py-0.5 rounded font-mono font-black text-xs border ${classAvgMsu.class}">${classAvgMsu.grade}</span>
           </td>
-          <td class="py-2.5 px-2 text-center bg-slate-100 border-l border-slate-200 whitespace-nowrap">
-            <span class="text-[11px] font-black ${passRate >= 75 ? 'text-emerald-700' : 'text-rose-700'}">${passRate.toFixed(2)}% Pass</span>
+          <td class="py-2.5 px-2 text-center bg-slate-100 dark:bg-slate-900 border-l border-slate-200 dark:border-slate-700 whitespace-nowrap">
+            <span class="text-[11px] font-black ${passRate >= 75 ? 'text-emerald-700 dark:text-emerald-400' : 'text-rose-700 dark:text-rose-400'}">${passRate.toFixed(2)}% Pass</span>
           </td>
         </tr>
       `;
@@ -695,7 +699,7 @@ function renderGradebook() {
             `;
       } else {
         gradebookClassroomContainer.innerHTML = `
-              <button type="button" onclick="openClassroomModal('${jsAttr(code)}', '${jsAttr(sec)}')" class="p-1.5 bg-slate-50 hover:bg-emerald-50 text-slate-500 hover:text-emerald-800 border border-dashed border-slate-300 hover:border-emerald-300 rounded-lg text-xs font-semibold flex items-center justify-center transition" title="+ Link Google Classroom for ${escapeHtml(selectedSec)}">
+              <button type="button" data-action="openClassroomModal" data-course="${escapeHtml(code)}" data-section="${escapeHtml(sec)}" class="p-1.5 bg-slate-50 hover:bg-emerald-50 text-slate-500 hover:text-emerald-800 border border-dashed border-slate-300 hover:border-emerald-300 rounded-lg text-xs font-semibold flex items-center justify-center transition" title="+ Link Google Classroom for ${escapeHtml(selectedSec)}">
                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/></svg>
               </button>
             `;
@@ -745,46 +749,46 @@ function renderGradebook() {
 
   const categoryPalette = [
     {
-      tier1: 'bg-sky-100/90 text-sky-950 border-sky-300',
-      tier2: 'bg-sky-50 text-sky-900 border-sky-200',
-      groupBorder: 'border-r-2 border-sky-300',
-      badge: 'bg-sky-100 text-sky-900 border border-sky-300'
+      tier1: 'bg-sky-100/90 dark:bg-[#0c1e36] text-sky-950 dark:text-sky-300 border-sky-300 dark:border-sky-700/80',
+      tier2: 'bg-sky-50 dark:bg-[#0a1524] text-sky-900 dark:text-sky-200 border-sky-200 dark:border-sky-900/60',
+      groupBorder: 'border-r-2 border-sky-300 dark:border-sky-700/80',
+      badge: 'bg-sky-100 dark:bg-[#0f274a] text-sky-900 dark:text-sky-200 border border-sky-300 dark:border-sky-700/80'
     },
     {
-      tier1: 'bg-violet-100/90 text-violet-950 border-violet-300',
-      tier2: 'bg-violet-50 text-violet-900 border-violet-200',
-      groupBorder: 'border-r-2 border-violet-300',
-      badge: 'bg-violet-100 text-violet-900 border border-violet-300'
+      tier1: 'bg-violet-100/90 dark:bg-[#201138] text-violet-950 dark:text-violet-300 border-violet-300 dark:border-violet-700/80',
+      tier2: 'bg-violet-50 dark:bg-[#150a24] text-violet-900 dark:text-violet-200 border-violet-200 dark:border-violet-900/60',
+      groupBorder: 'border-r-2 border-violet-300 dark:border-violet-700/80',
+      badge: 'bg-violet-100 dark:bg-[#2b1245] text-violet-900 dark:text-violet-200 border border-violet-300 dark:border-violet-700/80'
     },
     {
-      tier1: 'bg-amber-100/90 text-amber-950 border-amber-300',
-      tier2: 'bg-amber-50 text-amber-900 border-amber-200',
-      groupBorder: 'border-r-2 border-amber-300',
-      badge: 'bg-amber-100 text-amber-900 border border-amber-300'
+      tier1: 'bg-amber-100/90 dark:bg-[#2b1803] text-amber-950 dark:text-amber-300 border-amber-300 dark:border-amber-700/80',
+      tier2: 'bg-amber-50 dark:bg-[#1c1003] text-amber-900 dark:text-amber-200 border-amber-200 dark:border-amber-900/60',
+      groupBorder: 'border-r-2 border-amber-300 dark:border-amber-700/80',
+      badge: 'bg-amber-100 dark:bg-[#3b2306] text-amber-900 dark:text-amber-200 border border-amber-300 dark:border-amber-700/80'
     },
     {
-      tier1: 'bg-emerald-100/90 text-emerald-950 border-emerald-300',
-      tier2: 'bg-emerald-50 text-emerald-900 border-emerald-200',
-      groupBorder: 'border-r-2 border-emerald-300',
-      badge: 'bg-emerald-100 text-emerald-900 border border-emerald-300'
+      tier1: 'bg-emerald-100/90 dark:bg-[#072a1e] text-emerald-950 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700/80',
+      tier2: 'bg-emerald-50 dark:bg-[#041a13] text-emerald-900 dark:text-emerald-200 border-emerald-200 dark:border-emerald-900/60',
+      groupBorder: 'border-r-2 border-emerald-300 dark:border-emerald-700/80',
+      badge: 'bg-emerald-100 dark:bg-[#063526] text-emerald-900 dark:text-emerald-200 border border-emerald-300 dark:border-emerald-700/80'
     },
     {
-      tier1: 'bg-rose-100/90 text-rose-950 border-rose-300',
-      tier2: 'bg-rose-50 text-rose-900 border-rose-200',
-      groupBorder: 'border-r-2 border-rose-300',
-      badge: 'bg-rose-100 text-rose-900 border border-rose-300'
+      tier1: 'bg-rose-100/90 dark:bg-[#2d0e19] text-rose-950 dark:text-rose-300 border-rose-300 dark:border-rose-700/80',
+      tier2: 'bg-rose-50 dark:bg-[#1f0911] text-rose-900 dark:text-rose-200 border-rose-200 dark:border-rose-900/60',
+      groupBorder: 'border-r-2 border-rose-300 dark:border-rose-700/80',
+      badge: 'bg-rose-100 dark:bg-[#3b0d18] text-rose-900 dark:text-rose-200 border border-rose-300 dark:border-rose-700/80'
     },
     {
-      tier1: 'bg-teal-100/90 text-teal-950 border-teal-300',
-      tier2: 'bg-teal-50 text-teal-900 border-teal-200',
-      groupBorder: 'border-r-2 border-teal-300',
-      badge: 'bg-teal-100 text-teal-900 border border-teal-300'
+      tier1: 'bg-teal-100/90 dark:bg-[#062624] text-teal-950 dark:text-teal-300 border-teal-300 dark:border-teal-700/80',
+      tier2: 'bg-teal-50 dark:bg-[#041817] text-teal-900 dark:text-teal-200 border-teal-200 dark:border-teal-900/60',
+      groupBorder: 'border-r-2 border-teal-300 dark:border-teal-700/80',
+      badge: 'bg-teal-100 dark:bg-[#062624] text-teal-900 dark:text-teal-200 border border-teal-300 dark:border-teal-700/80'
     },
     {
-      tier1: 'bg-indigo-100/90 text-indigo-950 border-indigo-300',
-      tier2: 'bg-indigo-50 text-indigo-900 border-indigo-200',
-      groupBorder: 'border-r-2 border-indigo-300',
-      badge: 'bg-indigo-100 text-indigo-900 border border-indigo-300'
+      tier1: 'bg-indigo-100/90 dark:bg-[#13173d] text-indigo-950 dark:text-indigo-300 border-indigo-300 dark:border-indigo-700/80',
+      tier2: 'bg-indigo-50 dark:bg-[#0d0f28] text-indigo-900 dark:text-indigo-200 border-indigo-200 dark:border-indigo-900/60',
+      groupBorder: 'border-r-2 border-indigo-300 dark:border-indigo-700/80',
+      badge: 'bg-indigo-100 dark:bg-[#1f1b4d] text-indigo-900 dark:text-indigo-200 border border-indigo-300 dark:border-indigo-700/80'
     }
   ];
 
@@ -821,7 +825,7 @@ function renderGradebook() {
               ${isFilteredOut
             ? `<div class="space-y-2.5 py-4">
                      <p class="text-slate-600 dark:text-slate-300 font-medium">No students in ${escapeHtml(selectedSec)} match the current filter ${gradebookCohortFilter ? `(<strong>${escapeHtml(gradebookCohortFilter.label)}</strong>)` : ''}.</p>
-                     <button type="button" onclick="resetGradebookFilters()" class="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-600 font-bold rounded-lg text-xs shadow-2xs transition inline-flex items-center gap-1.5 active:scale-95">
+                     <button type="button" data-action="resetGradebookFilters" class="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-600 font-bold rounded-lg text-xs shadow-2xs transition inline-flex items-center gap-1.5 active:scale-95">
                        <span>✕</span><span>Reset Filters</span>
                      </button>
                    </div>`

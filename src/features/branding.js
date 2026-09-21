@@ -19,6 +19,13 @@ function applyHeaderBranding() {
   const logoImg = document.getElementById('header-school-logo');
   const fallbackEl = document.getElementById('header-logo-fallback');
   if (logoImg) {
+    if (!logoImg._hasBoundError) {
+      logoImg._hasBoundError = true;
+      logoImg.addEventListener('error', () => {
+        logoImg.style.display = 'none';
+        if (fallbackEl) fallbackEl.style.display = 'flex';
+      });
+    }
     logoImg.style.display = 'block';
     if (fallbackEl) fallbackEl.style.display = 'none';
 

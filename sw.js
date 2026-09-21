@@ -37,6 +37,7 @@ const MODULES = [
   './src/core/constants.js',
   './src/core/state.js',
   './src/core/utils.js',
+  './src/core/events.js',
   './src/core/render.js',
   './src/core/storage.js',
   './src/core/backup-reminder.js',

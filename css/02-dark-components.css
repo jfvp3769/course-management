@@ -1,268 +1,97 @@
 /* ---------------------------------------------------------------------------
    02-dark-components.css
-   Dark-mode harmonisation for buttons, lesson cards, badges and pills.
-   (originally styles.css lines 93-355)
+   Dark-mode harmonization for buttons, badges, tags and pills.
+   (Migrated to native Tailwind dark: utility variants and clean CSS in Phase 3)
    --------------------------------------------------------------------------- */
 
-/* ==========================================================================
-   DARK MODE COLORED COMPONENT HARMONIZATION (Background + Text Pairing)
-   ========================================================================== */
-
-/* 1. Action & Toolbar Buttons */
-html.theme-dark button.bg-rose-50,
-html.theme-dark button[class*="bg-rose-50"],
-html.theme-dark a[class*="bg-rose-50"] {
-  background-color: #2e0d17 !important;
-  border-color: #e11d48 !important;
-  color: #ffe4e6 !important;
+/* 1. Action & Toolbar Buttons (Fallback CSS for dynamically inserted controls without explicit dark:bg-) */
+html.theme-dark button[class*="bg-rose-50"]:not([class*="dark:bg-"]),
+html.theme-dark a[class*="bg-rose-50"]:not([class*="dark:bg-"]) {
+  background-color: #2e0d17;
+  border-color: #e11d48;
+  color: #ffe4e6;
 }
-html.theme-dark button.bg-rose-50:hover,
-html.theme-dark button[class*="bg-rose-50"]:hover {
-  background-color: #3f121f !important;
+html.theme-dark button[class*="bg-rose-50"]:not([class*="dark:bg-"]):hover {
+  background-color: #3f121f;
 }
 
-html.theme-dark button.bg-amber-50,
-html.theme-dark button[class*="bg-amber-50"],
-html.theme-dark a[class*="bg-amber-50"] {
-  background-color: #2b1704 !important;
-  border-color: #d97706 !important;
-  color: #fef3c7 !important;
+html.theme-dark button[class*="bg-amber-50"]:not([class*="dark:bg-"]),
+html.theme-dark a[class*="bg-amber-50"]:not([class*="dark:bg-"]) {
+  background-color: #2b1704;
+  border-color: #d97706;
+  color: #fef3c7;
 }
-html.theme-dark button.bg-amber-50:hover,
-html.theme-dark button[class*="bg-amber-50"]:hover {
-  background-color: #3d2106 !important;
+html.theme-dark button[class*="bg-amber-50"]:not([class*="dark:bg-"]):hover {
+  background-color: #3d2106;
 }
 
-html.theme-dark button.bg-emerald-50,
-html.theme-dark button[class*="bg-emerald-50"],
-html.theme-dark a[class*="bg-emerald-50"] {
-  background-color: #062b1f !important;
-  border-color: #059669 !important;
-  color: #d1fae5 !important;
+html.theme-dark button[class*="bg-emerald-50"]:not([class*="dark:bg-"]),
+html.theme-dark a[class*="bg-emerald-50"]:not([class*="dark:bg-"]) {
+  background-color: #062b1f;
+  border-color: #059669;
+  color: #d1fae5;
 }
-html.theme-dark button.bg-emerald-50:hover,
-html.theme-dark button[class*="bg-emerald-50"]:hover {
-  background-color: #083829 !important;
+html.theme-dark button[class*="bg-emerald-50"]:not([class*="dark:bg-"]):hover {
+  background-color: #083829;
 }
 
-html.theme-dark button.bg-indigo-50,
-html.theme-dark button[class*="bg-indigo-50"],
-html.theme-dark a[class*="bg-indigo-50"] {
-  background-color: #17153a !important;
-  border-color: #6366f1 !important;
-  color: #e0e7ff !important;
+html.theme-dark button[class*="bg-indigo-50"]:not([class*="dark:bg-"]),
+html.theme-dark a[class*="bg-indigo-50"]:not([class*="dark:bg-"]) {
+  background-color: #17153a;
+  border-color: #6366f1;
+  color: #e0e7ff;
 }
-html.theme-dark button.bg-indigo-50:hover,
-html.theme-dark button[class*="bg-indigo-50"]:hover {
-  background-color: #201d4e !important;
+html.theme-dark button[class*="bg-indigo-50"]:not([class*="dark:bg-"]):hover {
+  background-color: #201d4e;
 }
 
 /* Disabled Undo / Redo buttons */
 html.theme-dark #btn-planner-undo[disabled],
 html.theme-dark #btn-planner-redo[disabled] {
-  background-color: #181512 !important;
-  border-color: #3d3835 !important;
-  color: #78716c !important;
+  background-color: #181512;
+  border-color: #3d3835;
+  color: #78716c;
 }
 
-/* Single Student and Roster Buttons */
-html.theme-dark button[onclick*="openAddSingleStudentModal"],
-html.theme-dark button[onclick*="openUploadCalendarModal"] {
-  background-color: #1e293b !important;
-  border: 1px solid #475569 !important;
-  color: #ffffff !important;
-  font-weight: 600 !important;
-  letter-spacing: 0.015em;
-}
-html.theme-dark button[onclick*="openUploadCalendarModal"]:hover {
-  background-color: #334155 !important;
-}
-html.theme-dark button[onclick*="openUploadCalendarModal"] svg {
-  color: #94a3b8 !important;
+/* 2. Badges, Tags & Milestone Pills (Fallback CSS for items without explicit dark:bg-) */
+html.theme-dark span[class*="bg-amber-"]:not([class*="dark:bg-"]) {
+  background-color: #3b2306;
+  border-color: #b45309;
+  color: #fef08a;
 }
 
-/* Primary Add Schedule & Add Calendar Event Buttons */
-html.theme-dark button[onclick*="openAddScheduleModal"],
-html.theme-dark button[onclick*="openAddCalendarEventModal"] {
-  background-color: #7f1d1d !important;
-  border: 1px solid #991b1b !important;
-  color: #ffffff !important;
-}
-html.theme-dark button[onclick*="openAddScheduleModal"]:hover,
-html.theme-dark button[onclick*="openAddCalendarEventModal"]:hover {
-  background-color: #991b1b !important;
+html.theme-dark span[class*="bg-rose-"]:not([class*="dark:bg-"]) {
+  background-color: #3b0d18;
+  border-color: #be123c;
+  color: #fecdd3;
 }
 
-/* Email Filtered Sidebar Button */
-html.theme-dark #roster-widget-communications #roster-email-filtered-btn {
-  background-color: #0c213d !important;
-  border: 1px solid #2563eb !important;
-  color: #ffffff !important;
-}
-html.theme-dark #roster-widget-communications #roster-email-filtered-btn:hover {
-  background-color: #14325a !important;
-}
-html.theme-dark #roster-widget-communications #roster-email-filtered-btn span.text-blue-700 {
-  color: #93c5fd !important;
+html.theme-dark span[class*="bg-emerald-"]:not([class*="dark:bg-"]) {
+  background-color: #063526;
+  border-color: #059669;
+  color: #a7f3d0;
 }
 
-/* Individual Email Action Button in Roster Rows */
-html.theme-dark #student-table-body .roster-email-btn {
-  color: #60a5fa !important;
-}
-html.theme-dark #student-table-body .roster-email-btn:hover {
-  color: #93c5fd !important;
-}
-html.theme-dark #student-table-body .roster-email-btn svg {
-  color: #60a5fa !important;
+html.theme-dark span[class*="bg-blue-"]:not([class*="dark:bg-"]) {
+  background-color: #0f274a;
+  border-color: #2563eb;
+  color: #bfdbfe;
 }
 
-/* 2. Matrix & Timetable Lesson Schedule Cards (Matches both -50 and -100 backgrounds) */
-html.theme-dark [id^="card-"]:not([id$="__notes"]),
-html.theme-dark [id^="timetable-card-"] {
-  color: #f8fafc !important;
+html.theme-dark span[class*="bg-orange-"]:not([class*="dark:bg-"]) {
+  background-color: #431407;
+  border-color: #ea580c;
+  color: #fed7aa;
 }
 
-/* Emerald, Teal, Lime */
-html.theme-dark [id^="card-"][class*="bg-emerald-"],
-html.theme-dark [id^="card-"][class*="bg-teal-"],
-html.theme-dark [id^="card-"][class*="bg-lime-"],
-html.theme-dark [id^="timetable-card-"][class*="bg-emerald-"],
-html.theme-dark [id^="timetable-card-"][class*="bg-teal-"],
-html.theme-dark [id^="timetable-card-"][class*="bg-lime-"] {
-  background-color: #072a1e !important;
-  border-color: #059669 !important;
+html.theme-dark span[class*="bg-indigo-"]:not([class*="dark:bg-"]) {
+  background-color: #1f1b4d;
+  border-color: #4f46e5;
+  color: #c7d2fe;
 }
 
-/* Blue, Sky, Cyan, Indigo */
-html.theme-dark [id^="card-"][class*="bg-blue-"],
-html.theme-dark [id^="card-"][class*="bg-sky-"],
-html.theme-dark [id^="card-"][class*="bg-cyan-"],
-html.theme-dark [id^="card-"][class*="bg-indigo-"],
-html.theme-dark [id^="timetable-card-"][class*="bg-blue-"],
-html.theme-dark [id^="timetable-card-"][class*="bg-sky-"],
-html.theme-dark [id^="timetable-card-"][class*="bg-cyan-"],
-html.theme-dark [id^="timetable-card-"][class*="bg-indigo-"] {
-  background-color: #0e203c !important;
-  border-color: #2563eb !important;
-}
-
-/* Rose, Red, Maroon, No Class */
-html.theme-dark [id^="card-"][class*="bg-rose-"],
-html.theme-dark [id^="card-"][class*="bg-red-"],
-html.theme-dark [id^="timetable-card-"][class*="bg-rose-"],
-html.theme-dark [id^="timetable-card-"][class*="bg-red-"] {
-  background-color: #2d0e19 !important;
-  border-color: #be123c !important;
-}
-
-/* Amber, Orange, Yellow, Exam */
-html.theme-dark [id^="card-"][class*="bg-amber-"],
-html.theme-dark [id^="card-"][class*="bg-orange-"],
-html.theme-dark [id^="timetable-card-"][class*="bg-amber-"],
-html.theme-dark [id^="timetable-card-"][class*="bg-orange-"] {
-  background-color: #2b1803 !important;
-  border-color: #d97706 !important;
-}
-
-/* Violet, Purple, Fuchsia, Pink */
-html.theme-dark [id^="card-"][class*="bg-violet-"],
-html.theme-dark [id^="card-"][class*="bg-purple-"],
-html.theme-dark [id^="card-"][class*="bg-fuchsia-"],
-html.theme-dark [id^="card-"][class*="bg-pink-"],
-html.theme-dark [id^="timetable-card-"][class*="bg-violet-"],
-html.theme-dark [id^="timetable-card-"][class*="bg-purple-"],
-html.theme-dark [id^="timetable-card-"][class*="bg-fuchsia-"],
-html.theme-dark [id^="timetable-card-"][class*="bg-pink-"] {
-  background-color: #240e3b !important;
-  border-color: #7c3aed !important;
-}
-
-/* Slate / Neutral */
-html.theme-dark [id^="card-"][class*="bg-slate-"],
-html.theme-dark [id^="timetable-card-"][class*="bg-slate-"] {
-  background-color: #141d2b !important;
-  border-color: #475569 !important;
-}
-
-/* Card Content Typography & Contrast Inversion */
-html.theme-dark [id^="card-"] .font-bold,
-html.theme-dark [id^="timetable-card-"] .font-extrabold {
-  color: #ffffff !important;
-}
-
-html.theme-dark [id^="card-"] div[class*="text-[9px]"],
-html.theme-dark [id^="timetable-card-"] div[class*="text-[10px]"] {
-  color: #cbd5e1 !important;
-  opacity: 0.95 !important;
-}
-
-html.theme-dark [id^="card-"] span.font-extrabold {
-  color: #e2e8f0 !important;
-}
-
-html.theme-dark [id^="card-"] span.text-rose-700,
-html.theme-dark [id^="card-"] .text-rose-700 {
-  color: #fca5a5 !important;
-}
-
-html.theme-dark [id^="card-"] .text-slate-700 {
-  color: #cbd5e1 !important;
-}
-
-/* 3. Badges, Tags & Milestone Pills */
-html.theme-dark span[class*="bg-amber-100"],
-html.theme-dark span[class*="bg-amber-200"],
-html.theme-dark span[class*="bg-amber-50"] {
-  background-color: #3b2306 !important;
-  border-color: #b45309 !important;
-  color: #fef08a !important;
-}
-
-html.theme-dark span[class*="bg-rose-100"],
-html.theme-dark span[class*="bg-rose-200"],
-html.theme-dark span[class*="bg-rose-50"] {
-  background-color: #3b0d18 !important;
-  border-color: #be123c !important;
-  color: #fecdd3 !important;
-}
-
-html.theme-dark span[class*="bg-emerald-100"],
-html.theme-dark span[class*="bg-emerald-200"],
-html.theme-dark span[class*="bg-emerald-50"] {
-  background-color: #063526 !important;
-  border-color: #059669 !important;
-  color: #a7f3d0 !important;
-}
-
-html.theme-dark span[class*="bg-blue-100"],
-html.theme-dark span[class*="bg-blue-200"],
-html.theme-dark span[class*="bg-blue-50"] {
-  background-color: #0f274a !important;
-  border-color: #2563eb !important;
-  color: #bfdbfe !important;
-}
-
-html.theme-dark span[class*="bg-orange-100"],
-html.theme-dark span[class*="bg-orange-200"],
-html.theme-dark span[class*="bg-orange-50"] {
-  background-color: #431407 !important;
-  border-color: #ea580c !important;
-  color: #fed7aa !important;
-}
-
-html.theme-dark span[class*="bg-indigo-100"],
-html.theme-dark span[class*="bg-indigo-200"],
-html.theme-dark span[class*="bg-indigo-50"] {
-  background-color: #1f1b4d !important;
-  border-color: #4f46e5 !important;
-  color: #c7d2fe !important;
-}
-
-html.theme-dark span[class*="bg-purple-100"],
-html.theme-dark span[class*="bg-purple-200"],
-html.theme-dark span[class*="bg-purple-50"] {
-  background-color: #2b1245 !important;
-  border-color: #7c3aed !important;
-  color: #e9d5ff !important;
+html.theme-dark span[class*="bg-purple-"]:not([class*="dark:bg-"]) {
+  background-color: #2b1245;
+  border-color: #7c3aed;
+  color: #e9d5ff;
 }

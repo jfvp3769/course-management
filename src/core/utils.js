@@ -95,6 +95,46 @@ function timeToMinutes(tStr) {
   return h * 60 + m;
 }
 
+/**
+ * Parse a single CSV line respecting RFC 4180 quoted fields.
+ * Handles commas inside quotes and escaped double-quotes ("").
+ * Returns an array of trimmed field strings.
+ */
+function parseCSVLine(line) {
+  const fields = [];
+  let i = 0, len = line.length;
+  while (i <= len) {
+    if (i === len) { fields.push(''); break; }
+    if (line[i] === '"') {
+      let val = '';
+      i++; // skip opening quote
+      while (i < len) {
+        if (line[i] === '"') {
+          if (i + 1 < len && line[i + 1] === '"') {
+            val += '"'; i += 2; // escaped quote ""
+          } else {
+            i++; break;         // closing quote
+          }
+        } else {
+          val += line[i++];
+        }
+      }
+      fields.push(val.trim());
+      if (i < len && line[i] === ',') i++;
+    } else {
+      const next = line.indexOf(',', i);
+      if (next === -1) {
+        fields.push(line.substring(i).trim());
+        break;
+      } else {
+        fields.push(line.substring(i, next).trim());
+        i = next + 1;
+      }
+    }
+  }
+  return fields;
+}
+
 function showToast(msg, icon = '✓') {
   const toast = document.getElementById('toast');
   const iconElem = document.getElementById('toast-icon');

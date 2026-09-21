@@ -149,7 +149,7 @@ function importPlannerScheduleFile(event) {
         const lines = content.split(/\r?\n/).filter(Boolean);
         let importedCount = 0;
         for (let i = 1; i < lines.length; i++) {
-          const parts = lines[i].split(',').map(s => s.replace(/^"|"$/g, '').trim());
+          const parts = parseCSVLine(lines[i]);
           if (parts.length >= 5) {
             const dateStr = parts[0];
             const code = parts[2];
@@ -258,13 +258,13 @@ function importRosterCSVFile(event) {
 
       for (let i = (lines[0].toLowerCase().includes('id') ? 1 : 0); i < lines.length; i++) {
         const line = lines[i];
-        const parts = line.includes('\t') ? line.split('\t') : line.split(',');
+        const parts = line.includes('\t') ? line.split('\t').map(s => s.trim()) : parseCSVLine(line);
         if (parts.length >= 3) {
-          const id = parts[0].replace(/^"|"$/g, '').trim();
-          const last = parts[1].replace(/^"|"$/g, '').trim();
-          const first = parts[2].replace(/^"|"$/g, '').trim();
-          const email = parts[3] ? parts[3].replace(/^"|"$/g, '').trim() : (first.toLowerCase() + '.' + last.toLowerCase() + '@msugensan.edu.ph');
-          const section = parts[4] ? parts[4].replace(/^"|"$/g, '').trim() : 'Main';
+          const id = parts[0];
+          const last = parts[1];
+          const first = parts[2];
+          const email = parts[3] ? parts[3] : (first.toLowerCase() + '.' + last.toLowerCase() + '@msugensan.edu.ph');
+          const section = parts[4] ? parts[4] : 'Main';
 
           if (id && last) {
             if (!studentRoster.some(s => s.id === id && s.section === section)) {
@@ -302,7 +302,7 @@ function importGradebookScoresCSV(event) {
         return;
       }
 
-      const headers = lines[0].split(',').map(h => h.replace(/^"|"$/g, '').trim());
+      const headers = parseCSVLine(lines[0]);
       const idColIdx = headers.findIndex(h => h.toLowerCase().includes('student id') || h.toLowerCase() === 'id');
 
       if (idColIdx === -1) {
@@ -342,7 +342,7 @@ function importGradebookScoresCSV(event) {
 
       let updatedStudents = 0;
       for (let i = 1; i < lines.length; i++) {
-        const parts = lines[i].split(',').map(s => s.replace(/^"|"$/g, '').trim());
+        const parts = parseCSVLine(lines[i]);
         const studentId = parts[idColIdx];
         if (!studentId) continue;
 

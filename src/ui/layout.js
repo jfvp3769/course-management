@@ -44,7 +44,7 @@ ro.observe(bottomEl);
 if (bottomEl.firstElementChild) ro.observe(bottomEl.firstElementChild);
   }
   window.addEventListener("resize", syncTrackWidth);
-  setTimeout(syncTrackWidth, 150);
+  requestAnimationFrame(() => requestAnimationFrame(syncTrackWidth));
 }
 
 function initAllDualScrollbars() {

@@ -19,7 +19,7 @@ function renderColorSwatches(mode) {
     const meta = PALETTE_META[k];
     const isActive = (k === activeTheme);
     return `
-          <button type="button" onclick="selectColorTheme('${jsAttr(mode)}', '${jsAttr(k)}')" 
+          <button type="button" data-action="selectColorTheme" data-mode="${escapeHtml(mode)}" data-theme="${escapeHtml(k)}" 
             class="color-swatch-btn w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center cursor-pointer ${isActive ? 'color-swatch-active' : 'opacity-85 hover:opacity-100'}" 
             style="background-color: ${meta.hex};" 
             title="${meta.name} Palette">

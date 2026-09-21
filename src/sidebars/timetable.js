@@ -13,7 +13,7 @@ function setAgendaDay(day) {
 
 function highlightTimetableClass(course, section, day) {
   switchTab('timetable');
-  setTimeout(() => {
+  requestAnimationFrame(() => requestAnimationFrame(() => {
     const cardId = 'timetable-card-' + String(course).replace(/\s+/g, '_') + '-' + String(section).replace(/\s+/g, '_') + '-' + day;
     const card = document.getElementById(cardId);
     const wrapper = document.getElementById('timetable-scroll-wrapper');
@@ -31,7 +31,7 @@ function highlightTimetableClass(course, section, day) {
       setTimeout(() => card.classList.remove('activity-navigated-highlight'), 2200);
       showToast('Located ' + course + ' (' + section + ') on ' + day);
     }
-  }, 60);
+  }));
 }
 
 function updateTimetableSidebar() {
@@ -65,8 +65,8 @@ function updateTimetableSidebar() {
   if (loadStats) {
     loadStats.innerHTML = `
           <div class="flex items-center justify-between">
-            <span class="text-slate-600 font-semibold">Weekly Contact Hours:</span>
-            <span class="font-bold text-slate-900 text-sm">${hours} hrs / week</span>
+            <span class="text-slate-600 dark:text-slate-400 font-semibold">Weekly Contact Hours:</span>
+            <span class="font-bold text-slate-900 dark:text-slate-100 text-sm">${hours} hrs / week</span>
           </div>
         `;
   }
@@ -76,18 +76,18 @@ function updateTimetableSidebar() {
   if (distEl) {
     const maxDayMin = Math.max(1, ...Object.values(dayMinutes));
     distEl.innerHTML = `
-          <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Daily Distribution:</div>
+          <div class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Daily Distribution:</div>
           ${weekDays.map(d => {
         const mins = dayMinutes[d];
         const dayHrs = (mins / 60).toFixed(1);
         const barPct = Math.round((mins / maxDayMin) * 100);
         return `
               <div class="flex items-center gap-2 text-[10px]">
-                <span class="w-7 font-semibold text-slate-600">${d.substring(0, 3)}</span>
-                <div class="flex-1 bg-slate-100 rounded-full h-2 overflow-hidden border border-slate-200">
-                  <div class="h-full rounded-full ${mins > 0 ? 'bg-blue-600' : 'bg-transparent'}" style="width: ${barPct}%"></div>
+                <span class="w-7 font-semibold text-slate-600 dark:text-slate-300">${d.substring(0, 3)}</span>
+                <div class="flex-1 bg-slate-100 dark:bg-slate-800 rounded-full h-2 overflow-hidden border border-slate-200 dark:border-slate-700">
+                  <div class="h-full rounded-full ${mins > 0 ? 'bg-blue-600 dark:bg-blue-500' : 'bg-transparent'}" style="width: ${barPct}%"></div>
                 </div>
-                <span class="font-mono font-bold w-10 text-right text-slate-700">${dayHrs}h</span>
+                <span class="font-bold w-9 text-right text-slate-700 dark:text-slate-200">${dayHrs}h</span>
               </div>
             `;
       }).join('')}
@@ -116,16 +116,16 @@ function updateTimetableSidebar() {
 
     if (conflicts.length === 0) {
       conflictCont.innerHTML = `
-            <div class="p-2.5 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center gap-2 text-emerald-800 text-[11px] font-bold">
-              <span class="text-emerald-600">✓</span>
+            <div class="p-2.5 bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800/80 rounded-lg flex items-center gap-2 text-emerald-800 dark:text-emerald-300 text-[11px] font-bold">
+              <span class="text-emerald-600 dark:text-emerald-400">✓</span>
               <span>0 Room / Schedule Conflicts Detected</span>
             </div>
           `;
     } else {
       conflictCont.innerHTML = conflicts.map(c => `
-            <div class="p-2 bg-rose-50 border border-rose-200 rounded-lg text-rose-900 text-[11px] space-y-1 mb-1.5">
-              <div class="font-extrabold text-rose-800">⚠️ Room Conflict: ${escapeHtml(c.room)}</div>
-              <div>${c.day}: ${escapeHtml(c.a)} overlaps with ${escapeHtml(c.b)}</div>
+            <div class="p-2 bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-900/80 rounded-lg text-rose-900 dark:text-rose-200 text-[11px] space-y-1 mb-1.5">
+              <div class="font-extrabold text-rose-800 dark:text-rose-300">⚠️ Room Conflict: ${escapeHtml(c.room)}</div>
+              <div class="text-slate-700 dark:text-slate-300">${c.day}: ${escapeHtml(c.a)} overlaps with ${escapeHtml(c.b)}</div>
             </div>
           `).join('');
     }
@@ -149,9 +149,11 @@ function updateTimetableSidebar() {
         const isSelected = (d === displayDay);
         const isToday = (d === currentSystemDay);
         const shortName = d.substring(0, 3);
-        const activeClasses = isSelected ? 'bg-msu-maroon text-white font-black shadow-xs' : 'bg-slate-100 text-slate-700 hover:bg-slate-200 font-medium';
+        const activeClasses = isSelected
+          ? 'bg-msu-maroon text-white font-black shadow-xs'
+          : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 border border-transparent dark:border-slate-700/60 font-medium';
         return `
-              <button onclick="setAgendaDay('${jsAttr(d)}')" 
+              <button data-action="setAgendaDay" data-day="${escapeHtml(d)}" 
                 class="px-2 py-1 rounded-md transition ${activeClasses} relative" 
                 title="View ${d} Schedule">
                 ${shortName}
@@ -213,7 +215,7 @@ function updateTimetableSidebar() {
     }
 
     if (daySlots.length === 0) {
-      todayAgenda.innerHTML = `<div class="text-slate-400 italic text-[11px] py-3 text-center">No classes scheduled for ${displayDay}.</div>`;
+      todayAgenda.innerHTML = `<div class="text-slate-400 dark:text-slate-500 italic text-[11px] py-3 text-center">No classes scheduled for ${displayDay}.</div>`;
     } else {
       todayAgenda.innerHTML = daySlots.map(s => {
         const cellKey = `${todayDateKey}__${s.course}__${s.section}`;
@@ -221,22 +223,32 @@ function updateTimetableSidebar() {
         const isNoClass = entry && (entry.type === 'No Class' || entry.status === 'Cancelled' || (entry.topic && entry.topic.toLowerCase().includes('no class')));
         const hasPlannedTopic = entry && entry.topic && !isNoClass;
 
+        const cardClasses = isNoClass
+          ? 'bg-rose-50/70 dark:bg-[#200b12] border-rose-200 dark:border-rose-900/80 hover:bg-rose-100/70 dark:hover:bg-[#2d0e19] opacity-85'
+          : (s.isSpecialSession
+            ? 'bg-amber-50/70 dark:bg-[#1a1c24] border-amber-200 dark:border-amber-900/70 hover:bg-amber-100/80 dark:hover:bg-[#252834] hover:border-amber-300 dark:hover:border-amber-600/80'
+            : 'bg-slate-50 dark:bg-[#151922] hover:bg-blue-50/60 dark:hover:bg-[#1d2330] border-slate-200 dark:border-slate-800');
+
+        const titleHover = isNoClass
+          ? ''
+          : (s.isSpecialSession ? 'group-hover:text-msu-maroon dark:group-hover:text-amber-400' : 'group-hover:text-blue-900 dark:group-hover:text-blue-400');
+
         return `
-              <div onclick="highlightTimetableClass('${jsAttr(s.course)}', '${jsAttr(s.section)}', '${jsAttr(s.day)}')"
-                class="p-2 ${isNoClass ? 'bg-rose-50/70 border-rose-200 opacity-80' : (s.isSpecialSession ? 'bg-amber-50/70 border-amber-200' : 'bg-slate-50 hover:bg-blue-50/60 border-slate-200')} border rounded-lg flex items-center justify-between gap-2 text-xs transition cursor-pointer group">
+              <div data-action="highlightTimetableClass" data-course="${escapeHtml(s.course)}" data-section="${escapeHtml(s.section)}" data-day="${escapeHtml(s.day)}"
+                class="p-2 ${cardClasses} border rounded-lg flex items-center justify-between gap-2 text-xs transition cursor-pointer group shadow-2xs">
                 <div class="min-w-0">
-                  <div class="font-extrabold text-slate-800 text-[11px] group-hover:text-blue-900 transition flex items-center gap-1.5 flex-wrap">
-                    <span class="${isNoClass ? 'line-through text-rose-800' : ''}">${escapeHtml(s.course)} - ${escapeHtml(s.section)}</span>
-                    ${isNoClass ? '<span class="text-[8px] font-bold px-1.5 py-0.2 rounded bg-rose-100 text-rose-700 border border-rose-200">No Class</span>' : ''}
-                    ${s.isSpecialSession ? '<span class="text-[8px] font-bold px-1.5 py-0.2 rounded bg-amber-100 text-amber-800 border border-amber-200">⚡ Special</span>' : ''}
+                  <div class="font-extrabold text-slate-800 dark:text-slate-100 text-[11px] ${titleHover} transition flex items-center gap-1.5 flex-wrap">
+                    <span class="${isNoClass ? 'line-through text-rose-800 dark:text-rose-400' : ''}">${escapeHtml(s.course)} - ${escapeHtml(s.section)}</span>
+                    ${isNoClass ? '<span class="text-[8px] font-bold px-1.5 py-0.2 rounded bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800">No Class</span>' : ''}
+                    ${s.isSpecialSession ? '<span class="text-[8px] font-bold px-1.5 py-0.2 rounded bg-amber-100 dark:bg-amber-950/90 text-amber-900 dark:text-amber-300 border border-amber-300 dark:border-amber-700/80">⚡ Special</span>' : ''}
                   </div>
-                  <div class="text-[10px] text-slate-500 font-mono">${formatTime12(s.startTime)} - ${formatTime12(s.endTime)} • Rm ${escapeHtml(s.room)}</div>
-                  ${hasPlannedTopic ? `<div class="text-[10px] text-slate-600 truncate italic mt-0.5">${escapeHtml(entry.topic)}</div>` : ''}
+                  <div class="text-[10.5px] font-semibold text-slate-500 dark:text-slate-400 tracking-tight">${formatTime12(s.startTime)} – ${formatTime12(s.endTime)} • Rm ${escapeHtml(s.room)}</div>
+                  ${hasPlannedTopic ? `<div class="text-[10px] text-slate-600 ${s.isSpecialSession ? 'dark:text-amber-200/90' : 'dark:text-slate-300'} truncate italic mt-0.5">${escapeHtml(entry.topic)}</div>` : ''}
                 </div>
-                <div class="shrink-0" onclick="event.stopPropagation()">
+                <div class="shrink-0" data-action="noop" data-stop-propagation="true">
                   ${getClassroomLink(s.course, s.section) 
-                ? `<a href="${escapeHtml(getClassroomLink(s.course, s.section))}" target="_blank" rel="noopener noreferrer" class="p-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-lg flex items-center justify-center transition shadow-2xs group/btn" title="Open Google Classroom for ${escapeHtml(s.course)} (${escapeHtml(s.section)})">
-                        <svg class="w-3.5 h-3.5 text-emerald-700 group-hover/btn:scale-110 transition" viewBox="0 0 24 24" fill="currentColor">
+                ? `<a href="${escapeHtml(getClassroomLink(s.course, s.section))}" target="_blank" rel="noopener noreferrer" class="p-1.5 bg-emerald-50 hover:bg-emerald-100 dark:bg-[#06291e] dark:hover:bg-[#0a3d2c] text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700/80 rounded-lg flex items-center justify-center transition shadow-2xs group/btn" title="Open Google Classroom for ${escapeHtml(s.course)} (${escapeHtml(s.section)})">
+                        <svg class="w-3.5 h-3.5 text-emerald-700 dark:text-emerald-400 group-hover/btn:scale-110 transition" viewBox="0 0 24 24" fill="currentColor">
                           <path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/>
                         </svg>
                       </a>`

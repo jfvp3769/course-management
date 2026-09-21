@@ -30,14 +30,13 @@ function switchTab(tabId) {
   updateTabSidebar(tabId);
   checkAndSyncBackdrop();
   if (typeof initAllDualScrollbars === 'function') {
-    setTimeout(initAllDualScrollbars, 60);
+    requestAnimationFrame(() => requestAnimationFrame(initAllDualScrollbars));
   }
   if (typeof initMainWindowResizers === 'function') {
     initMainWindowResizers();
   }
   if (typeof autoResizeContentWindows === 'function') {
     autoResizeContentWindows();
-    requestAnimationFrame(autoResizeContentWindows);
-    setTimeout(autoResizeContentWindows, 60);
+    requestAnimationFrame(() => requestAnimationFrame(autoResizeContentWindows));
   }
 }
