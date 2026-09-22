@@ -150,7 +150,7 @@ function updateTimetableSidebar() {
         const isToday = (d === currentSystemDay);
         const shortName = d.substring(0, 3);
         const activeClasses = isSelected
-          ? 'bg-msu-maroon text-white font-black shadow-xs'
+          ? 'app-themed-btn-primary text-white font-black shadow-xs'
           : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 border border-transparent dark:border-slate-700/60 font-medium';
         return `
               <button data-action="setAgendaDay" data-day="${escapeHtml(d)}" 
@@ -231,7 +231,7 @@ function updateTimetableSidebar() {
 
         const titleHover = isNoClass
           ? ''
-          : (s.isSpecialSession ? 'group-hover:text-msu-maroon dark:group-hover:text-amber-400' : 'group-hover:text-blue-900 dark:group-hover:text-blue-400');
+          : (s.isSpecialSession ? 'group-hover:text-[var(--app-header-primary)] dark:group-hover:text-amber-400' : 'group-hover:text-blue-900 dark:group-hover:text-blue-400');
 
         return `
               <div data-action="highlightTimetableClass" data-course="${escapeHtml(s.course)}" data-section="${escapeHtml(s.section)}" data-day="${escapeHtml(s.day)}"

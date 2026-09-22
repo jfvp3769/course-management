@@ -127,4 +127,221 @@
           margin-left 0.68s cubic-bezier(0.25, 1, 0.35, 1) !important;
 }
 
+/* Dynamic Themed Planner Action Buttons & Harmonization */
+.planner-action-btn {
+  background-color: var(--white) !important;
+  border-color: var(--slate-300) !important;
+  color: var(--app-header-primary, #800000) !important;
+}
+
+.planner-action-btn svg {
+  color: var(--app-header-primary, #800000) !important;
+}
+
+.planner-action-btn:hover:not(:disabled) {
+  border-color: var(--app-header-primary, #800000) !important;
+  background-color: color-mix(in srgb, var(--app-header-primary, #800000) 8%, #ffffff) !important;
+  color: var(--app-header-primary, #800000) !important;
+}
+
+.planner-action-btn:hover:not(:disabled) svg {
+  color: var(--app-header-primary, #800000) !important;
+}
+
+.planner-action-btn:disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+  border-color: var(--slate-200) !important;
+  color: #94a3b8 !important;
+  background-color: #f8fafc !important;
+}
+
+html.theme-dark .planner-action-btn {
+  background-color: #1e293b !important;
+  border-color: #475569 !important;
+  color: var(--app-header-accent, #daa520) !important;
+}
+
+html.theme-dark .planner-action-btn svg {
+  color: var(--app-header-accent, #daa520) !important;
+}
+
+html.theme-dark .planner-action-btn:hover:not(:disabled) {
+  border-color: var(--app-header-accent, #daa520) !important;
+  background-color: rgba(218, 165, 32, 0.14) !important;
+  color: var(--app-header-tab-text, #fde047) !important;
+}
+
+html.theme-dark .planner-action-btn:hover:not(:disabled) svg {
+  color: var(--app-header-tab-text, #fde047) !important;
+}
+
+html.theme-dark .planner-action-btn:disabled {
+  border-color: #334155 !important;
+  color: #64748b !important;
+  background-color: #0f172a !important;
+}
+
+/* Planner Week Navigator Theming */
+.planner-week-nav-btn {
+  color: var(--app-header-primary, #800000) !important;
+  transition: all 0.2s ease !important;
+}
+
+.planner-week-nav-btn:hover {
+  border-color: var(--app-header-primary, #800000) !important;
+  background-color: color-mix(in srgb, var(--app-header-primary, #800000) 8%, #ffffff) !important;
+  color: var(--app-header-primary, #800000) !important;
+}
+
+html.theme-dark .planner-week-nav-btn {
+  color: var(--app-header-accent, #daa520) !important;
+}
+
+html.theme-dark .planner-week-nav-btn:hover {
+  border-color: var(--app-header-accent, #daa520) !important;
+  background-color: rgba(218, 165, 32, 0.14) !important;
+  color: var(--app-header-tab-text, #fde047) !important;
+}
+
+#current-week-nav-label {
+  color: var(--app-header-primary, #800000) !important;
+}
+
+html.theme-dark #current-week-nav-label {
+  color: var(--app-header-accent, #daa520) !important;
+}
+
+/* ================= UNIFIED TAB HEADER ACTION BUTTONS ================= */
+.tab-header-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem; /* 6px */
+  height: 2rem !important; /* 32px matching control height */
+  padding-left: 0.75rem !important; /* 12px */
+  padding-right: 0.75rem !important;
+  background-color: var(--white) !important;
+  color: var(--app-header-primary, #800000) !important;
+  border: 1px solid var(--slate-300) !important;
+  border-radius: 0.5rem !important; /* 8px */
+  font-size: 0.75rem !important; /* 12px */
+  font-weight: 700 !important;
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
+  cursor: pointer;
+  user-select: none;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s cubic-bezier(0.2, 0, 0, 1) !important;
+}
+
+.tab-header-btn.hidden,
+.tab-header-btn[hidden],
+.planner-action-btn.hidden,
+.planner-action-btn[hidden] {
+  display: none !important;
+}
+
+.tab-header-btn svg {
+  color: var(--app-header-primary, #800000) !important;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.tab-header-btn:hover:not(:disabled) {
+  border-color: var(--app-header-primary, #800000) !important;
+  background-color: color-mix(in srgb, var(--app-header-primary, #800000) 8%, #ffffff) !important;
+  color: var(--app-header-primary, #800000) !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+.tab-header-btn:hover:not(:disabled) svg {
+  color: var(--app-header-primary, #800000) !important;
+}
+
+.tab-header-btn:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+.tab-header-btn:disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+}
+
+/* Active State (e.g. Grading Scale Drawer open) */
+.tab-header-btn.is-active-btn {
+  border-color: var(--app-header-primary, #800000) !important;
+  background-color: color-mix(in srgb, var(--app-header-primary, #800000) 14%, #ffffff) !important;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Dark Mode Harmonization */
+html.theme-dark .tab-header-btn {
+  background-color: #1e293b !important;
+  border-color: #475569 !important;
+  color: var(--app-header-accent, #daa520) !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+html.theme-dark .tab-header-btn svg {
+  color: var(--app-header-accent, #daa520) !important;
+}
+
+html.theme-dark .tab-header-btn:hover:not(:disabled) {
+  border-color: var(--app-header-accent, #daa520) !important;
+  background-color: rgba(218, 165, 32, 0.14) !important;
+  color: var(--app-header-tab-text, #fde047) !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+html.theme-dark .tab-header-btn:hover:not(:disabled) svg {
+  color: var(--app-header-tab-text, #fde047) !important;
+}
+
+html.theme-dark .tab-header-btn.is-active-btn {
+  border-color: var(--app-header-accent, #daa520) !important;
+  background-color: rgba(218, 165, 32, 0.22) !important;
+}
+
+/* Danger Variant (for destructive / warning actions like Remove All Students, Reset Filter) */
+.tab-header-btn.tab-header-btn-danger {
+  color: #be123c !important; /* rose-700 */
+  border-color: #fda4af !important; /* rose-300 */
+  background-color: var(--white) !important;
+}
+
+.tab-header-btn.tab-header-btn-danger svg {
+  color: #e11d48 !important; /* rose-600 */
+}
+
+.tab-header-btn.tab-header-btn-danger:hover:not(:disabled) {
+  background-color: #fff1f2 !important; /* rose-50 */
+  border-color: #f43f5e !important; /* rose-500 */
+  color: #9f1239 !important; /* rose-800 */
+}
+
+.tab-header-btn.tab-header-btn-danger:hover:not(:disabled) svg {
+  color: #be123c !important;
+}
+
+html.theme-dark .tab-header-btn.tab-header-btn-danger {
+  background-color: #1e293b !important;
+  border-color: rgba(244, 63, 94, 0.45) !important;
+  color: #fda4af !important; /* rose-300 */
+}
+
+html.theme-dark .tab-header-btn.tab-header-btn-danger svg {
+  color: #fb7185 !important; /* rose-400 */
+}
+
+html.theme-dark .tab-header-btn.tab-header-btn-danger:hover:not(:disabled) {
+  background-color: rgba(159, 18, 57, 0.25) !important;
+  border-color: #f43f5e !important;
+  color: #ffe4e6 !important;
+}
+
+html.theme-dark .tab-header-btn.tab-header-btn-danger:hover:not(:disabled) svg {
+  color: #ffe4e6 !important;
+}
+
+
 

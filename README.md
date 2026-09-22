@@ -1,4 +1,4 @@
-# Faculty Course & Lesson Manager (v2.4.0)
+# Faculty Course & Lesson Manager (v2.5.0)
 
 [![Offline Ready](https://img.shields.io/badge/Offline-100%25%20Ready-success?style=flat-square&logo=pwa)](index.html)
 [![Zero Build](https://img.shields.io/badge/Build%20Step-Zero%20Bundler-blue?style=flat-square)](index.html)
@@ -237,7 +237,24 @@ All user data is stored entirely on the client side via the browser's `localStor
 
 ## Version History & Changelog
 
-### Version 2.4.0 (September 2026) — *Current Release*
+### Version 2.5.0 (September 2026) — *Current Release*
+- **Full UI Dynamic Theme Harmonization (Tier 0 & Tier 1)**:
+  - Synchronized remaining modals (`#grading-scale-modal`, `#grading-criteria-modal`, `#google-classroom-modal`) with `.app-themed-header` and `.app-themed-subtitle`.
+  - Standardized all 8 primary save/commit buttons across all modals to `.app-themed-btn-primary`.
+  - Added prominent `3.5px` top accent borders to all sidebar widget cards across all 5 sidebars bound to `--app-header-primary` (light) and `--app-header-accent` (dark).
+  - Styled widget header titles and main tab section headers (`h2`) with active theme colors.
+  - Global input focus rings and checkboxes/radios dynamically glow with active theme accents.
+- **Unified Tab Header Action Buttons (`.tab-header-btn`)**:
+  - Harmonized all action buttons across the toolbars of all 5 tabs (Lesson Planner, Weekly Timetable, Academic Calendar, Student Roster, Gradebook) into a consistent 32px height, 8px rounded card design.
+  - Replaced inconsistent legacy pastel colors (pink, yellow, purple, dark green) with clean white surfaces, slate borders, and active theme text/icons in light mode, and elevated slate cards in dark mode.
+  - Dedicated danger variant (`.tab-header-btn-danger`) for destructive operations (`Remove All Students`, `Reset Filter`).
+  - Resolved Reset Filter button lifecycle by ensuring `.tab-header-btn.hidden` correctly hides with `display: none !important` when no filter is active.
+- **Themed Docked Sidebar Overview Toggles (`<< ... Overview`)**:
+  - All 5 docked sidebar toggles (`Planner Overview`, `Timetable Overview`, `Calendar Overview`, `Roster Overview`, `Gradebook Overview`) dynamically inherit active theme colors and hover borders.
+- **Service Worker & Cache Upgrade**:
+  - Bumped service worker cache to `v2.38` for immediate update propagation across devices.
+
+### Version 2.4.0 (September 2026)
 - **Visual Theme & Appearance Customization**:
   - Added dedicated **Visual Theme & Appearance** modal directly in the top header (`#btn-theme-toggle`), decoupling visual theming from administrative term settings.
   - Implemented 8 rich preset header gradients: Heritage Maroon & Gold, Academic Navy & Gold, Ocean Sapphire & Sky, Forest Emerald & Mint, Royal Violet & Lavender, Executive Slate & Ice, Mahogany & Amber Bronze, and Deep Teal & Seafoam.

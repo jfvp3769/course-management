@@ -262,8 +262,8 @@ function getGradebookSortIndicator(colKey) {
     return '<span class="text-[10px] text-slate-400 opacity-60 ml-1 inline-block">⇅</span>';
   }
   return gradebookSortState.direction === 'asc'
-    ? '<span class="text-[11px] text-msu-maroon font-black ml-1 inline-block">▲</span>'
-    : '<span class="text-[11px] text-msu-maroon font-black ml-1 inline-block">▼</span>';
+    ? '<span class="text-[11px] app-themed-link font-black ml-1 inline-block">▲</span>'
+    : '<span class="text-[11px] app-themed-link font-black ml-1 inline-block">▼</span>';
 }
 
 function toggleGradebookSort(colKey) {
@@ -300,13 +300,7 @@ function toggleGradingScaleDrawer() {
   scaleDrawer.classList.toggle('hidden');
   const isOpen = !scaleDrawer.classList.contains('hidden');
   if (scaleBtn) {
-    if (isOpen) {
-      scaleBtn.classList.add('ring-2', 'ring-amber-500', 'bg-amber-100', 'shadow-inner');
-      scaleBtn.classList.remove('bg-amber-50');
-    } else {
-      scaleBtn.classList.remove('ring-2', 'ring-amber-500', 'bg-amber-100', 'shadow-inner');
-      scaleBtn.classList.add('bg-amber-50');
-    }
+    scaleBtn.classList.toggle('is-active-btn', isOpen);
   }
 }
 

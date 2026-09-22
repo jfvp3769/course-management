@@ -506,7 +506,7 @@ function _updateRadarFilterPills() {
     const f = btn.getAttribute('data-radar-filter');
     const isSelected = (f === currentRadarFilter);
     if (isSelected) {
-      btn.className = 'radar-filter-pill px-2 py-0.5 text-[10px] font-bold rounded-md bg-msu-maroon text-white transition shadow-2xs';
+      btn.className = 'radar-filter-pill app-themed-btn-primary px-2 py-0.5 text-[10px] font-bold rounded-md bg-msu-maroon text-white transition shadow-2xs';
     } else {
       btn.className = 'radar-filter-pill px-2 py-0.5 text-[10px] font-medium rounded-md bg-slate-100 text-slate-600 hover:bg-slate-200 transition';
     }

@@ -39,9 +39,11 @@ function setCalendarTypeFilter(type) {
   if (label) label.innerText = labelsMap[type] || 'Type: All';
   if (btn) {
     if (type !== 'all') {
-      btn.classList.add('bg-amber-100', 'text-amber-900', 'border', 'border-amber-300');
+      btn.classList.add('app-themed-btn-primary');
+      btn.classList.remove('text-slate-700');
     } else {
-      btn.classList.remove('bg-amber-100', 'text-amber-900', 'border', 'border-amber-300');
+      btn.classList.remove('app-themed-btn-primary');
+      btn.classList.add('text-slate-700');
     }
   }
 
@@ -118,12 +120,12 @@ function renderAcademicCalendarTable() {
               </div>
             </td>
             <td class="py-2.5 px-4 font-bold text-slate-800 dark:text-slate-100">${escapeHtml(evt.activity)}</td>
-            <td class="py-2.5 px-4 font-semibold text-msu-maroon dark:text-rose-300 bg-amber-50/40 dark:bg-slate-800/60 border-x border-amber-200/60 dark:border-slate-700">${escapeHtml(evt.firstSem || '—')}</td>
+            <td class="py-2.5 px-4 font-semibold app-themed-link dark:text-rose-300 bg-amber-50/40 dark:bg-slate-800/60 border-x border-amber-200/60 dark:border-slate-700">${escapeHtml(evt.firstSem || '—')}</td>
             <td class="py-2.5 px-4 font-semibold text-blue-900 dark:text-blue-300 bg-blue-50/20 dark:bg-slate-800/40 border-r border-blue-200/60 dark:border-slate-700">${escapeHtml(evt.secondSem || '—')}</td>
             <td class="py-2.5 px-4 font-semibold text-emerald-900 dark:text-emerald-300 bg-emerald-50/20 dark:bg-slate-800/40 border-r border-emerald-200/60 dark:border-slate-700">${escapeHtml(evt.summer || '—')}</td>
             <td class="py-2.5 px-3 text-center">
               <div class="flex items-center justify-center gap-1.5">
-                <button type="button" data-action="openEditCalendarEvent" data-idx="${idx}" title="Edit event" class="p-1.5 text-slate-500 dark:text-slate-400 hover:text-msu-maroon dark:hover:text-rose-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition">
+                <button type="button" data-action="openEditCalendarEvent" data-idx="${idx}" title="Edit event" class="p-1.5 text-slate-500 dark:text-slate-400 hover:text-[var(--app-header-primary)] dark:hover:text-rose-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
                 </button>
                 <button type="button" data-action="deleteCalendarEventByIndex" data-idx="${idx}" title="Delete event" class="p-1.5 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-lg transition">

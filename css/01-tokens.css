@@ -172,3 +172,142 @@ html.theme-dark .text-slate-500 {
 html.theme-dark .text-slate-400 {
   color: #94a3b8;
 }
+
+/* ==========================================================================
+ * TIER 1 DYNAMIC THEME SYSTEM EXTENSIONS
+ * ========================================================================== */
+
+/* Tab Content Section Main Titles */
+.tab-main-window h2,
+#planner-term-label {
+  color: var(--app-header-primary, #800000) !important;
+  transition: color 0.25s ease;
+}
+
+html.theme-dark .tab-main-window h2,
+html.theme-dark #planner-term-label {
+  color: var(--app-header-accent, #daa520) !important;
+}
+
+/* Planner Term Total Weeks Badge */
+#planner-total-weeks-badge {
+  color: var(--app-header-primary, #800000) !important;
+  border-color: var(--app-header-primary, #800000) !important;
+  background-color: rgba(128, 0, 0, 0.08) !important;
+}
+
+html.theme-dark #planner-total-weeks-badge {
+  color: var(--app-header-tab-text, #fde047) !important;
+  border-color: var(--app-header-accent, #daa520) !important;
+  background-color: rgba(218, 165, 32, 0.12) !important;
+}
+
+/* Sidebar Widget Cards: Dynamic Top Accent Border */
+.tab-sidebar > div[id^="planner-widget-"],
+.tab-sidebar > div[id^="timetable-widget-"],
+.tab-sidebar > div[id^="calendar-widget-"],
+.tab-sidebar > div[id^="roster-widget-"],
+.tab-sidebar > div[id^="gradebook-widget-"] {
+  border-top: 3.5px solid var(--app-header-primary, #800000) !important;
+  transition: border-color 0.25s ease, box-shadow 0.2s ease !important;
+}
+
+html.theme-dark .tab-sidebar > div[id^="planner-widget-"],
+html.theme-dark .tab-sidebar > div[id^="timetable-widget-"],
+html.theme-dark .tab-sidebar > div[id^="calendar-widget-"],
+html.theme-dark .tab-sidebar > div[id^="roster-widget-"],
+html.theme-dark .tab-sidebar > div[id^="gradebook-widget-"] {
+  border-top: 3.5px solid var(--app-header-accent, #daa520) !important;
+}
+
+/* Sidebar Widget Header Titles */
+.tab-sidebar [id*="-widget-"] > div:first-child > span.font-extrabold,
+.tab-sidebar [id*="-widget-"] > div:first-child > div.font-extrabold {
+  color: var(--app-header-primary, #800000);
+  transition: color 0.25s ease;
+}
+
+html.theme-dark .tab-sidebar [id*="-widget-"] > div:first-child > span.font-extrabold,
+html.theme-dark .tab-sidebar [id*="-widget-"] > div:first-child > div.font-extrabold {
+  color: var(--app-header-accent, #daa520);
+}
+
+/* Saved Offline Indicator Subtle Themed Accent on Hover */
+#save-status-indicator:hover {
+  border-color: var(--app-header-accent, #daa520) !important;
+}
+
+/* Form Input & Textarea Focus Rings */
+input:focus,
+input:focus-visible,
+select:focus,
+select:focus-visible,
+textarea:focus,
+textarea:focus-visible {
+  --tw-ring-color: var(--app-header-primary, #800000) !important;
+  border-color: var(--app-header-primary, #800000) !important;
+}
+
+html.theme-dark input:focus,
+html.theme-dark input:focus-visible,
+html.theme-dark select:focus,
+html.theme-dark select:focus-visible,
+html.theme-dark textarea:focus,
+html.theme-dark textarea:focus-visible {
+  --tw-ring-color: var(--app-header-accent, #daa520) !important;
+  border-color: var(--app-header-accent, #daa520) !important;
+}
+
+/* Checkboxes & Radios Accent Theming */
+input[type="checkbox"],
+input[type="radio"] {
+  accent-color: var(--app-header-primary, #800000);
+}
+
+input[type="checkbox"].text-msu-maroon,
+input[type="radio"].text-msu-maroon {
+  color: var(--app-header-primary, #800000) !important;
+}
+
+html.theme-dark input[type="checkbox"],
+html.theme-dark input[type="radio"] {
+  accent-color: var(--app-header-accent, #daa520);
+}
+
+html.theme-dark input[type="checkbox"].text-msu-maroon,
+html.theme-dark input[type="radio"].text-msu-maroon {
+  color: var(--app-header-accent, #daa520) !important;
+}
+
+/* Sidebar Docked Toggle Ear Tags & Overview Titles */
+.sidebar-docked-tag .sidebar-tab-title {
+  color: var(--app-header-primary, #800000) !important;
+  transition: color 0.25s ease;
+}
+
+.sidebar-docked-tag svg {
+  color: var(--app-header-primary, #800000) !important;
+  transition: color 0.25s ease, transform 0.2s ease;
+}
+
+.sidebar-docked-tag:hover {
+  border-color: var(--app-header-primary, #800000) !important;
+}
+
+.sidebar-docked-tag:hover .sidebar-tab-title,
+.sidebar-docked-tag:hover svg {
+  filter: brightness(1.18);
+}
+
+html.theme-dark .sidebar-docked-tag .sidebar-tab-title {
+  color: var(--app-header-accent, #daa520) !important;
+}
+
+html.theme-dark .sidebar-docked-tag svg {
+  color: var(--app-header-accent, #daa520) !important;
+}
+
+html.theme-dark .sidebar-docked-tag:hover {
+  border-color: var(--app-header-accent, #daa520) !important;
+}
+

@@ -159,7 +159,7 @@ function updateCalendarSidebar() {
                   title="Click to view detailed lost teaching dates for ${escapeHtml(it.course)} (${escapeHtml(it.sec)})"
                   class="p-2 ${it.lostCount > 0 ? 'bg-amber-50/70 dark:bg-[#1a1c24] border-amber-200 dark:border-amber-900/60 hover:bg-amber-100/80 dark:hover:bg-[#252834] hover:border-amber-300 dark:hover:border-amber-600/70' : 'bg-slate-50 dark:bg-[#151922] border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-[#1d2330]'} border rounded-lg flex items-center justify-between text-xs cursor-pointer transition group shadow-2xs">
                   <div class="flex items-center gap-1.5 min-w-0">
-                    <span class="font-bold text-slate-800 dark:text-slate-100 text-[11px] group-hover:text-msu-maroon dark:group-hover:text-amber-400 transition truncate">${escapeHtml(it.course)} - ${escapeHtml(it.sec)}</span>
+                    <span class="font-bold text-slate-800 dark:text-slate-100 text-[11px] group-hover:text-[var(--app-header-primary)] dark:group-hover:text-amber-400 transition truncate">${escapeHtml(it.course)} - ${escapeHtml(it.sec)}</span>
                   </div>
                   <span class="text-[10px] font-bold ${it.lostCount > 0 ? 'text-amber-900 dark:text-amber-300 bg-amber-100 dark:bg-amber-950/80 border border-amber-200 dark:border-amber-800/80' : 'text-slate-600 dark:text-slate-400 bg-slate-200 dark:bg-slate-800 border border-slate-300 dark:border-slate-700'} px-2 py-0.5 rounded-md shrink-0">
                     ${it.lostCount} / ${it.totalMeetings} Days Lost (${it.pct}%)

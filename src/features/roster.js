@@ -9,8 +9,8 @@ function getRosterSortIndicator(colKey) {
     return '<span class="text-[10px] text-slate-400 opacity-60 ml-1 inline-block">⇅</span>';
   }
   return rosterSortState.direction === 'asc'
-    ? '<span class="text-[11px] text-msu-maroon font-black ml-1 inline-block">▲</span>'
-    : '<span class="text-[11px] text-msu-maroon font-black ml-1 inline-block">▼</span>';
+    ? '<span class="text-[11px] app-themed-link font-black ml-1 inline-block">▲</span>'
+    : '<span class="text-[11px] app-themed-link font-black ml-1 inline-block">▼</span>';
 }
 
 function toggleRosterSort(colKey) {
