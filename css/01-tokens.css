@@ -299,6 +299,36 @@ html.theme-dark input[type="radio"].text-msu-maroon {
   filter: brightness(1.18);
 }
 
+html.theme-dark .sidebar-docked-tag {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+  border-left-color: #1e293b !important;
+}
+
+html.theme-dark .sidebar-docked-tag.sidebar-tag-collapsed {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+  border-left-color: #1e293b !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3) !important;
+}
+
+html.theme-dark .sidebar-docked-tag.sidebar-tag-collapsed:hover {
+  background-color: #27354f !important;
+  border-color: var(--app-header-accent, #daa520) !important;
+  border-left-color: #27354f !important;
+}
+
+html.theme-dark .sidebar-docked-tag.sidebar-tag-expanded {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+  border-left-color: #1e293b !important;
+}
+
+html.theme-dark .sidebar-docked-tag.sidebar-tag-expanded:hover {
+  background-color: #27354f !important;
+  border-color: var(--app-header-accent, #daa520) !important;
+}
+
 html.theme-dark .sidebar-docked-tag .sidebar-tab-title {
   color: var(--app-header-accent, #daa520) !important;
 }
@@ -310,4 +340,5 @@ html.theme-dark .sidebar-docked-tag svg {
 html.theme-dark .sidebar-docked-tag:hover {
   border-color: var(--app-header-accent, #daa520) !important;
 }
+
 

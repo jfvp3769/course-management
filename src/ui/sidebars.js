@@ -56,7 +56,7 @@ function updateSidebarToggleButton(tabId, isCollapsed) {
     btn.classList.add('sidebar-tag-collapsed');
     btn.classList.remove('sidebar-tag-expanded');
     btn.innerHTML = `
-          <svg class="w-4 h-4 text-amber-700 transition-transform group-hover:translate-x-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-4 h-4 transition-transform group-hover:translate-x-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 5l7 7-7 7M5 5l7 7-7 7"/>
           </svg>
           <span class="sr-only sidebar-toggle-text">Sidebar</span>
@@ -66,10 +66,10 @@ function updateSidebarToggleButton(tabId, isCollapsed) {
     btn.classList.add('sidebar-tag-expanded');
     btn.innerHTML = `
           <div class="flex items-center justify-center gap-2 w-full min-w-0">
-            <svg class="w-4 h-4 text-slate-600 transition-transform group-hover:-translate-x-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-4 h-4 transition-transform group-hover:-translate-x-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
             </svg>
-            <span class="font-extrabold text-xs sm:text-sm text-slate-900 tracking-tight truncate sidebar-tab-title text-center">${title}</span>
+            <span class="font-extrabold text-xs sm:text-sm tracking-tight truncate sidebar-tab-title text-center">${title}</span>
           </div>
           <span class="sr-only sidebar-toggle-text">Hide</span>
         `;
