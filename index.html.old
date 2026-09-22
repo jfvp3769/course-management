@@ -288,7 +288,8 @@
 
               <!-- 5. Jump to Today -->
               <button type="button" data-action="scrollToToday" class="planner-action-btn planner-btn-today bg-amber-400 hover:bg-amber-300 dark:bg-amber-700 dark:hover:bg-amber-600 text-slate-900 dark:text-white border border-amber-500/30 dark:border-amber-600 shadow-2xs" title="Jump to today's date in matrix">
-                <svg class="w-3.5 h-3.5 text-msu-maroon dark:text-amber-200 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">           
+                <svg class="w-3.5 h-3.5 text-msu-maroon dark:text-amber-200 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-3.5 h-3.5 text-current shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                   <circle cx="12" cy="15" r="1.5" fill="currentColor" stroke="none"/>
                 </svg>
@@ -571,6 +572,7 @@
             <tr class="border-b border-slate-300 text-slate-700 font-bold">
               <th class="py-2.5 px-3 w-44 text-center relative select-none">
                 <button type="button" id="calendar-type-header-btn" data-action="toggleCalendarTypeDropdown" class="inline-flex items-center justify-center gap-1.5 font-bold text-slate-700 hover:text-msu-maroon hover:bg-slate-200/70 px-2.5 py-1.5 rounded-lg transition w-full">
+                <button type="button" id="calendar-type-header-btn" data-action="toggleCalendarTypeDropdown" class="inline-flex items-center justify-center gap-1.5 font-bold text-slate-700 hover:opacity-85 px-2.5 py-1.5 rounded-lg transition w-full">
                   <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
                   <span id="calendar-type-header-label">Type: All</span>
                   <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
@@ -578,27 +580,33 @@
                 <div id="calendar-type-menu" class="hidden absolute left-2 top-full mt-1 w-52 bg-white rounded-xl shadow-xl border border-slate-200 py-1.5 z-30 text-left font-normal divide-y divide-slate-100">
                   <div class="p-1 space-y-0.5">
                     <button type="button" data-action="setCalendarTypeFilter" data-filter="all" class="w-full px-3 py-1.5 text-xs flex items-center justify-between rounded-lg hover:bg-slate-100 transition text-slate-800 font-semibold" data-type="all">
-                      <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-black"></span>All Event Types</span>
+                      <span>All Event Types</span>
+                      <span class="type-check text-msu-maroon font-bold" data-for="all">✓</span>
                       <span class="type-check app-themed-link font-bold" data-for="all">✓</span>
                     </button>
                     <button type="button" data-action="setCalendarTypeFilter" data-filter="holiday" class="w-full px-3 py-1.5 text-xs flex items-center justify-between rounded-lg hover:bg-slate-100 transition text-slate-800 font-semibold" data-type="holiday">
                       <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-rose-500"></span>Holidays & Suspensions</span>
+                      <span class="type-check text-msu-maroon font-bold hidden" data-for="holiday">✓</span>
                       <span class="type-check app-themed-link font-bold hidden" data-for="holiday">✓</span>
                     </button>
                     <button type="button" data-action="setCalendarTypeFilter" data-filter="exam" class="w-full px-3 py-1.5 text-xs flex items-center justify-between rounded-lg hover:bg-slate-100 transition text-slate-800 font-semibold" data-type="exam">
                       <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-amber-500"></span>Major Examinations</span>
+                      <span class="type-check text-msu-maroon font-bold hidden" data-for="exam">✓</span>
                       <span class="type-check app-themed-link font-bold hidden" data-for="exam">✓</span>
                     </button>
                     <button type="button" data-action="setCalendarTypeFilter" data-filter="milestone" class="w-full px-3 py-1.5 text-xs flex items-center justify-between rounded-lg hover:bg-slate-100 transition text-slate-800 font-semibold" data-type="milestone">
                       <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-emerald-500"></span>Term Milestones</span>
+                      <span class="type-check text-msu-maroon font-bold hidden" data-for="milestone">✓</span>
                       <span class="type-check app-themed-link font-bold hidden" data-for="milestone">✓</span>
                     </button>
                     <button type="button" data-action="setCalendarTypeFilter" data-filter="activity" class="w-full px-3 py-1.5 text-xs flex items-center justify-between rounded-lg hover:bg-slate-100 transition text-slate-800 font-semibold" data-type="activity">
                       <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-blue-500"></span>University Activities</span>
+                      <span class="type-check text-msu-maroon font-bold hidden" data-for="activity">✓</span>
                       <span class="type-check app-themed-link font-bold hidden" data-for="activity">✓</span>
                     </button>
                     <button type="button" data-action="setCalendarTypeFilter" data-filter="admin" class="w-full px-3 py-1.5 text-xs flex items-center justify-between rounded-lg hover:bg-slate-100 transition text-slate-800 font-semibold" data-type="admin">
                       <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-slate-500"></span>Administrative</span>
+                      <span class="type-check text-msu-maroon font-bold hidden" data-for="admin">✓</span>
                       <span class="type-check app-themed-link font-bold hidden" data-for="admin">✓</span>
                     </button>
                   </div>
@@ -1381,6 +1389,8 @@
             <button type="button" data-action="closeLessonModal" class="h-9 px-4 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl font-semibold text-xs border border-slate-200 dark:border-slate-700 transition active:scale-95">
               Cancel
             </button>
+            <button type="button" data-action="saveLessonModalData" class="h-9 px-5 bg-msu-maroon hover:bg-msu-darkMaroon active:scale-95 text-white rounded-xl font-bold text-xs shadow-md inline-flex items-center gap-1.5 transition" title="Save Activity (Ctrl+Enter)">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
             <button type="button" data-action="saveLessonModalData" class="app-themed-btn-primary h-9 px-5 bg-msu-maroon hover:bg-msu-darkMaroon active:scale-95 text-white rounded-xl font-bold text-xs shadow-md inline-flex items-center gap-1.5 transition" title="Save Activity (Ctrl+Enter)">
               <svg class="w-3.5 h-3.5 fill-none stroke-current" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
               <span>Save Activity</span>
@@ -1513,13 +1523,14 @@
         </div>
       </div>
 
-      <div class="flex items-center justify-between pt-2 border-t border-slate-200">
+      <div class="flex items-center justify-between pt-2 border-t border-slate-100">
         <button type="button" id="btn-delete-academic-event" data-action="deleteAcademicEvent" class="px-3 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold rounded-lg text-xs border border-rose-200 flex items-center gap-1">
           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
           Remove Event
         </button>
-        <div class="flex justify-end gap-2 ml-auto">
+        <div class="flex justify-end gap-2">
           <button data-action="closeEventEditorModal" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-semibold text-xs">Cancel</button>
+          <button data-action="saveAcademicEventChanges" class="px-4 py-2 bg-msu-maroon hover:bg-msu-darkMaroon text-white rounded-xl font-bold text-xs shadow-md">Save Event</button>
           <button data-action="saveAcademicEventChanges" class="app-themed-btn-primary px-4 py-2 bg-msu-maroon hover:bg-msu-darkMaroon text-white rounded-xl font-bold text-xs shadow-md">Save Event</button>
         </div>
       </div>
@@ -1618,6 +1629,7 @@
         </button>
         <div class="flex justify-end gap-2 ml-auto">
           <button type="button" data-action="closeScheduleEditorModal" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-semibold text-xs">Cancel</button>
+          <button type="button" data-action="saveScheduleEditorData" class="px-4 py-2 bg-msu-maroon hover:bg-msu-darkMaroon text-white rounded-xl font-bold text-xs shadow-md">Save Changes</button>
           <button type="button" data-action="saveScheduleEditorData" class="app-themed-btn-primary px-4 py-2 bg-msu-maroon hover:bg-msu-darkMaroon text-white rounded-xl font-bold text-xs shadow-md">Save Changes</button>
         </div>
       </div>
@@ -2050,6 +2062,7 @@
 
       <div class="flex justify-end gap-2 pt-2">
         <button data-action="closeUploadCalendarModal" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-semibold text-xs">Cancel</button>
+        <button data-action="applyPastedCalendar" class="px-4 py-2 bg-msu-maroon hover:bg-msu-darkMaroon text-white rounded-xl font-bold text-xs shadow-md">Apply Calendar Events</button>
         <button data-action="applyPastedCalendar" class="app-themed-btn-primary px-4 py-2 bg-msu-maroon hover:bg-msu-darkMaroon text-white rounded-xl font-bold text-xs shadow-md">Apply Calendar Events</button>
       </div>
     </div>
@@ -2131,6 +2144,7 @@
 
       <div class="flex justify-end gap-2 pt-2">
         <button data-action="closeSingleStudentModal" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-semibold text-xs">Cancel</button>
+        <button data-action="saveSingleStudent" class="px-4 py-2 bg-msu-maroon hover:bg-msu-darkMaroon text-white rounded-xl font-bold text-xs shadow-md">Add Student</button>
         <button data-action="saveSingleStudent" class="app-themed-btn-primary px-4 py-2 bg-msu-maroon hover:bg-msu-darkMaroon text-white rounded-xl font-bold text-xs shadow-md">Add Student</button>
       </div>
     </div>
@@ -2196,6 +2210,7 @@
             <p class="app-themed-subtitle text-xs text-amber-200/90">Set default or section-specific grade equivalence thresholds</p>
           </div>
         </div>
+        <button type="button" aria-label="Close modal" data-action="closeGradingScaleModal" class="text-amber-200 hover:text-white p-1 rounded-lg hover:bg-white/10 transition">
         <button type="button" aria-label="Close modal" data-action="closeGradingScaleModal" class="text-current opacity-80 hover:opacity-100 p-1 rounded-lg hover:bg-white/10 transition">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
@@ -2252,6 +2267,7 @@
           <button type="button" data-action="closeGradingScaleModal" class="px-3.5 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-600 rounded-lg font-semibold text-xs transition">
             Cancel
           </button>
+          <button type="button" data-action="saveGradingScaleModal" class="px-4 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-lg font-bold text-xs shadow-xs transition">
           <button type="button" data-action="saveGradingScaleModal" class="app-themed-btn-primary px-4 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-lg font-bold text-xs shadow-xs transition">
             Save Scale
           </button>
@@ -2272,9 +2288,11 @@
           </div>
           <div>
             <h3 class="font-extrabold text-sm sm:text-base">Grading Criteria & Activities</h3>
+            <p id="grading-criteria-modal-subtitle" class="text-xs text-indigo-200">Customize categories, weights, and sub-activities</p>
             <p id="grading-criteria-modal-subtitle" class="app-themed-subtitle text-xs text-amber-200/90">Customize categories, weights, and sub-activities</p>
           </div>
         </div>
+        <button type="button" aria-label="Close modal" data-action="closeGradingCriteriaModal" class="text-indigo-200 hover:text-white p-1 rounded-lg hover:bg-white/10 transition">
         <button type="button" aria-label="Close modal" data-action="closeGradingCriteriaModal" class="text-current opacity-80 hover:opacity-100 p-1 rounded-lg hover:bg-white/10 transition">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
@@ -2318,6 +2336,7 @@
           <button type="button" data-action="closeGradingCriteriaModal" class="px-3.5 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-600 rounded-lg font-semibold text-xs transition">
             Cancel
           </button>
+          <button type="button" data-action="saveGradingCriteriaModal" class="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-bold text-xs shadow-xs transition">
           <button type="button" data-action="saveGradingCriteriaModal" class="app-themed-btn-primary px-4 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-bold text-xs shadow-xs transition">
             Save Criteria
           </button>
@@ -2338,9 +2357,11 @@
           </div>
           <div>
             <h3 class="font-extrabold text-sm sm:text-base">Google Classroom Link</h3>
+            <p id="classroom-modal-subtitle" class="text-xs text-emerald-100">Configure class link for section</p>
             <p id="classroom-modal-subtitle" class="app-themed-subtitle text-xs text-amber-200/90">Configure class link for section</p>
           </div>
         </div>
+        <button type="button" aria-label="Close modal" data-action="closeClassroomModal" class="text-emerald-200 hover:text-white p-1 rounded-lg hover:bg-white/10 transition">
         <button type="button" aria-label="Close modal" data-action="closeClassroomModal" class="text-current opacity-80 hover:opacity-100 p-1 rounded-lg hover:bg-white/10 transition">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
@@ -2374,6 +2395,7 @@
             <button type="button" data-action="closeClassroomModal" class="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold transition">
               Cancel
             </button>
+            <button type="submit" class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold shadow-xs transition">
             <button type="submit" class="app-themed-btn-primary px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold shadow-xs transition">
               Save Link
             </button>
@@ -2845,6 +2867,7 @@
           <span>Don't show tips again today</span>
         </label>
         <div class="flex items-center gap-2">
+          <button type="button" data-action="closeAndOpen" data-close="tips-modal" data-open="user-guide-modal" class="text-xs text-msu-maroon dark:text-amber-400 hover:underline font-semibold pr-1">Full Guide</button>
           <button type="button" data-action="closeAndOpen" data-close="tips-modal" data-open="user-guide-modal" class="app-themed-link text-xs text-msu-maroon dark:text-amber-400 hover:underline font-semibold pr-1">Full Guide</button>
           <button type="button" data-action="closeTipsModal" class="app-themed-btn-primary px-4 py-1.5 bg-msu-maroon hover:bg-msu-darkMaroon text-white font-bold text-xs rounded-xl shadow-xs transition active:scale-95">Got it!</button>
         </div>
