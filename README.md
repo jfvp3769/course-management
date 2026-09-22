@@ -1,3 +1,4 @@
+# Faculty Course & Lesson Manager (v2.4.0)
 # Faculty Course & Lesson Manager (v2.5.0)
 
 [![Offline Ready](https://img.shields.io/badge/Offline-100%25%20Ready-success?style=flat-square&logo=pwa)](index.html)
@@ -237,6 +238,7 @@ All user data is stored entirely on the client side via the browser's `localStor
 
 ## Version History & Changelog
 
+### Version 2.4.0 (September 2026) — *Current Release*
 ### Version 2.5.0 (September 2026) — *Current Release*
 - **Full UI Dynamic Theme Harmonization (Tier 0 & Tier 1)**:
   - Synchronized remaining modals (`#grading-scale-modal`, `#grading-criteria-modal`, `#google-classroom-modal`) with `.app-themed-header` and `.app-themed-subtitle`.
