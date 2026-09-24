@@ -61,6 +61,19 @@ if (htmlModules.length !== swModules.length || htmlModules.some((m, i) => m !== 
 const missingOnDisk = htmlModules.filter((m) => !fs.existsSync(path.join(ROOT, m)));
 if (missingOnDisk.length) problems.push('script tags with no file: ' + missingOnDisk.join(', '));
 
+/* ---------- 1b. manifest.json integrity ---------- */
+try {
+  const manifestRaw = read('manifest.json');
+  const manifest = JSON.parse(manifestRaw);
+  if (!manifest.name || !manifest.short_name) {
+    problems.push('manifest.json is missing required name or short_name property');
+  } else {
+    notes.push(`manifest.json valid (name: "${manifest.name}", short_name: "${manifest.short_name}")`);
+  }
+} catch (e) {
+  problems.push(`manifest.json failed to parse as valid JSON: ${e.message}`);
+}
+
 /* ---------- 2. top-level declarations, via a real parser ---------- */
 // Classic <script> tags share one global lexical environment, so the same
 // name declared in two files is either a silent overwrite (function/var) or
