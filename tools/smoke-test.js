@@ -508,6 +508,18 @@ setTimeout(() => {
           return false;
         }
       }
+
+      // Verify favicon synchronization with schoolLogo
+      const fav = window.document.querySelector('link[rel*="icon"]');
+      if (!fav) return false;
+      const prevLogo = window.__probe('semesterConfig.schoolLogo');
+      window.__probe('semesterConfig.schoolLogo = "data:image/png;base64,TEST_FAVICON_DATA"');
+      window.applyHeaderBranding();
+      const updatedHref = fav.href;
+      window.__probe(`semesterConfig.schoolLogo = ${JSON.stringify(prevLogo)}`);
+      window.applyHeaderBranding();
+      if (!updatedHref.includes('TEST_FAVICON_DATA')) return false;
+
       return true;
     }],
     ['gradebook manual status override works reliably with uniform dropdown width and compact header', () => {

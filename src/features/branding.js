@@ -40,6 +40,16 @@ function applyHeaderBranding() {
     }
   }
 
+  // Synchronize browser tab favicon with school logo
+  const faviconEl = document.querySelector('link[rel*="icon"]');
+  if (faviconEl) {
+    if (semesterConfig && semesterConfig.schoolLogo) {
+      faviconEl.href = semesterConfig.schoolLogo;
+    } else {
+      faviconEl.href = 'logo.svg';
+    }
+  }
+
   if (fallbackEl) {
     const initials = sName.split(/\s+/).map(w => w[0]).filter(c => /[A-Za-z0-9]/.test(c)).slice(0, 3).join('').toUpperCase() || 'EDU';
     fallbackEl.textContent = initials;

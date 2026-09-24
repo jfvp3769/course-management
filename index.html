@@ -87,6 +87,15 @@
           document.documentElement.style.setProperty('--app-window-bg-light', wLight);
           document.documentElement.style.setProperty('--app-window-bg-dark', wDark);
         }
+
+        var rawData = localStorage.getItem('FACULTY_COURSE_MANAGER_DATA_V2') || localStorage.getItem('MSU_GSC_COURSE_MANAGER_DATA_V2');
+        if (rawData) {
+          var parsed = JSON.parse(rawData);
+          if (parsed && parsed.semesterConfig && parsed.semesterConfig.schoolLogo) {
+            var fav = document.querySelector('link[rel*="icon"]');
+            if (fav) fav.href = parsed.semesterConfig.schoolLogo;
+          }
+        }
       } catch (e) {}
     })();
   </script>
