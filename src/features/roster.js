@@ -23,6 +23,112 @@ function toggleRosterSort(colKey) {
   renderStudentRoster();
 }
 
+let activeEmailMenuTrigger = null;
+
+function closeStudentEmailMenu() {
+  const menu = document.getElementById('roster-email-dropdown-menu');
+  if (menu) menu.classList.add('hidden');
+  activeEmailMenuTrigger = null;
+}
+
+function copyStudentEmail(email, name = '') {
+  if (!email) {
+    showToast("Student does not have an email address recorded.", "⚠️");
+    return;
+  }
+  const cleanEmail = email.trim();
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(cleanEmail).then(() => {
+      showToast(`Copied ${cleanEmail} to clipboard!`, '📋');
+    }).catch(() => {
+      _fallbackCopyStudentEmail(cleanEmail);
+    });
+  } else {
+    _fallbackCopyStudentEmail(cleanEmail);
+  }
+  closeStudentEmailMenu();
+}
+
+function _fallbackCopyStudentEmail(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+  try {
+    document.execCommand('copy');
+    showToast(`Copied ${text} to clipboard!`, '📋');
+  } catch (err) {
+    showToast(`Could not copy: ${text}`, '⚠️');
+  }
+  document.body.removeChild(ta);
+}
+
+function toggleStudentEmailMenu(triggerBtn, email, section, first, last) {
+  let menu = document.getElementById('roster-email-dropdown-menu');
+  if (!menu) {
+    menu = document.createElement('div');
+    menu.id = 'roster-email-dropdown-menu';
+    menu.className = 'fixed z-50 hidden bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 py-1.5 w-48 text-left font-sans text-xs divide-y divide-slate-100 dark:divide-slate-700/60 select-none';
+    document.body.appendChild(menu);
+  }
+
+  if (!menu.classList.contains('hidden') && activeEmailMenuTrigger === triggerBtn) {
+    closeStudentEmailMenu();
+    return;
+  }
+
+  activeEmailMenuTrigger = triggerBtn;
+  const safeEmail = escapeHtml(email || '');
+  const safeSec = escapeHtml(section || '');
+  const safeFirst = escapeHtml(first || '');
+  const safeLast = escapeHtml(last || '');
+
+  menu.innerHTML = `
+    <div class="px-3 py-1.5 bg-slate-50 dark:bg-slate-900/40 border-b border-slate-100 dark:border-slate-700/60">
+      <div class="text-[9px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Student Email</div>
+      <div class="text-[11px] font-mono font-semibold text-slate-700 dark:text-slate-300 truncate" title="${safeEmail}">${safeEmail || 'None'}</div>
+    </div>
+    <div class="py-1">
+      <button type="button" data-action="copyStudentEmail" data-email="${safeEmail}" data-name="${safeFirst} ${safeLast}"
+              class="w-full px-3 py-1.5 flex items-center gap-2 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition font-semibold text-xs cursor-pointer">
+        <svg class="w-4 h-4 text-slate-500 dark:text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+        <span>Copy Email</span>
+      </button>
+      <button type="button" data-action="sendIndividualStudentEmail" data-email="${safeEmail}" data-section="${safeSec}" data-first="${safeFirst}" data-last="${safeLast}"
+              class="w-full px-3 py-1.5 flex items-center gap-2 hover:bg-slate-100 dark:hover:bg-slate-700 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition font-semibold text-xs cursor-pointer">
+        <svg class="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+        <span>Send Email</span>
+      </button>
+    </div>
+  `;
+
+  if (triggerBtn && typeof triggerBtn.getBoundingClientRect === 'function') {
+    const rect = triggerBtn.getBoundingClientRect();
+    const menuWidth = 192;
+    const menuHeight = 90;
+    let top = rect.bottom + 4;
+    let left = rect.left;
+
+    if (left + menuWidth > window.innerWidth - 8) {
+      left = window.innerWidth - menuWidth - 8;
+    }
+    if (top + menuHeight > window.innerHeight - 8 && rect.top > menuHeight) {
+      top = rect.top - menuHeight - 4;
+    }
+
+    menu.style.top = `${Math.max(4, Math.round(top))}px`;
+    menu.style.left = `${Math.max(4, Math.round(left))}px`;
+  }
+  menu.classList.remove('hidden');
+}
+
+window.toggleStudentEmailMenu = toggleStudentEmailMenu;
+window.copyStudentEmail = copyStudentEmail;
+window.closeStudentEmailMenu = closeStudentEmailMenu;
+
 function renderStudentRoster() {
   const tbody = document.getElementById('student-table-body');
   const filterSelect = document.getElementById('roster-section-filter');
@@ -87,29 +193,32 @@ function renderStudentRoster() {
     });
   }
 
-  tbody.innerHTML = sortedStudents.map(s => {
+  tbody.innerHTML = sortedStudents.map((s, idx) => {
     const res = s._gradeResult || { total: 0, msu: { grade: '—', class: 'bg-slate-100 text-slate-600', status: 'Pending' } };
     const gradeText = res.msu.grade;
     const gradeBadgeClass = res.msu.class || 'bg-slate-100 text-slate-700 border-slate-300';
-    const mailtoSubject = encodeURIComponent(`Academic Notice: ${s.section}`);
+    const isEven = (idx % 2 === 0);
+    const rowClass = isEven
+      ? 'roster-row-even bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100'
+      : 'roster-row-odd bg-[#f1f5f9] dark:bg-[#1e293b] text-slate-800 dark:text-slate-100';
 
     return `
-          <tr data-student-id="${escapeHtml(s.id)}" data-section="${escapeHtml(s.section)}" data-grade="${escapeHtml(gradeText)}" data-email="${escapeHtml(s.email)}" class="bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700/60 transition border-b border-slate-200 dark:border-slate-700">
-            <td class="py-2.5 px-4 font-mono font-bold text-slate-800 dark:text-slate-100">${escapeHtml(s.id)}</td>
+          <tr data-student-id="${escapeHtml(s.id)}" data-section="${escapeHtml(s.section)}" data-grade="${escapeHtml(gradeText)}" data-status="${escapeHtml(res.msu.status || '')}" data-email="${escapeHtml(s.email)}" class="${rowClass} hover:bg-blue-50/60 dark:hover:bg-[#24344d] transition border-b border-slate-200 dark:border-slate-700 group">
+            <td class="py-2.5 px-4 font-mono text-[11px] text-slate-600 dark:text-slate-400 font-semibold whitespace-nowrap">${escapeHtml(s.dateAdded || '2026-08-10')}</td>
+            <td class="py-2.5 px-4 font-mono font-bold text-slate-800 dark:text-slate-100 whitespace-nowrap">${escapeHtml(s.id)}</td>
             <td class="py-2.5 px-4 font-bold text-slate-900 dark:text-slate-100">${escapeHtml(s.last)}</td>
             <td class="py-2.5 px-4 text-slate-700 dark:text-slate-200 font-medium">${escapeHtml(s.first)}</td>
-            <td class="py-2.5 px-4 text-slate-500 dark:text-slate-400 font-mono text-[11px]">${escapeHtml(s.email)}</td>
             <td class="py-2.5 px-3 text-center whitespace-nowrap">
               <span class="grade-msu-cell inline-block px-2 py-0.5 rounded font-mono font-black text-xs border ${gradeBadgeClass}" title="Weighted Score: ${res.total.toFixed(2)}% • Status: ${escapeHtml(res.msu.status)}">
                 ${escapeHtml(gradeText)}
               </span>
             </td>
-            <td class="py-2.5 px-4 font-mono text-[11px] text-slate-600 dark:text-slate-400 font-semibold">${escapeHtml(s.dateAdded || '2026-08-10')}</td>
             <td class="py-2.5 px-4 text-center whitespace-nowrap">
               <div class="flex items-center justify-center gap-2">
-                <button type="button" data-action="sendIndividualStudentEmail" data-email="${escapeHtml(s.email)}" data-section="${escapeHtml(s.section)}" data-first="${escapeHtml(s.first)}" data-last="${escapeHtml(s.last)}" class="roster-email-btn text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-semibold text-xs hover:underline inline-flex items-center gap-1 cursor-pointer" title="Send email to ${escapeHtml(s.first)} ${escapeHtml(s.last)} (${escapeHtml(s.email)})">
+                <button type="button" data-action="toggleStudentEmailMenu" data-email="${escapeHtml(s.email)}" data-section="${escapeHtml(s.section)}" data-first="${escapeHtml(s.first)}" data-last="${escapeHtml(s.last)}" class="roster-email-btn text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-semibold text-xs hover:underline inline-flex items-center gap-1 cursor-pointer" title="Email options: Copy or Send email">
                   <svg class="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
                   <span>Email</span>
+                  <svg class="w-2.5 h-2.5 text-blue-500/80 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
                 </button>
                 <span class="text-slate-300 dark:text-slate-600">|</span>
                 <button type="button" data-action="removeStudent" data-id="${escapeHtml(s.id)}" data-section="${escapeHtml(s.section)}" class="text-rose-600 hover:text-rose-800 dark:text-rose-400 dark:hover:text-rose-300 font-semibold text-xs hover:underline cursor-pointer">
@@ -128,6 +237,7 @@ function filterStudentTable() {
   const term = (document.getElementById('roster-search')?.value || '').toLowerCase().trim();
   const secFilter = document.getElementById('roster-section-filter')?.value || '';
   const gradeFilter = document.getElementById('roster-grade-filter')?.value || 'all';
+  const statusFilter = document.getElementById('roster-status-filter')?.value || 'all';
 
   const rosterClassroomContainer = document.getElementById('roster-classroom-btn-container');
   if (rosterClassroomContainer) {
@@ -160,16 +270,24 @@ function filterStudentTable() {
 
   rows.forEach(r => {
     const text = r.textContent.toLowerCase();
-    const matchesTerm = !term || text.includes(term);
+    const rowEmail = (r.getAttribute('data-email') || '').toLowerCase();
+    const matchesTerm = !term || text.includes(term) || rowEmail.includes(term);
     const rowSec = r.getAttribute('data-section') || '';
     const rowGrade = r.getAttribute('data-grade') || '';
+    const rowStatus = (r.getAttribute('data-status') || '').toLowerCase();
     const matchesSec = secFilter ? (rowSec === secFilter || secFilter.endsWith(' - ' + rowSec) || (rowSec && secFilter.includes(rowSec))) : true;
     const matchesGrade = (gradeFilter === 'all') || (rowGrade === gradeFilter);
+    const matchesStatus = (statusFilter === 'all') || (rowStatus === statusFilter.toLowerCase());
 
     if (matchesSec) totalForSection++;
-    const isVisible = matchesTerm && matchesSec && matchesGrade;
+    const isVisible = matchesTerm && matchesSec && matchesGrade && matchesStatus;
     r.style.display = isVisible ? '' : 'none';
-    if (isVisible) visibleCount++;
+    if (isVisible) {
+      const isEven = (visibleCount % 2 === 0);
+      r.classList.toggle('roster-row-even', isEven);
+      r.classList.toggle('roster-row-odd', !isEven);
+      visibleCount++;
+    }
   });
 
   const countBadge = document.getElementById('roster-count-badge');

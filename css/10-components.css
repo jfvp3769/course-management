@@ -86,6 +86,10 @@
   white-space: nowrap !important;
   overflow: hidden !important;
   flex-shrink: 0 !important;
+  /* Explicit border box: Tailwind preflight zeroes border-width on all
+     elements, so border-color alone renders no visible box. */
+  border-width: 1px !important;
+  border-style: solid !important;
   cursor: pointer;
   user-select: none;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
@@ -212,15 +216,29 @@ html.theme-dark #current-week-nav-label {
   color: var(--app-header-accent, #daa520) !important;
 }
 
-/* ================= UNIFIED TAB HEADER ACTION BUTTONS ================= */
+/* ================= UNIFIED COMPACT TAB HEADER CARDS ================= */
+.app-tab-header-card {
+  padding: 0.5rem 1rem !important; /* 8px top/bottom, 16px left/right */
+  min-height: 3.5rem !important; /* 56px matching height across all 5 tabs */
+  box-sizing: border-box !important;
+}
+
+@media (min-width: 640px) {
+  .app-tab-header-card {
+    padding: 0.5rem 1.125rem !important;
+  }
+}
+
+/* ================= UNIFIED TAB HEADER ACTION BUTTONS (HOVER-EXPAND) ================= */
 .tab-header-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.375rem; /* 6px */
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0 !important;
   height: 2rem !important; /* 32px matching control height */
-  padding-left: 0.75rem !important; /* 12px */
-  padding-right: 0.75rem !important;
+  padding-left: 0.5625rem !important; /* ~9px icon button padding */
+  padding-right: 0.5625rem !important;
+  min-width: 2rem !important;
   background-color: var(--white) !important;
   color: var(--app-header-primary, #800000) !important;
   border: 1px solid var(--slate-300) !important;
@@ -228,11 +246,49 @@ html.theme-dark #current-week-nav-label {
   font-size: 0.75rem !important; /* 12px */
   font-weight: 700 !important;
   white-space: nowrap !important;
+  overflow: hidden !important;
   flex-shrink: 0 !important;
   cursor: pointer;
   user-select: none;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   transition: all 0.2s cubic-bezier(0.2, 0, 0, 1) !important;
+}
+
+/* Individual fitted expand widths to eliminate dead overshoot lag */
+.tab-btn-add-schedule    { --expand-w: 135px; }
+.tab-btn-add-event       { --expand-w: 70px; }
+.tab-btn-upload-calendar { --expand-w: 165px; }
+.tab-btn-paste-roster    { --expand-w: 100px; }
+.tab-btn-add-student     { --expand-w: 105px; }
+.tab-btn-remove-all      { --expand-w: 138px; }
+.tab-btn-collapse        { --expand-w: 150px; }
+.tab-btn-criteria        { --expand-w: 100px; }
+.tab-btn-scale           { --expand-w: 90px; }
+.tab-btn-reset           { --expand-w: 135px; }
+
+.tab-header-btn .tab-btn-label {
+  display: inline-block !important;
+  max-width: 0 !important;
+  opacity: 0 !important;
+  margin-left: 0 !important;
+  overflow: hidden !important;
+  white-space: nowrap !important;
+  vertical-align: middle !important;
+  pointer-events: none;
+  will-change: max-width, opacity, margin-left;
+  transition: max-width 0.4s cubic-bezier(0.25, 1, 0.35, 1),
+              opacity 0.25s ease,
+              margin-left 0.4s cubic-bezier(0.25, 1, 0.35, 1) !important;
+}
+
+.tab-header-btn:hover .tab-btn-label,
+.tab-header-btn:focus-visible .tab-btn-label {
+  max-width: var(--expand-w, 160px) !important;
+  opacity: 1 !important;
+  margin-left: 0.375rem !important; /* 6px */
+  transition: max-width 0.45s cubic-bezier(0.25, 1, 0.35, 1),
+              opacity 0.35s ease 0.04s,
+              margin-left 0.45s cubic-bezier(0.25, 1, 0.35, 1) !important;
 }
 
 .tab-header-btn.hidden,

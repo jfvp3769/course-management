@@ -268,10 +268,22 @@ function saveGradingCriteriaModal() {
         delete courseData.gradingConfigs[key];
       }
     });
+    // Ensure all students in this course have default scores (0 for new sub-activities) initialized
+    if (Array.isArray(studentRoster)) {
+      studentRoster.filter(s => s.section && s.section.startsWith(courseCode + ' - ')).forEach(s => {
+        ensureStudentScores(s, currentEditingGradingConfig);
+      });
+    }
     showToast(`Grading criteria applied to all sections of ${courseCode}!`);
   } else {
     const sectionKey = scopeVal.replace('section__', '');
     courseData.gradingConfigs[sectionKey] = JSON.parse(JSON.stringify(currentEditingGradingConfig));
+    // Ensure all students in this section have default scores (0 for new sub-activities) initialized
+    if (Array.isArray(studentRoster)) {
+      studentRoster.filter(s => s.section === sectionKey).forEach(s => {
+        ensureStudentScores(s, currentEditingGradingConfig);
+      });
+    }
     showToast(`Grading criteria saved for section ${sectionKey}!`);
   }
 

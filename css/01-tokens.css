@@ -35,6 +35,9 @@ body { font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Sego
   --app-header-bg: linear-gradient(to right, #4a0000, #800000, #0f172a);
   --app-header-primary: #800000;
   --app-header-accent: #daa520;
+  --app-header-accent-glow: rgba(218, 165, 32, 0.65);
+  --app-header-accent-subtle: rgba(218, 165, 32, 0.12);
+  --app-header-accent-border: rgba(218, 165, 32, 0.5);
   --app-header-nav-border: rgba(155, 17, 30, 0.6);
   --app-header-tab-text: #fde047;
   --app-window-bg: #e2e8f0;
@@ -189,47 +192,78 @@ html.theme-dark #planner-term-label {
   color: var(--app-header-accent, #daa520) !important;
 }
 
-/* Planner Term Total Weeks Badge */
+/* Planner Term Total Weeks Badge — blends into the tab-window card it sits on.
+   The card is `bg-white` (#ffffff) in light mode and is remapped to #1e293b by
+   `html.theme-dark .bg-white` in dark mode — exactly the --white token's two
+   values. Border matches the card's slate-200 border (dark: #334155), and the
+   text follows the h2 title color of each mode. */
 #planner-total-weeks-badge {
   color: var(--app-header-primary, #800000) !important;
-  border-color: var(--app-header-primary, #800000) !important;
-  background-color: rgba(128, 0, 0, 0.08) !important;
+  border-color: #e2e8f0 !important;
+  background: var(--white, #ffffff) !important;
 }
 
 html.theme-dark #planner-total-weeks-badge {
-  color: var(--app-header-tab-text, #fde047) !important;
-  border-color: var(--app-header-accent, #daa520) !important;
-  background-color: rgba(218, 165, 32, 0.12) !important;
+  color: var(--app-header-accent, #daa520) !important;
+  border-color: #334155 !important;
+  background: var(--white, #1e293b) !important;
 }
 
-/* Sidebar Widget Cards: Dynamic Top Accent Border */
-.tab-sidebar > div[id^="planner-widget-"],
-.tab-sidebar > div[id^="timetable-widget-"],
-.tab-sidebar > div[id^="calendar-widget-"],
-.tab-sidebar > div[id^="roster-widget-"],
-.tab-sidebar > div[id^="gradebook-widget-"] {
-  border-top: 3.5px solid var(--app-header-primary, #800000) !important;
-  transition: border-color 0.25s ease, box-shadow 0.2s ease !important;
-}
-
-html.theme-dark .tab-sidebar > div[id^="planner-widget-"],
-html.theme-dark .tab-sidebar > div[id^="timetable-widget-"],
-html.theme-dark .tab-sidebar > div[id^="calendar-widget-"],
-html.theme-dark .tab-sidebar > div[id^="roster-widget-"],
-html.theme-dark .tab-sidebar > div[id^="gradebook-widget-"] {
-  border-top: 3.5px solid var(--app-header-accent, #daa520) !important;
-}
 
 /* Sidebar Widget Header Titles */
-.tab-sidebar [id*="-widget-"] > div:first-child > span.font-extrabold,
-.tab-sidebar [id*="-widget-"] > div:first-child > div.font-extrabold {
-  color: var(--app-header-primary, #800000);
+.tab-sidebar [id*="-widget-"] > div:first-child span.font-extrabold,
+.tab-sidebar [id*="-widget-"] > div:first-child div.font-extrabold,
+.tab-sidebar [id*="-widget-"] > div.font-extrabold:first-child,
+.tab-sidebar .widget-title {
+  color: var(--app-header-primary, #800000) !important;
   transition: color 0.25s ease;
 }
 
-html.theme-dark .tab-sidebar [id*="-widget-"] > div:first-child > span.font-extrabold,
-html.theme-dark .tab-sidebar [id*="-widget-"] > div:first-child > div.font-extrabold {
-  color: var(--app-header-accent, #daa520);
+html.theme-dark .tab-sidebar [id*="-widget-"] > div:first-child span.font-extrabold,
+html.theme-dark .tab-sidebar [id*="-widget-"] > div:first-child div.font-extrabold,
+html.theme-dark .tab-sidebar [id*="-widget-"] > div.font-extrabold:first-child,
+html.theme-dark .tab-sidebar .widget-title {
+  color: var(--app-header-accent, #daa520) !important;
+}
+
+/* Consistent Sidebar Interactive Items Hover Transitions & Contrast */
+.tab-sidebar [data-action="selectRosterSection"],
+.tab-sidebar [data-action="jumpToCalendarEvent"],
+.tab-sidebar [data-action="openLostDaysModal"],
+.tab-sidebar [data-action="highlightTimetableClass"],
+.tab-sidebar [data-action="highlightStudentInGradebook"],
+.tab-sidebar [data-action="highlightStudentScoreError"],
+.tab-sidebar #roster-communications-actions button {
+  transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, color 0.15s ease !important;
+}
+
+html.theme-dark .tab-sidebar [data-action="selectRosterSection"]:hover {
+  background-color: #1a2638 !important;
+  border-color: #475569 !important;
+}
+html.theme-dark .tab-sidebar [data-action="selectRosterSection"]:hover span {
+  color: #f8fafc !important;
+}
+html.theme-dark .tab-sidebar [data-action="selectRosterSection"]:hover span:first-child {
+  color: var(--app-header-accent, #daa520) !important;
+}
+
+/* Timetable Weekday Picker Auto-Width Distribution */
+#timetable-agenda-day-pills {
+  display: grid !important;
+  grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+  width: 100% !important;
+  gap: 0.25rem !important;
+  overflow: visible !important;
+}
+
+#timetable-agenda-day-pills button {
+  width: 100% !important;
+  min-width: 0 !important;
+  padding-left: 0.125rem !important;
+  padding-right: 0.125rem !important;
+  text-align: center !important;
+  justify-content: center !important;
 }
 
 /* Saved Offline Indicator Subtle Themed Accent on Hover */

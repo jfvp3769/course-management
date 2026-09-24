@@ -20,10 +20,20 @@ function onGradebookDropdownFilterChange() {
   }
 }
 
+function onGradebookSearchInput() {
+  gradebookCohortFilter = null;
+  renderGradebook();
+  if (typeof updateGradebookSidebar === 'function') {
+    updateGradebookSidebar();
+  }
+}
+
 function resetGradebookFilters() {
   gradebookCohortFilter = null;
+  const searchEl = document.getElementById('gradebook-search');
   const gradeFilterEl = document.getElementById('gradebook-grade-filter');
   const statusFilterEl = document.getElementById('gradebook-status-filter');
+  if (searchEl) searchEl.value = '';
   if (gradeFilterEl) gradeFilterEl.value = 'all';
   if (statusFilterEl) statusFilterEl.value = 'all';
   renderGradebook();
@@ -209,9 +219,9 @@ function _renderInputErrorRadar(errorsList, errorsBadge, studentRoster, selected
   } else {
     errorsList.innerHTML = errorEntries.map(err => `
           <div data-action="highlightStudentScoreError" data-student-id="${escapeHtml(err.student.id)}" data-sub-id="${escapeHtml(err.sub.id)}" data-section="${escapeHtml(err.student.section)}"
-            class="p-2 bg-rose-50 dark:bg-[#200b12] hover:bg-rose-100 dark:hover:bg-[#2d0e19] border border-rose-300 dark:border-rose-900/60 rounded-lg cursor-pointer transition text-xs group"
+            class="p-2 bg-rose-50 dark:bg-[#200b12] hover:bg-rose-100 dark:hover:bg-[#2d0e19] border border-rose-300 dark:border-rose-900/60 hover:border-rose-400 dark:hover:border-rose-700/80 rounded-lg cursor-pointer transition-all hover:shadow-2xs text-xs group"
             title="Click to focus input">
-            <div class="font-bold text-slate-900 dark:text-rose-100 truncate text-[11px] group-hover:text-rose-900 dark:group-hover:text-rose-200">${escapeHtml(err.student.last)}, ${escapeHtml(err.student.first)}</div>
+            <div class="font-bold text-slate-900 dark:text-rose-100 truncate text-[11px] group-hover:text-rose-700 dark:group-hover:text-rose-300 transition-colors">${escapeHtml(err.student.last)}, ${escapeHtml(err.student.first)}</div>
             <div class="text-[10px] text-rose-700 dark:text-rose-400 font-semibold truncate mt-0.5">${escapeHtml(err.msg)}</div>
           </div>
         `).join('');
@@ -268,9 +278,9 @@ function _renderAtRiskRadar(atRiskList, atRiskBadge, studentGrades) {
   } else {
     atRiskList.innerHTML = atRisk.map(item => `
           <div data-action="highlightStudentInGradebook" data-student-id="${escapeHtml(item.student.id)}" data-section="${escapeHtml(item.student.section)}" 
-            class="p-2 bg-rose-50 dark:bg-[#200b12] hover:bg-rose-100 dark:hover:bg-[#2d0e19] border border-rose-200 dark:border-rose-900/60 rounded-lg flex items-center justify-between cursor-pointer transition text-xs shadow-2xs">
+            class="p-2 bg-rose-50 dark:bg-[#200b12] hover:bg-rose-100 dark:hover:bg-[#2d0e19] border border-rose-200 dark:border-rose-900/60 hover:border-rose-300 dark:hover:border-rose-700/80 rounded-lg flex items-center justify-between cursor-pointer transition-all hover:shadow-2xs text-xs shadow-2xs group">
             <div class="min-w-0">
-              <div class="font-bold text-slate-900 dark:text-rose-100 truncate text-[11px]">${escapeHtml(item.student.last)}, ${escapeHtml(item.student.first)}</div>
+              <div class="font-bold text-slate-900 dark:text-rose-100 truncate text-[11px] group-hover:text-rose-700 dark:group-hover:text-rose-300 transition-colors">${escapeHtml(item.student.last)}, ${escapeHtml(item.student.first)}</div>
               <div class="text-[10px] text-slate-500 dark:text-slate-400 font-mono">${escapeHtml(item.student.id)} • ${escapeHtml(item.student.section)}</div>
             </div>
             <div class="text-right shrink-0">
@@ -331,6 +341,8 @@ function _renderClassPerformanceWidget(statsContent, statsBadge, studentGrades, 
   const avgTotal = sumTotal / count;
   const medianTotal = (count % 2 === 0) ? (totals[count / 2 - 1] + totals[count / 2]) / 2 : totals[Math.floor(count / 2)];
   const passRate = (count > 0) ? (passCount / count) * 100 : 0;
+  const failRate = (count > 0) ? (failCount / count) * 100 : 0;
+  const otherRate = (count > 0) ? (otherCount / count) * 100 : 0;
   const avgMsu = getMsuGrade(avgTotal, null, selectedSec);
   const medianMsu = getMsuGrade(medianTotal, null, selectedSec);
 
@@ -350,118 +362,150 @@ function _renderClassPerformanceWidget(statsContent, statsBadge, studentGrades, 
   }
 
   statsContent.innerHTML = `
-        <div class="grid grid-cols-3 gap-1.5 text-center">
-          <div class="py-1 px-1 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
-            <div class="text-[8px] font-extrabold text-slate-400 uppercase tracking-wider">Average</div>
-            <div class="text-xs font-extrabold text-slate-900 dark:text-slate-100 leading-tight my-0.5 font-mono">${avgTotal.toFixed(1)}%</div>
-            <div class="inline-block px-1 py-0.2 rounded text-[8.5px] font-bold font-mono bg-amber-100 dark:bg-amber-900/40 text-amber-900 dark:text-amber-200 border border-amber-200/80 dark:border-amber-700/60 mx-auto" title="Institutional Equivalent: ${escapeHtml(avgMsu.status)}">${escapeHtml(avgMsu.grade)}</div>
+        <!-- KPI Row: Average, Median, Pass Rate -->
+        <div class="grid grid-cols-3 gap-2 text-center">
+          <div class="py-2 px-1 rounded-xl bg-slate-50/90 dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-800 flex flex-col items-center justify-between shadow-2xs">
+            <span class="text-[9px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Average</span>
+            <span class="text-sm font-black text-slate-900 dark:text-slate-100 font-mono tracking-tight my-1">${avgTotal.toFixed(1)}%</span>
+            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[9.5px] font-black font-mono bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-200/80 dark:border-amber-800/60 shadow-2xs" title="Institutional Equivalent: ${escapeHtml(avgMsu.status)}">${escapeHtml(avgMsu.grade)}</span>
           </div>
-          <div class="py-1 px-1 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
-            <div class="text-[8px] font-extrabold text-slate-400 uppercase tracking-wider">Median</div>
-            <div class="text-xs font-extrabold text-slate-900 dark:text-slate-100 leading-tight my-0.5 font-mono">${medianTotal.toFixed(1)}%</div>
-            <div class="inline-block px-1 py-0.2 rounded text-[8.5px] font-bold font-mono bg-sky-100 dark:bg-sky-900/40 text-sky-900 dark:text-sky-200 border border-sky-200/80 dark:border-sky-700/60 mx-auto" title="Institutional Equivalent: ${escapeHtml(medianMsu.status)}">${escapeHtml(medianMsu.grade)}</div>
+          <div class="py-2 px-1 rounded-xl bg-slate-50/90 dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-800 flex flex-col items-center justify-between shadow-2xs">
+            <span class="text-[9px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Median</span>
+            <span class="text-sm font-black text-slate-900 dark:text-slate-100 font-mono tracking-tight my-1">${medianTotal.toFixed(1)}%</span>
+            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[9.5px] font-black font-mono bg-sky-100 dark:bg-sky-950/60 text-sky-800 dark:text-sky-300 border border-sky-200/80 dark:border-sky-800/60 shadow-2xs" title="Institutional Equivalent: ${escapeHtml(medianMsu.status)}">${escapeHtml(medianMsu.grade)}</span>
           </div>
-          <div class="py-1 px-1 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
-            <div class="text-[8px] font-extrabold text-slate-400 uppercase tracking-wider">Pass Rate</div>
-            <div class="text-xs font-extrabold ${passRate >= 75 ? 'text-emerald-700 dark:text-emerald-400' : (passRate >= 50 ? 'text-amber-600 dark:text-amber-400' : 'text-rose-600 dark:text-rose-400')} leading-tight my-0.5 font-mono">${Math.round(passRate)}%</div>
-            <div class="inline-block px-1 py-0.2 rounded text-[8.5px] font-bold font-mono ${passRate >= 75 ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-300' : (passRate >= 50 ? 'bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300' : 'bg-rose-100 dark:bg-rose-900/40 text-rose-800 dark:text-rose-300')} mx-auto">${passCount}/${count}</div>
+          <div class="py-2 px-1 rounded-xl bg-slate-50/90 dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-800 flex flex-col items-center justify-between shadow-2xs">
+            <span class="text-[9px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Pass Rate</span>
+            <span class="text-sm font-black ${passRate >= 75 ? 'text-emerald-700 dark:text-emerald-400' : (passRate >= 50 ? 'text-amber-600 dark:text-amber-400' : 'text-rose-600 dark:text-rose-400')} font-mono tracking-tight my-1">${Math.round(passRate)}%</span>
+            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[9.5px] font-black font-mono ${passRate >= 75 ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800/60' : (passRate >= 50 ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-200/80 dark:border-amber-800/60' : 'bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 border border-rose-200/80 dark:border-rose-800/60')} shadow-2xs">${passCount}/${count}</span>
           </div>
         </div>
 
-        <!-- Class Standing / Outcome Card with Complete 3-Way Legend -->
-        <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1.5">
-          <div class="flex items-center justify-between text-[11px] font-bold">
-            <span class="text-slate-700 dark:text-slate-300">Class Standing</span>
-            <div class="flex items-center gap-1.5 font-mono text-[10px]">
-              <span data-action="filterGradebookByCohort" data-cohort-label="Passed" data-student-ids="${passedStudentIds}"
-                    class="px-1.5 py-0.5 rounded cursor-pointer hover:opacity-80 transition ${gradebookCohortFilter?.label === 'Passed' ? 'bg-emerald-600 text-white font-black' : 'bg-emerald-100/90 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-300 font-bold border border-emerald-200/80 dark:border-emerald-800/60'}"
-                    title="Click to filter passed students">${passCount} Pass</span>
-              <span data-action="filterGradebookByCohort" data-cohort-label="Failed" data-student-ids="${failedStudentIds}"
-                    class="px-1.5 py-0.5 rounded cursor-pointer hover:opacity-80 transition ${gradebookCohortFilter?.label === 'Failed' ? 'bg-rose-600 text-white font-black' : 'bg-rose-100/90 dark:bg-rose-950/70 text-rose-800 dark:text-rose-300 font-bold border border-rose-200/80 dark:border-rose-800/60'}"
-                    title="Click to filter failed students">${failCount} Fail</span>
-              ${otherCount > 0 ? `
-              <span data-action="filterGradebookByCohort" data-cohort-label="Incomplete / Other" data-student-ids="${otherStudentIds}"
-                    class="px-1.5 py-0.5 rounded cursor-pointer hover:opacity-80 transition ${gradebookCohortFilter?.label === 'Incomplete / Other' ? 'bg-slate-600 text-white font-black' : 'bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold border border-slate-300 dark:border-slate-700'}"
-                    title="Click to filter incomplete students">${otherCount} INC</span>
-              ` : ''}
-            </div>
+        <!-- Score Spread & Standard Deviation Strip (Directly below Average, Median, Pass Rate) -->
+        ${topStudent ? `
+        <div class="flex items-center justify-between text-[10.5px] px-2.5 py-1.5 bg-slate-50/90 dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-800 rounded-xl text-slate-600 dark:text-slate-400 font-mono shadow-2xs">
+          <div class="flex items-center gap-1.5">
+            <span class="text-[9px] font-sans font-extrabold text-slate-400 uppercase tracking-wider">Range</span>
+            <span class="font-extrabold text-slate-800 dark:text-slate-200">${lowStudent ? lowStudent.gradeResult.total.toFixed(1) : 0}% – ${topStudent.gradeResult.total.toFixed(1)}%</span>
+            <span class="text-[9px] font-sans font-bold px-1.5 py-0.5 rounded bg-slate-200/70 dark:bg-slate-800 text-slate-600 dark:text-slate-300">Δ ${scoreSpread}%</span>
           </div>
-          <div class="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-2 overflow-hidden flex cursor-pointer" title="Click segments to filter cohort in table">
+          <div class="flex items-center gap-1">
+            <span class="text-[9px] font-sans font-extrabold text-slate-400 uppercase tracking-wider">σ</span>
+            <span class="font-extrabold text-slate-800 dark:text-slate-200">±${stdDev.toFixed(1)}%</span>
+          </div>
+        </div>
+        ` : ''}
+
+        <!-- Class Standing Card with Clean Multi-Segment Bar and Interactive Cohort Cards -->
+        <div class="p-2.5 rounded-xl bg-slate-50/90 dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-800 space-y-2 shadow-2xs">
+          <div class="flex items-center justify-between text-[10px]">
+            <span class="font-extrabold uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center gap-1">
+              Class Standing
+            </span>
+          </div>
+
+          <!-- Multi-segmented Progress Bar -->
+          <div class="w-full bg-slate-200/80 dark:bg-slate-800 rounded-full h-2.5 overflow-hidden flex cursor-pointer shadow-inner">
             <div data-action="filterGradebookByCohort" data-cohort-label="Passed" data-student-ids="${passedStudentIds}"
                  class="bg-emerald-500 hover:bg-emerald-600 h-full transition-all duration-300 ${gradebookCohortFilter?.label === 'Passed' ? 'ring-2 ring-emerald-700' : ''}"
                  style="width: ${passRate}%"
                  title="${passCount} Passed (${passRate.toFixed(1)}%) • Click to filter"></div>
             <div data-action="filterGradebookByCohort" data-cohort-label="Failed" data-student-ids="${failedStudentIds}"
                  class="bg-rose-500 hover:bg-rose-600 h-full transition-all duration-300 ${gradebookCohortFilter?.label === 'Failed' ? 'ring-2 ring-rose-700' : ''}"
-                 style="width: ${count > 0 ? (failCount / count) * 100 : 0}%"
-                 title="${failCount} Failed (${((failCount / count) * 100).toFixed(1)}%) • Click to filter"></div>
+                 style="width: ${failRate}%"
+                 title="${failCount} Failed (${failRate.toFixed(1)}%) • Click to filter"></div>
             ${otherCount > 0 ? `
-            <div data-action="filterGradebookByCohort" data-cohort-label="Incomplete / Other" data-student-ids="${otherStudentIds}"
-                 class="bg-slate-400 hover:bg-slate-500 h-full transition-all duration-300 ${gradebookCohortFilter?.label === 'Incomplete / Other' ? 'ring-2 ring-slate-600' : ''}"
-                 style="width: ${(otherCount / count) * 100}%"
-                 title="${otherCount} Incomplete / Other (${((otherCount / count) * 100).toFixed(1)}%) • Click to filter"></div>
+            <div data-action="filterGradebookByCohort" data-cohort-label="Others" data-student-ids="${otherStudentIds}"
+                 class="bg-amber-400 hover:bg-amber-500 dark:bg-slate-400 dark:hover:bg-slate-500 h-full transition-all duration-300 ${gradebookCohortFilter?.label === 'Others' ? 'ring-2 ring-slate-600' : ''}"
+                 style="width: ${otherRate}%"
+                 title="${otherCount} Others (${otherRate.toFixed(1)}%) • Click to filter"></div>
             ` : ''}
           </div>
-          <div class="flex items-center justify-between text-[10px] text-slate-500 pt-0.5 font-medium">
-            <span data-action="filterGradebookByCohort" data-cohort-label="Passed" data-student-ids="${passedStudentIds}"
-                  class="inline-flex items-center gap-1 font-semibold ${gradebookCohortFilter?.label === 'Passed' ? 'text-emerald-800 dark:text-emerald-300 font-black underline' : 'text-emerald-700 dark:text-emerald-400 hover:underline'} cursor-pointer transition"
-                  title="Click to filter passed students">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>${passRate.toFixed(1)}% Passed
-            </span>
-            <span data-action="filterGradebookByCohort" data-cohort-label="Failed" data-student-ids="${failedStudentIds}"
-                  class="inline-flex items-center gap-1 font-semibold ${gradebookCohortFilter?.label === 'Failed' ? 'text-rose-800 dark:text-rose-300 font-black underline' : 'text-rose-600 dark:text-rose-400 hover:underline'} cursor-pointer transition"
-                  title="Click to filter failed students">
-              <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>${count > 0 ? ((failCount / count) * 100).toFixed(1) : 0}% Failed
-            </span>
-            <span data-action="filterGradebookByCohort" data-cohort-label="Incomplete / Other" data-student-ids="${otherStudentIds}"
-                  class="inline-flex items-center gap-1 font-semibold ${gradebookCohortFilter?.label === 'Incomplete / Other' ? 'text-slate-800 dark:text-slate-200 font-black underline' : 'text-slate-500 dark:text-slate-400 hover:underline'} cursor-pointer transition"
-                  title="Click to filter incomplete students">
-              <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>${count > 0 ? ((otherCount / count) * 100).toFixed(1) : 0}% INC
-            </span>
+
+          <!-- 3 Interactive Cohort Cards -->
+          <div class="grid grid-cols-3 gap-1.5 pt-0.5">
+            <!-- Passed -->
+            <button type="button" data-action="filterGradebookByCohort" data-cohort-label="Passed" data-student-ids="${passedStudentIds}"
+                    class="py-1.5 px-1 rounded-lg border text-center transition cursor-pointer flex flex-col items-center justify-center ${gradebookCohortFilter?.label === 'Passed' ? 'bg-emerald-600 text-white border-emerald-700 ring-2 ring-emerald-400 shadow-sm' : 'bg-emerald-50/70 dark:bg-emerald-950/40 hover:bg-emerald-100/80 dark:hover:bg-emerald-950/70 text-emerald-800 dark:text-emerald-300 border-emerald-200/90 dark:border-emerald-800/60'}"
+                    title="Filter ${passCount} passed students (${passRate.toFixed(1)}%)">
+              <span class="text-[9px] font-extrabold uppercase tracking-wider ${gradebookCohortFilter?.label === 'Passed' ? 'text-emerald-100' : 'text-emerald-700 dark:text-emerald-400'} flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full ${gradebookCohortFilter?.label === 'Passed' ? 'bg-white' : 'bg-emerald-500'}"></span>Pass
+              </span>
+              <span class="font-mono font-black text-xs my-0.5 ${gradebookCohortFilter?.label === 'Passed' ? 'text-white' : 'text-emerald-950 dark:text-emerald-100'}">${passCount}</span>
+              <span class="font-mono text-[9px] font-bold ${gradebookCohortFilter?.label === 'Passed' ? 'text-emerald-200' : 'text-emerald-600 dark:text-emerald-400'}">${passRate.toFixed(1)}%</span>
+            </button>
+
+            <!-- Failed -->
+            <button type="button" data-action="filterGradebookByCohort" data-cohort-label="Failed" data-student-ids="${failedStudentIds}"
+                    class="py-1.5 px-1 rounded-lg border text-center transition cursor-pointer flex flex-col items-center justify-center ${gradebookCohortFilter?.label === 'Failed' ? 'bg-rose-600 text-white border-rose-700 ring-2 ring-rose-400 shadow-sm' : 'bg-rose-50/70 dark:bg-rose-950/40 hover:bg-rose-100/80 dark:hover:bg-rose-950/70 text-rose-800 dark:text-rose-300 border-rose-200/90 dark:border-rose-800/60'}"
+                    title="Filter ${failCount} failed students (${failRate.toFixed(1)}%)">
+              <span class="text-[9px] font-extrabold uppercase tracking-wider ${gradebookCohortFilter?.label === 'Failed' ? 'text-rose-100' : 'text-rose-700 dark:text-rose-400'} flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full ${gradebookCohortFilter?.label === 'Failed' ? 'bg-white' : 'bg-rose-500'}"></span>Fail
+              </span>
+              <span class="font-mono font-black text-xs my-0.5 ${gradebookCohortFilter?.label === 'Failed' ? 'text-white' : 'text-rose-950 dark:text-rose-100'}">${failCount}</span>
+              <span class="font-mono text-[9px] font-bold ${gradebookCohortFilter?.label === 'Failed' ? 'text-rose-200' : 'text-rose-600 dark:text-rose-400'}">${failRate.toFixed(1)}%</span>
+            </button>
+
+            <!-- Others -->
+            <button type="button" data-action="filterGradebookByCohort" data-cohort-label="Others" data-student-ids="${otherStudentIds}"
+                    class="py-1.5 px-1 rounded-lg border text-center transition cursor-pointer flex flex-col items-center justify-center ${gradebookCohortFilter?.label === 'Others' ? 'bg-slate-700 text-white border-slate-800 ring-2 ring-slate-400 shadow-sm' : 'bg-slate-100/70 dark:bg-slate-800/50 hover:bg-slate-200/80 dark:hover:bg-slate-800/80 text-slate-700 dark:text-slate-300 border-slate-200/90 dark:border-slate-700'}"
+                    title="Filter ${otherCount} other students (${otherRate.toFixed(1)}%)">
+              <span class="text-[9px] font-extrabold uppercase tracking-wider ${gradebookCohortFilter?.label === 'Others' ? 'text-slate-200' : 'text-slate-500 dark:text-slate-400'} flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full ${gradebookCohortFilter?.label === 'Others' ? 'bg-white' : 'bg-slate-400'}"></span>Others
+              </span>
+              <span class="font-mono font-black text-xs my-0.5 ${gradebookCohortFilter?.label === 'Others' ? 'text-white' : 'text-slate-900 dark:text-slate-100'}">${otherCount}</span>
+              <span class="font-mono text-[9px] font-bold ${gradebookCohortFilter?.label === 'Others' ? 'text-slate-200' : 'text-slate-500 dark:text-slate-400'}">${otherRate.toFixed(1)}%</span>
+            </button>
           </div>
         </div>
 
-        <!-- Performer Cards + Score Spread & Standard Deviation Strip -->
+        <!-- Performer Cards (Best & Worst) -->
         ${topStudent ? `
-          <div class="space-y-1.5">
-            <div class="grid grid-cols-2 gap-2 text-[11px]">
-              <div data-action="filterGradebookByCohort" data-cohort-label="Top Score: ${escapeHtml(topStudent.student.last)}" data-student-ids="${escapeHtml(topStudent.student.id)}"
-                   class="p-2 rounded-xl cursor-pointer transition flex items-center gap-1.5 group shadow-2xs min-w-0 ${gradebookCohortFilter?.label === 'Top Score: ' + topStudent.student.last ? 'bg-emerald-100 dark:bg-emerald-950/80 ring-2 ring-inset ring-emerald-500 dark:ring-emerald-400 relative z-10' : 'bg-emerald-50/70 dark:bg-emerald-950/30 hover:bg-emerald-100 dark:hover:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800/60'}"
-                   title="Click to filter to top performer: ${escapeHtml(topStudent.student.last)}, ${escapeHtml(topStudent.student.first)}">
-                <span class="text-sm shrink-0 group-hover:scale-110 transition-transform">🏆</span>
-                <div class="min-w-0 flex-1">
-                  <div class="text-[9px] font-extrabold text-emerald-800 dark:text-emerald-400 uppercase tracking-wider whitespace-nowrap flex items-center justify-between">
-                    <span>High Score</span>
-                    ${gradebookCohortFilter?.label === 'Top Score: ' + topStudent.student.last ? `<span class="text-[9px] text-emerald-700 dark:text-emerald-300 font-extrabold" title="Filtered (click to reset)">✕</span>` : ''}
-                  </div>
-                  <div class="font-bold text-slate-800 dark:text-slate-200 truncate group-hover:text-emerald-950 dark:group-hover:text-emerald-300 text-[11px]">${escapeHtml(topStudent.student.last)}</div>
-                </div>
-                <span class="font-mono font-extrabold text-emerald-700 dark:text-emerald-400 text-xs shrink-0">${topStudent.gradeResult.total}%</span>
+        <div class="grid grid-cols-2 gap-2 text-[11px]">
+          <!-- Best Score Card -->
+          <div data-action="filterGradebookByCohort" data-cohort-label="Best: ${escapeHtml(topStudent.student.last)}" data-student-ids="${escapeHtml(topStudent.student.id)}"
+               class="p-2.5 rounded-xl cursor-pointer transition-all shadow-2xs hover:shadow-xs min-w-0 flex flex-col justify-between ${gradebookCohortFilter?.label === 'Best: ' + topStudent.student.last ? 'bg-emerald-100 dark:bg-emerald-950/80 ring-2 ring-inset ring-emerald-500 dark:ring-emerald-400 relative z-10' : 'bg-emerald-50/70 dark:bg-emerald-950/30 hover:bg-emerald-100/90 dark:hover:bg-emerald-950/60 border border-emerald-200/90 dark:border-emerald-800/60 hover:border-emerald-300 dark:hover:border-emerald-700'}"
+               title="Best performer: ${escapeHtml(topStudent.student.last)}, ${escapeHtml(topStudent.student.first)} (${topStudent.gradeResult.total.toFixed(1)}%) • Click to inspect in gradebook">
+            <!-- Top Row: Icon + Label + Score -->
+            <div class="flex items-center justify-between gap-1 w-full">
+              <div class="flex items-center gap-1 min-w-0">
+                <span class="text-xs shrink-0">🏆</span>
+                <span class="text-[9.5px] font-extrabold text-emerald-800 dark:text-emerald-400 uppercase tracking-wider truncate">Best</span>
               </div>
-
-              ${lowStudent ? `
-              <div data-action="filterGradebookByCohort" data-cohort-label="Low Score: ${escapeHtml(lowStudent.student.last)}" data-student-ids="${escapeHtml(lowStudent.student.id)}"
-                   class="p-2 rounded-xl cursor-pointer transition flex items-center gap-1.5 group shadow-2xs min-w-0 ${gradebookCohortFilter?.label === 'Low Score: ' + lowStudent.student.last ? 'bg-amber-100 dark:bg-amber-950/80 ring-2 ring-inset ring-amber-500 dark:ring-amber-400 relative z-10' : 'bg-amber-50/70 dark:bg-amber-950/30 hover:bg-amber-100 dark:hover:bg-amber-950/50 border border-amber-200 dark:border-amber-800/60'}"
-                   title="Click to filter to lowest performer: ${escapeHtml(lowStudent.student.last)}, ${escapeHtml(lowStudent.student.first)}">
-                <span class="text-sm shrink-0 group-hover:scale-110 transition-transform">${lowStudent.gradeResult.total < 75 ? '⚠️' : '🎯'}</span>
-                <div class="min-w-0 flex-1">
-                  <div class="text-[9px] font-extrabold text-amber-800 dark:text-amber-400 uppercase tracking-wider whitespace-nowrap flex items-center justify-between">
-                    <span>Low Score</span>
-                    ${gradebookCohortFilter?.label === 'Low Score: ' + lowStudent.student.last ? `<span class="text-[9px] text-amber-700 dark:text-amber-300 font-extrabold" title="Filtered (click to reset)">✕</span>` : ''}
-                  </div>
-                  <div class="font-bold text-slate-800 dark:text-slate-200 truncate group-hover:text-amber-950 dark:group-hover:text-amber-300 text-[11px]">${escapeHtml(lowStudent.student.last)}</div>
-                </div>
-                <span class="font-mono font-extrabold ${lowStudent.gradeResult.total < 75 ? 'text-rose-700 dark:text-rose-400' : 'text-amber-700 dark:text-amber-400'} text-xs shrink-0">${lowStudent.gradeResult.total}%</span>
-              </div>
-              ` : ''}
+              <span class="font-mono font-black text-emerald-700 dark:text-emerald-300 text-xs shrink-0">${topStudent.gradeResult.total.toFixed(1)}%</span>
             </div>
-
-            <!-- Score Spread & Standard Deviation Strip -->
-            <div class="flex items-center justify-between text-xs px-2.5 py-1 bg-slate-50 dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-lg text-slate-600 dark:text-slate-400 font-mono">
-              <span title="Score range between lowest and top performers">Range: <strong class="text-slate-800 dark:text-slate-200">${lowStudent ? lowStudent.gradeResult.total : 0}% – ${topStudent.gradeResult.total}%</strong> <span class="text-slate-400 dark:text-slate-500 text-[10px]">(Δ${scoreSpread}%)</span></span>
-              <span title="Standard Deviation (σ) of section final percentage scores">σ = <strong class="text-slate-800 dark:text-slate-200">±${stdDev.toFixed(1)}%</strong></span>
+            <!-- Bottom Row: Student Name + Grade Pill -->
+            <div class="mt-1.5 flex items-center justify-between gap-1 w-full min-w-0">
+              <span class="font-bold text-slate-800 dark:text-slate-100 truncate text-[11px]" title="${escapeHtml(topStudent.student.last)}, ${escapeHtml(topStudent.student.first)}">
+                ${escapeHtml(topStudent.student.last)}${topStudent.student.first ? `, ${escapeHtml(topStudent.student.first.charAt(0))}.` : ''}
+              </span>
+              <span class="text-[9px] font-mono font-extrabold px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-700/60 shrink-0">${escapeHtml(topStudent.gradeResult.msu.grade)}</span>
             </div>
           </div>
+
+          <!-- Worst Score Card -->
+          ${lowStudent ? `
+          <div data-action="filterGradebookByCohort" data-cohort-label="Worst: ${escapeHtml(lowStudent.student.last)}" data-student-ids="${escapeHtml(lowStudent.student.id)}"
+               class="p-2.5 rounded-xl cursor-pointer transition-all shadow-2xs hover:shadow-xs min-w-0 flex flex-col justify-between ${gradebookCohortFilter?.label === 'Worst: ' + lowStudent.student.last ? 'bg-amber-100 dark:bg-amber-950/80 ring-2 ring-inset ring-amber-500 dark:ring-amber-400 relative z-10' : 'bg-amber-50/70 dark:bg-amber-950/30 hover:bg-amber-100/90 dark:hover:bg-amber-950/60 border border-amber-200/90 dark:border-amber-800/60 hover:border-amber-300 dark:hover:border-amber-700'}"
+               title="Worst performer: ${escapeHtml(lowStudent.student.last)}, ${escapeHtml(lowStudent.student.first)} (${lowStudent.gradeResult.total.toFixed(1)}%) • Click to inspect in gradebook">
+            <!-- Top Row: Icon + Label + Score -->
+            <div class="flex items-center justify-between gap-1 w-full">
+              <div class="flex items-center gap-1 min-w-0">
+                <span class="text-xs shrink-0">${lowStudent.gradeResult.total < 75 ? '⚠️' : '🎯'}</span>
+                <span class="text-[9.5px] font-extrabold text-amber-800 dark:text-amber-400 uppercase tracking-wider truncate">Worst</span>
+              </div>
+              <span class="font-mono font-black ${lowStudent.gradeResult.total < 75 ? 'text-rose-700 dark:text-rose-400' : 'text-amber-700 dark:text-amber-300'} text-xs shrink-0">${lowStudent.gradeResult.total.toFixed(1)}%</span>
+            </div>
+            <!-- Bottom Row: Student Name + Grade Pill -->
+            <div class="mt-1.5 flex items-center justify-between gap-1 w-full min-w-0">
+              <span class="font-bold text-slate-800 dark:text-slate-100 truncate text-[11px]" title="${escapeHtml(lowStudent.student.last)}, ${escapeHtml(lowStudent.student.first)}">
+                ${escapeHtml(lowStudent.student.last)}${lowStudent.student.first ? `, ${escapeHtml(lowStudent.student.first.charAt(0))}.` : ''}
+              </span>
+              <span class="text-[9px] font-mono font-extrabold px-1.5 py-0.5 rounded ${lowStudent.gradeResult.total < 75 ? 'bg-rose-100 dark:bg-rose-900/60 text-rose-800 dark:text-rose-300 border border-rose-200/80 dark:border-rose-700/60' : 'bg-amber-100 dark:bg-amber-900/60 text-amber-800 dark:text-amber-300 border border-amber-200/80 dark:border-amber-700/60'} shrink-0">${escapeHtml(lowStudent.gradeResult.msu.grade)}</span>
+            </div>
+          </div>
+          ` : ''}
+        </div>
         ` : ''}
       `;
 }
@@ -561,21 +605,23 @@ function _renderGradeDistributionHistogram(distCont, studentGrades, selectedSec)
     const hasStudents = b.students.length > 0;
     const studentIdsParam = b.students.map(st => st.id).join(',');
     const isCohortActive = (gradebookCohortFilter && gradebookCohortFilter.label === k);
+    const barWidth = b.count > 0 ? Math.max(pct, 3.5) : 0;
 
     return `
           <div ${hasStudents ? `data-action="filterGradebookByCohort" data-student-ids="${escapeHtml(studentIdsParam)}" data-cohort-label="${escapeHtml(k)}"` : ''}
-               class="flex items-center gap-2 text-[11px] py-1 px-1.5 rounded-lg ${isCohortActive ? 'bg-amber-100/90 dark:bg-amber-950/70 ring-1.5 ring-amber-500 font-bold' : (hasStudents ? 'hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer group' : 'opacity-50 cursor-default')} transition"
-               title="${hasStudents ? (isCohortActive ? `Active Filter (${k}): Click to reset` : `Click to filter ${b.students.length} student${b.students.length === 1 ? '' : 's'} (${k}): ${escapeHtml(studentNames)}`) : `No students in grade bracket ${k}`}">
-            <span class="w-20 font-bold ${isCohortActive ? 'text-amber-900 dark:text-amber-200' : 'text-slate-700 dark:text-slate-300'} shrink-0 font-mono text-[10.5px] flex items-center justify-between">
-              <span>${escapeHtml(k)}</span>
-              ${isCohortActive ? `<span class="text-[9px] text-amber-700 dark:text-amber-400 font-extrabold" title="Filtered (click to reset)">✕</span>` : (hasStudents ? `<span class="text-[8px] opacity-0 group-hover:opacity-100 text-slate-500 transition-opacity">🔍</span>` : '')}
-            </span>
-            <div class="flex-1 bg-slate-100 dark:bg-[#0b1120] border border-transparent dark:border-slate-700 rounded-full h-1.5 overflow-hidden">
-              <div class="${b.color} h-full rounded-full transition-all duration-300" style="width: ${pct}%"></div>
+               class="flex items-center gap-2 text-[11px] py-1 px-1.5 rounded-lg ${isCohortActive ? 'bg-amber-100/90 dark:bg-amber-950/70 ring-1.5 ring-amber-500 font-bold' : (hasStudents ? 'hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer group' : 'opacity-40 cursor-default')} transition select-none"
+               title="${hasStudents ? (isCohortActive ? `Active Filter (${k}): Click to reset` : `Click to filter ${b.students.length} student${b.students.length === 1 ? '' : 's'} (${k} - ${b.label}): ${escapeHtml(studentNames)}`) : `No students in grade bracket ${k} (${b.label})`}">
+            <div class="w-20 shrink-0 flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full ${b.color} shrink-0"></span>
+              <span class="font-mono text-[10.5px] font-bold ${isCohortActive ? 'text-amber-900 dark:text-amber-200' : 'text-slate-700 dark:text-slate-300'} truncate" title="${escapeHtml(b.label)}">${escapeHtml(k)}</span>
+              ${isCohortActive ? `<span class="text-[9px] text-amber-700 dark:text-amber-400 font-black ml-auto" title="Filtered (click to reset)">✕</span>` : ''}
+            </div>
+            <div class="flex-1 bg-slate-200/80 dark:bg-slate-800/80 rounded-full h-2 overflow-hidden shadow-inner">
+              <div class="${b.color} h-full rounded-full transition-all duration-300" style="width: ${barWidth}%"></div>
             </div>
             <div class="w-14 text-right font-mono shrink-0">
-              <span class="font-bold ${isCohortActive ? 'text-amber-900 dark:text-amber-100' : 'text-slate-800 dark:text-slate-200'}">${b.count}</span>
-              <span class="text-[9.5px] ${isCohortActive ? 'text-amber-700 dark:text-amber-300' : 'text-slate-400'}">(${pct}%)</span>
+              <span class="font-black ${isCohortActive ? 'text-amber-900 dark:text-amber-100' : 'text-slate-800 dark:text-slate-200'}">${b.count}</span>
+              <span class="text-[9.5px] ${isCohortActive ? 'text-amber-700 dark:text-amber-300' : 'text-slate-400 dark:text-slate-500'}">(${pct}%)</span>
             </div>
           </div>
         `;
@@ -617,7 +663,7 @@ function updateGradebookSidebar() {
   _renderGradeDistributionHistogram(distCont, studentGrades, selectedSec);
 }
 
-  function highlightStudentInGradebook(studentId, section = null) {
+function highlightStudentInGradebook(studentId, section = null) {
   const secSelect = document.getElementById('gradebook-section-select');
   const activeSec = secSelect ? secSelect.value : '';
   const targetSection = section || activeSec;

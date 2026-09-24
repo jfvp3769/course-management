@@ -123,11 +123,51 @@ html.theme-dark .matrix-row-weekend > td.sticky-col-date {
   box-shadow: 4px 0 6px -2px rgba(0, 0, 0, 0.08);
 }
 
-/* Calibrated Row Height: 7 rows fill exactly the container */
+:root {
+  --matrix-row-height: 60px;
+}
+
+/* Calibrated Dynamic Row Height: 7 rows fill exactly the viewport */
 .matrix-row-height {
-  height: 60px;
-  max-height: 60px;
-  scroll-margin-top: 70px;
+  height: var(--matrix-row-height, 60px);
+  min-height: var(--matrix-row-height, 60px);
+  max-height: var(--matrix-row-height, 60px);
+  scroll-margin-top: 86px;
+}
+
+.matrix-row-height > td {
+  height: var(--matrix-row-height, 60px);
+  max-height: var(--matrix-row-height, 60px);
+  box-sizing: border-box;
+}
+
+/* Activity Cards & Slots: Match Row Height Exactly */
+.matrix-cell-slot > div,
+.matrix-activity-card {
+  height: calc(var(--matrix-row-height, 60px) - 8px) !important;
+  max-height: calc(var(--matrix-row-height, 60px) - 8px);
+  box-sizing: border-box !important;
+}
+
+.matrix-cell-slot:hover > div,
+.matrix-cell-slot:hover > .matrix-activity-card {
+  height: auto !important;
+  max-height: none !important;
+  min-height: calc(var(--matrix-row-height, 60px) - 8px) !important;
+}
+
+.matrix-activity-slot-empty,
+.matrix-cell-slot > div.border-dashed {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: stretch !important;
+  text-align: center;
+}
+
+.matrix-cell-slot:hover > .matrix-activity-slot-empty,
+.matrix-cell-slot:hover > div.border-dashed {
+  justify-content: flex-start !important;
 }
 
 /* Column Resizer Handle */
@@ -331,26 +371,19 @@ html.theme-dark .row-today-pulse > td {
   z-index: 22;
 }
 
-/* MSU Gradebook Freeze Panes (Sticky First 3 Columns: #, Student ID, Student Name) */
+/* MSU Gradebook Freeze Panes (Sticky First 2 Columns: Student ID, Student Name) */
 .sticky-grade-col-1 {
   position: sticky;
   left: 0;
-  width: 40px;
-  min-width: 40px;
-  max-width: 40px;
-  z-index: 25;
-}
-.sticky-grade-col-2 {
-  position: sticky;
-  left: 40px;
   width: 105px;
   min-width: 105px;
   max-width: 105px;
   z-index: 25;
 }
+.sticky-grade-col-2,
 .sticky-grade-col-3 {
   position: sticky;
-  left: 145px;
+  left: 105px;
   width: 240px;
   min-width: 240px;
   max-width: 240px;
@@ -366,26 +399,17 @@ html.theme-dark .row-today-pulse > td {
   position: sticky;
   top: 0;
   left: 0;
-  width: 40px;
-  min-width: 40px;
-  max-width: 40px;
-  z-index: 50 !important;
-  background-color: var(--slate-100) !important;
-}
-.sticky-grade-head-2 {
-  position: sticky;
-  top: 0;
-  left: 40px;
   width: 105px;
   min-width: 105px;
   max-width: 105px;
   z-index: 50 !important;
   background-color: var(--slate-100) !important;
 }
+.sticky-grade-head-2,
 .sticky-grade-head-3 {
   position: sticky;
   top: 0;
-  left: 145px;
+  left: 105px;
   width: 240px;
   min-width: 240px;
   max-width: 240px;
@@ -406,12 +430,14 @@ html.theme-dark .row-today-pulse > td {
 #gradebook-table-head tr:first-child th {
   position: sticky;
   top: 0;
+  height: 28px;
   z-index: 35;
   background-color: var(--slate-100);
 }
 #gradebook-table-head tr:nth-child(2) th {
   position: sticky;
-  top: 36px;
+  top: 28px;
+  height: 26px;
   z-index: 35;
 }
 #gradebook-table-head th.sticky-grade-head-1,
@@ -422,64 +448,100 @@ html.theme-dark .row-today-pulse > td {
   background-color: var(--slate-100) !important;
 }
 
+/* Uniform Size and Centering for Gradebook Status Column Dropdowns */
+.grade-status-select {
+  width: 114px !important;
+  min-width: 114px !important;
+  max-width: 114px !important;
+  text-align-last: center;
+  text-align: center;
+}
+
 /* Professional Alternating Row Zebra Striping & Solid Backgrounds */
-html:not(.theme-dark) #gradebook-table-body tr.grade-row-even,
-html:not(.theme-dark) #gradebook-table-body tr.grade-row-even > td {
+html:not(.theme-dark) #gradebook-table-body tr.grade-row-even:not(:hover),
+html:not(.theme-dark) #gradebook-table-body tr.grade-row-even:not(:hover) > td,
+html:not(.theme-dark) #student-table-body tr.roster-row-even:not(:hover),
+html:not(.theme-dark) #student-table-body tr.roster-row-even:not(:hover) > td {
   background-color: #ffffff !important;
 }
-html:not(.theme-dark) #gradebook-table-body tr.grade-row-odd,
-html:not(.theme-dark) #gradebook-table-body tr.grade-row-odd > td {
+html:not(.theme-dark) #gradebook-table-body tr.grade-row-odd:not(:hover),
+html:not(.theme-dark) #gradebook-table-body tr.grade-row-odd:not(:hover) > td,
+html:not(.theme-dark) #student-table-body tr.roster-row-odd:not(:hover),
+html:not(.theme-dark) #student-table-body tr.roster-row-odd:not(:hover) > td {
   background-color: #f1f5f9 !important;
 }
 
-html:not(.theme-dark) #gradebook-table-body tr.grade-row-even td.sticky-grade-col-1,
-html:not(.theme-dark) #gradebook-table-body tr.grade-row-even td.sticky-grade-col-2,
-html:not(.theme-dark) #gradebook-table-body tr.grade-row-even td.sticky-grade-col-3 {
+html:not(.theme-dark) #gradebook-table-body tr.grade-row-even:not(:hover) td.sticky-grade-col-1,
+html:not(.theme-dark) #gradebook-table-body tr.grade-row-even:not(:hover) td.sticky-grade-col-2,
+html:not(.theme-dark) #gradebook-table-body tr.grade-row-even:not(:hover) td.sticky-grade-col-3 {
   background-color: #ffffff !important;
 }
-html:not(.theme-dark) #gradebook-table-body tr.grade-row-odd td.sticky-grade-col-1,
-html:not(.theme-dark) #gradebook-table-body tr.grade-row-odd td.sticky-grade-col-2,
-html:not(.theme-dark) #gradebook-table-body tr.grade-row-odd td.sticky-grade-col-3 {
+html:not(.theme-dark) #gradebook-table-body tr.grade-row-odd:not(:hover) td.sticky-grade-col-1,
+html:not(.theme-dark) #gradebook-table-body tr.grade-row-odd:not(:hover) td.sticky-grade-col-2,
+html:not(.theme-dark) #gradebook-table-body tr.grade-row-odd:not(:hover) td.sticky-grade-col-3 {
   background-color: #f1f5f9 !important;
 }
 
 /* Dark Mode Gradebook Zebra Striping (Elevated Slate-900 / Slate-800) */
-html.theme-dark #gradebook-table-body tr.grade-row-even,
-html.theme-dark #gradebook-table-body tr.grade-row-even > td {
+html.theme-dark #gradebook-table-body tr.grade-row-even:not(:hover),
+html.theme-dark #gradebook-table-body tr.grade-row-even:not(:hover) > td,
+html.theme-dark #student-table-body tr.roster-row-even:not(:hover),
+html.theme-dark #student-table-body tr.roster-row-even:not(:hover) > td {
   background-color: #0f172a !important;
 }
-html.theme-dark #gradebook-table-body tr.grade-row-odd,
-html.theme-dark #gradebook-table-body tr.grade-row-odd > td {
+html.theme-dark #gradebook-table-body tr.grade-row-odd:not(:hover),
+html.theme-dark #gradebook-table-body tr.grade-row-odd:not(:hover) > td,
+html.theme-dark #student-table-body tr.roster-row-odd:not(:hover),
+html.theme-dark #student-table-body tr.roster-row-odd:not(:hover) > td {
   background-color: #1e293b !important;
 }
 
-html.theme-dark #gradebook-table-body tr.grade-row-even td.sticky-grade-col-1,
-html.theme-dark #gradebook-table-body tr.grade-row-even td.sticky-grade-col-2,
-html.theme-dark #gradebook-table-body tr.grade-row-even td.sticky-grade-col-3 {
+html.theme-dark #gradebook-table-body tr.grade-row-even:not(:hover) td.sticky-grade-col-1,
+html.theme-dark #gradebook-table-body tr.grade-row-even:not(:hover) td.sticky-grade-col-2,
+html.theme-dark #gradebook-table-body tr.grade-row-even:not(:hover) td.sticky-grade-col-3 {
   background-color: #0f172a !important;
 }
-html.theme-dark #gradebook-table-body tr.grade-row-odd td.sticky-grade-col-1,
-html.theme-dark #gradebook-table-body tr.grade-row-odd td.sticky-grade-col-2,
-html.theme-dark #gradebook-table-body tr.grade-row-odd td.sticky-grade-col-3 {
+html.theme-dark #gradebook-table-body tr.grade-row-odd:not(:hover) td.sticky-grade-col-1,
+html.theme-dark #gradebook-table-body tr.grade-row-odd:not(:hover) td.sticky-grade-col-2,
+html.theme-dark #gradebook-table-body tr.grade-row-odd:not(:hover) td.sticky-grade-col-3 {
   background-color: #1e293b !important;
 }
 
-/* Hover States Across Entire Row Including Frozen Sticky Panes */
+/* Hover States Across Entire Row Including All Score Cells and Frozen Sticky Panes */
 html:not(.theme-dark) #gradebook-table-body tr:hover,
 html:not(.theme-dark) #gradebook-table-body tr:hover > td,
+html:not(.theme-dark) #gradebook-table-body tr.grade-row-even:hover > td,
+html:not(.theme-dark) #gradebook-table-body tr.grade-row-odd:hover > td,
 html:not(.theme-dark) #gradebook-table-body tr:hover td.sticky-grade-col-1,
 html:not(.theme-dark) #gradebook-table-body tr:hover td.sticky-grade-col-2,
-html:not(.theme-dark) #gradebook-table-body tr:hover td.sticky-grade-col-3 {
+html:not(.theme-dark) #gradebook-table-body tr:hover td.sticky-grade-col-3,
+html:not(.theme-dark) #student-table-body tr:hover,
+html:not(.theme-dark) #student-table-body tr:hover > td,
+html:not(.theme-dark) #student-table-body tr.roster-row-even:hover > td,
+html:not(.theme-dark) #student-table-body tr.roster-row-odd:hover > td {
   background-color: #e8f1fd !important;
 }
 
 html.theme-dark #gradebook-table-body tr:hover,
 html.theme-dark #gradebook-table-body tr:hover > td,
+html.theme-dark #gradebook-table-body tr.grade-row-even:hover > td,
+html.theme-dark #gradebook-table-body tr.grade-row-odd:hover > td,
 html.theme-dark #gradebook-table-body tr:hover td.sticky-grade-col-1,
 html.theme-dark #gradebook-table-body tr:hover td.sticky-grade-col-2,
-html.theme-dark #gradebook-table-body tr:hover td.sticky-grade-col-3 {
+html.theme-dark #gradebook-table-body tr:hover td.sticky-grade-col-3,
+html.theme-dark #student-table-body tr:hover,
+html.theme-dark #student-table-body tr:hover > td,
+html.theme-dark #student-table-body tr.roster-row-even:hover > td,
+html.theme-dark #student-table-body tr.roster-row-odd:hover > td {
   background-color: #24344d !important;
   color: #f8fafc !important;
+}
+
+html:not(.theme-dark) #gradebook-table-body tr:hover .grade-cell-input:not(:focus):not(.border-rose-500) {
+  border-color: #93c5fd;
+}
+html.theme-dark #gradebook-table-body tr:hover .grade-cell-input:not(:focus):not(.border-rose-500) {
+  border-color: #3b82f6;
 }
 
 /* App-wide Snappy & Smooth Animations */
@@ -561,7 +623,10 @@ button:active, .tab-btn:active {
     page-break-inside: avoid;
     page-break-after: auto;
   }
-  .matrix-row-height {
+  .matrix-row-height,
+  .matrix-row-height > td,
+  .matrix-cell-slot > div,
+  .matrix-activity-card {
     height: auto !important;
     max-height: none !important;
   }
@@ -576,26 +641,17 @@ button:active, .tab-btn:active {
   position: sticky;
   bottom: 0;
   left: 0;
-  width: 40px;
-  min-width: 40px;
-  max-width: 40px;
-  z-index: 45 !important;
-  background-color: var(--slate-100) !important;
-}
-.sticky-grade-foot-2 {
-  position: sticky;
-  bottom: 0;
-  left: 40px;
   width: 105px;
   min-width: 105px;
   max-width: 105px;
   z-index: 45 !important;
   background-color: var(--slate-100) !important;
 }
+.sticky-grade-foot-2,
 .sticky-grade-foot-3 {
   position: sticky;
   bottom: 0;
-  left: 145px;
+  left: 105px;
   width: 240px;
   min-width: 240px;
   max-width: 240px;
@@ -846,11 +902,11 @@ html.theme-dark .activity-navigated-highlight {
 }
 .sidebar-docked-tag.sidebar-tag-collapsed {
   width: 36px !important;
-  background-color: var(--amber-50) !important;
-  border-color: var(--amber-500) !important;
-  border-left-color: var(--amber-50) !important;
-  color: var(--amber-800) !important;
-  box-shadow: 2px 2px 8px -1px rgba(245, 158, 11, 0.25);
+  background-color: var(--white) !important;
+  border-color: var(--slate-300) !important;
+  border-left-color: var(--white) !important;
+  color: var(--slate-700) !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
   justify-content: flex-start;
   padding: 0 0 0 10px;
   transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1),
@@ -860,9 +916,9 @@ html.theme-dark .activity-navigated-highlight {
               box-shadow 0.3s ease !important;
 }
 .sidebar-docked-tag.sidebar-tag-collapsed:hover {
-  background-color: var(--yellow-200) !important;
-  border-color: var(--amber-600) !important;
-  border-left-color: var(--yellow-200) !important;
+  background-color: var(--slate-50) !important;
+  border-color: var(--slate-400) !important;
+  border-left-color: var(--slate-50) !important;
   transform: translateX(2px);
 }
 .sidebar-docked-tag.sidebar-tag-expanded {
@@ -949,8 +1005,8 @@ html.theme-dark .tab-sidebar > [id^="gradebook-widget-"] {
 
 .widget-bottom-resizer:hover,
 .widget-resizing .widget-bottom-resizer {
-  background-color: rgba(254, 243, 199, 0.75) !important;
-  border-top-color: rgba(245, 158, 11, 0.6) !important;
+  background-color: var(--app-header-accent-subtle, rgba(254, 243, 199, 0.75)) !important;
+  border-top-color: var(--app-header-accent-border, rgba(245, 158, 11, 0.6)) !important;
 }
 
 .widget-resizer-grip {
@@ -966,10 +1022,10 @@ html.theme-dark .tab-sidebar > [id^="gradebook-widget-"] {
 
 .widget-bottom-resizer:hover .widget-resizer-grip,
 .widget-resizing .widget-resizer-grip {
-  background-color: var(--msu-gold, #f59e0b) !important;
+  background-color: var(--app-header-accent, var(--msu-gold, #f59e0b)) !important;
   width: 52px;
   height: 4px;
-  box-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
+  box-shadow: 0 0 10px var(--app-header-accent-glow, rgba(245, 158, 11, 0.6)) !important;
 }
 
 html.theme-dark .widget-bottom-resizer {
@@ -980,7 +1036,7 @@ html.theme-dark .widget-bottom-resizer {
 html.theme-dark .widget-bottom-resizer:hover,
 html.theme-dark .widget-resizing .widget-bottom-resizer {
   background-color: #1e293b !important;
-  border-top-color: #d97706 !important;
+  border-top-color: var(--app-header-accent-border, #d97706) !important;
 }
 
 html.theme-dark .widget-resizer-grip {
@@ -989,8 +1045,8 @@ html.theme-dark .widget-resizer-grip {
 
 html.theme-dark .widget-bottom-resizer:hover .widget-resizer-grip,
 html.theme-dark .widget-resizing .widget-resizer-grip {
-  background-color: #f59e0b !important;
-  box-shadow: 0 0 10px rgba(245, 158, 11, 0.7) !important;
+  background-color: var(--app-header-accent, #f59e0b) !important;
+  box-shadow: 0 0 12px var(--app-header-accent-glow, rgba(245, 158, 11, 0.75)) !important;
 }
 
 body.resizing-widget-active {
@@ -1031,8 +1087,8 @@ body.resizing-widget-active {
 
 .main-table-bottom-resizer:hover,
 .main-window-resizing .main-table-bottom-resizer {
-  background-color: rgba(254, 243, 199, 0.75) !important;
-  border-top-color: rgba(245, 158, 11, 0.6) !important;
+  background-color: var(--app-header-accent-subtle, rgba(254, 243, 199, 0.75)) !important;
+  border-top-color: var(--app-header-accent-border, rgba(245, 158, 11, 0.6)) !important;
 }
 
 .main-resizer-grip {
@@ -1048,10 +1104,10 @@ body.resizing-widget-active {
 
 .main-table-bottom-resizer:hover .main-resizer-grip,
 .main-window-resizing .main-resizer-grip {
-  background-color: var(--msu-gold, #f59e0b) !important;
+  background-color: var(--app-header-accent, var(--msu-gold, #f59e0b)) !important;
   width: 72px;
   height: 4px;
-  box-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
+  box-shadow: 0 0 10px var(--app-header-accent-glow, rgba(245, 158, 11, 0.65)) !important;
 }
 
 html.theme-dark .main-table-bottom-resizer {
@@ -1062,7 +1118,7 @@ html.theme-dark .main-table-bottom-resizer {
 html.theme-dark .main-table-bottom-resizer:hover,
 html.theme-dark .main-window-resizing .main-table-bottom-resizer {
   background-color: #1e293b !important;
-  border-top-color: #d97706 !important;
+  border-top-color: var(--app-header-accent-border, #d97706) !important;
 }
 
 html.theme-dark .main-resizer-grip {
@@ -1071,8 +1127,8 @@ html.theme-dark .main-resizer-grip {
 
 html.theme-dark .main-table-bottom-resizer:hover .main-resizer-grip,
 html.theme-dark .main-window-resizing .main-resizer-grip {
-  background-color: #f59e0b !important;
-  box-shadow: 0 0 10px rgba(245, 158, 11, 0.7) !important;
+  background-color: var(--app-header-accent, #f59e0b) !important;
+  box-shadow: 0 0 12px var(--app-header-accent-glow, rgba(245, 158, 11, 0.75)) !important;
 }
 
 body.resizing-main-window-active {
@@ -1156,10 +1212,16 @@ html.theme-dark #gradebook-widget-stats .bg-slate-100 {
 html.theme-dark #gradebook-widget-stats .bg-slate-200 {
   background-color: #334155;
 }
-html.theme-dark #gradebook-widget-stats .text-slate-900,
-html.theme-dark #gradebook-widget-stats .text-slate-800,
-html.theme-dark #gradebook-widget-stats .text-slate-700 {
+html.theme-dark #gradebook-widget-stats .text-slate-900:not(.widget-title),
+html.theme-dark #gradebook-widget-stats .text-slate-800:not(.widget-title),
+html.theme-dark #gradebook-widget-stats .text-slate-700:not(.widget-title) {
   color: #f1f5f9;
+}
+#gradebook-widget-stats .widget-title {
+  color: var(--app-header-primary, #800000) !important;
+}
+html.theme-dark #gradebook-widget-stats .widget-title {
+  color: var(--app-header-accent, #daa520) !important;
 }
 html.theme-dark #gradebook-widget-stats .text-slate-500,
 html.theme-dark #gradebook-widget-stats .text-slate-400 {

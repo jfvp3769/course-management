@@ -7,7 +7,15 @@
 // 1. Planner Sidebar Updates & Navigation
 function jumpToMatrixDate(dateKey, courseCode = '', section = '', isMilestone = false) {
   if (!dateKey) return;
-  switchTab('planner');
+
+  const plannerContent = document.getElementById('tab-content-planner');
+  if (plannerContent && plannerContent.classList.contains('hidden')) {
+    switchTab('planner');
+  }
+
+  // Preserve teaching radar activities scroll position so jumping does not reset it
+  const list = document.getElementById('planner-milestones-list');
+  const keptRadarScroll = list ? list.scrollTop : null;
 
   // Ensure full semester dates are visible if month filter excluded this date
   const parts = dateKey.split('-');
@@ -17,6 +25,10 @@ function jumpToMatrixDate(dateKey, courseCode = '', section = '', isMilestone = 
     if (monthFilter) monthFilter.value = 'all';
     selectedMonthFilter = 'all';
     renderMatrixTable();
+  }
+
+  if (list && keptRadarScroll !== null) {
+    list.scrollTop = keptRadarScroll;
   }
 
   requestAnimationFrame(() => requestAnimationFrame(() => {
@@ -65,33 +77,48 @@ function jumpToMatrixDate(dateKey, courseCode = '', section = '', isMilestone = 
     } else if (isMilestone) {
       targetCell = document.getElementById('cell-' + dateKey + '__notes');
       targetCard = document.getElementById('card-' + dateKey + '__notes');
-    } else if (targetRow) {
-      // If called with only dateKey, look for the first planned activity in this row
+    }
+
+    // Fallback: called with only a date, or the exact cell (e.g. a milestone's
+    // notes column) is not rendered - aim at the first cell of that row so the
+    // horizontal jump still happens instead of silently doing nothing.
+    if (!targetCell && targetRow) {
       targetCell = targetRow.querySelector('.matrix-cell-slot') || targetRow.querySelector('[id^="cell-"]');
       if (targetCell) {
         targetCard = targetCell.querySelector('[id^="card-"]') || targetCell.querySelector('div');
       }
     }
 
+    // Horizontal: compare getBoundingClientRect() values (both rects are taken
+    // from the same viewport frame, so the delta is exact and immune to the
+    // offsetLeft coordinate-space ambiguity inside a scrolled container), then
+    // write scrollLeft DIRECTLY rather than smoothly: setupDualScrollbar
+    // mirrors scrollLeft to the top scrollbar and a late echo cancels a smooth
+    // animation mid-flight, leaving the target off-screen.
     if (targetCell && wrapper) {
       const stickyLeftWidth = 110; // 42px Day + 68px Date sticky columns
-      const cellLeft = targetCell.offsetLeft;
-      const cellWidth = targetCell.offsetWidth;
-      const cellRight = cellLeft + cellWidth;
+      const cellRect = targetCell.getBoundingClientRect();
+      const wrapRect = wrapper.getBoundingClientRect();
+      const viewLeft = wrapRect.left + stickyLeftWidth;
+      const viewRight = wrapRect.right;
 
-      const viewLeft = wrapper.scrollLeft + stickyLeftWidth;
-      const viewRight = wrapper.scrollLeft + wrapper.clientWidth;
-
-      if (cellLeft < viewLeft) {
-        targetLeft = Math.max(0, cellLeft - stickyLeftWidth - 12);
-      } else if (cellRight > viewRight) {
-        targetLeft = cellRight - wrapper.clientWidth + 24;
+      let newScrollLeft = wrapper.scrollLeft;
+      if (cellRect.left < viewLeft) {
+        newScrollLeft += cellRect.left - viewLeft - 12;
+      } else if (cellRect.right > viewRight) {
+        newScrollLeft += cellRect.right - viewRight + 24;
+      }
+      newScrollLeft = Math.max(0, Math.round(newScrollLeft));
+      if (newScrollLeft !== wrapper.scrollLeft) {
+        wrapper.scrollLeft = newScrollLeft;
       }
     }
 
-    // 3. Coordinated scroll on both axes at once
+    // Vertical: smooth. scrollTop has no mirror to fight it, so this cannot be
+    // cancelled; `left` is passed explicitly so the instant horizontal move
+    // above is not discarded when the options object is applied.
     if (wrapper) {
-      wrapper.scrollTo({ top: targetTop, left: targetLeft, behavior: 'smooth' });
+      wrapper.scrollTo({ top: targetTop, left: wrapper.scrollLeft, behavior: 'smooth' });
     }
 
     // 4. Clear any lingering flash highlights before triggering a new one
@@ -134,6 +161,10 @@ function jumpToMatrixDate(dateKey, courseCode = '', section = '', isMilestone = 
     } else {
       showToast('Date ' + dateKey + ' not in current view.', '⚠️');
     }
+
+    if (list && keptRadarScroll !== null) {
+      list.scrollTop = keptRadarScroll;
+    }
   }));
 }
 
@@ -142,6 +173,11 @@ window.jumpToMatrixDate = jumpToMatrixDate;
 function setRadarFilter(filter) {
   currentRadarFilter = filter;
   updatePlannerSidebar();
+  // A filter change re-scopes the list, so start it at the top on purpose
+  // (unlike the passive re-renders, which preserve the scroll via
+  // _renderHorizonTimeline).
+  const list = document.getElementById('planner-milestones-list');
+  if (list) list.scrollTop = 0;
 }
 if (typeof window !== 'undefined') window.setRadarFilter = setRadarFilter;
 
@@ -401,7 +437,7 @@ function _renderRadarDispatchCard(radarData) {
     const classroomLink = (typeof getClassroomLink === 'function') ? getClassroomLink(upcomingToday.course, upcomingToday.section) : '';
     dispatchCardEl.innerHTML = `
           <div id="planner-radar-active-card"
-            class="p-2.5 rounded-xl border ${isOngoing ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-800 text-emerald-950 dark:text-emerald-100' : (upcomingToday.isSpecialSession ? 'bg-amber-50/70 dark:bg-amber-950/40 border-amber-300 dark:border-amber-800 text-amber-950 dark:text-amber-100' : 'bg-slate-50 dark:bg-slate-800/80 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100')} space-y-1.5 cursor-pointer transition hover:border-emerald-400 hover:shadow-xs group"
+            class="p-2.5 rounded-xl border ${isOngoing ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-800 text-emerald-950 dark:text-emerald-100' : (upcomingToday.isSpecialSession ? 'bg-amber-50/70 dark:bg-amber-950/40 border-amber-300 dark:border-amber-800 text-amber-950 dark:text-amber-100' : 'bg-slate-50 dark:bg-[#141d2b] border-slate-200 dark:border-slate-700/80 text-slate-900 dark:text-slate-100')} space-y-1.5 cursor-pointer transition-all hover:bg-slate-100 dark:hover:bg-[#1a2638] hover:border-slate-300 dark:hover:border-slate-600 hover:shadow-xs group"
             title="${classroomLink ? `Open Google Classroom for ${escapeHtml(upcomingToday.course)} ${escapeHtml(upcomingToday.section)} in new tab` : 'Click to jump to today in matrix'}">
             <div class="flex items-center justify-between gap-1.5">
               <span class="font-black text-xs flex items-center gap-1.5 min-w-0">
@@ -452,7 +488,7 @@ function _renderRadarDispatchCard(radarData) {
     const classroomLink = (typeof getClassroomLink === 'function') ? getClassroomLink(lookaheadClass.course, lookaheadClass.section) : '';
     dispatchCardEl.innerHTML = `
           <div id="planner-radar-lookahead-card"
-            class="p-2.5 rounded-xl border bg-blue-50/60 dark:bg-[#0e1e38] border-blue-200/90 dark:border-blue-800/80 text-slate-900 dark:text-slate-100 space-y-1.5 cursor-pointer transition hover:border-blue-400 dark:hover:border-blue-600 hover:shadow-xs group"
+            class="p-2.5 rounded-xl border bg-blue-50/60 dark:bg-[#0e1e38] hover:bg-blue-100/70 dark:hover:bg-[#142646] border-blue-200/90 dark:border-blue-800/80 hover:border-blue-300 dark:hover:border-blue-600 text-slate-900 dark:text-slate-100 space-y-1.5 cursor-pointer transition-all hover:shadow-xs group"
             title="Click to jump to ${lookaheadClass.dateKey} in matrix">
             <div class="flex items-center justify-between gap-1.5">
               <span class="font-black text-xs flex items-center gap-1.5 min-w-0">
@@ -665,9 +701,45 @@ function _getHorizonTimelineEvents(now, todayStr, currentTotalMinutes, dayNames)
   return filteredItems.slice(0, 15);
 }
 
+function _formatRadarDate(dateKey) {
+  if (!dateKey) return '';
+  if (typeof semesterDates !== 'undefined' && Array.isArray(semesterDates)) {
+    const matched = semesterDates.find(d => d.dateKey === dateKey);
+    if (matched && matched.displayDate && matched.dayOfWeek) {
+      return `${matched.dayOfWeek}, ${matched.displayDate}`;
+    }
+  }
+  const parts = dateKey.split('-').map(Number);
+  if (parts.length === 3 && !isNaN(parts[0]) && !isNaN(parts[1]) && !isNaN(parts[2])) {
+    const d = new Date(parts[0], parts[1] - 1, parts[2]);
+    if (!isNaN(d.getTime())) {
+      const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      return `${days[d.getDay()]}, ${d.getDate()}-${months[d.getMonth()]}`;
+    }
+  }
+  return dateKey;
+}
+
+function _formatRadarTime(timeStr) {
+  if (!timeStr) return '';
+  const parts = timeStr.split(':');
+  let h = parseInt(parts[0], 10);
+  const m = parts[1] || '00';
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  h = h % 12 || 12;
+  return `${h}:${m} ${ampm}`;
+}
+
 function _renderHorizonTimeline(displayList, currentTotalMinutes) {
   const nextActivitiesList = document.getElementById('planner-milestones-list');
   if (!nextActivitiesList) return;
+
+  // Replacing a scroll container's innerHTML resets scrollTop to 0, and this
+  // runs on every clock tick and every switchTab('planner') - which is what
+  // snapped the radar back to the top after each jump click. Hold the position
+  // across the repaint and let the browser clamp it to the new content height.
+  const keptScrollTop = nextActivitiesList.scrollTop;
 
   if (displayList.length === 0) {
     let emptyText = 'No activities scheduled in the next 30 days.';
@@ -675,15 +747,22 @@ function _renderHorizonTimeline(displayList, currentTotalMinutes) {
     else if (currentRadarFilter === 'week') emptyText = 'No more activities scheduled for this week.';
     else if (currentRadarFilter === 'milestones') emptyText = 'No upcoming exams or university milestones.';
 
-    nextActivitiesList.innerHTML = `
+    const emptyHtml = `
           <div class="text-slate-400 italic text-[11px] py-4 text-center bg-slate-50 rounded-lg border border-dashed border-slate-200">
             ${emptyText}<br><span class="text-[10px] text-slate-400">Add lessons, quizzes, or exams in the matrix.</span>
           </div>
         `;
+    if (nextActivitiesList.innerHTML !== emptyHtml) {
+      nextActivitiesList.innerHTML = emptyHtml;
+    }
+    nextActivitiesList.scrollTop = keptScrollTop;
+    requestAnimationFrame(() => {
+      if (nextActivitiesList) nextActivitiesList.scrollTop = keptScrollTop;
+    });
     return;
   }
 
-  nextActivitiesList.innerHTML = displayList.map(item => {
+  const newHtml = displayList.map(item => {
     let daysBadge = '';
     if (item.diffDays === 0) {
       const startMin = item.startTime ? timeToMinutes(item.startTime) : 0;
@@ -691,14 +770,14 @@ function _renderHorizonTimeline(displayList, currentTotalMinutes) {
       const isOngoing = startMin > 0 && endMin > 0 && currentTotalMinutes >= startMin && currentTotalMinutes <= endMin;
 
       if (isOngoing) {
-        daysBadge = `<span class="text-[10px] font-black px-1.5 py-0.5 rounded bg-emerald-500 text-white shadow-2xs shrink-0 animate-pulse">Now</span>`;
+        daysBadge = `<span class="inline-flex items-center justify-center text-[10px] font-black px-1.5 py-0.5 rounded bg-emerald-500 text-white shadow-2xs shrink-0 animate-pulse leading-none">Now</span>`;
       } else {
-        daysBadge = `<span class="text-[10px] font-black px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-300 shrink-0 shadow-2xs">Today</span>`;
+        daysBadge = `<span class="inline-flex items-center justify-center text-[10px] font-black px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-300 shrink-0 shadow-2xs leading-none">Today</span>`;
       }
     } else if (item.diffDays === 1) {
-      daysBadge = `<span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-100 text-blue-800 border border-blue-200 shrink-0">Tmrw</span>`;
+      daysBadge = `<span class="inline-flex items-center justify-center text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-100 text-blue-800 border border-blue-200 shrink-0 leading-none">Tmrw</span>`;
     } else {
-      daysBadge = `<span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200 shrink-0">${item.diffDays}d left</span>`;
+      daysBadge = `<span class="inline-flex items-center justify-center text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200 shrink-0 leading-none">${item.diffDays}d left</span>`;
     }
 
     const cursorClass = item.dateKey ? 'cursor-pointer hover:shadow-xs transition' : '';
@@ -714,75 +793,89 @@ function _renderHorizonTimeline(displayList, currentTotalMinutes) {
         milestoneTypeLabel = 'University Holiday / No Class';
       }
 
+      const milestoneDate = _formatRadarDate(item.dateKey) || item.activity;
+
       return `
             <div ${clickAttr} title="${item.dateKey ? 'Click to view event in matrix' : ''}"
-              class="p-2.5 rounded-xl ${milestoneBg} flex items-start justify-between gap-2.5 ${cursorClass}">
-              <div class="min-w-0 flex-1 space-y-1">
-                <div class="flex items-center gap-1.5 flex-wrap">
-                  <span class="text-[9px] font-black px-1.5 py-0.5 rounded bg-amber-200 dark:bg-amber-900/60 text-amber-950 dark:text-amber-200 border border-amber-300 dark:border-amber-700 flex items-center gap-1 shrink-0">
+              class="px-2.5 py-1.5 rounded-xl ${milestoneBg} space-y-1 ${cursorClass}">
+              <div class="flex items-center justify-between gap-2">
+                <div class="flex items-center gap-1.5 min-w-0 flex-wrap">
+                  <span class="inline-flex items-center justify-center text-[9px] font-black px-1.5 py-0.5 rounded bg-amber-200 dark:bg-amber-900/60 text-amber-950 dark:text-amber-200 border border-amber-300 dark:border-amber-700 gap-1 shrink-0 leading-none">
                     ⭐ ${milestoneTypeLabel}
                   </span>
-                  <span class="text-[10px] font-bold text-amber-800 dark:text-amber-300 font-mono">${escapeHtml(item.dateKey || item.activity)}</span>
+                  <span class="text-[10px] font-bold text-amber-800 dark:text-amber-300 leading-none">${escapeHtml(milestoneDate)}</span>
                 </div>
-                <div class="font-bold text-slate-900 dark:text-amber-100 text-xs leading-snug break-words">
-                  <span>${escapeHtml(item.topic)}</span>
-                </div>
+                ${daysBadge}
               </div>
-              <div class="shrink-0 pt-0.5">${daysBadge}</div>
+              <div class="font-bold text-slate-900 dark:text-amber-100 text-xs leading-snug break-words">
+                <span>${escapeHtml(item.topic)}</span>
+              </div>
             </div>
           `;
     }
 
     // Planned Matrix Activity card
     const clickAttr = item.dateKey ? `data-action="jumpToMatrixDate" data-date="${escapeHtml(item.dateKey)}" data-course="${escapeHtml(item.course || '')}" data-section="${escapeHtml(item.section || '')}"` : '';
-    let typeColor = 'bg-blue-100 text-blue-800 border-blue-200';
+    let typeColor = 'bg-blue-100 dark:bg-blue-950/70 text-blue-800 dark:text-blue-300 border-blue-200 dark:border-blue-800';
     if (item.type === 'Quiz') {
-      typeColor = 'bg-purple-100 text-purple-800 border-purple-200';
+      typeColor = 'bg-purple-100 dark:bg-purple-950/70 text-purple-800 dark:text-purple-300 border-purple-200 dark:border-purple-800';
     } else if (item.type === 'Exam') {
-      typeColor = 'bg-rose-100 text-rose-800 border-rose-200';
+      typeColor = 'bg-rose-100 dark:bg-rose-950/70 text-rose-800 dark:text-rose-300 border-rose-200 dark:border-rose-800';
     } else if (item.type === 'Laboratory') {
-      typeColor = 'bg-emerald-100 text-emerald-800 border-emerald-200';
+      typeColor = 'bg-emerald-100 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800';
     } else if (item.type === 'No Class') {
-      typeColor = 'bg-rose-100 text-rose-800 border-rose-200';
+      typeColor = 'bg-rose-100 dark:bg-rose-950/70 text-rose-800 dark:text-rose-300 border-rose-200 dark:border-rose-800';
     } else if (item.type === 'Makeup Class' || item.type === 'Special Session') {
-      typeColor = 'bg-amber-100 text-amber-900 border-amber-300';
+      typeColor = 'bg-amber-100 dark:bg-amber-950/70 text-amber-900 dark:text-amber-300 border-amber-300 dark:border-amber-800';
     }
 
-    const typeBadge = `<span class="text-[9px] font-black px-1.5 py-0.5 rounded ${typeColor} border shrink-0">${escapeHtml(item.type)}</span>`;
-    const timeBadge = (item.startTime && item.endTime) ? `
-          <span class="text-[10px] text-indigo-700 font-semibold font-mono bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-200/70 shrink-0 flex items-center gap-0.5" title="Class Schedule">
-            <span>🕒</span>
-            <span>${formatTime12(item.startTime)} – ${formatTime12(item.endTime)}</span>
-          </span>
-        ` : '';
-    const roomBadge = item.room ? `
-          <span class="text-[9px] text-slate-500 font-semibold bg-slate-100 px-1 py-0.5 rounded border border-slate-200 shrink-0" title="Room">
-            Rm ${escapeHtml(item.room)}
-          </span>
+    const typeBadge = `<span class="inline-flex items-center justify-center text-[9.5px] font-bold px-1.5 py-0.5 rounded ${typeColor} border shrink-0 leading-none">${escapeHtml(item.type)}</span>`;
+
+    // Simplified single-line schedule details (no bulky badge boxes or raw ISO date)
+    const detailParts = [];
+    const dateLabel = _formatRadarDate(item.dateKey);
+    if (dateLabel) detailParts.push(escapeHtml(dateLabel));
+    const timeLabel = _formatRadarTime(item.startTime);
+    if (timeLabel) detailParts.push(escapeHtml(timeLabel));
+    if (item.room) detailParts.push(`Rm ${escapeHtml(item.room)}`);
+
+    const detailsHtml = detailParts.length > 0 ? `
+          <div class="flex items-center flex-wrap gap-x-1.5 gap-y-0.5 text-[10.5px] text-slate-500 dark:text-slate-400 font-medium pt-0.5">
+            ${detailParts.map((part, idx) => `
+              ${idx > 0 ? '<span class="opacity-30 select-none">•</span>' : ''}
+              <span>${part}</span>
+            `).join('')}
+          </div>
         ` : '';
 
     return `
           <div ${clickAttr} title="${item.dateKey ? 'Click to jump to ' + item.dateKey + ' in matrix' : ''}"
-            class="p-2.5 bg-slate-50 dark:bg-[#141d2b] hover:bg-indigo-50/50 dark:hover:bg-[#1a2638] rounded-xl border border-slate-200 dark:border-slate-700 hover:border-indigo-200 dark:hover:border-indigo-700/60 flex items-start justify-between gap-2.5 ${cursorClass}">
-            <div class="min-w-0 flex-1 space-y-1">
-              <div class="flex items-center gap-1.5 flex-wrap">
-                <span class="text-[10px] font-extrabold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-700 shrink-0">
+            class="px-2.5 py-1.5 bg-slate-50 dark:bg-[#141d2b] hover:bg-slate-100 dark:hover:bg-[#1a2638] rounded-xl border border-slate-200 dark:border-slate-700/80 hover:border-slate-300 dark:hover:border-slate-600 hover:shadow-2xs space-y-1 transition-all group ${cursorClass}">
+            <div class="flex items-center justify-between gap-2">
+              <div class="flex items-center gap-1.5 min-w-0">
+                <span class="text-[11px] font-extrabold text-slate-800 dark:text-slate-100 truncate leading-none">
                   ${escapeHtml(item.course)} (${escapeHtml(item.section)})
                 </span>
                 ${typeBadge}
-                <span class="text-[10px] text-slate-500 dark:text-slate-400 font-mono">${escapeHtml(item.dateKey)}</span>
-                ${timeBadge}
-                ${roomBadge}
               </div>
-              <div class="font-bold text-slate-800 dark:text-slate-100 text-xs leading-snug break-words">
-                <span>${escapeHtml(item.topic)}</span>
-              </div>
-              ${item.activity && item.activity !== item.topic ? `<div class="text-[11px] text-slate-500 dark:text-slate-400 truncate">${escapeHtml(item.activity)}</div>` : ''}
+              ${daysBadge}
             </div>
-            <div class="shrink-0 pt-0.5">${daysBadge}</div>
+            <div class="font-bold text-slate-800 dark:text-slate-100 group-hover:text-[var(--app-header-primary)] dark:group-hover:text-[var(--app-header-accent)] text-xs leading-snug break-words transition-colors">
+              <span>${escapeHtml(item.topic)}</span>
+            </div>
+            ${item.activity && item.activity !== item.topic ? `<div class="text-[10.5px] text-slate-400 dark:text-slate-500 italic truncate">${escapeHtml(item.activity)}</div>` : ''}
+            ${detailsHtml}
           </div>
         `;
   }).join('');
+  if (nextActivitiesList.innerHTML !== newHtml) {
+    nextActivitiesList.innerHTML = newHtml;
+  }
+  // ...and restore the position for the populated branch too.
+  nextActivitiesList.scrollTop = keptScrollTop;
+  requestAnimationFrame(() => {
+    if (nextActivitiesList) nextActivitiesList.scrollTop = keptScrollTop;
+  });
 }
 
 function _renderTeachingPacingStats(todayStr, currentTotalMinutes) {
@@ -869,7 +962,7 @@ function _renderTeachingPacingStats(todayStr, currentTotalMinutes) {
       subjectPaceList.innerHTML = '<div class="text-slate-400 italic text-[11px] py-2 text-center">No sections configured.</div>';
     } else {
       subjectPaceList.innerHTML = paceItems.map(it => `
-            <div class="p-2 bg-slate-50 dark:bg-[#141d2b] border border-slate-200 dark:border-slate-700 rounded-lg space-y-1">
+            <div class="p-2 bg-slate-50 dark:bg-[#141d2b] hover:bg-slate-100 dark:hover:bg-[#1a2638] border border-slate-200 dark:border-slate-700/80 hover:border-slate-300 dark:hover:border-slate-600 rounded-lg space-y-1 transition-all">
               <div class="flex items-center justify-between">
                 <span class="font-bold text-slate-800 dark:text-slate-100 text-[11px]">${escapeHtml(it.course)} (${escapeHtml(it.sec)})</span>
                 <span class="font-mono text-[10px] font-bold text-indigo-700 dark:text-indigo-300">${it.doneMtgs} / ${it.totalMtgs} mtgs (${it.pct}%)</span>

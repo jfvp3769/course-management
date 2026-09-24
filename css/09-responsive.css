@@ -23,11 +23,13 @@ width: 310px !important;
   }
 
   /* Compact Gradebook frozen columns on laptops */
+  .sticky-grade-col-2, .sticky-grade-head-2, .sticky-grade-foot-2,
   .sticky-grade-col-3, .sticky-grade-head-3, .sticky-grade-foot-3 {
 width: 170px !important;
 min-width: 170px !important;
 max-width: 170px !important;
   }
+  .sticky-grade-col-2 div,
   .sticky-grade-col-3 div {
 max-width: 155px !important;
   }
@@ -248,21 +250,39 @@ html.theme-dark .dual-top-scroll::-webkit-scrollbar-thumb:hover {
   background-clip: padding-box;
 }
 
-/* --- Student Roster Rows & Headers Theme Assurance --- */
-#student-table-body tr {
-  background-color: #ffffff;
+/* --- Student Roster Rows Theme Assurance & Zebra Striping --- */
+html:not(.theme-dark) #student-table-body tr.roster-row-even:not(:hover),
+html:not(.theme-dark) #student-table-body tr.roster-row-even:not(:hover) > td {
+  background-color: #ffffff !important;
+}
+html:not(.theme-dark) #student-table-body tr.roster-row-odd:not(:hover),
+html:not(.theme-dark) #student-table-body tr.roster-row-odd:not(:hover) > td {
+  background-color: #f1f5f9 !important;
 }
 
-#student-table-body tr:hover {
-  background-color: #f8fafc;
+html.theme-dark #student-table-body tr.roster-row-even:not(:hover),
+html.theme-dark #student-table-body tr.roster-row-even:not(:hover) > td {
+  background-color: #0f172a !important;
+}
+html.theme-dark #student-table-body tr.roster-row-odd:not(:hover),
+html.theme-dark #student-table-body tr.roster-row-odd:not(:hover) > td {
+  background-color: #1e293b !important;
 }
 
-html.theme-dark #student-table-body tr {
-  background-color: #1e293b;
+/* Hover assurance across all cells for Student Roster */
+html:not(.theme-dark) #student-table-body tr:hover,
+html:not(.theme-dark) #student-table-body tr:hover > td,
+html:not(.theme-dark) #student-table-body tr.roster-row-even:hover > td,
+html:not(.theme-dark) #student-table-body tr.roster-row-odd:hover > td {
+  background-color: #e8f1fd !important;
 }
 
-html.theme-dark #student-table-body tr:hover {
-  background-color: #24344d;
+html.theme-dark #student-table-body tr:hover,
+html.theme-dark #student-table-body tr:hover > td,
+html.theme-dark #student-table-body tr.roster-row-even:hover > td,
+html.theme-dark #student-table-body tr.roster-row-odd:hover > td {
+  background-color: #24344d !important;
+  color: #f8fafc !important;
 }
 
 #roster-table thead,
@@ -282,22 +302,42 @@ html.theme-dark #roster-table thead th {
 }
 
 /* --- Gradebook Rows Theme Assurance & Zebra Striping --- */
-html:not(.theme-dark) #gradebook-table-body tr.grade-row-even,
-html:not(.theme-dark) #gradebook-table-body tr.grade-row-even > td {
+html:not(.theme-dark) #gradebook-table-body tr.grade-row-even:not(:hover),
+html:not(.theme-dark) #gradebook-table-body tr.grade-row-even:not(:hover) > td {
   background-color: #ffffff !important;
 }
-html:not(.theme-dark) #gradebook-table-body tr.grade-row-odd,
-html:not(.theme-dark) #gradebook-table-body tr.grade-row-odd > td {
+html:not(.theme-dark) #gradebook-table-body tr.grade-row-odd:not(:hover),
+html:not(.theme-dark) #gradebook-table-body tr.grade-row-odd:not(:hover) > td {
   background-color: #f1f5f9 !important;
 }
 
-html.theme-dark #gradebook-table-body tr.grade-row-even,
-html.theme-dark #gradebook-table-body tr.grade-row-even > td {
+html.theme-dark #gradebook-table-body tr.grade-row-even:not(:hover),
+html.theme-dark #gradebook-table-body tr.grade-row-even:not(:hover) > td {
   background-color: #0f172a !important;
 }
-html.theme-dark #gradebook-table-body tr.grade-row-odd,
-html.theme-dark #gradebook-table-body tr.grade-row-odd > td {
+html.theme-dark #gradebook-table-body tr.grade-row-odd:not(:hover),
+html.theme-dark #gradebook-table-body tr.grade-row-odd:not(:hover) > td {
   background-color: #1e293b !important;
+}
+
+/* Hover assurance across all cells */
+html:not(.theme-dark) #gradebook-table-body tr:hover,
+html:not(.theme-dark) #gradebook-table-body tr:hover > td,
+html:not(.theme-dark) #gradebook-table-body tr.grade-row-even:hover > td,
+html:not(.theme-dark) #gradebook-table-body tr.grade-row-odd:hover > td,
+html:not(.theme-dark) #gradebook-table-body tr:hover td.sticky-grade-col-1,
+html:not(.theme-dark) #gradebook-table-body tr:hover td.sticky-grade-col-2 {
+  background-color: #e8f1fd !important;
+}
+
+html.theme-dark #gradebook-table-body tr:hover,
+html.theme-dark #gradebook-table-body tr:hover > td,
+html.theme-dark #gradebook-table-body tr.grade-row-even:hover > td,
+html.theme-dark #gradebook-table-body tr.grade-row-odd:hover > td,
+html.theme-dark #gradebook-table-body tr:hover td.sticky-grade-col-1,
+html.theme-dark #gradebook-table-body tr:hover td.sticky-grade-col-2 {
+  background-color: #24344d !important;
+  color: #f8fafc !important;
 }
 
 /* Flash highlight safety */

@@ -104,11 +104,32 @@ function initDraggableSidebarWidgets(sidebarId) {
     const savedOrder = JSON.parse(localStorage.getItem(`widget_order_${sidebarId}`) || '[]');
     if (Array.isArray(savedOrder) && savedOrder.length > 0) {
       const currentValidIds = widgets.map(el => el.id);
-      savedOrder.forEach(id => {
-        const el = document.getElementById(id);
-        if (el && el.parentElement === sidebar) sidebar.appendChild(el);
-      });
       const sanitized = savedOrder.filter(id => currentValidIds.includes(id));
+      const currentOrder = widgets.map(el => el.id);
+      const isAlreadyInOrder = sanitized.length === currentOrder.length &&
+        sanitized.every((id, idx) => id === currentOrder[idx]);
+
+      if (!isAlreadyInOrder) {
+        // Preserve scroll states of any scrollable descendants before re-ordering
+        const savedScrolls = new Map();
+        sidebar.querySelectorAll('*').forEach(node => {
+          if (node.scrollTop > 0 || node.scrollLeft > 0) {
+            savedScrolls.set(node, { top: node.scrollTop, left: node.scrollLeft });
+          }
+        });
+
+        sanitized.forEach(id => {
+          const el = document.getElementById(id);
+          if (el && el.parentElement === sidebar) sidebar.appendChild(el);
+        });
+
+        // Restore scroll states
+        savedScrolls.forEach((pos, node) => {
+          node.scrollTop = pos.top;
+          node.scrollLeft = pos.left;
+        });
+      }
+
       if (sanitized.length !== savedOrder.length) {
         localStorage.setItem(`widget_order_${sidebarId}`, JSON.stringify(sanitized));
       }

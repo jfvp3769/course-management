@@ -76,8 +76,12 @@ function bootBindings() {
 
   const gradeFilter = document.getElementById('gradebook-grade-filter');
   const statusFilter = document.getElementById('gradebook-status-filter');
+  const gradebookSearch = document.getElementById('gradebook-search');
   if (gradeFilter) gradeFilter.addEventListener('change', onGradebookDropdownFilterChange);
   if (statusFilter) statusFilter.addEventListener('change', onGradebookDropdownFilterChange);
+  if (gradebookSearch && typeof onGradebookSearchInput === 'function') {
+    gradebookSearch.addEventListener('input', onGradebookSearchInput);
+  }
 
   // One resize handler, coalesced to a frame. Previously two handlers fired on
   // every resize event, one of them re-rendering the timetable synchronously.

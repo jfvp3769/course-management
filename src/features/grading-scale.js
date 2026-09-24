@@ -198,7 +198,12 @@ function restoreDefaultGradingScale() {
   renderGradingScaleInputs();
   showToast("Reset to default institutional grading scale (95.56% - 60.00%).");
 }
-const restoreOfficialMsuScale = restoreDefaultGradingScale; // Backward compatibility alias
+// Backward-compatibility alias. This MUST be a window property: a top-level
+// `const` creates a global *lexical* binding, never a property of `window`, and
+// index.html:2246 has data-action="restoreOfficialMsuScale". dispatchAction()
+// (src/core/events.js) consults the ActionRegistry and then window[action], so
+// the "Reset to Default Scale" button silently did nothing but console.warn.
+window.restoreOfficialMsuScale = restoreDefaultGradingScale;
 
 function updateGradingScaleItemMin(grade, val) {
   const item = currentEditingScaleData.find(i => i.grade === grade);

@@ -58,11 +58,11 @@ function updateCalendarSidebar() {
         const dateStr = ev.firstSem || ev.sem1 || ev.dateKey || '—';
         return `
               <div data-action="jumpToCalendarEvent" data-idx="${originalIdx >= 0 ? originalIdx : 0}" title="Click to view event in calendar table"
-                class="p-2 bg-slate-50 hover:bg-rose-50/70 border border-slate-200 hover:border-rose-300 rounded-lg space-y-0.5 cursor-pointer transition group">
-                <div class="font-bold text-slate-800 group-hover:text-rose-900 text-[11px] truncate">
+                class="p-2 bg-slate-50 dark:bg-[#141d2b] hover:bg-slate-100 dark:hover:bg-[#1a2638] border border-slate-200 dark:border-slate-700/80 hover:border-slate-300 dark:hover:border-slate-600 rounded-lg space-y-0.5 cursor-pointer transition-all hover:shadow-2xs group">
+                <div class="font-bold text-slate-800 dark:text-slate-100 group-hover:text-[var(--app-header-primary)] dark:group-hover:text-[var(--app-header-accent)] text-[11px] truncate transition-colors">
                   <span class="truncate">${escapeHtml(title)}</span>
                 </div>
-                <div class="text-[10px] text-slate-500 font-mono">${escapeHtml(dateStr)}</div>
+                <div class="text-[10px] text-slate-500 dark:text-slate-400 font-mono">${escapeHtml(dateStr)}</div>
               </div>
             `;
       }).join('');
@@ -157,11 +157,11 @@ function updateCalendarSidebar() {
               ${items.map(it => `
                 <div data-action="openLostDaysModal" data-course="${escapeHtml(it.course)}" data-section="${escapeHtml(it.sec)}"
                   title="Click to view detailed lost teaching dates for ${escapeHtml(it.course)} (${escapeHtml(it.sec)})"
-                  class="p-2 ${it.lostCount > 0 ? 'bg-amber-50/70 dark:bg-[#1a1c24] border-amber-200 dark:border-amber-900/60 hover:bg-amber-100/80 dark:hover:bg-[#252834] hover:border-amber-300 dark:hover:border-amber-600/70' : 'bg-slate-50 dark:bg-[#151922] border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-[#1d2330]'} border rounded-lg flex items-center justify-between text-xs cursor-pointer transition group shadow-2xs">
+                  class="p-2 bg-slate-50 dark:bg-[#141d2b] border border-slate-200 dark:border-slate-700/80 hover:bg-slate-100 dark:hover:bg-[#1a2638] hover:border-slate-300 dark:hover:border-slate-600 rounded-lg flex items-center justify-between text-xs cursor-pointer transition-all hover:shadow-2xs group shadow-2xs">
                   <div class="flex items-center gap-1.5 min-w-0">
-                    <span class="font-bold text-slate-800 dark:text-slate-100 text-[11px] group-hover:text-[var(--app-header-primary)] dark:group-hover:text-amber-400 transition truncate">${escapeHtml(it.course)} - ${escapeHtml(it.sec)}</span>
+                    <span class="font-bold text-slate-800 dark:text-slate-100 text-[11px] group-hover:text-[var(--app-header-primary)] dark:group-hover:text-[var(--app-header-accent)] transition-colors truncate">${escapeHtml(it.course)} - ${escapeHtml(it.sec)}</span>
                   </div>
-                  <span class="text-[10px] font-bold ${it.lostCount > 0 ? 'text-amber-900 dark:text-amber-300 bg-amber-100 dark:bg-amber-950/80 border border-amber-200 dark:border-amber-800/80' : 'text-slate-600 dark:text-slate-400 bg-slate-200 dark:bg-slate-800 border border-slate-300 dark:border-slate-700'} px-2 py-0.5 rounded-md shrink-0">
+                  <span class="text-[10px] font-bold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2 py-0.5 rounded-md shrink-0">
                     ${it.lostCount} / ${it.totalMeetings} Days Lost (${it.pct}%)
                   </span>
                 </div>

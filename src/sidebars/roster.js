@@ -113,14 +113,18 @@ function updateRosterSidebar() {
       const count = secCounts[sec] || 0;
       const pct = maxCount > 0 ? Math.round((count / maxCount) * 100) : 0;
       return `
-        <div data-action="selectRosterSection" data-section="${escapeHtml(sec)}" onclick="selectRosterSection('${escapeHtml(sec)}')" title="Click to filter table by ${escapeHtml(sec)}"
-          class="space-y-1 p-1.5 rounded-lg hover:bg-slate-100 transition cursor-pointer border border-transparent hover:border-slate-200">
+        <!-- Delegated only: src/core/events.js dispatches data-action, so an extra
+             inline onclick here would (a) run the handler twice per click and
+             (b) embed the section name in a JS string literal, which breaks for
+             names containing an apostrophe (escapeHtml is not enough - see jsAttr). -->
+        <div data-action="selectRosterSection" data-section="${escapeHtml(sec)}" title="Click to filter table by ${escapeHtml(sec)}"
+          class="space-y-1 p-2 rounded-lg bg-slate-50 dark:bg-[#141d2b] hover:bg-slate-100 dark:hover:bg-[#1a2638] transition-all cursor-pointer border border-slate-200 dark:border-slate-700/80 hover:border-slate-300 dark:hover:border-slate-600 hover:shadow-2xs group">
           <div class="flex justify-between text-xs font-bold">
-            <span class="text-slate-800 truncate">${escapeHtml(sec)}</span>
-            <span class="text-indigo-700 font-mono text-[11px]">${count}</span>
+            <span class="text-slate-800 dark:text-slate-100 group-hover:text-[var(--app-header-primary)] dark:group-hover:text-[var(--app-header-accent)] transition-colors truncate">${escapeHtml(sec)}</span>
+            <span class="text-indigo-700 dark:text-indigo-300 font-mono text-[11px]">${count}</span>
           </div>
-          <div class="w-full bg-slate-200 rounded-full h-1.5 overflow-hidden">
-            <div class="bg-indigo-600 h-full rounded-full" style="width: ${pct}%"></div>
+          <div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-1.5 overflow-hidden">
+            <div class="bg-indigo-600 dark:bg-indigo-500 h-full rounded-full transition-all duration-300" style="width: ${pct}%"></div>
           </div>
         </div>
       `;

@@ -78,13 +78,78 @@ const MAIN_WINDOW_CONFIGS = [
   { wrapperId: 'gradebook-scroll-wrapper', tabId: 'gradebook' }
 ];
 
+function adjustMatrixRowHeightFor7Rows(wrapperEl, explicitWrapperH) {
+  const el = wrapperEl || document.getElementById('matrix-scroll-wrapper');
+  if (!el) return null;
+
+  const thead = el.querySelector('thead') || document.getElementById('matrix-head');
+  const theadH = (thead && typeof thead.offsetHeight === 'number' && thead.offsetHeight > 0)
+    ? thead.offsetHeight
+    : 86;
+
+  // Detect horizontal scrollbar height (calibrated to 12px for WebKit/Blink scrollbars)
+  const hasHorizontalScroll = el.scrollWidth > el.clientWidth;
+  let scrollbarH = 0;
+  if (el.offsetHeight > 0 && el.clientHeight > 0) {
+    scrollbarH = Math.max(0, el.offsetHeight - el.clientHeight);
+  } else if (hasHorizontalScroll) {
+    scrollbarH = 12;
+  }
+
+  // Determine available container height
+  let containerH = 0;
+  if (typeof explicitWrapperH === 'number' && explicitWrapperH > 0) {
+    containerH = explicitWrapperH;
+  } else if (el.offsetHeight > 0) {
+    containerH = el.offsetHeight;
+  }
+
+  // Headless / JSDOM fallback
+  if (containerH <= 0) {
+    const defaultRowH = 60;
+    el.style.setProperty('--matrix-row-height', defaultRowH + 'px');
+    if (typeof document !== 'undefined' && document.documentElement) {
+      document.documentElement.style.setProperty('--matrix-row-height', defaultRowH + 'px');
+    }
+    return { rowH: defaultRowH, exactWrapperH: theadH + (defaultRowH * 7) + scrollbarH };
+  }
+
+  // Available vertical space for the 7 rows
+  const availableForRows = Math.max(0, containerH - theadH - scrollbarH);
+  // Exactly 7 rows per week
+  const rowH = Math.max(48, Math.floor(availableForRows / 7));
+
+  // Maintain relative scroll position if row height changed
+  const oldRowH = parseFloat(el.style.getPropertyValue('--matrix-row-height')) || 0;
+  if (oldRowH > 0 && oldRowH !== rowH && el.scrollTop > 0) {
+    const scrollRatio = el.scrollTop / oldRowH;
+    el.scrollTop = Math.round(scrollRatio * rowH);
+  }
+
+  // Set CSS custom property on wrapper and root
+  el.style.setProperty('--matrix-row-height', rowH + 'px');
+  if (typeof document !== 'undefined' && document.documentElement) {
+    document.documentElement.style.setProperty('--matrix-row-height', rowH + 'px');
+  }
+
+  // Calibrate wrapper height so 7 rows fill the viewport with zero fractional cutoff
+  const exactWrapperH = theadH + (rowH * 7) + scrollbarH;
+  el.style.height = exactWrapperH + 'px';
+  el.style.maxHeight = 'none';
+
+  return { rowH, exactWrapperH };
+}
+
 function autoResizeContentWindows() {
   MAIN_WINDOW_CONFIGS.forEach(({ wrapperId, tabId }) => {
     const el = document.getElementById(wrapperId);
     if (!el) return;
 
     // Check if user set a manual height override for this tab
-    const savedH = localStorage.getItem('faculty_main_win_h_' + tabId) || localStorage.getItem('msu_main_win_h_' + tabId);
+    // (Planner matrix dynamically calculates 7 rows to fit the window on resize)
+    const savedH = (tabId !== 'planner')
+      ? (localStorage.getItem('faculty_main_win_h_' + tabId) || localStorage.getItem('msu_main_win_h_' + tabId))
+      : null;
     if (savedH) {
       const numH = parseInt(savedH, 10);
       if (!isNaN(numH) && numH >= 240) {
@@ -105,8 +170,14 @@ function autoResizeContentWindows() {
       // 36px breathing room for bottom margin, 14px resizer bar, and page padding
       const bottomBuffer = 36;
       const targetH = Math.max(280, Math.floor(window.innerHeight - rect.top - bottomBuffer));
-      el.style.height = targetH + 'px';
-      el.style.maxHeight = 'none';
+      if (wrapperId === 'matrix-scroll-wrapper') {
+        adjustMatrixRowHeightFor7Rows(el, targetH);
+      } else {
+        el.style.height = targetH + 'px';
+        el.style.maxHeight = 'none';
+      }
+    } else if (wrapperId === 'matrix-scroll-wrapper') {
+      adjustMatrixRowHeightFor7Rows(el);
     }
   });
 
@@ -133,6 +204,9 @@ function initMainWindowResizers() {
       if (!isNaN(numH) && numH >= 240) {
         targetEl.style.height = numH + 'px';
         targetEl.style.maxHeight = 'none';
+        if (targetId === 'matrix-scroll-wrapper') {
+          adjustMatrixRowHeightFor7Rows(targetEl, numH);
+        }
       }
     }
 
@@ -159,6 +233,9 @@ function initMainWindowResizers() {
         rafId = null;
         targetEl.style.height = targetH + 'px';
         targetEl.style.maxHeight = 'none';
+        if (targetId === 'matrix-scroll-wrapper') {
+          adjustMatrixRowHeightFor7Rows(targetEl, targetH);
+        }
         if (typeof initAllDualScrollbars === 'function') {
           initAllDualScrollbars();
         }
@@ -220,6 +297,10 @@ function initMainWindowResizers() {
 function fixNextActivitiesScroll() {
   const list = document.getElementById("planner-milestones-list") || document.getElementById("next-activities-list") || document.querySelector(".next-activities-scroll-area");
   if (list) {
-list.scrollTop = 0;
+    list.scrollTop = 0;
   }
+}
+
+if (typeof window !== 'undefined') {
+  window.adjustMatrixRowHeightFor7Rows = adjustMatrixRowHeightFor7Rows;
 }

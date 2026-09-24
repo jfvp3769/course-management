@@ -154,10 +154,10 @@ function updateTimetableSidebar() {
           : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 border border-transparent dark:border-slate-700/60 font-medium';
         return `
               <button data-action="setAgendaDay" data-day="${escapeHtml(d)}" 
-                class="px-2 py-1 rounded-md transition ${activeClasses} relative" 
+                class="w-full py-1 px-0.5 text-center flex items-center justify-center rounded-md transition ${activeClasses} relative min-w-0" 
                 title="View ${d} Schedule">
-                ${shortName}
-                ${isToday ? '<span class="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-amber-400 rounded-full"></span>' : ''}
+                <span class="truncate leading-tight">${shortName}</span>
+                ${isToday ? '<span class="absolute top-0.5 right-0.5 w-1.5 h-1.5 bg-amber-400 rounded-full"></span>' : ''}
               </button>
             `;
       }).join('');
@@ -224,20 +224,20 @@ function updateTimetableSidebar() {
         const hasPlannedTopic = entry && entry.topic && !isNoClass;
 
         const cardClasses = isNoClass
-          ? 'bg-rose-50/70 dark:bg-[#200b12] border-rose-200 dark:border-rose-900/80 hover:bg-rose-100/70 dark:hover:bg-[#2d0e19] opacity-85'
+          ? 'bg-rose-50/70 dark:bg-[#200b12] border-rose-200 dark:border-rose-900/80 hover:bg-rose-100/80 dark:hover:bg-[#2d0e19] hover:border-rose-300 dark:hover:border-rose-700/80 opacity-85'
           : (s.isSpecialSession
             ? 'bg-amber-50/70 dark:bg-[#1a1c24] border-amber-200 dark:border-amber-900/70 hover:bg-amber-100/80 dark:hover:bg-[#252834] hover:border-amber-300 dark:hover:border-amber-600/80'
-            : 'bg-slate-50 dark:bg-[#151922] hover:bg-blue-50/60 dark:hover:bg-[#1d2330] border-slate-200 dark:border-slate-800');
+            : 'bg-slate-50 dark:bg-[#141d2b] hover:bg-slate-100 dark:hover:bg-[#1a2638] border-slate-200 dark:border-slate-700/80 hover:border-slate-300 dark:hover:border-slate-600');
 
         const titleHover = isNoClass
           ? ''
-          : (s.isSpecialSession ? 'group-hover:text-[var(--app-header-primary)] dark:group-hover:text-amber-400' : 'group-hover:text-blue-900 dark:group-hover:text-blue-400');
+          : 'group-hover:text-[var(--app-header-primary)] dark:group-hover:text-[var(--app-header-accent)]';
 
         return `
               <div data-action="highlightTimetableClass" data-course="${escapeHtml(s.course)}" data-section="${escapeHtml(s.section)}" data-day="${escapeHtml(s.day)}"
-                class="p-2 ${cardClasses} border rounded-lg flex items-center justify-between gap-2 text-xs transition cursor-pointer group shadow-2xs">
+                class="p-2 ${cardClasses} border rounded-lg flex items-center justify-between gap-2 text-xs transition-all hover:shadow-2xs cursor-pointer group shadow-2xs">
                 <div class="min-w-0">
-                  <div class="font-extrabold text-slate-800 dark:text-slate-100 text-[11px] ${titleHover} transition flex items-center gap-1.5 flex-wrap">
+                  <div class="font-extrabold text-slate-800 dark:text-slate-100 text-[11px] ${titleHover} transition-colors flex items-center gap-1.5 flex-wrap">
                     <span class="${isNoClass ? 'line-through text-rose-800 dark:text-rose-400' : ''}">${escapeHtml(s.course)} - ${escapeHtml(s.section)}</span>
                     ${isNoClass ? '<span class="text-[8px] font-bold px-1.5 py-0.2 rounded bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800">No Class</span>' : ''}
                     ${s.isSpecialSession ? '<span class="text-[8px] font-bold px-1.5 py-0.2 rounded bg-amber-100 dark:bg-amber-950/90 text-amber-900 dark:text-amber-300 border border-amber-300 dark:border-amber-700/80">⚡ Special</span>' : ''}

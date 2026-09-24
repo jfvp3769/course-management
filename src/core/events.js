@@ -80,6 +80,15 @@
 
     // 1. Click events
     document.addEventListener('click', (e) => {
+      if (typeof window.closeStudentEmailMenu === 'function') {
+        const emailMenu = document.getElementById('roster-email-dropdown-menu');
+        if (emailMenu && !emailMenu.classList.contains('hidden')) {
+          if (!emailMenu.contains(e.target) && !e.target.closest('[data-action="toggleStudentEmailMenu"]')) {
+            window.closeStudentEmailMenu();
+          }
+        }
+      }
+
       const target = e.target.closest('[data-action]');
       if (!target) return;
       dispatchAction(target.dataset.action, e, target, 'click');
@@ -110,6 +119,9 @@
 
     // 5. Keydown events (grid navigation)
     document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && typeof window.closeStudentEmailMenu === 'function') {
+        window.closeStudentEmailMenu();
+      }
       const target = e.target.closest('[data-action-keydown]');
       if (!target) return;
       dispatchAction(target.dataset.actionKeydown, e, target, 'keydown');
@@ -347,7 +359,16 @@
       if (typeof window.openClassroomModal === 'function') window.openClassroomModal(data.course, data.section);
     },
     // Roster
+    toggleStudentEmailMenu: (e, target, data) => {
+      if (e) e.stopPropagation();
+      if (typeof window.toggleStudentEmailMenu === 'function') window.toggleStudentEmailMenu(target, data.email, data.section, data.first, data.last);
+    },
+    copyStudentEmail: (e, target, data) => {
+      if (e) e.stopPropagation();
+      if (typeof window.copyStudentEmail === 'function') window.copyStudentEmail(data.email, data.name);
+    },
     sendIndividualStudentEmail: (e, target, data) => {
+      if (typeof window.closeStudentEmailMenu === 'function') window.closeStudentEmailMenu();
       if (typeof window.sendIndividualStudentEmail === 'function') window.sendIndividualStudentEmail(data.email, data.section, data.first, data.last);
     },
     removeStudent: (e, target, data) => {
@@ -446,7 +467,7 @@
       if (typeof window.updateDynamicScore === 'function') window.updateDynamicScore(data.student, data.sub, target.value, true);
     },
     updateGradeStatusOverride: (e, target, data) => {
-      if (typeof window.updateGradeStatusOverride === 'function') window.updateGradeStatusOverride(data.student, target.value);
+      if (typeof window.updateGradeStatusOverride === 'function') window.updateGradeStatusOverride(data.student, target.value, data.section);
     },
     resetGradebookFilters: () => {
       if (typeof window.resetGradebookFilters === 'function') window.resetGradebookFilters();

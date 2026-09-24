@@ -211,21 +211,29 @@ function scrollMatrixCellIntoHorizontalView(targetCell, behavior = 'smooth') {
   if (!wrapper || !targetCell) return;
 
   const stickyLeftWidth = 110; // 42px Day + 68px Date sticky columns
-  const cellLeft = targetCell.offsetLeft;
-  const cellWidth = targetCell.offsetWidth;
-  const cellRight = cellLeft + cellWidth;
+  // getBoundingClientRect() (not offsetLeft): with a scrolled, dual-scrollbar
+  // container, offset* coordinates are relative to an ambiguous offsetParent,
+  // so they misfire exactly when the cell is already off-screen.
+  const cellRect = targetCell.getBoundingClientRect();
+  const wrapRect = wrapper.getBoundingClientRect();
+  const viewLeft = wrapRect.left + stickyLeftWidth;
+  const viewRight = wrapRect.right;
 
-  const viewLeft = wrapper.scrollLeft + stickyLeftWidth;
-  const viewRight = wrapper.scrollLeft + wrapper.clientWidth;
-
-  if (cellLeft < viewLeft) {
+  let newScrollLeft = wrapper.scrollLeft;
+  if (cellRect.left < viewLeft) {
     // Scrolled too far right or cell hidden behind sticky columns: bring into view
-    const newScrollLeft = Math.max(0, cellLeft - stickyLeftWidth - 12);
-    wrapper.scrollTo({ left: newScrollLeft, top: wrapper.scrollTop, behavior });
-  } else if (cellRight > viewRight) {
+    newScrollLeft += cellRect.left - viewLeft - 12;
+  } else if (cellRect.right > viewRight) {
     // Off-screen to the right: bring cell into view with padding
-    const newScrollLeft = cellRight - wrapper.clientWidth + 24;
-    wrapper.scrollTo({ left: newScrollLeft, top: wrapper.scrollTop, behavior });
+    newScrollLeft += cellRect.right - viewRight + 24;
+  }
+  newScrollLeft = Math.max(0, Math.round(newScrollLeft));
+  if (newScrollLeft === wrapper.scrollLeft) return;
+
+  if (behavior === 'smooth') {
+    wrapper.scrollTo({ left: newScrollLeft, top: wrapper.scrollTop, behavior: 'smooth' });
+  } else {
+    wrapper.scrollLeft = newScrollLeft;
   }
 }
 
@@ -234,8 +242,18 @@ function scrollMatrixToRow(targetRow, behavior = 'smooth') {
   const thead = document.getElementById('matrix-head');
   if (!targetRow || !wrapper) return;
   const theadHeight = (thead && typeof thead.offsetHeight === 'number' && !isNaN(thead.offsetHeight)) ? thead.offsetHeight : 68;
-  const targetTop = Math.max(0, targetRow.offsetTop - theadHeight);
-  wrapper.scrollTo({ top: targetTop, left: wrapper.scrollLeft, behavior });
+  // getBoundingClientRect() (not offsetTop): same offsetParent ambiguity as
+  // the horizontal helper above - in a scrolled wrapper offset* reads are only
+  // trustworthy when the row is already on screen.
+  const rowRect = targetRow.getBoundingClientRect();
+  const wrapRect = wrapper.getBoundingClientRect();
+  const targetTop = Math.max(0, wrapper.scrollTop + (rowRect.top - wrapRect.top) - theadHeight);
+  if (targetTop === wrapper.scrollTop) return;
+  if (behavior === 'smooth') {
+    wrapper.scrollTo({ top: targetTop, left: wrapper.scrollLeft, behavior: 'smooth' });
+  } else {
+    wrapper.scrollTop = targetTop;
+  }
 }
 
 function navigateWeek(direction) {

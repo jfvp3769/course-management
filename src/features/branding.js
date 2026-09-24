@@ -183,7 +183,8 @@ function saveTermSettings() {
   applyHeaderBranding();
 
   document.getElementById('header-term-title').innerText = semesterConfig.title + ' • Course Planning & Activity Matrix';
-  document.getElementById('planner-term-label').innerText = semesterConfig.title + ' Matrix';
+  const plannerTermEl = document.getElementById('planner-term-label');
+  if (plannerTermEl) plannerTermEl.innerText = 'Semester Schedule & Activity Matrix';
 
   semesterDates = generateSemesterDateList();
   Render.after('semester');

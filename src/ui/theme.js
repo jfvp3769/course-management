@@ -243,6 +243,29 @@ function initColorThemes() {
   applyWindowTheme(savedWindow, customWindowConfig, false);
 }
 
+function hexToRgba(color, alpha = 1) {
+  if (!color || typeof color !== 'string') return `rgba(218, 165, 32, ${alpha})`;
+  const trimmed = color.trim();
+  if (trimmed.startsWith('rgb')) {
+    const match = trimmed.match(/\d+[\s,]+\d+[\s,]+\d+/);
+    if (match) {
+      const parts = match[0].split(/[\s,]+/).filter(Boolean);
+      return `rgba(${parts[0]}, ${parts[1]}, ${parts[2]}, ${alpha})`;
+    }
+    return trimmed;
+  }
+  let h = trimmed.replace(/^#/, '');
+  if (h.length === 3) {
+    h = h.split('').map(c => c + c).join('');
+  }
+  const num = parseInt(h, 16);
+  if (isNaN(num)) return `rgba(218, 165, 32, ${alpha})`;
+  const r = (num >> 16) & 255;
+  const g = (num >> 8) & 255;
+  const b = num & 255;
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
 function applyHeaderTheme(themeKey, custom = null, persist = true) {
   const palette = HEADER_PALETTES[themeKey] || HEADER_PALETTES.maroon;
   let bg = palette.gradient;
@@ -265,6 +288,9 @@ function applyHeaderTheme(themeKey, custom = null, persist = true) {
   root.style.setProperty('--app-header-bg', bg);
   root.style.setProperty('--app-header-primary', primary);
   root.style.setProperty('--app-header-accent', accent);
+  root.style.setProperty('--app-header-accent-glow', hexToRgba(accent, 0.65));
+  root.style.setProperty('--app-header-accent-subtle', hexToRgba(accent, 0.12));
+  root.style.setProperty('--app-header-accent-border', hexToRgba(accent, 0.5));
   root.style.setProperty('--app-header-tab-text', tabText);
   root.style.setProperty('--app-header-nav-border', navBorder);
 

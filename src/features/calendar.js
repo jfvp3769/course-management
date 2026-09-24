@@ -152,7 +152,12 @@ function loadSampleAcademicCalendar() {
   closeUploadCalendarModal();
   showToast("Sample Academic AY 2026–2027 Calendar loaded!");
 }
-const loadOfficialMsuCalendar = loadSampleAcademicCalendar; // Backward compatibility alias
+// Backward-compatibility alias. This MUST be a window property: a top-level
+// `const` creates a global *lexical* binding, never a property of `window`, so
+// data-action="loadOfficialMsuCalendar" fell through both the ActionRegistry
+// and the window[name] fallback in dispatchAction() (src/core/events.js) and
+// the button silently did nothing but console.warn.
+window.loadOfficialMsuCalendar = loadSampleAcademicCalendar;
 
 // Intelligent PDF.js Calendar Parser with Cross-Origin Fallback
 function parseAcademicCalendarText(fullText) {

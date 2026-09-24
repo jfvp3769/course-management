@@ -1,0 +1,17 @@
+{
+  "name": "msu-course-manager-v2",
+  "version": "2.37.0",
+  "private": true,
+  "description": "Static faculty course/lesson manager. No bundler: index.html loads css/ and src/ directly. This file only exists to pin the Node tooling used to verify the app; its version mirrors sw.js CACHE_NAME.",
+  "scripts": {
+    "test": "node tools/smoke-test.js && node tools/audit.js",
+    "smoke": "node tools/smoke-test.js",
+    "audit": "node tools/audit.js",
+    "probe:dom": "node tools/dom-probe.js",
+    "inventory": "node tools/inventory.js"
+  },
+  "devDependencies": {
+    "acorn": "^8.18.0",
+    "jsdom": "^29.1.1"
+  }
+}
