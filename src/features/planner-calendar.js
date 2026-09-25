@@ -592,6 +592,7 @@ function _renderSubgridColumn(period, dateKey, classes, isWeekend, isNoClassDate
           style="grid-row: ${u} / span 1; grid-column: 1 / -1;" 
           class="planner-empty-slot w-full h-full select-none" 
           title="Click to add activity at ${formatTimeDisplay(startStr)} (${period})">
+          <span class="planner-slot-time-label">${formatTimeDisplay(startStr)}</span>
         </button>
       `);
     }

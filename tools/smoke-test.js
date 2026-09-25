@@ -999,10 +999,12 @@ setTimeout(() => {
         const slots = activeCol.querySelectorAll('.planner-empty-slot');
         if (slots.length !== 9) return false;
 
-        // Verify slot attributes
+        // Verify slot attributes and time label
         const slot1 = slots[0];
         if (!slot1.getAttribute('data-action') || slot1.getAttribute('data-action') !== 'openAddActivityModal') return false;
         if (!slot1.getAttribute('data-start-time')) return false;
+        const timeLabel = slot1.querySelector('.planner-slot-time-label');
+        if (!timeLabel || !timeLabel.textContent.trim()) return false;
 
         // 5. Verify weekend cells (Sunday/Saturday) render the 2-column subgrid and retain #f8fafc styling
         const allCells = Array.from(document.querySelectorAll('#planner-calendar-view-container .planner-calendar-cell'));

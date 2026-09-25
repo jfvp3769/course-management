@@ -1514,6 +1514,9 @@ html.theme-dark input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .planner-empty-slot {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
   height: 100%;
   min-height: 14px;
   border-radius: 4px;
@@ -1522,16 +1525,41 @@ html.theme-dark input[type="date"]::-webkit-calendar-picker-indicator {
   cursor: pointer;
   box-sizing: border-box;
   transition: background-color 0.15s ease, border-color 0.15s ease;
+  overflow: hidden;
+  padding: 0 2px;
 }
 
 .planner-empty-slot:hover {
-  background-color: rgba(144, 27, 43, 0.05);
+  background-color: rgba(144, 27, 43, 0.06);
   border-color: rgba(144, 27, 43, 0.35);
 }
 
 html.theme-dark .planner-empty-slot:hover {
   background-color: rgba(244, 63, 94, 0.12);
   border-color: rgba(244, 63, 94, 0.4);
+}
+
+.planner-slot-time-label {
+  opacity: 0;
+  transform: scale(0.92);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  font-size: 8px;
+  font-weight: 700;
+  line-height: 1;
+  color: #901b2b;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+}
+
+.planner-empty-slot:hover .planner-slot-time-label {
+  opacity: 1;
+  transform: scale(1);
+}
+
+html.theme-dark .planner-slot-time-label {
+  color: #fb7185;
 }
 
 .planner-calendar-pill {
@@ -1620,7 +1648,7 @@ html.theme-dark .day-campus-suspended {
 .day-campus-suspended .calendar-pill-slot:hover,
 .day-campus-suspended .calendar-pill-slot:hover .planner-calendar-expanded-card {
   opacity: 1 !important;
-  transition-delay: 150ms;
+  transition-delay: 200ms;
 }
 
 /* =============================================================================
@@ -1640,7 +1668,7 @@ html.theme-dark .day-campus-suspended {
 .calendar-pill-slot:hover > .planner-calendar-pill {
   opacity: 0 !important;
   pointer-events: none !important;
-  transition-delay: 150ms;
+  transition-delay: 200ms;
 }
 
 .planner-calendar-expanded-card {
@@ -1663,7 +1691,7 @@ html.theme-dark .day-campus-suspended {
   pointer-events: auto !important;
   transform: scale(1.02) !important;
   transition: opacity 0.15s cubic-bezier(0.16, 1, 0.3, 1), transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), visibility 0s linear;
-  transition-delay: 150ms;
+  transition-delay: 200ms;
 }
 
 .calendar-subgrid-col,
