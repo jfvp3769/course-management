@@ -674,6 +674,8 @@ function _renderSubgridColumn(period, dateKey, classes, isWeekend, isNoClassDate
         
         <!-- Collapsed Compact State (matches pill requirements) -->
         <div 
+          id="cal-pill-${c.cellKey}"
+          data-cell-key="${c.cellKey}"
           data-action="openLessonModal" 
           data-date="${dateKey}" 
           data-course="${escapeHtml(c.course)}" 
@@ -875,7 +877,7 @@ function _renderCalendarDayCell(g, isCurrentMonth, todayKey, timetableMap, meeti
             <span class="px-1 py-0.2 rounded text-[7.5px] sm:text-[8px] font-black bg-rose-100 dark:bg-rose-950 text-rose-800 dark:text-rose-300 border border-rose-300 dark:border-rose-800/80 leading-none shrink-0" title="University Class Suspension">No Class</span>
           ` : ''}
           ${calendarEvent && !isNoClassDate ? `
-            <span class="px-1 py-0.2 rounded text-[7.5px] sm:text-[8px] font-bold bg-amber-100 dark:bg-amber-950 text-amber-900 dark:text-amber-300 border border-amber-300 dark:border-amber-800/80 truncate max-w-[65px] leading-none shrink-0" title="${escapeHtml(calendarEvent.activity || '')}">${escapeHtml(calendarEvent.activity || 'Event')}</span>
+            <span class="cal-event-badge px-1 py-0.2 rounded text-[7.5px] sm:text-[8px] font-bold bg-amber-100 dark:bg-amber-950 text-amber-900 dark:text-amber-300 border border-amber-300 dark:border-amber-800/80 truncate max-w-[65px] leading-none shrink-0" title="${escapeHtml(calendarEvent.activity || '')}">${escapeHtml(calendarEvent.activity || 'Event')}</span>
           ` : ''}
 
           <!-- Open Day Inspector Quick Link -->

@@ -5,6 +5,77 @@
  * ======================================================================== */
 
 // 1. Planner Sidebar Updates & Navigation
+function highlightPlannerCalendarActivity(dateKey, courseCode = '', section = '', isMilestone = false) {
+  if (!dateKey) return;
+
+  // Clear any existing calendar highlights
+  document.querySelectorAll('.cal-day-navigated-highlight').forEach(el => el.classList.remove('cal-day-navigated-highlight'));
+  document.querySelectorAll('.cal-pill-navigated-highlight').forEach(el => el.classList.remove('cal-pill-navigated-highlight'));
+
+  const calDay = document.getElementById('cal-day-' + dateKey);
+  if (!calDay) return;
+
+  // 1. Add vibrant animated halo highlight to the entire day cell
+  void calDay.offsetWidth;
+  calDay.classList.add('cal-day-navigated-highlight');
+  setTimeout(() => {
+    if (calDay) calDay.classList.remove('cal-day-navigated-highlight');
+  }, 2400);
+
+  // 2. Locate and highlight the specific class pill or academic event badge
+  let targetPill = null;
+  if (courseCode && section) {
+    const cellKey = `${dateKey}__${courseCode}__${section}`;
+    targetPill = document.getElementById('cal-pill-' + cellKey) ||
+                 calDay.querySelector(`[data-date="${dateKey}"][data-course="${courseCode}"][data-section="${section}"]`);
+  } else if (isMilestone) {
+    targetPill = calDay.querySelector('.cal-event-badge') ||
+                 calDay.querySelector('[title*="Class Suspension"], [class*="bg-amber-100"], [class*="bg-rose-100"]');
+  }
+
+  if (targetPill) {
+    void targetPill.offsetWidth;
+    targetPill.classList.add('cal-pill-navigated-highlight');
+    if (targetPill.parentElement && targetPill.parentElement.classList.contains('calendar-pill-slot')) {
+      targetPill.parentElement.style.zIndex = '40';
+      setTimeout(() => {
+        if (targetPill && targetPill.parentElement) targetPill.parentElement.style.zIndex = '';
+      }, 2400);
+    }
+    setTimeout(() => {
+      if (targetPill) targetPill.classList.remove('cal-pill-navigated-highlight');
+    }, 2400);
+  }
+
+  // 3. Smoothly scroll day cell into view inside #calendar-view-scroll-wrapper, keeping it below sticky header
+  const wrapper = document.getElementById('calendar-view-scroll-wrapper');
+  if (wrapper && typeof wrapper.getBoundingClientRect === 'function') {
+    const headerRow = wrapper.querySelector('.planner-calendar-header-row');
+    const headerH = headerRow ? headerRow.offsetHeight : 34;
+    const wrapRect = wrapper.getBoundingClientRect();
+    const dayRect = calDay.getBoundingClientRect();
+
+    const visibleTop = wrapRect.top + headerH;
+    const visibleBottom = wrapRect.bottom;
+
+    if (dayRect.top < visibleTop || dayRect.bottom > visibleBottom) {
+      const targetScrollTop = wrapper.scrollTop + (dayRect.top - visibleTop) - Math.max(0, (wrapper.clientHeight - headerH - dayRect.height) / 2);
+      if (typeof wrapper.scrollTo === 'function') {
+        wrapper.scrollTo({
+          top: Math.max(0, Math.round(targetScrollTop)),
+          behavior: 'smooth'
+        });
+      }
+    }
+  } else if (typeof calDay.scrollIntoView === 'function') {
+    calDay.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+}
+
+if (typeof window !== 'undefined') {
+  window.highlightPlannerCalendarActivity = highlightPlannerCalendarActivity;
+}
+
 function jumpToMatrixDate(dateKey, courseCode = '', section = '', isMilestone = false) {
   if (!dateKey) return;
 
@@ -39,15 +110,8 @@ function jumpToMatrixDate(dateKey, courseCode = '', section = '', isMilestone = 
     saveAppState();
   }
 
-  const calDay = document.getElementById('cal-day-' + dateKey);
-  if (calDay) {
-    calDay.classList.remove('activity-navigated-highlight');
-    void calDay.offsetWidth;
-    calDay.classList.add('activity-navigated-highlight');
-    setTimeout(() => calDay.classList.remove('activity-navigated-highlight'), 1600);
-    if (typeof calDay.scrollIntoView === 'function') {
-      calDay.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
+  if (plannerViewMode === 'month') {
+    highlightPlannerCalendarActivity(dateKey, courseCode, section, isMilestone);
   }
 
   if (list && keptRadarScroll !== null) {
@@ -183,6 +247,11 @@ function jumpToMatrixDate(dateKey, courseCode = '', section = '', isMilestone = 
       showToast('Navigated to: ' + dateKey);
     } else {
       showToast('Date ' + dateKey + ' not in current view.', '⚠️');
+    }
+
+    // 7. In Monthly View, re-affirm calendar cell and pill highlights after render/cleanup
+    if (plannerViewMode === 'month') {
+      highlightPlannerCalendarActivity(dateKey, courseCode, section, isMilestone);
     }
 
     if (list && keptRadarScroll !== null) {
