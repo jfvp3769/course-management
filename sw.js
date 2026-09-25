@@ -17,7 +17,7 @@
  * Bump CACHE_NAME on every release; `activate` purges older caches.
  * ========================================================================== */
 
-const CACHE_NAME = 'faculty-course-manager-v2.41';
+const CACHE_NAME = 'faculty-course-manager-v2.42';
 
 const SHELL = [
   './',
@@ -134,19 +134,16 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Static assets: cache-first, refreshing the entry in the background.
+  // Static assets: network-first, falling back to cache when offline.
   event.respondWith(
-    caches.match(request).then((cached) => {
-      const network = fetch(request)
-        .then((response) => {
-          if (response && response.ok && response.type === 'basic') {
-            const copy = response.clone();
-            caches.open(CACHE_NAME).then((c) => c.put(request, copy));
-          }
-          return response;
-        })
-        .catch(() => cached);
-      return cached || network;
-    })
+    fetch(request)
+      .then((response) => {
+        if (response && response.ok && response.type === 'basic') {
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then((c) => c.put(request, copy));
+        }
+        return response;
+      })
+      .catch(() => caches.match(request))
   );
 });
