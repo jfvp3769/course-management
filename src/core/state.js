@@ -46,6 +46,12 @@ let plannerUndoStack = [];
 let plannerRedoStack = [];
 const MAX_PLANNER_HISTORY = 50;
 
+// Lesson Planner View Mode & Controls ('month' | 'week')
+let plannerViewMode = 'month'; // Default to 'month' ("Monthly View")
+let currentPlannerMonth = ''; // 'YYYY-MM', defaults to current month
+let plannerSectionFilter = 'all'; // 'all' or specific 'COURSE - SECTION'
+let activeDayInspectorDate = null; // 'YYYY-MM-DD' for Day Inspector Flyout
+
 let rosterSortState = { col: 'name', direction: 'asc' };
 
 let gradebookCollapsedCats = {};

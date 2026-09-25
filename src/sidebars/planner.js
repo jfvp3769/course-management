@@ -27,6 +27,29 @@ function jumpToMatrixDate(dateKey, courseCode = '', section = '', isMilestone = 
     renderMatrixTable();
   }
 
+  // Monthly View Support: Navigate to target month & highlight calendar cell
+  const targetYearMonth = `${parts[0]}-${parts[1]}`;
+  if (plannerViewMode === 'month' && currentPlannerMonth !== targetYearMonth) {
+    currentPlannerMonth = targetYearMonth;
+    const monthSelect = document.getElementById('planner-month-select');
+    if (monthSelect) monthSelect.value = targetYearMonth;
+    if (typeof renderPlannerMonthCalendar === 'function') {
+      renderPlannerMonthCalendar();
+    }
+    saveAppState();
+  }
+
+  const calDay = document.getElementById('cal-day-' + dateKey);
+  if (calDay) {
+    calDay.classList.remove('activity-navigated-highlight');
+    void calDay.offsetWidth;
+    calDay.classList.add('activity-navigated-highlight');
+    setTimeout(() => calDay.classList.remove('activity-navigated-highlight'), 1600);
+    if (typeof calDay.scrollIntoView === 'function') {
+      calDay.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }
+
   if (list && keptRadarScroll !== null) {
     list.scrollTop = keptRadarScroll;
   }

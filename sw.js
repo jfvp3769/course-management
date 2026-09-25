@@ -17,7 +17,7 @@
  * Bump CACHE_NAME on every release; `activate` purges older caches.
  * ========================================================================== */
 
-const CACHE_NAME = 'faculty-course-manager-v2.38';
+const CACHE_NAME = 'faculty-course-manager-v2.39';
 
 const SHELL = [
   './',
@@ -51,6 +51,7 @@ const MODULES = [
   './src/features/semester.js',
   './src/features/classroom.js',
   './src/features/planner-matrix.js',
+  './src/features/planner-calendar.js',
   './src/features/timetable.js',
   './src/features/calendar.js',
   './src/features/branding.js',

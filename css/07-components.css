@@ -1465,3 +1465,41 @@ html.theme-dark input[type="date"]::-webkit-calendar-picker-indicator {
   filter: invert(0.85);
 }
 
+/* =============================================================================
+ * MONTHLY PLANNER CALENDAR VIEW COMPONENT STYLES
+ * ========================================================================== */
+
+.planner-calendar-cell {
+  position: relative;
+  transition: background-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.planner-class-pill {
+  line-height: 1.25;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background-color 0.12s ease;
+}
+
+.planner-class-pill:hover {
+  transform: translateY(-1px);
+}
+
+@keyframes calTodayPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(144, 27, 43, 0.7);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(144, 27, 43, 0);
+    transform: scale(1.02);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(144, 27, 43, 0);
+    transform: scale(1);
+  }
+}
+
+.cal-today-pulse {
+  animation: calTodayPulse 1.2s cubic-bezier(0.16, 1, 0.3, 1) 2;
+  z-index: 15 !important;
+}
+

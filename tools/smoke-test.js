@@ -826,6 +826,145 @@ setTimeout(() => {
         renderStudentRoster();
         return true;
       })()`);
+    }],
+    ['planner calendar monthly view renders 7-day columns and 1-month grid', () => {
+      return window.__probe(`(() => {
+        // Ensure monthly view is rendered
+        setPlannerViewMode('month');
+        renderPlannerMonthCalendar();
+
+        const calContainer = document.getElementById('planner-calendar-view-container');
+        if (!calContainer) return false;
+
+        // Verify 7-day column headers
+        const headerDays = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+        for (const h of headerDays) {
+          if (!calContainer.textContent.includes(h)) return false;
+        }
+
+        // Verify day cells rendered (at least 28 cells)
+        const cells = calContainer.querySelectorAll('.planner-calendar-cell');
+        if (cells.length < 28) return false;
+
+        // Verify day cells contain date keys
+        const firstCell = cells[0];
+        if (!firstCell.getAttribute('data-date')) return false;
+
+        return true;
+      })()`);
+    }],
+    ['view switcher toggles seamlessly between Monthly View and Weekly View', () => {
+      return window.__probe(`(() => {
+        const calContainer = document.getElementById('planner-calendar-view-container');
+        const matrixContainer = document.getElementById('planner-matrix-view-container');
+        const monthNav = document.getElementById('planner-month-nav-container');
+        const weekNav = document.getElementById('planner-week-nav-container');
+        const btnMonth = document.getElementById('btn-planner-view-month');
+        const btnWeek = document.getElementById('btn-planner-view-week');
+
+        // 1. Switch to Weekly View
+        setPlannerViewMode('week');
+        if (plannerViewMode !== 'week') return false;
+        if (!calContainer.classList.contains('hidden')) return false;
+        if (matrixContainer.classList.contains('hidden')) return false;
+        if (!monthNav.classList.contains('hidden')) return false;
+        if (weekNav.classList.contains('hidden')) return false;
+        if (!btnWeek.classList.contains('font-bold')) return false;
+
+        // 2. Switch back to Monthly View
+        setPlannerViewMode('month');
+        if (plannerViewMode !== 'month') return false;
+        if (calContainer.classList.contains('hidden')) return false;
+        if (!matrixContainer.classList.contains('hidden')) return false;
+        if (monthNav.classList.contains('hidden')) return false;
+        if (!weekNav.classList.contains('hidden')) return false;
+        if (!btnMonth.classList.contains('font-bold')) return false;
+
+        return true;
+      })()`);
+    }],
+    ['planner month navigator advances and rewinds active month', () => {
+      return window.__probe(`(() => {
+        initPlannerMonthControls();
+        const initialMonth = currentPlannerMonth;
+        const select = document.getElementById('planner-month-select');
+        if (!select || select.options.length < 2) return false;
+
+        // Advance 1 month
+        navigatePlannerMonth(1);
+        if (currentPlannerMonth === initialMonth && select.options.length > 1) return false;
+        if (select.value !== currentPlannerMonth) return false;
+
+        // Rewind back
+        navigatePlannerMonth(-1);
+        if (currentPlannerMonth !== initialMonth) return false;
+        if (select.value !== initialMonth) return false;
+
+        return true;
+      })()`);
+    }],
+    ['planner section filter filters displayed classes in monthly view', () => {
+      return window.__probe(`(() => {
+        initPlannerMonthControls();
+        renderPlannerMonthCalendar();
+
+        const filterSelect = document.getElementById('planner-section-filter');
+        if (!filterSelect || filterSelect.options.length < 2) return false;
+
+        // Select specific section
+        const targetSection = filterSelect.options[1].value;
+        onPlannerSectionFilterChange(null, { value: targetSection });
+        if (plannerSectionFilter !== targetSection) return false;
+
+        // Verify only pills for targetSection appear
+        const targetParts = targetSection.split(' - ');
+        const targetCourse = targetParts[0];
+        const targetSec = targetParts[1];
+        const pills = document.querySelectorAll('#planner-calendar-view-container .planner-class-pill');
+        for (const p of pills) {
+          if (p.getAttribute('data-course') !== targetCourse || p.getAttribute('data-section') !== targetSec) {
+            return false;
+          }
+        }
+
+        // Reset filter
+        onPlannerSectionFilterChange(null, { value: 'all' });
+        if (plannerSectionFilter !== 'all') return false;
+
+        return true;
+      })()`);
+    }],
+    ['planner day inspector modal opens with full class schedule and action buttons', () => {
+      return window.__probe(`(() => {
+        const modal = document.getElementById('planner-day-inspector-modal');
+        if (!modal) return false;
+
+        // Open inspector for a known class date
+        const testDate = '2026-08-18';
+        openPlannerDayInspector(testDate);
+        if (modal.classList.contains('hidden')) return false;
+        if (activeDayInspectorDate !== testDate) return false;
+
+        // Check header title
+        const titleEl = document.getElementById('day-inspector-title');
+        if (!titleEl || !titleEl.textContent.includes('2026')) return false;
+
+        // Check class cards and action buttons
+        const listEl = document.getElementById('day-inspector-classes-list');
+        if (!listEl) return false;
+        const copyBtns = listEl.querySelectorAll('[data-action="copyMatrixActivity"]');
+        const pasteBtns = listEl.querySelectorAll('[data-action="pasteMatrixActivity"]');
+        const editBtns = listEl.querySelectorAll('[data-action="openLessonModal"]');
+
+        if (copyBtns.length === 0 || pasteBtns.length === 0 || editBtns.length === 0) return false;
+
+        // Close inspector
+        closePlannerDayInspector();
+        if (!modal.classList.contains('hidden')) return false;
+        if (activeDayInspectorDate !== null) return false;
+
+        return true;
+      })()`);
     }]
   ];
 

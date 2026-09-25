@@ -21,7 +21,7 @@
 const Render = (() => {
   /** view id -> render fn. Called lazily: feature modules load after this one. */
   const VIEWS = {
-    matrix: () => renderMatrixTable(),
+    matrix: () => (typeof renderPlannerView === 'function' ? renderPlannerView() : renderMatrixTable()),
     timetable: () => renderWeeklyTimetable(),
     calendar: () => renderAcademicCalendarTable(),
     roster: () => renderStudentRoster(),

@@ -29,7 +29,10 @@ function saveAppState(immediate = false) {
         dailyNotes,
         syllabusBacklog,
         currentWeekViewIndex,
-        selectedMonthFilter
+        selectedMonthFilter,
+        plannerViewMode,
+        currentPlannerMonth,
+        plannerSectionFilter
       };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
       if (indicator) {
@@ -124,10 +127,10 @@ function loadAppState() {
       if (parsed.syllabusBacklog) syllabusBacklog = parsed.syllabusBacklog;
       if (parsed.currentWeekViewIndex) currentWeekViewIndex = parsed.currentWeekViewIndex;
       if (parsed.selectedMonthFilter) selectedMonthFilter = parsed.selectedMonthFilter;
+      if (parsed.plannerViewMode) plannerViewMode = parsed.plannerViewMode;
+      if (parsed.currentPlannerMonth) currentPlannerMonth = parsed.currentPlannerMonth;
+      if (parsed.plannerSectionFilter) plannerSectionFilter = parsed.plannerSectionFilter;
       cleanupOrphanedStudents();
-      if (typeof sortStudentRosterByName === 'function') {
-        sortStudentRosterByName();
-      }
       return true;
     }
   } catch (e) {
@@ -152,7 +155,10 @@ function exportBackupJSON() {
     dailyNotes,
     syllabusBacklog,
     currentWeekViewIndex,
-    selectedMonthFilter
+    selectedMonthFilter,
+    plannerViewMode,
+    currentPlannerMonth,
+    plannerSectionFilter
   };
   const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(payload, null, 2));
   const a = document.createElement('a');
@@ -229,9 +235,6 @@ function importBackupJSON(event) {
       syllabusBacklog = data.syllabusBacklog || [];
 
       cleanupOrphanedStudents();
-      if (typeof sortStudentRosterByName === 'function') {
-        sortStudentRosterByName();
-      }
       saveAppState();
       semesterDates = generateSemesterDateList();
       Render.views('everything');
@@ -272,9 +275,6 @@ function requestResetToDefaults() {
       currentWeekViewIndex = 1;
       selectedMonthFilter = 'all';
 
-      if (typeof sortStudentRosterByName === 'function') {
-        sortStudentRosterByName();
-      }
       saveAppState();
       semesterDates = generateSemesterDateList();
       Render.views('everything');

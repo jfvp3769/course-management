@@ -206,6 +206,27 @@
     navigateWeek: (e, target, data) => {
       if (typeof window.navigateWeek === 'function') window.navigateWeek(parseInt(data.delta, 10) || 0);
     },
+    setPlannerViewMode: (e, target, data) => {
+      const mode = data.mode || (target ? target.getAttribute('data-mode') : 'month');
+      if (typeof window.setPlannerViewMode === 'function') window.setPlannerViewMode(mode);
+    },
+    navigatePlannerMonth: (e, target, data) => {
+      const delta = parseInt(data.delta, 10) || 0;
+      if (typeof window.navigatePlannerMonth === 'function') window.navigatePlannerMonth(delta);
+    },
+    onPlannerMonthSelectChange: (e, target, data) => {
+      if (typeof window.onPlannerMonthSelectChange === 'function') window.onPlannerMonthSelectChange(e, target, data);
+    },
+    onPlannerSectionFilterChange: (e, target, data) => {
+      if (typeof window.onPlannerSectionFilterChange === 'function') window.onPlannerSectionFilterChange(e, target, data);
+    },
+    openPlannerDayInspector: (e, target, data) => {
+      const dateKey = data.date || (target ? target.getAttribute('data-date') : '');
+      if (typeof window.openPlannerDayInspector === 'function') window.openPlannerDayInspector(dateKey);
+    },
+    closePlannerDayInspector: () => {
+      if (typeof window.closePlannerDayInspector === 'function') window.closePlannerDayInspector();
+    },
     setRadarFilter: (e, target, data) => {
       if (typeof window.setRadarFilter === 'function') window.setRadarFilter(data.filter);
     },

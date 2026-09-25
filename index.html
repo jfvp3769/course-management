@@ -265,8 +265,28 @@
               <p class="text-[11px] text-slate-500 mt-0.5 leading-tight">Schedule lecture topics, activities, and class suspensions.</p>
             </div>
 
-            <!-- Controls: Action Buttons & Week Navigator (Ordered: Declare No Class, Undo, Redo, Jump to Today, Week Navigator) -->
+            <!-- Controls: Action Buttons & Navigators (Ordered: View Switcher, Section Filter, Declare No Class, Undo, Redo, Jump to Today, Month/Week Navigator) -->
             <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap text-xs shrink-0">
+              <!-- View Switcher (Monthly View vs. Weekly View) -->
+              <div class="flex items-center gap-0.5 bg-slate-100 dark:bg-slate-800 p-0.5 rounded-lg border border-slate-200 dark:border-slate-700 select-none h-8 shrink-0">
+                <button type="button" id="btn-planner-view-month" data-action="setPlannerViewMode" data-mode="month" class="px-2.5 py-1 rounded-md text-xs font-bold transition shadow-2xs bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 inline-flex items-center gap-1.5 cursor-pointer" title="Switch to Monthly View">
+                  <svg class="w-3.5 h-3.5 text-slate-600 dark:text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                  <span class="planner-btn-label">Monthly View</span>
+                </button>
+                <button type="button" id="btn-planner-view-week" data-action="setPlannerViewMode" data-mode="week" class="px-2.5 py-1 rounded-md text-xs font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition inline-flex items-center gap-1.5 cursor-pointer" title="Switch to Weekly View">
+                  <svg class="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18M10 3v18M14 3v18M5 3h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2z"/></svg>
+                  <span class="planner-btn-label">Weekly View</span>
+                </button>
+              </div>
+
+              <!-- Section Filter Bar (Strategy 2) -->
+              <div class="flex items-center gap-1 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-2 shadow-2xs h-8 shrink-0">
+                <label for="planner-section-filter" class="text-[11px] font-bold text-slate-500 dark:text-slate-400 select-none whitespace-nowrap">Section:</label>
+                <select id="planner-section-filter" data-action-change="onPlannerSectionFilterChange" class="bg-transparent border-0 text-xs font-bold text-slate-800 dark:text-slate-100 focus:ring-0 py-0 pl-0 pr-4 cursor-pointer max-w-[155px] truncate">
+                  <option value="all">All Sections</option>
+                </select>
+              </div>
+
               <!-- 1. Declare No Class -->
               <button type="button" data-action="openDeclareNoClassModal" class="planner-action-btn planner-btn-noclass shadow-2xs" title="Declare 'No Class' Day(s)">
                 <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
@@ -286,7 +306,7 @@
               </button>
 
               <!-- 4. Jump to Today -->
-              <button type="button" data-action="scrollToToday" class="planner-action-btn planner-btn-today shadow-2xs" title="Jump to today's date in matrix">
+              <button type="button" data-action="scrollToToday" class="planner-action-btn planner-btn-today shadow-2xs" title="Jump to today's date in matrix / calendar">
                 <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                   <circle cx="12" cy="15" r="1.5" fill="currentColor" stroke="none"/>
@@ -294,8 +314,23 @@
                 <span class="planner-btn-label">Jump to Today</span>
               </button>
 
-              <!-- 5. Week Navigator (Rightmost) -->
-              <div class="flex items-center gap-1 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg p-0.5 shadow-2xs h-8">
+              <!-- Month Navigator (Visible in Monthly View) -->
+              <div id="planner-month-nav-container" class="flex items-center gap-1 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg p-0.5 shadow-2xs h-8 shrink-0">
+                <button type="button" data-action="navigatePlannerMonth" data-delta="-1" class="planner-month-nav-btn p-1 rounded bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-600 shadow-2xs transition active:scale-95" title="Previous Month">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                  <span class="sr-only planner-btn-label">Previous Month</span>
+                </button>
+                <select id="planner-month-select" data-action-change="onPlannerMonthSelectChange" class="bg-transparent border-0 text-xs font-extrabold text-slate-800 dark:text-slate-100 focus:ring-0 py-0 px-1 cursor-pointer">
+                  <!-- Populated dynamically -->
+                </select>
+                <button type="button" data-action="navigatePlannerMonth" data-delta="1" class="planner-month-nav-btn p-1 rounded bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-600 shadow-2xs transition active:scale-95" title="Next Month">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                  <span class="sr-only planner-btn-label">Next Month</span>
+                </button>
+              </div>
+
+              <!-- Week Navigator (Visible in Weekly View) -->
+              <div id="planner-week-nav-container" class="hidden flex items-center gap-1 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg p-0.5 shadow-2xs h-8 shrink-0">
                 <button type="button" data-action="navigateWeek" data-delta="-1" class="planner-week-nav-btn p-1 rounded bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-600 shadow-2xs transition active:scale-95" title="Previous Week">
                   <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
                 </button>
@@ -322,25 +357,29 @@
       <div class="w-full space-y-3">
 
         <!-- Main Content Window / Table Card -->
+        <div class="bg-white dark:bg-slate-900 main-table-card rounded-xl shadow-md border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col">
 
-        <div class="bg-white main-table-card rounded-xl shadow-md border border-slate-200 overflow-hidden flex flex-col">
+          <!-- Monthly Calendar View Container (Default) -->
+          <div id="planner-calendar-view-container" class="w-full flex-1 flex flex-col min-h-[480px]">
+            <!-- Calendar Grid rendered here -->
+          </div>
 
-          <!-- Top Scrollbar inside main content window, directly above column headers -->
+          <!-- Weekly Matrix View Container -->
+          <div id="planner-matrix-view-container" class="hidden flex-col flex-1 w-full">
+            <!-- Top Scrollbar inside main content window, directly above column headers -->
+            <div id="matrix-top-scroll-wrapper" class="dual-top-scroll"><div id="matrix-top-scroll-track" style="height: 1px; width: 100%;"></div></div>
 
-          <div id="matrix-top-scroll-wrapper" class="dual-top-scroll"><div id="matrix-top-scroll-track" style="height: 1px; width: 100%;"></div></div>
-
-          <!-- Scrollable Table Body -->
-
-          <div id="matrix-scroll-wrapper" class="overflow-x-auto overflow-y-auto relative main-table-scroll-wrapper">
-
-            <table id="matrix-table" class="w-full border-collapse text-left text-xs min-w-[1050px]">
-            <thead id="matrix-head" class="bg-slate-100 sticky top-0 z-30 shadow-sm select-none"></thead>
-            <tbody id="matrix-body" class="divide-y divide-slate-200"></tbody>
-          </table>
-        </div>
-        <div class="main-table-bottom-resizer" data-target="matrix-scroll-wrapper" data-tab="planner" title="Drag to adjust window height • Double-click to reset to auto-fit">
-          <div class="main-resizer-grip"></div>
-        </div>
+            <!-- Scrollable Table Body -->
+            <div id="matrix-scroll-wrapper" class="overflow-x-auto overflow-y-auto relative main-table-scroll-wrapper">
+              <table id="matrix-table" class="w-full border-collapse text-left text-xs min-w-[1050px]">
+                <thead id="matrix-head" class="bg-slate-100 sticky top-0 z-30 shadow-sm select-none"></thead>
+                <tbody id="matrix-body" class="divide-y divide-slate-200"></tbody>
+              </table>
+            </div>
+            <div class="main-table-bottom-resizer" data-target="matrix-scroll-wrapper" data-tab="planner" title="Drag to adjust window height • Double-click to reset to auto-fit">
+              <div class="main-resizer-grip"></div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -1408,6 +1447,39 @@
             </button>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2b. DAY SCHEDULE INSPECTOR MODAL (Strategy 1: High-Density Flyout) -->
+  <div id="planner-day-inspector-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 hidden" data-action="closeModalOnBackdrop" data-modal="planner-day-inspector-modal">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-xl w-full p-4 sm:p-6 shadow-2xl space-y-4 border border-slate-200 dark:border-slate-800 max-h-[90vh] flex flex-col">
+      <!-- Modal Header -->
+      <div class="flex items-start justify-between border-b border-slate-100 dark:border-slate-800 pb-3 shrink-0">
+        <div>
+          <span class="text-[10px] font-extrabold uppercase tracking-wider text-msu-maroon dark:text-rose-400">Day Schedule Inspector</span>
+          <h3 id="day-inspector-title" class="font-extrabold text-base sm:text-lg text-slate-900 dark:text-slate-100 tracking-tight">Wednesday, September 9, 2026</h3>
+          <p id="day-inspector-subtitle" class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">4 Classes Scheduled • AY 2026–2027</p>
+        </div>
+        <button type="button" aria-label="Close day inspector" data-action="closePlannerDayInspector" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <!-- Optional Campus Banner / Daily Notes -->
+      <div id="day-inspector-banner" class="space-y-1.5 shrink-0 hidden"></div>
+
+      <!-- Scrollable List of Full Class Cards -->
+      <div id="day-inspector-classes-list" class="space-y-2.5 overflow-y-auto flex-1 pr-1 min-h-[160px]">
+        <!-- Rendered dynamically by planner-calendar.js -->
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-800 shrink-0">
+        <span class="text-[11px] text-slate-400 dark:text-slate-500 font-medium">Click Edit on any card to modify lesson or mark No Class</span>
+        <button type="button" data-action="closePlannerDayInspector" class="h-9 px-4 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl font-bold text-xs border border-slate-200 dark:border-slate-700 transition active:scale-95 shadow-2xs cursor-pointer">
+          Close
+        </button>
       </div>
     </div>
   </div>
@@ -2937,6 +3009,7 @@
   <script src="src/features/semester.js"></script>
   <script src="src/features/classroom.js"></script>
   <script src="src/features/planner-matrix.js"></script>
+  <script src="src/features/planner-calendar.js"></script>
   <script src="src/features/timetable.js"></script>
   <script src="src/features/calendar.js"></script>
   <script src="src/features/branding.js"></script>

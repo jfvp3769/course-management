@@ -1,4 +1,4 @@
-# Faculty Course & Lesson Manager (v2.5.0)
+# Faculty Course & Lesson Manager (v2.6.0)
 
 [![Offline Ready](https://img.shields.io/badge/Offline-100%25%20Ready-success?style=flat-square&logo=pwa)](index.html)
 [![Zero Build](https://img.shields.io/badge/Build%20Step-Zero%20Bundler-blue?style=flat-square)](index.html)
@@ -14,7 +14,7 @@ Engineered with an uncompromising commitment to local privacy and zero server de
 ## Table of Contents
 1. [Project Overview](#project-overview)
 2. [Key Capabilities & Workspaces](#key-capabilities--workspaces)
-   - [1. Lesson Planner Matrix](#1-lesson-planner-matrix)
+   - [1. Lesson Planner: Monthly View & Weekly View Matrix](#1-lesson-planner-monthly-view--weekly-view-matrix)
    - [2. Weekly Timetable & Room Conflict Auditor](#2-weekly-timetable--room-conflict-auditor)
    - [3. Academic Calendar & Lost Days Engine](#3-academic-calendar--lost-days-engine)
    - [4. Class List (Roster) & Faculty Communications](#4-class-list-roster--faculty-communications)
@@ -48,8 +48,13 @@ Modern academic environments demand reliable digital tools that remain fully fun
 
 ## Key Capabilities & Workspaces
 
-### 1. Lesson Planner Matrix
-- **Matrix Grid View**: Interactive calendar grid mapping each teaching date across all course sections with distinctive weekday vs. weekend visual rhythm.
+### 1. Lesson Planner: Monthly View & Weekly View Matrix
+- **Monthly View (1-Month Calendar)**: Standard 7-column monthly calendar grid showing all scheduled class sessions across the semester with intuitive previous/next month navigation, month select dropdown, and instant "Today" jumping.
+- **Compact Class Pills with "+X more" Overflow**: Each scheduled session displays a sleek color-coded class pill with course badge, meeting number (`M#1`), start time, and activity type/topic. Automatically handles busy days (up to 6+ classes per day) by displaying the top 2 classes and a "+X more classes ▾" badge.
+- **Day Schedule Inspector**: Interactive modal flyout opened by clicking any day card or "+X more" badge, presenting the complete agenda for that date with start/end time, room/venue, meeting count badges (`Mtg #X of Y` • `Z left`), activity topic, and one-click `Edit`, `Copy`, and `Paste` actions.
+- **Section Focus Filter**: Real-time dropdown filter in the planner toolbar allowing faculty to isolate a specific course/section across the entire monthly calendar or view all sections simultaneously.
+- **View Switcher (Monthly View vs. Weekly View)**: Seamless 1-click toggle between the high-level monthly calendar overview and the detailed week-by-week multi-section matrix table.
+- **Matrix Grid View (Weekly View)**: Interactive multi-section table grid mapping each teaching date across all course sections with distinctive weekday vs. weekend visual rhythm.
 - **Meeting Count & Remaining Term Badges**: Every planned activity card and scheduled empty slot displays crisp meeting indices (`Mtg #X`) and remaining meeting pills (`Y left` or `Final Mtg`), giving instructors immediate term pacing visibility.
 - **Meeting Context Banner**: The Lesson Planner modal features a real-time meeting context banner showing `Meeting #X of Y`, remaining meetings in the term, and celebration tags for final meetings or out-of-schedule special sessions.
 - **Context-Aware Cross-Section Copy & Paste**: Copying lesson plans between sections preserves pedagogical topics, activity types, and notes while dynamically inheriting the destination section's start time, end time, and assigned classroom venue.
@@ -176,6 +181,7 @@ course-management/
 │   │   └── backup-reminder.js   # Automated weekly data safety prompt
 │   ├── features/
 │   │   ├── planner-matrix.js    # Lesson planner table grid & drag-and-drop
+│   │   ├── planner-calendar.js  # Monthly calendar grid engine & day inspector modal
 │   │   ├── lesson-planner.js    # Planner undo/redo history stacks & topics
 │   │   ├── timetable.js         # Timetable grid & schedule calculations
 │   │   ├── timetable-editor.js  # Add/Edit class schedule meeting modal
@@ -243,7 +249,18 @@ All user data is stored entirely on the client side via the browser's `localStor
 
 ## Version History & Changelog
 
-### Version 2.5.0 (September 2026) — *Current Release*
+### Version 2.6.0 (September 2026) — *Current Release*
+- **Semester Schedule & Activity Matrix: Monthly View**:
+  - **1-Month Calendar Grid**: Added a full 7-column monthly calendar view (`#planner-calendar-view-container`) as the default visual experience for the Semester Schedule & Activity Matrix.
+  - **Compact Class Pills with "+X more" Overflow**: Each scheduled session displays a sleek color-coded class pill with course badge, meeting number (`M#1`), start time, and activity type/topic. Automatically handles busy days (up to 6+ classes per day) by displaying the top 2 classes and a "+X more classes ▾" badge.
+  - **Day Schedule Inspector**: Interactive modal flyout (`#planner-day-inspector-modal`) opened by clicking any day card or "+X more" badge, presenting the complete agenda for that date with start/end time, room/venue, meeting count badges (`Mtg #X of Y` • `Z left`), activity topic, and one-click `Edit`, `Copy`, and `Paste` actions.
+  - **Section Focus Filter**: Real-time dropdown filter (`#planner-section-filter`) in the planner toolbar allowing faculty to isolate a specific course/section across the entire monthly calendar or view all sections simultaneously.
+  - **View Switcher (Monthly View vs. Weekly View)**: Seamless 1-click toggle between the high-level monthly calendar overview and the detailed week-by-week multi-section matrix table. Both views stay in sync.
+  - **Month Navigation Controls**: Clean Prev Month / Next Month buttons and dynamic month select dropdown populated strictly from the semester's date range, with automatic synchronization when navigating via calendar jumps or "Today" buttons.
+- **Service Worker & Cache Upgrade**:
+  - Bumped service worker cache to `faculty-course-manager-v2.39` with instant module caching for `src/features/planner-calendar.js`.
+
+### Version 2.5.0 (September 2026)
 - **Meeting Numbers & Semester Remaining Count in Planning Experience**:
   - **Matrix Activity Cards & Slots**: Every scheduled empty matrix slot and planned lesson card displays a meeting header (`Mtg #X`) and a remaining meetings pill (`Y left` or `Final Mtg`), giving instructors immediate term pacing visibility.
   - **Lesson Planner Meeting Context Banner**: Added a dedicated meeting context banner to the Lesson Planner modal showing `Meeting #X of Y`, remaining meetings left in the term, and celebration tags for the final scheduled meeting or out-of-schedule special sessions.

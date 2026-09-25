@@ -642,7 +642,31 @@ function scrollToToday() {
     renderMatrixTable();
   }
 
+  // Monthly View Support: Navigate to today's month & highlight calendar cell
+  const thisYearMonth = `${year}-${month}`;
+  if (plannerViewMode === 'month' && currentPlannerMonth !== thisYearMonth) {
+    currentPlannerMonth = thisYearMonth;
+    const monthSelect = document.getElementById('planner-month-select');
+    if (monthSelect) monthSelect.value = thisYearMonth;
+    if (typeof renderPlannerMonthCalendar === 'function') {
+      renderPlannerMonthCalendar();
+    }
+    saveAppState();
+  }
+
   setTimeout(() => {
+    // 1. Highlight Monthly View calendar cell if visible
+    const calCell = document.getElementById('cal-day-' + todayKey);
+    if (calCell) {
+      calCell.classList.remove('cal-today-pulse');
+      void calCell.offsetWidth;
+      calCell.classList.add('cal-today-pulse');
+      if (typeof calCell.scrollIntoView === 'function') {
+        calCell.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }
+
+    // 2. Weekly View matrix table navigation
     let row = document.getElementById('row-' + todayKey);
     if (!row) {
       const rows = document.querySelectorAll('#matrix-body tr');
@@ -676,7 +700,7 @@ function scrollToToday() {
       void row.offsetWidth;
       row.classList.add('row-today-pulse');
 
-      showToast('Focused on date: ' + row.id.replace('row-', ''));
+      showToast('Focused on date: ' + (calCell ? todayKey : row.id.replace('row-', '')));
     }
   }, 150);
 }
