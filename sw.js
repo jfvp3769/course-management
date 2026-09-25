@@ -17,7 +17,7 @@
  * Bump CACHE_NAME on every release; `activate` purges older caches.
  * ========================================================================== */
 
-const CACHE_NAME = 'faculty-course-manager-v2.44';
+const CACHE_NAME = 'faculty-course-manager-v2.45';
 
 const SHELL = [
   './',

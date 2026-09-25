@@ -1548,7 +1548,7 @@ html.theme-dark .planner-empty-slot:hover {
   user-select: none;
   height: 100%;
   min-height: 14px;
-  transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease, opacity 0.15s cubic-bezier(0.16, 1, 0.3, 1) 0s;
 }
 
 .planner-calendar-pill:hover {
@@ -1620,6 +1620,7 @@ html.theme-dark .day-campus-suspended {
 .day-campus-suspended .calendar-pill-slot:hover,
 .day-campus-suspended .calendar-pill-slot:hover .planner-calendar-expanded-card {
   opacity: 1 !important;
+  transition-delay: 150ms;
 }
 
 /* =============================================================================
@@ -1639,6 +1640,7 @@ html.theme-dark .day-campus-suspended {
 .calendar-pill-slot:hover > .planner-calendar-pill {
   opacity: 0 !important;
   pointer-events: none !important;
+  transition-delay: 150ms;
 }
 
 .planner-calendar-expanded-card {
@@ -1650,7 +1652,7 @@ html.theme-dark .day-campus-suspended {
   visibility: hidden;
   pointer-events: none;
   transform: scale(0.96);
-  transition: opacity 0.15s cubic-bezier(0.16, 1, 0.3, 1), transform 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: opacity 0.15s cubic-bezier(0.16, 1, 0.3, 1) 0s, transform 0.15s cubic-bezier(0.16, 1, 0.3, 1) 0s, visibility 0s linear 0.15s;
   z-index: 50 !important;
   box-sizing: border-box;
 }
@@ -1660,6 +1662,8 @@ html.theme-dark .day-campus-suspended {
   visibility: visible !important;
   pointer-events: auto !important;
   transform: scale(1.02) !important;
+  transition: opacity 0.15s cubic-bezier(0.16, 1, 0.3, 1), transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), visibility 0s linear;
+  transition-delay: 150ms;
 }
 
 .calendar-subgrid-col,

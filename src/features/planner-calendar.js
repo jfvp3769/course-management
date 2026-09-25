@@ -241,7 +241,7 @@ function _calculateCalendarMeetingStats() {
         const scheduled = (weeklyTimetable || []).some(t => t.course === sub.code && t.section === sec && t.day === fullDay);
         const isSpecial = !scheduled && !!entry;
 
-        if (d.isWeekend && !isSpecial) return;
+        if (!scheduled && !isSpecial) return;
         if (d.isNoClassDate) return;
 
         if (scheduled || isSpecial) {
@@ -266,7 +266,7 @@ function _calculateCalendarMeetingStats() {
         const scheduled = (weeklyTimetable || []).some(t => t.course === sub.code && t.section === sec && t.day === fullDay);
         const isSpecial = !scheduled && !!entry;
 
-        if (d.isWeekend && !isSpecial) return;
+        if (!scheduled && !isSpecial) return;
         if (d.isNoClassDate) return;
 
         if (scheduled || isSpecial) {
@@ -766,8 +766,6 @@ function _renderCalendarDayCell(g, isCurrentMonth, todayKey, timetableMap, meeti
         const isScheduledToday = !!timetableSlot;
         const isSpecialSession = !isScheduledToday && !!entry;
 
-        if (isWeekend && !isSpecialSession) return;
-
         if (isScheduledToday || isSpecialSession) {
           const stats = meetingStats[cellKey] || { meetingNum: 0, totalMeetings: 0, meetingsLeft: 0 };
           const isDone = entry && (entry.status === 'Completed' || (dateKey < todayKey && entry.status !== 'Cancelled'));
@@ -866,29 +864,11 @@ function _renderCalendarDayCell(g, isCurrentMonth, todayKey, timetableMap, meeti
         </div>
       ` : ''}
 
-      <!-- Subgrid: Rendered for Monday–Friday (omitted on weekends) -->
-      ${!isWeekend ? `
-        <div class="calendar-2col-container grid grid-cols-2 gap-1 mt-1 w-full flex-1">
-          ${_renderSubgridColumn('AM', dateKey, amClasses, isWeekend, isNoClassDate, isCurrentMonth)}
-          ${_renderSubgridColumn('PM', dateKey, pmClasses, isWeekend, isNoClassDate, isCurrentMonth)}
-        </div>
-      ` : `
-        <div class="calendar-weekend-space flex-1 w-full">
-          ${dayClasses.length > 0 ? `
-            <div class="space-y-1 mt-1">
-              ${dayClasses.map(c => `
-                <div data-action="openLessonModal" data-date="${dateKey}" data-course="${escapeHtml(c.course)}" data-section="${escapeHtml(c.section)}" data-weekend="true" class="p-1.5 rounded-lg bg-amber-50 dark:bg-amber-950/60 border border-amber-300 dark:border-amber-800 text-amber-900 dark:text-amber-200 text-xs font-bold cursor-pointer hover:shadow-xs transition">
-                  <div class="flex items-center justify-between text-[9px] uppercase tracking-tight opacity-75">
-                    <span>${escapeHtml(c.course)} (${escapeHtml(c.section)})</span>
-                    <span>${formatTime12(c.startTime)}</span>
-                  </div>
-                  <div class="text-[10px] font-bold truncate mt-0.5">${escapeHtml(c.topic || c.type || 'Special Session')}</div>
-                </div>
-              `).join('')}
-            </div>
-          ` : ''}
-        </div>
-      `}
+      <!-- 2-Column Vertical Subgrid (AM & PM) across all days -->
+      <div class="calendar-2col-container grid grid-cols-2 gap-1 mt-1 w-full flex-1">
+        ${_renderSubgridColumn('AM', dateKey, amClasses, isWeekend, isNoClassDate, isCurrentMonth)}
+        ${_renderSubgridColumn('PM', dateKey, pmClasses, isWeekend, isNoClassDate, isCurrentMonth)}
+      </div>
     </div>
   `;
 }
@@ -974,8 +954,6 @@ function openPlannerDayInspector(dateKey) {
         const timetableSlot = (weeklyTimetable || []).find(t => t.course === sub.code && t.section === sec && t.day === fullDay);
         const isScheduledToday = !!timetableSlot;
         const isSpecialSession = !isScheduledToday && !!entry;
-
-        if (isWeekend && !isSpecialSession) return;
 
         if (isScheduledToday || isSpecialSession) {
           const stats = meetingStats[cellKey] || { meetingNum: 0, totalMeetings: 0, meetingsLeft: 0 };
@@ -1267,7 +1245,7 @@ function openAddActivityModal(context) {
   const radioRegular = document.getElementById('scope-regular');
   const radioOther = document.getElementById('scope-other');
 
-  if (regularSlots.length > 0 && !isWeekend) {
+  if (regularSlots.length > 0) {
     if (radioRegular) radioRegular.checked = true;
     _populateAddSubjectSelect('regular', fullDay);
   } else {
@@ -1436,21 +1414,19 @@ function validateAddActivityTimeLive() {
   let conflict = null;
 
   // 1. Regular timetable slots on this date
-  if (!isWeekend) {
-    for (const t of scheduledToday) {
-      if (t.course === selectedCourse && t.section === selectedSection) continue;
-      const cellKey = `${dateKey}__${t.course}__${t.section}`;
-      const entry = plannerEntries[cellKey];
-      if (entry && (entry.type === 'No Class' || (entry.topic && entry.topic.toLowerCase().includes('no class')))) {
-        continue;
-      }
-      const tStart = parseTimeToMinutes((entry && entry.startTime) || t.startTime);
-      const tEnd = parseTimeToMinutes((entry && entry.endTime) || t.endTime);
-      if (tStart !== null && tEnd !== null) {
-        if (Math.max(startM, tStart) < Math.min(endM, tEnd)) {
-          conflict = { course: t.course, section: t.section, start: (entry && entry.startTime) || t.startTime, end: (entry && entry.endTime) || t.endTime };
-          break;
-        }
+  for (const t of scheduledToday) {
+    if (t.course === selectedCourse && t.section === selectedSection) continue;
+    const cellKey = `${dateKey}__${t.course}__${t.section}`;
+    const entry = plannerEntries[cellKey];
+    if (entry && (entry.type === 'No Class' || (entry.topic && entry.topic.toLowerCase().includes('no class')))) {
+      continue;
+    }
+    const tStart = parseTimeToMinutes((entry && entry.startTime) || t.startTime);
+    const tEnd = parseTimeToMinutes((entry && entry.endTime) || t.endTime);
+    if (tStart !== null && tEnd !== null) {
+      if (Math.max(startM, tStart) < Math.min(endM, tEnd)) {
+        conflict = { course: t.course, section: t.section, start: (entry && entry.startTime) || t.startTime, end: (entry && entry.endTime) || t.endTime };
+        break;
       }
     }
   }
