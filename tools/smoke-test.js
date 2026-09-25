@@ -859,6 +859,11 @@ setTimeout(() => {
         if (!stickyHeader) return false;
         if (!stickyHeader.classList.contains('sticky') || !stickyHeader.classList.contains('top-0') || !stickyHeader.classList.contains('z-30') || !stickyHeader.classList.contains('shadow-xs')) return false;
 
+        // Verify resizer manual adjustment and dblclick reset
+        scrollWrapper.style.setProperty('height', '520px', 'important');
+        if (scrollWrapper.style.height !== '520px') return false;
+        resizer.dispatchEvent(new MouseEvent('dblclick', { bubbles: true }));
+
         return true;
       })()`);
     }],

@@ -389,8 +389,8 @@ html.theme-dark #gradebook-table-body tr.row-flash-highlight > td {
 
   /* Compact content window scroll wrapper on short viewports */
   .main-table-scroll-wrapper {
-    height: calc(100vh - 215px) !important;
-    min-height: 240px !important;
+    height: calc(100vh - 215px);
+    min-height: 240px;
   }
 
   /* Compact Sticky Calendar Day Header (SUN..SAT) */

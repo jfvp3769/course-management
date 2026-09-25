@@ -147,14 +147,14 @@ function autoResizeContentWindows() {
     if (!el) return;
 
     // Check if user set a manual height override for this tab
-    // (Planner matrix and planner calendar dynamically calculate height to fit the window on resize)
-    const savedH = (tabId !== 'planner' && tabId !== 'planner-calendar')
+    // (Planner matrix dynamically calculates 7 rows to fit the window on resize)
+    const savedH = (tabId !== 'planner')
       ? (localStorage.getItem('faculty_main_win_h_' + tabId) || localStorage.getItem('msu_main_win_h_' + tabId))
       : null;
     if (savedH) {
       const numH = parseInt(savedH, 10);
       if (!isNaN(numH) && numH >= 240) {
-        el.style.height = numH + 'px';
+        el.style.setProperty('height', numH + 'px', 'important');
         el.style.maxHeight = 'none';
         return;
       }
@@ -187,7 +187,7 @@ function autoResizeContentWindows() {
       if (wrapperId === 'matrix-scroll-wrapper') {
         adjustMatrixRowHeightFor7Rows(el, targetH);
       } else {
-        el.style.height = targetH + 'px';
+        el.style.setProperty('height', targetH + 'px', 'important');
         el.style.maxHeight = 'none';
       }
     } else if (wrapperId === 'matrix-scroll-wrapper') {
@@ -216,7 +216,7 @@ function initMainWindowResizers() {
     if (savedH) {
       const numH = parseInt(savedH, 10);
       if (!isNaN(numH) && numH >= 240) {
-        targetEl.style.height = numH + 'px';
+        targetEl.style.setProperty('height', numH + 'px', 'important');
         targetEl.style.maxHeight = 'none';
         if (targetId === 'matrix-scroll-wrapper') {
           adjustMatrixRowHeightFor7Rows(targetEl, numH);
@@ -229,9 +229,9 @@ function initMainWindowResizers() {
       e.stopPropagation();
 
       const startY = e.clientY;
-      const startH = targetEl.getBoundingClientRect().height;
+      const startH = targetEl.offsetHeight || targetEl.getBoundingClientRect().height;
       const minH = 240;
-      const maxH = Math.max(minH, Math.floor(window.innerHeight * 0.94));
+      const maxH = Math.max(minH, Math.max(1600, Math.floor(window.innerHeight * 2)));
 
       try {
         resizer.setPointerCapture(e.pointerId);
@@ -245,7 +245,7 @@ function initMainWindowResizers() {
 
       const applyHeight = () => {
         rafId = null;
-        targetEl.style.height = targetH + 'px';
+        targetEl.style.setProperty('height', targetH + 'px', 'important');
         targetEl.style.maxHeight = 'none';
         if (targetId === 'matrix-scroll-wrapper') {
           adjustMatrixRowHeightFor7Rows(targetEl, targetH);
@@ -274,6 +274,9 @@ function initMainWindowResizers() {
           }
         } catch (err) {}
 
+        resizer.removeEventListener('pointermove', onPointerMove);
+        resizer.removeEventListener('pointerup', onPointerUp);
+        resizer.removeEventListener('pointercancel', onPointerUp);
         window.removeEventListener('pointermove', onPointerMove);
         window.removeEventListener('pointerup', onPointerUp);
         window.removeEventListener('pointercancel', onPointerUp);
@@ -287,6 +290,9 @@ function initMainWindowResizers() {
         }
       };
 
+      resizer.addEventListener('pointermove', onPointerMove, { passive: true });
+      resizer.addEventListener('pointerup', onPointerUp);
+      resizer.addEventListener('pointercancel', onPointerUp);
       window.addEventListener('pointermove', onPointerMove, { passive: true });
       window.addEventListener('pointerup', onPointerUp);
       window.addEventListener('pointercancel', onPointerUp);
@@ -298,6 +304,7 @@ function initMainWindowResizers() {
       e.stopPropagation();
       localStorage.removeItem('faculty_main_win_h_' + tabId);
       localStorage.removeItem('msu_main_win_h_' + tabId);
+      targetEl.style.removeProperty('height');
       targetEl.style.height = '';
       autoResizeContentWindows();
       if (typeof showToast === 'function') {
