@@ -1004,6 +1004,15 @@ setTimeout(() => {
         if (!slot1.getAttribute('data-action') || slot1.getAttribute('data-action') !== 'openAddActivityModal') return false;
         if (!slot1.getAttribute('data-start-time')) return false;
 
+        // 5. Verify weekend cells (Sunday/Saturday) omit subgrid completely and have #f8fafc styling
+        const allCells = Array.from(document.querySelectorAll('#planner-calendar-view-container .planner-calendar-cell'));
+        const weekendCells = allCells.filter((_, idx) => (idx % 7 === 0 || idx % 7 === 6));
+        if (weekendCells.length === 0) return false;
+        const hasWeekendSubgrid = weekendCells.some(c => c.querySelector('.calendar-2col-container'));
+        if (hasWeekendSubgrid) return false;
+        const hasWeekendMutedBg = weekendCells.some(c => c.classList.contains('bg-[#f8fafc]'));
+        if (!hasWeekendMutedBg) return false;
+
         return true;
       })()`);
     }],
@@ -1023,12 +1032,16 @@ setTimeout(() => {
         const code = firstPill.getAttribute('data-course');
         const sec = firstPill.getAttribute('data-section');
         if (spans[0].textContent.trim() !== code || spans[1].textContent.trim() !== sec) return false;
+        if (!firstPill.querySelector('.planner-pill-code') || !firstPill.querySelector('.planner-pill-section')) return false;
 
-        // Check solid vs muted style functions
+        // Check 3-state styling
         const solidStyle = getSubjectPillStyles('CVE111', true, false);
-        const mutedStyle = getSubjectPillStyles('CVE111', false, false);
+        const unplannedStyle = getSubjectPillStyles('CVE111', false, false);
+        const noclassStyle = getSubjectPillStyles('CVE111', false, true);
         if (!solidStyle.includes('text-white') || !solidStyle.includes('shadow-2xs')) return false;
-        if (!mutedStyle.includes('border-dashed')) return false;
+        if (!unplannedStyle.includes('border-[1.5px]') && !unplannedStyle.includes('border-solid')) return false;
+        if (unplannedStyle.includes('line-through')) return false;
+        if (!noclassStyle.includes('line-through') || !noclassStyle.includes('#f1f5f9')) return false;
 
         // Popover functions
         showPlannerPillPopover(firstPill);

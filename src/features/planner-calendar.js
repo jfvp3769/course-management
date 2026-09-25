@@ -395,7 +395,7 @@ function renderPlannerMonthCalendar() {
     <!-- 7-Day Header -->
     <div class="grid grid-cols-7 border-b border-slate-200 dark:border-slate-800 bg-slate-100/90 dark:bg-slate-900/90 sticky top-0 z-20 select-none shadow-xs">
       ${daysHeader.map(h => `
-        <div class="py-2 px-1 text-center font-extrabold text-[11px] sm:text-xs tracking-wider border-r last:border-r-0 border-slate-200/80 dark:border-slate-800 ${h.isWeekend ? 'text-amber-800 dark:text-amber-400 bg-amber-50/50 dark:bg-amber-950/20' : 'text-slate-700 dark:text-slate-300'}">
+        <div class="py-2 px-1 text-center font-extrabold text-[11px] sm:text-xs tracking-wider border-r last:border-r-0 border-slate-200/80 dark:border-slate-800 ${h.isWeekend ? 'text-slate-500 dark:text-slate-400 bg-[#f8fafc] dark:bg-[#0f172a]' : 'text-slate-700 dark:text-slate-300'}">
           <span>${h.code}</span>
         </div>
       `).join('')}
@@ -504,8 +504,10 @@ function assignGridTracks(classes) {
  * - No Planned Activity: Muted/pale styling of the subject color (low opacity tint/light pastel fill with dashed border).
  */
 function getSubjectPillStyles(courseCode, hasPlannedActivity, isNoClass) {
+  // State 3: No Class / Cancelled
+  // Neutral muted gray background (#f1f5f9), subtle gray border, with a distinct red/dark-gray strikethrough across the text.
   if (isNoClass) {
-    return 'bg-rose-100 dark:bg-rose-950/70 text-rose-800 dark:text-rose-300 border border-rose-300 dark:border-rose-800 line-through opacity-85';
+    return 'planner-pill-noclass bg-[#f1f5f9] dark:bg-[#1e293b] text-slate-500 dark:text-slate-400 border border-[#cbd5e1] dark:border-[#334155] line-through decoration-rose-600 dark:decoration-rose-500 decoration-[1.5px] opacity-80';
   }
 
   const sub = (courseData && Array.isArray(courseData.subjects))
@@ -513,34 +515,48 @@ function getSubjectPillStyles(courseCode, hasPlannedActivity, isNoClass) {
     : null;
   const theme = (sub && sub.colorTheme ? sub.colorTheme.toLowerCase() : 'blue');
 
+  // State 1: Planned Activity (Solid subject color fill + bold white text)
   const solidThemes = {
-    blue: 'bg-blue-600 dark:bg-blue-700 text-white border border-blue-700 dark:border-blue-500 shadow-2xs',
-    emerald: 'bg-emerald-600 dark:bg-emerald-700 text-white border border-emerald-700 dark:border-emerald-500 shadow-2xs',
-    amber: 'bg-amber-600 dark:bg-amber-700 text-white border border-amber-700 dark:border-amber-500 shadow-2xs',
-    purple: 'bg-purple-600 dark:bg-purple-700 text-white border border-purple-700 dark:border-purple-500 shadow-2xs',
-    teal: 'bg-teal-600 dark:bg-teal-700 text-white border border-teal-700 dark:border-teal-500 shadow-2xs',
-    rose: 'bg-rose-600 dark:bg-rose-700 text-white border border-rose-700 dark:border-rose-500 shadow-2xs',
-    indigo: 'bg-indigo-600 dark:bg-indigo-700 text-white border border-indigo-700 dark:border-indigo-500 shadow-2xs',
-    cyan: 'bg-cyan-600 dark:bg-cyan-700 text-white border border-cyan-700 dark:border-cyan-500 shadow-2xs',
-    slate: 'bg-slate-700 dark:bg-slate-700 text-white border border-slate-800 dark:border-slate-600 shadow-2xs'
+    blue: 'bg-blue-600 dark:bg-blue-700 text-white font-bold border border-blue-700 dark:border-blue-500 shadow-2xs',
+    emerald: 'bg-emerald-600 dark:bg-emerald-700 text-white font-bold border border-emerald-700 dark:border-emerald-500 shadow-2xs',
+    amber: 'bg-amber-600 dark:bg-amber-700 text-white font-bold border border-amber-700 dark:border-amber-500 shadow-2xs',
+    purple: 'bg-purple-600 dark:bg-purple-700 text-white font-bold border border-purple-700 dark:border-purple-500 shadow-2xs',
+    teal: 'bg-teal-600 dark:bg-teal-700 text-white font-bold border border-teal-700 dark:border-teal-500 shadow-2xs',
+    rose: 'bg-rose-600 dark:bg-rose-700 text-white font-bold border border-rose-700 dark:border-rose-500 shadow-2xs',
+    indigo: 'bg-indigo-600 dark:bg-indigo-700 text-white font-bold border border-indigo-700 dark:border-indigo-500 shadow-2xs',
+    cyan: 'bg-cyan-600 dark:bg-cyan-700 text-white font-bold border border-cyan-700 dark:border-cyan-500 shadow-2xs',
+    slate: 'bg-slate-700 dark:bg-slate-700 text-white font-bold border border-slate-800 dark:border-slate-600 shadow-2xs',
+    orange: 'bg-orange-600 dark:bg-orange-700 text-white font-bold border border-orange-700 dark:border-orange-500 shadow-2xs',
+    lime: 'bg-lime-600 dark:bg-lime-700 text-white font-bold border border-lime-700 dark:border-lime-500 shadow-2xs',
+    sky: 'bg-sky-600 dark:bg-sky-700 text-white font-bold border border-sky-700 dark:border-sky-500 shadow-2xs',
+    pink: 'bg-pink-600 dark:bg-pink-700 text-white font-bold border border-pink-700 dark:border-pink-500 shadow-2xs',
+    fuchsia: 'bg-fuchsia-600 dark:bg-fuchsia-700 text-white font-bold border border-fuchsia-700 dark:border-fuchsia-500 shadow-2xs',
+    red: 'bg-red-600 dark:bg-red-700 text-white font-bold border border-red-700 dark:border-red-500 shadow-2xs'
   };
 
-  const mutedThemes = {
-    blue: 'bg-blue-50/90 dark:bg-blue-950/40 text-blue-900 dark:text-blue-200 border border-dashed border-blue-300 dark:border-blue-700/80',
-    emerald: 'bg-emerald-50/90 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-200 border border-dashed border-emerald-300 dark:border-emerald-700/80',
-    amber: 'bg-amber-50/90 dark:bg-amber-950/40 text-amber-900 dark:text-amber-200 border border-dashed border-amber-300 dark:border-amber-700/80',
-    purple: 'bg-purple-50/90 dark:bg-purple-950/40 text-purple-900 dark:text-purple-200 border border-dashed border-purple-300 dark:border-purple-700/80',
-    teal: 'bg-teal-50/90 dark:bg-teal-950/40 text-teal-900 dark:text-teal-200 border border-dashed border-teal-300 dark:border-teal-700/80',
-    rose: 'bg-rose-50/90 dark:bg-rose-950/40 text-rose-900 dark:text-rose-200 border border-dashed border-rose-300 dark:border-rose-700/80',
-    indigo: 'bg-indigo-50/90 dark:bg-indigo-950/40 text-indigo-900 dark:text-indigo-200 border border-dashed border-indigo-300 dark:border-indigo-700/80',
-    cyan: 'bg-cyan-50/90 dark:bg-cyan-950/40 text-cyan-900 dark:text-cyan-200 border border-dashed border-cyan-300 dark:border-cyan-700/80',
-    slate: 'bg-slate-100/90 dark:bg-slate-800/60 text-slate-800 dark:text-slate-200 border border-dashed border-slate-300 dark:border-slate-700'
+  // State 2: Unplanned Activity (10% pastel tint + matching 1.5px solid border + colored text, no strikethrough)
+  const pastelThemes = {
+    blue: 'planner-pill-unplanned bg-blue-50/90 dark:bg-blue-950/40 text-blue-900 dark:text-blue-200 border-[1.5px] border-solid border-blue-400 dark:border-blue-600',
+    emerald: 'planner-pill-unplanned bg-emerald-50/90 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-200 border-[1.5px] border-solid border-emerald-400 dark:border-emerald-600',
+    amber: 'planner-pill-unplanned bg-amber-50/90 dark:bg-amber-950/40 text-amber-900 dark:text-amber-200 border-[1.5px] border-solid border-amber-400 dark:border-amber-600',
+    purple: 'planner-pill-unplanned bg-purple-50/90 dark:bg-purple-950/40 text-purple-900 dark:text-purple-200 border-[1.5px] border-solid border-purple-400 dark:border-purple-600',
+    teal: 'planner-pill-unplanned bg-teal-50/90 dark:bg-teal-950/40 text-teal-900 dark:text-teal-200 border-[1.5px] border-solid border-teal-400 dark:border-teal-600',
+    rose: 'planner-pill-unplanned bg-rose-50/90 dark:bg-rose-950/40 text-rose-900 dark:text-rose-200 border-[1.5px] border-solid border-rose-400 dark:border-rose-600',
+    indigo: 'planner-pill-unplanned bg-indigo-50/90 dark:bg-indigo-950/40 text-indigo-900 dark:text-indigo-200 border-[1.5px] border-solid border-indigo-400 dark:border-indigo-600',
+    cyan: 'planner-pill-unplanned bg-cyan-50/90 dark:bg-cyan-950/40 text-cyan-900 dark:text-cyan-200 border-[1.5px] border-solid border-cyan-400 dark:border-cyan-600',
+    slate: 'planner-pill-unplanned bg-slate-100/90 dark:bg-slate-800/60 text-slate-800 dark:text-slate-200 border-[1.5px] border-solid border-slate-400 dark:border-slate-600',
+    orange: 'planner-pill-unplanned bg-orange-50/90 dark:bg-orange-950/40 text-orange-900 dark:text-orange-200 border-[1.5px] border-solid border-orange-400 dark:border-orange-600',
+    lime: 'planner-pill-unplanned bg-lime-50/90 dark:bg-lime-950/40 text-lime-900 dark:text-lime-200 border-[1.5px] border-solid border-lime-400 dark:border-lime-600',
+    sky: 'planner-pill-unplanned bg-sky-50/90 dark:bg-sky-950/40 text-sky-900 dark:text-sky-200 border-[1.5px] border-solid border-sky-400 dark:border-sky-600',
+    pink: 'planner-pill-unplanned bg-pink-50/90 dark:bg-pink-950/40 text-pink-900 dark:text-pink-200 border-[1.5px] border-solid border-pink-400 dark:border-pink-600',
+    fuchsia: 'planner-pill-unplanned bg-fuchsia-50/90 dark:bg-fuchsia-950/40 text-fuchsia-900 dark:text-fuchsia-200 border-[1.5px] border-solid border-fuchsia-400 dark:border-fuchsia-600',
+    red: 'planner-pill-unplanned bg-red-50/90 dark:bg-red-950/40 text-red-900 dark:text-red-200 border-[1.5px] border-solid border-red-400 dark:border-red-600'
   };
 
   if (hasPlannedActivity) {
     return solidThemes[theme] || solidThemes.slate;
   } else {
-    return mutedThemes[theme] || mutedThemes.slate;
+    return pastelThemes[theme] || pastelThemes.slate;
   }
 }
 
@@ -553,6 +569,7 @@ function _renderSubgridColumn(period, dateKey, classes, isWeekend, isNoClassDate
   const baseMinutes = period === 'AM' ? 450 : 780; // 07:30 AM (450) vs 1:00 PM (780)
 
   // 1. Generate 9 background 30-minute empty slot units (Rows 1–9)
+  // Transparent/clean white space with interactive hover outline
   const slotsHtml = [];
   for (let u = 1; u <= 9; u++) {
     const startM = baseMinutes + (u - 1) * 30;
@@ -561,7 +578,7 @@ function _renderSubgridColumn(period, dateKey, classes, isWeekend, isNoClassDate
 
     if (!isCurrentMonth) {
       slotsHtml.push(`
-        <div style="grid-row: ${u} / span 1; grid-column: 1 / -1;" class="h-full rounded-xs border border-dashed border-slate-200/40 dark:border-slate-800/40 pointer-events-none"></div>
+        <div style="grid-row: ${u} / span 1; grid-column: 1 / -1;" class="h-full rounded-xs pointer-events-none"></div>
       `);
     } else {
       slotsHtml.push(`
@@ -646,10 +663,10 @@ function _renderSubgridColumn(period, dateKey, classes, isWeekend, isNoClassDate
           data-total-meetings="${c.stats.totalMeetings || ''}"
           data-meetings-left="${c.stats.meetingsLeft || ''}"
           data-has-activity="${hasActivity ? 'true' : 'false'}"
-          class="planner-calendar-pill planner-class-pill pointer-events-auto cursor-pointer flex flex-col justify-center select-none w-full h-full ${styleClasses}"
+          class="planner-calendar-pill planner-class-pill pointer-events-auto cursor-pointer w-full h-full ${styleClasses}"
           title="${escapeHtml(tooltipText)}">
-          <span class="text-[9.5px] font-black leading-tight truncate text-left w-full">${escapeHtml(c.course)}</span>
-          <span class="text-[8.5px] font-bold leading-tight truncate text-left w-full opacity-90">${escapeHtml(c.section)}</span>
+          <span class="planner-pill-code font-bold text-[10px] leading-tight truncate text-left w-full">${escapeHtml(c.course)}</span>
+          <span class="planner-pill-section text-[8.5px] leading-tight text-left w-full opacity-75 truncate" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHtml(c.section)}</span>
         </div>
 
         <!-- In-Place Expanding Card on Hover (Weekly View Behavior) -->
@@ -701,7 +718,7 @@ function _renderSubgridColumn(period, dateKey, classes, isWeekend, isNoClassDate
   }).join('');
 
   return `
-    <div class="calendar-subgrid-col calendar-subgrid-row relative rounded border border-slate-200/70 dark:border-slate-800/80 bg-slate-50/40 dark:bg-slate-900/40 p-0.5" 
+    <div class="calendar-subgrid-col calendar-subgrid-row relative rounded border border-slate-200/50 dark:border-slate-800/60 bg-transparent p-0.5" 
          style="display: grid; grid-template-rows: repeat(9, minmax(14px, 1fr)); grid-template-columns: repeat(${maxTracks}, minmax(0, 1fr)); gap: 2px;">
       <!-- Layer 1: Background 9 30-min empty slot units -->
       ${slotsHtml.join('')}
@@ -754,7 +771,7 @@ function _renderCalendarDayCell(g, isCurrentMonth, todayKey, timetableMap, meeti
         if (isScheduledToday || isSpecialSession) {
           const stats = meetingStats[cellKey] || { meetingNum: 0, totalMeetings: 0, meetingsLeft: 0 };
           const isDone = entry && (entry.status === 'Completed' || (dateKey < todayKey && entry.status !== 'Cancelled'));
-          const isNoClass = entry && (entry.type === 'No Class' || (entry.topic && entry.topic.toLowerCase().includes('no class')));
+          const isNoClass = entry && (entry.type === 'No Class' || entry.status === 'Cancelled' || (entry.topic && entry.topic.toLowerCase().includes('no class')));
           const hasPlannedActivity = !!(!isNoClass && entry && ((entry.topic && entry.topic.trim()) || (entry.activity && entry.activity.trim())));
 
           dayClasses.push({
@@ -800,10 +817,12 @@ function _renderCalendarDayCell(g, isCurrentMonth, todayKey, timetableMap, meeti
 
   // Cell Background & Text Theme
   let cellBgClass = 'bg-white dark:bg-slate-900';
-  if (!isCurrentMonth) {
-    cellBgClass = 'bg-slate-50/70 dark:bg-slate-950/60 text-slate-400 dark:text-slate-600';
+  if (isNoClassDate) {
+    cellBgClass = 'day-campus-suspended bg-[#fef2f2] dark:bg-rose-950/25 border-rose-200/60 dark:border-rose-900/40';
   } else if (isWeekend) {
     cellBgClass = 'bg-[#f8fafc] dark:bg-[#0f172a]';
+  } else if (!isCurrentMonth) {
+    cellBgClass = 'bg-slate-50/70 dark:bg-slate-950/60 text-slate-400 dark:text-slate-600';
   }
 
   const todayBorder = isToday ? 'ring-2 ring-inset ring-msu-maroon dark:ring-rose-500 shadow-sm z-10' : '';
@@ -847,11 +866,29 @@ function _renderCalendarDayCell(g, isCurrentMonth, todayKey, timetableMap, meeti
         </div>
       ` : ''}
 
-      <!-- 2-Column Vertical Subgrid (AM on Left, PM on Right, No Time Labels) -->
-      <div class="calendar-2col-container grid grid-cols-2 gap-1 mt-1 w-full flex-1">
-        ${_renderSubgridColumn('AM', dateKey, amClasses, isWeekend, isNoClassDate, isCurrentMonth)}
-        ${_renderSubgridColumn('PM', dateKey, pmClasses, isWeekend, isNoClassDate, isCurrentMonth)}
-      </div>
+      <!-- Subgrid: Rendered for Monday–Friday (omitted on weekends) -->
+      ${!isWeekend ? `
+        <div class="calendar-2col-container grid grid-cols-2 gap-1 mt-1 w-full flex-1">
+          ${_renderSubgridColumn('AM', dateKey, amClasses, isWeekend, isNoClassDate, isCurrentMonth)}
+          ${_renderSubgridColumn('PM', dateKey, pmClasses, isWeekend, isNoClassDate, isCurrentMonth)}
+        </div>
+      ` : `
+        <div class="calendar-weekend-space flex-1 w-full">
+          ${dayClasses.length > 0 ? `
+            <div class="space-y-1 mt-1">
+              ${dayClasses.map(c => `
+                <div data-action="openLessonModal" data-date="${dateKey}" data-course="${escapeHtml(c.course)}" data-section="${escapeHtml(c.section)}" data-weekend="true" class="p-1.5 rounded-lg bg-amber-50 dark:bg-amber-950/60 border border-amber-300 dark:border-amber-800 text-amber-900 dark:text-amber-200 text-xs font-bold cursor-pointer hover:shadow-xs transition">
+                  <div class="flex items-center justify-between text-[9px] uppercase tracking-tight opacity-75">
+                    <span>${escapeHtml(c.course)} (${escapeHtml(c.section)})</span>
+                    <span>${formatTime12(c.startTime)}</span>
+                  </div>
+                  <div class="text-[10px] font-bold truncate mt-0.5">${escapeHtml(c.topic || c.type || 'Special Session')}</div>
+                </div>
+              `).join('')}
+            </div>
+          ` : ''}
+        </div>
+      `}
     </div>
   `;
 }
