@@ -717,6 +717,7 @@ button:active, .tab-btn:active {
   flex-shrink: 0;
   overflow-x: hidden;
   overflow-y: auto !important;
+  max-height: calc(100vh - 120px) !important;
   padding: 52px 10px 3rem 6px !important;
   will-change: width, opacity, transform;
 }
@@ -1470,11 +1471,12 @@ html.theme-dark input[type="date"]::-webkit-calendar-picker-indicator {
  * ========================================================================== */
 
 #calendar-view-scroll-wrapper {
-  min-height: 280px;
+  min-height: 260px;
   overflow-y: auto;
   overflow-x: auto;
   position: relative;
   overscroll-behavior: contain;
+  scroll-padding-top: 36px;
 }
 
 .planner-calendar-header-row {
@@ -1484,9 +1486,14 @@ html.theme-dark input[type="date"]::-webkit-calendar-picker-indicator {
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.08), 0 1px 2px -1px rgba(0, 0, 0, 0.08);
 }
 
+html.theme-dark .planner-calendar-header-row {
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.4);
+}
+
 .planner-calendar-cell {
   position: relative;
   min-height: 110px;
+  scroll-margin-top: 36px;
   transition: background-color 0.15s ease, box-shadow 0.15s ease;
 }
 

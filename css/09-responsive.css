@@ -130,8 +130,8 @@ html.theme-dark .tab-main-window .main-table-card {
 
 /* --- Dynamic Viewport Auto-Resizing for Main Tab Content Windows --- */
 .main-table-scroll-wrapper {
-  height: calc(100vh - 250px);
-  min-height: 280px;
+  height: calc(100vh - 265px);
+  min-height: 260px;
 }
 
 /* Enhanced comfortable grab zone for main table scrollbars */
@@ -385,6 +385,12 @@ html.theme-dark #gradebook-table-body tr.row-flash-highlight > td {
   /* Compact vertical gap between header card and table card */
   #tab-content-planner .space-y-3 > :not([hidden]) ~ :not([hidden]) {
     margin-top: 6px !important;
+  }
+
+  /* Compact content window scroll wrapper on short viewports */
+  .main-table-scroll-wrapper {
+    height: calc(100vh - 215px) !important;
+    min-height: 240px !important;
   }
 
   /* Compact Sticky Calendar Day Header (SUN..SAT) */

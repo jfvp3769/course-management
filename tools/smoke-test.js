@@ -857,6 +857,7 @@ setTimeout(() => {
         if (!resizer) return false;
         const stickyHeader = calContainer.querySelector('.planner-calendar-header-row');
         if (!stickyHeader) return false;
+        if (!stickyHeader.classList.contains('sticky') || !stickyHeader.classList.contains('top-0') || !stickyHeader.classList.contains('z-30') || !stickyHeader.classList.contains('shadow-xs')) return false;
 
         return true;
       })()`);

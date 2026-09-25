@@ -147,8 +147,8 @@ function autoResizeContentWindows() {
     if (!el) return;
 
     // Check if user set a manual height override for this tab
-    // (Planner matrix dynamically calculates 7 rows to fit the window on resize)
-    const savedH = (tabId !== 'planner')
+    // (Planner matrix and planner calendar dynamically calculate height to fit the window on resize)
+    const savedH = (tabId !== 'planner' && tabId !== 'planner-calendar')
       ? (localStorage.getItem('faculty_main_win_h_' + tabId) || localStorage.getItem('msu_main_win_h_' + tabId))
       : null;
     if (savedH) {
@@ -176,10 +176,14 @@ function autoResizeContentWindows() {
     }
 
     const rect = el.getBoundingClientRect();
-    if (rect.top > 0) {
-      // 36px breathing room for bottom margin, 14px resizer bar, and page padding
-      const bottomBuffer = 36;
-      const targetH = Math.max(280, Math.floor(window.innerHeight - rect.top - bottomBuffer));
+    const scrollY = (typeof window !== 'undefined') ? (window.pageYOffset || document.documentElement.scrollTop || 0) : 0;
+    const docTop = rect.top + scrollY;
+
+    if (docTop > 0 || rect.top > 0) {
+      const topPos = docTop > 0 ? docTop : rect.top;
+      // Comfortable breathing room for bottom margin, 14px resizer bar, and page padding
+      const bottomBuffer = (typeof window !== 'undefined' && window.innerHeight <= 800) ? 36 : 48;
+      const targetH = Math.max(260, Math.floor(window.innerHeight - topPos - bottomBuffer));
       if (wrapperId === 'matrix-scroll-wrapper') {
         adjustMatrixRowHeightFor7Rows(el, targetH);
       } else {

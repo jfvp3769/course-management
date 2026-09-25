@@ -189,6 +189,9 @@ function navigatePlannerMonth(delta) {
 
   saveAppState();
   renderPlannerMonthCalendar();
+  if (typeof autoResizeContentWindows === 'function') {
+    autoResizeContentWindows();
+  }
 }
 
 function onPlannerMonthSelectChange(e, target) {
@@ -198,6 +201,9 @@ function onPlannerMonthSelectChange(e, target) {
   currentPlannerMonth = sel.value;
   saveAppState();
   renderPlannerMonthCalendar();
+  if (typeof autoResizeContentWindows === 'function') {
+    autoResizeContentWindows();
+  }
 }
 
 function onPlannerSectionFilterChange(e, target) {
@@ -207,6 +213,9 @@ function onPlannerSectionFilterChange(e, target) {
   plannerSectionFilter = sel.value || 'all';
   saveAppState();
   renderPlannerMonthCalendar();
+  if (typeof autoResizeContentWindows === 'function') {
+    autoResizeContentWindows();
+  }
 
   if (plannerSectionFilter === 'all') {
     showToast('Showing all scheduled sections', '🔍');
@@ -405,21 +414,27 @@ function renderPlannerMonthCalendar() {
 
   let html = `
     <!-- 7-Day Header (Sticky inside scroll container) -->
-    <div class="planner-calendar-header-row grid grid-cols-7 border-b border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 sticky top-0 z-30 select-none shadow-xs">
+    <div class="planner-calendar-header-row grid grid-cols-7 border-b border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 sticky top-0 z-30 select-none shadow-xs min-w-[700px] sm:min-w-0">
       ${daysHeader.map(h => `
-        <div class="planner-calendar-header-day py-1.5 sm:py-2 px-1 text-center font-extrabold text-[11px] sm:text-xs tracking-wider border-r last:border-r-0 border-slate-200/80 dark:border-slate-800 ${h.isWeekend ? 'text-slate-500 dark:text-slate-400 bg-[#f8fafc] dark:bg-[#0f172a]' : 'text-slate-700 dark:text-slate-300'}">
+        <div class="planner-calendar-header-day py-1.5 sm:py-2 px-1 text-center font-extrabold text-[11px] sm:text-xs tracking-wider border-r last:border-r-0 border-slate-200/80 dark:border-slate-800 ${h.isWeekend ? 'text-slate-500 dark:text-slate-400 bg-[#f8fafc] dark:bg-[#0f172a]' : 'text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-900'}">
           <span>${h.code}</span>
         </div>
       `).join('')}
     </div>
 
     <!-- Calendar 7-Column Days Grid -->
-    <div class="grid grid-cols-7 auto-rows-fr divide-y divide-slate-200 dark:divide-slate-800 border-l border-slate-200 dark:border-slate-800 bg-slate-200 dark:bg-slate-800/80 gap-[1px]">
+    <div class="grid grid-cols-7 auto-rows-fr divide-y divide-slate-200 dark:divide-slate-800 border-l border-slate-200 dark:border-slate-800 bg-slate-200 dark:bg-slate-800/80 gap-[1px] min-w-[700px] sm:min-w-0">
       ${gridDays.map(g => _renderCalendarDayCell(g, g.isCurrentMonth, todayKey, timetableMap, meetingStats)).join('')}
     </div>
   `;
 
   target.innerHTML = html;
+
+  if (typeof autoResizeContentWindows === 'function') {
+    requestAnimationFrame(() => {
+      autoResizeContentWindows();
+    });
+  }
 }
 
 /**
@@ -1527,6 +1542,9 @@ function renderPlannerView() {
     renderPlannerMonthCalendar();
   }
   _syncPlannerViewContainers();
+  if (typeof autoResizeContentWindows === 'function') {
+    autoResizeContentWindows();
+  }
 }
 
 // Global window assignments
