@@ -144,7 +144,7 @@
 
 .planner-action-btn:hover:not(:disabled) {
   border-color: var(--app-header-primary, #800000) !important;
-  background-color: color-mix(in srgb, var(--app-header-primary, #800000) 8%, #ffffff) !important;
+  background-color: var(--white, #ffffff) !important;
   color: var(--app-header-primary, #800000) !important;
 }
 
@@ -161,8 +161,8 @@
 }
 
 html.theme-dark .planner-action-btn {
-  background-color: #1e293b !important;
-  border-color: #475569 !important;
+  background-color: #0f172a !important;
+  border-color: #334155 !important;
   color: var(--app-header-accent, #daa520) !important;
 }
 
@@ -172,7 +172,7 @@ html.theme-dark .planner-action-btn svg {
 
 html.theme-dark .planner-action-btn:hover:not(:disabled) {
   border-color: var(--app-header-accent, #daa520) !important;
-  background-color: rgba(218, 165, 32, 0.14) !important;
+  background-color: #0f172a !important;
   color: var(--app-header-tab-text, #fde047) !important;
 }
 
@@ -194,7 +194,7 @@ html.theme-dark .planner-action-btn:disabled {
 
 .planner-week-nav-btn:hover {
   border-color: var(--app-header-primary, #800000) !important;
-  background-color: color-mix(in srgb, var(--app-header-primary, #800000) 8%, #ffffff) !important;
+  background-color: var(--white, #ffffff) !important;
   color: var(--app-header-primary, #800000) !important;
 }
 
@@ -204,7 +204,7 @@ html.theme-dark .planner-week-nav-btn {
 
 html.theme-dark .planner-week-nav-btn:hover {
   border-color: var(--app-header-accent, #daa520) !important;
-  background-color: rgba(218, 165, 32, 0.14) !important;
+  background-color: #0f172a !important;
   color: var(--app-header-tab-text, #fde047) !important;
 }
 
@@ -305,7 +305,7 @@ html.theme-dark #current-week-nav-label {
 
 .tab-header-btn:hover:not(:disabled) {
   border-color: var(--app-header-primary, #800000) !important;
-  background-color: color-mix(in srgb, var(--app-header-primary, #800000) 8%, #ffffff) !important;
+  background-color: var(--white, #ffffff) !important;
   color: var(--app-header-primary, #800000) !important;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
 }
@@ -326,14 +326,14 @@ html.theme-dark #current-week-nav-label {
 /* Active State (e.g. Grading Scale Drawer open) */
 .tab-header-btn.is-active-btn {
   border-color: var(--app-header-primary, #800000) !important;
-  background-color: color-mix(in srgb, var(--app-header-primary, #800000) 14%, #ffffff) !important;
+  background-color: var(--white, #ffffff) !important;
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.08) !important;
 }
 
 /* Dark Mode Harmonization */
 html.theme-dark .tab-header-btn {
-  background-color: #1e293b !important;
-  border-color: #475569 !important;
+  background-color: #0f172a !important;
+  border-color: #334155 !important;
   color: var(--app-header-accent, #daa520) !important;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
@@ -344,7 +344,7 @@ html.theme-dark .tab-header-btn svg {
 
 html.theme-dark .tab-header-btn:hover:not(:disabled) {
   border-color: var(--app-header-accent, #daa520) !important;
-  background-color: rgba(218, 165, 32, 0.14) !important;
+  background-color: #0f172a !important;
   color: var(--app-header-tab-text, #fde047) !important;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
@@ -355,14 +355,14 @@ html.theme-dark .tab-header-btn:hover:not(:disabled) svg {
 
 html.theme-dark .tab-header-btn.is-active-btn {
   border-color: var(--app-header-accent, #daa520) !important;
-  background-color: rgba(218, 165, 32, 0.22) !important;
+  background-color: #0f172a !important;
 }
 
 /* Danger Variant (for destructive / warning actions like Remove All Students, Reset Filter) */
 .tab-header-btn.tab-header-btn-danger {
   color: #be123c !important; /* rose-700 */
   border-color: #fda4af !important; /* rose-300 */
-  background-color: var(--white) !important;
+  background-color: var(--white, #ffffff) !important;
 }
 
 .tab-header-btn.tab-header-btn-danger svg {
@@ -370,7 +370,7 @@ html.theme-dark .tab-header-btn.is-active-btn {
 }
 
 .tab-header-btn.tab-header-btn-danger:hover:not(:disabled) {
-  background-color: #fff1f2 !important; /* rose-50 */
+  background-color: var(--white, #ffffff) !important;
   border-color: #f43f5e !important; /* rose-500 */
   color: #9f1239 !important; /* rose-800 */
 }
@@ -380,7 +380,7 @@ html.theme-dark .tab-header-btn.is-active-btn {
 }
 
 html.theme-dark .tab-header-btn.tab-header-btn-danger {
-  background-color: #1e293b !important;
+  background-color: #0f172a !important;
   border-color: rgba(244, 63, 94, 0.45) !important;
   color: #fda4af !important; /* rose-300 */
 }
@@ -390,7 +390,7 @@ html.theme-dark .tab-header-btn.tab-header-btn-danger svg {
 }
 
 html.theme-dark .tab-header-btn.tab-header-btn-danger:hover:not(:disabled) {
-  background-color: rgba(159, 18, 57, 0.25) !important;
+  background-color: #0f172a !important;
   border-color: #f43f5e !important;
   color: #ffe4e6 !important;
 }

@@ -125,6 +125,9 @@ function loadAppState() {
       if (parsed.currentWeekViewIndex) currentWeekViewIndex = parsed.currentWeekViewIndex;
       if (parsed.selectedMonthFilter) selectedMonthFilter = parsed.selectedMonthFilter;
       cleanupOrphanedStudents();
+      if (typeof sortStudentRosterByName === 'function') {
+        sortStudentRosterByName();
+      }
       return true;
     }
   } catch (e) {
@@ -226,6 +229,9 @@ function importBackupJSON(event) {
       syllabusBacklog = data.syllabusBacklog || [];
 
       cleanupOrphanedStudents();
+      if (typeof sortStudentRosterByName === 'function') {
+        sortStudentRosterByName();
+      }
       saveAppState();
       semesterDates = generateSemesterDateList();
       Render.views('everything');
@@ -266,6 +272,9 @@ function requestResetToDefaults() {
       currentWeekViewIndex = 1;
       selectedMonthFilter = 'all';
 
+      if (typeof sortStudentRosterByName === 'function') {
+        sortStudentRosterByName();
+      }
       saveAppState();
       semesterDates = generateSemesterDateList();
       Render.views('everything');

@@ -24,6 +24,10 @@
 function bootLoadState() {
   const hasStoredData = loadAppState();
 
+  if (typeof sortStudentRosterByName === 'function') {
+    sortStudentRosterByName();
+  }
+
   // Every student needs an explicit score object for their section's grading
   // config before anything tries to render a grade.
   (courseData?.subjects || []).forEach((sub) => {

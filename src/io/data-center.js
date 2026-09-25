@@ -275,6 +275,13 @@ function importRosterCSVFile(event) {
         }
       }
 
+      if (typeof sortStudentRosterByName === 'function') {
+        sortStudentRosterByName();
+      }
+      if (typeof rosterSortState !== 'undefined') {
+        rosterSortState.col = 'name';
+        rosterSortState.direction = 'asc';
+      }
       saveAppState(false);
       Render.only('roster', 'gradebook', 'rosterSidebar');
       showToast("Imported " + addedCount + " students into roster!");

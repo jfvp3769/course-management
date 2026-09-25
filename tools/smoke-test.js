@@ -221,6 +221,17 @@ setTimeout(() => {
       window.bindBrandingEasterEgg();
       window.bindBrandingEasterEgg();
       window.bindBrandingEasterEgg();
+      // verify favicon sync with school logo
+      const fav = window.document.querySelector('link[rel*="icon"]');
+      if (!fav) return false;
+      const prevLogo = window.__probe('semesterConfig.schoolLogo');
+      window.__probe('semesterConfig.schoolLogo = "data:image/png;base64,TEST_FAVICON_DATA"');
+      window.applyHeaderBranding();
+      const updatedHref = fav.href;
+      window.__probe(`semesterConfig.schoolLogo = ${JSON.stringify(prevLogo)}`);
+      window.applyHeaderBranding();
+      if (!updatedHref.includes('TEST_FAVICON_DATA')) return false;
+
       // one bind only: the guard flag must be set and re-binding must be a no-op
       return logo.dataset.eggBound === '1';
     }],
@@ -508,18 +519,6 @@ setTimeout(() => {
           return false;
         }
       }
-
-      // Verify favicon synchronization with schoolLogo
-      const fav = window.document.querySelector('link[rel*="icon"]');
-      if (!fav) return false;
-      const prevLogo = window.__probe('semesterConfig.schoolLogo');
-      window.__probe('semesterConfig.schoolLogo = "data:image/png;base64,TEST_FAVICON_DATA"');
-      window.applyHeaderBranding();
-      const updatedHref = fav.href;
-      window.__probe(`semesterConfig.schoolLogo = ${JSON.stringify(prevLogo)}`);
-      window.applyHeaderBranding();
-      if (!updatedHref.includes('TEST_FAVICON_DATA')) return false;
-
       return true;
     }],
     ['gradebook manual status override works reliably with uniform dropdown width and compact header', () => {
@@ -567,6 +566,266 @@ setTimeout(() => {
       // Restore original state
       window.updateGradeStatusOverride(testStudent.id, prevOverride, testStudent.section);
       return true;
+    }],
+    ['lesson planner modal action buttons have consistent sizing, corner radius, and iconography', () => {
+      if (typeof window.openLessonModal !== 'function') {
+        window.openLessonModal = window.__probe('openLessonModal');
+        window.closeLessonModal = window.__probe('closeLessonModal');
+      }
+      const wt = window.__probe('weeklyTimetable') || [];
+      const slot = wt[0] || { course: 'CVE111', section: 'B15.1' };
+      window.openLessonModal('2026-08-24', slot.course, slot.section, false);
+
+      const modal = window.document.getElementById('lesson-modal');
+      if (!modal || modal.classList.contains('hidden')) return false;
+
+      const markBtn = window.document.getElementById('btn-mark-noclass-shift');
+      const prevBtn = window.document.getElementById('btn-pullback-schedule');
+      const nextBtn = window.document.getElementById('btn-movelast-schedule');
+      const clearBtn = modal.querySelector('[data-action="clearLessonModalData"]');
+      const cancelBtn = Array.from(modal.querySelectorAll('[data-action="closeLessonModal"]')).find(b => b.textContent.includes('Cancel'));
+      const saveBtn = modal.querySelector('[data-action="saveLessonModalData"]');
+
+      if (!markBtn || !prevBtn || !nextBtn || !clearBtn || !cancelBtn || !saveBtn) return false;
+
+      // Verify all buttons have uniform h-9, rounded-xl, and font-bold text-xs
+      const btns = [markBtn, prevBtn, nextBtn, clearBtn, cancelBtn, saveBtn];
+      for (const btn of btns) {
+        if (!btn.classList.contains('h-9')) return false;
+        if (!btn.classList.contains('rounded-xl')) return false;
+        if (!btn.classList.contains('font-bold') || !btn.classList.contains('text-xs')) return false;
+      }
+
+      // Verify destructive buttons share matching rose palette
+      if (!markBtn.classList.contains('bg-rose-50') || !clearBtn.classList.contains('bg-rose-50')) return false;
+      if (!markBtn.classList.contains('text-rose-700') || !clearBtn.classList.contains('text-rose-700')) return false;
+
+      // Verify secondary buttons share matching slate palette
+      if (!prevBtn.classList.contains('bg-slate-100') || !nextBtn.classList.contains('bg-slate-100') || !cancelBtn.classList.contains('bg-slate-100')) return false;
+
+      // Verify SVG icons
+      if (!markBtn.querySelector('svg') || !prevBtn.querySelector('svg') || !nextBtn.querySelector('svg') || !clearBtn.querySelector('svg') || !saveBtn.querySelector('svg')) {
+        return false;
+      }
+
+      window.closeLessonModal();
+      return true;
+    }],
+    ['tab header buttons hover fill color matches the header card in both light and dark mode', () => {
+      const css = fs.readFileSync(path.join(ROOT, 'css/10-components.css'), 'utf8');
+
+      // Verify light mode hover fill color matches header card (#ffffff)
+      const lightTabBtnOk = css.includes('.tab-header-btn:hover:not(:disabled)') &&
+        css.includes('background-color: var(--white, #ffffff) !important;');
+      if (!lightTabBtnOk) return false;
+
+      // Verify dark mode hover fill color matches dark header card (#0f172a)
+      const darkTabBtnOk = css.includes('html.theme-dark .tab-header-btn:hover:not(:disabled)') &&
+        css.includes('background-color: #0f172a !important;');
+      if (!darkTabBtnOk) return false;
+
+      // Verify planner action button hover fill matches header card
+      const plannerBtnOk = css.includes('.planner-action-btn:hover:not(:disabled)') &&
+        css.includes('html.theme-dark .planner-action-btn:hover:not(:disabled)');
+      if (!plannerBtnOk) return false;
+
+      // Verify no remaining color-mix on tab header button hover rules
+      if (css.match(/\.tab-header-btn:hover:not\(:disabled\)[^}]*color-mix/)) return false;
+      if (css.match(/html\.theme-dark \.tab-header-btn:hover:not\(:disabled\)[^}]*rgba\(218,\s*165,\s*32/)) return false;
+
+      return true;
+    }],
+    ['copy and paste matrix activity inherits target section start time, end time, and room', () => {
+      return window.__probe(`(() => {
+        const testDate = '2026-08-18';
+        const srcCourse = 'CVE111';
+        const srcSection = 'B15.1';
+        const dstCourse = 'CVE112';
+        const dstSection = 'E15.1';
+
+        // Prepare destination slot with a distinct schedule
+        let dstSlot = weeklyTimetable.find(t => t.course === dstCourse && t.section === dstSection);
+        if (!dstSlot) {
+          dstSlot = { course: dstCourse, section: dstSection, day: 'Tuesday', startTime: '14:00', endTime: '15:30', room: 'Lab 404' };
+          weeklyTimetable.push(dstSlot);
+        } else {
+          dstSlot.startTime = '14:00';
+          dstSlot.endTime = '15:30';
+          dstSlot.room = 'Lab 404';
+        }
+
+        const srcKey = testDate + '__' + srcCourse + '__' + srcSection;
+        const dstKey = testDate + '__' + dstCourse + '__' + dstSection;
+
+        plannerEntries[srcKey] = {
+          topic: 'Structural Mechanics',
+          activity: 'Slide Deck & Computation',
+          type: 'Lecture',
+          status: 'Planned',
+          notes: 'Bring engineering paper',
+          startTime: '07:30',
+          endTime: '09:00',
+          room: 'Eng 101'
+        };
+
+        // Copy source activity
+        copyMatrixActivity(testDate, srcCourse, srcSection);
+
+        // Verify clipboard stripped original time and room
+        if (activityClipboard.startTime || activityClipboard.endTime || activityClipboard.room) {
+          return false;
+        }
+        if (activityClipboard.topic !== 'Structural Mechanics') {
+          return false;
+        }
+
+        // Paste into destination section
+        pasteMatrixActivity(testDate, dstCourse, dstSection);
+
+        const pasted = plannerEntries[dstKey];
+        if (!pasted) return false;
+
+        // Verify activity details preserved
+        if (pasted.topic !== 'Structural Mechanics') return false;
+        if (pasted.activity !== 'Slide Deck & Computation') return false;
+        if (pasted.notes !== 'Bring engineering paper') return false;
+
+        // Verify original time and room were NOT copied
+        if (pasted.startTime === '07:30' || pasted.endTime === '09:00' || pasted.room === 'Eng 101') {
+          return false;
+        }
+
+        // Verify destination section's time and room were inherited
+        if (pasted.startTime !== '14:00' || pasted.endTime !== '15:30' || pasted.room !== 'Lab 404') {
+          return false;
+        }
+
+        // Clean up
+        delete plannerEntries[srcKey];
+        delete plannerEntries[dstKey];
+        activityClipboard = null;
+        return true;
+      })()`);
+    }],
+    ['gradebook default sort is student name A-Z and automatically updates when new students are enrolled', () => {
+      return window.__probe(`(() => {
+        // 1. Initial default state
+        if (gradebookSortState.col !== 'name' || gradebookSortState.direction !== 'asc') return false;
+
+        // 2. Render gradebook for active section
+        const secSelect = document.getElementById('gradebook-section-select');
+        const targetSec = secSelect ? secSelect.value : (courseData.subjects[0]?.code + ' - ' + courseData.subjects[0]?.sections[0]);
+        renderGradebook();
+
+        // Check header indicator for Student Name
+        const nameHead = document.querySelector('th[data-sort="name"]');
+        if (!nameHead || !nameHead.textContent.includes('▲')) return false;
+
+        // Check rendered order of student rows
+        const getRowNames = () => Array.from(document.querySelectorAll('#gradebook-table-body tr')).map(tr => {
+          const nameCell = tr.querySelector('.sticky-grade-col-2');
+          return nameCell ? nameCell.textContent.trim().toLowerCase() : '';
+        }).filter(Boolean);
+
+        let names = getRowNames();
+        if (names.length < 2) return false;
+        for (let i = 0; i < names.length - 1; i++) {
+          if (names[i].localeCompare(names[i + 1]) > 0) return false;
+        }
+
+        // 3. Add a student late with an alphabetically early name (e.g. "Abad, Alan")
+        const testStudentId = '2020-0001';
+        studentRoster.push({
+          id: testStudentId,
+          last: 'Abad',
+          first: 'Alan',
+          email: 'alan.abad@university.edu',
+          section: targetSec,
+          dateAdded: '2026-09-25',
+          qz: 85, lab: 85, p1: 85, p2: 85, fin: 85
+        });
+
+        // Re-render gradebook (simulating Render.views('enrollment'))
+        renderGradebook();
+
+        // Verify "Abad, Alan" is at the very TOP of the table, not at the bottom
+        names = getRowNames();
+        if (!names[0].includes('abad')) return false;
+
+        // Check full alphabetical order
+        for (let i = 0; i < names.length - 1; i++) {
+          if (names[i].localeCompare(names[i + 1]) > 0) return false;
+        }
+
+        // Clean up test student
+        studentRoster = studentRoster.filter(s => s.id !== testStudentId);
+        renderGradebook();
+        return true;
+      })()`);
+    }],
+    ['student roster default sort is last name A-Z and automatically updates when new students are enrolled', () => {
+      return window.__probe(`(() => {
+        // 1. Initial default state
+        if (rosterSortState.col !== 'name' || rosterSortState.direction !== 'asc') return false;
+
+        // 2. Render student roster
+        renderStudentRoster();
+
+        // Check header indicator for Last Name
+        const nameSortEl = document.getElementById('roster-sort-name');
+        if (!nameSortEl || !nameSortEl.textContent.includes('▲')) return false;
+
+        // Check other indicators
+        const idSortEl = document.getElementById('roster-sort-id');
+        if (!idSortEl || !idSortEl.textContent.includes('⇅')) return false;
+
+        // Check rendered order of student roster rows
+        const getRowLastNames = () => Array.from(document.querySelectorAll('#student-table-body tr')).map(tr => {
+          const cells = tr.querySelectorAll('td');
+          return cells[2] ? cells[2].textContent.trim().toLowerCase() : '';
+        }).filter(Boolean);
+
+        let lastNames = getRowLastNames();
+        if (lastNames.length < 2) return false;
+        for (let i = 0; i < lastNames.length - 1; i++) {
+          if (lastNames[i].localeCompare(lastNames[i + 1]) > 0) return false;
+        }
+
+        // 3. Add a student late with an alphabetically earlier last name (e.g. "Abad, Alan")
+        const targetSec = document.getElementById('roster-section-filter')?.value || (courseData.subjects[0]?.code + ' - ' + courseData.subjects[0]?.sections[0]);
+        const testStudentId = '2020-0002';
+        studentRoster.push({
+          id: testStudentId,
+          last: 'Abad',
+          first: 'Alan',
+          email: 'alan.abad@university.edu',
+          section: targetSec,
+          dateAdded: '2026-09-25',
+          qz: 85, lab: 85, p1: 85, p2: 85, fin: 85
+        });
+
+        // Re-render roster (simulating saveSingleStudent / commitBulkImport)
+        sortStudentRosterByName();
+        renderStudentRoster();
+
+        // Verify "Abad" is at the very TOP of the table, not at the bottom
+        lastNames = getRowLastNames();
+        if (lastNames[0] !== 'abad') return false;
+
+        // Verify 3-state cycling for Last Name
+        toggleRosterSort('name'); // should become desc (Z-A)
+        if (rosterSortState.col !== 'name' || rosterSortState.direction !== 'desc') return false;
+        if (!nameSortEl.textContent.includes('▼')) return false;
+
+        toggleRosterSort('name'); // 2nd click resets to default A-Z
+        if (rosterSortState.col !== 'name' || rosterSortState.direction !== 'asc') return false;
+        if (!nameSortEl.textContent.includes('▲')) return false;
+
+        // Clean up test student
+        studentRoster = studentRoster.filter(s => s.id !== testStudentId);
+        renderStudentRoster();
+        return true;
+      })()`);
     }]
   ];
 

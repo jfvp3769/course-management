@@ -5,6 +5,35 @@
  * filtering and activity copy/paste.
  * ======================================================================== */
 
+function _resolveSectionSlot(dateKey, course, section) {
+  if (typeof weeklyTimetable === 'undefined' || !Array.isArray(weeklyTimetable)) {
+    return null;
+  }
+  let fullDay = '';
+  if (typeof semesterDates !== 'undefined' && Array.isArray(semesterDates)) {
+    const dObj = semesterDates.find(d => d.dateKey === dateKey);
+    if (dObj && dObj.dayOfWeek) {
+      fullDay = (typeof FULL_DAY_NAMES !== 'undefined' && FULL_DAY_NAMES[dObj.dayOfWeek])
+        ? FULL_DAY_NAMES[dObj.dayOfWeek]
+        : dObj.dayOfWeek;
+    }
+  }
+  if (!fullDay && dateKey) {
+    try {
+      fullDay = new Date(dateKey + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long' });
+    } catch (e) {
+      fullDay = '';
+    }
+  }
+
+  const scheduledSlot = fullDay
+    ? weeklyTimetable.find(t => t.course === course && t.section === section && t.day === fullDay)
+    : null;
+  const fallbackSlot = weeklyTimetable.find(t => t.course === course && t.section === section);
+
+  return scheduledSlot || fallbackSlot || null;
+}
+
 function copyMatrixActivity(dateKey, course, section, e) {
   if (e) e.stopPropagation();
   const cellKey = `${dateKey}__${course}__${section}`;
@@ -14,6 +43,10 @@ function copyMatrixActivity(dateKey, course, section, e) {
     return;
   }
   activityClipboard = JSON.parse(JSON.stringify(entry));
+  // Strip source slot's specific schedule and venue so they don't leak into pasted slots
+  delete activityClipboard.startTime;
+  delete activityClipboard.endTime;
+  delete activityClipboard.room;
   showToast(`Copied activity from ${course} (${section})!`, "📋");
 }
 
@@ -25,7 +58,22 @@ function pasteMatrixActivity(dateKey, course, section, e) {
   }
   pushPlannerUndo(`Paste Activity to ${course} (${section})`);
   const cellKey = `${dateKey}__${course}__${section}`;
-  plannerEntries[cellKey] = JSON.parse(JSON.stringify(activityClipboard));
+
+  const newEntry = JSON.parse(JSON.stringify(activityClipboard));
+  // Ensure source start time, end time, and room / venue are never carried over
+  delete newEntry.startTime;
+  delete newEntry.endTime;
+  delete newEntry.room;
+
+  // Use the Start Time, End Time, and Room / Venue of the section where pasted
+  const targetSlot = _resolveSectionSlot(dateKey, course, section);
+  if (targetSlot) {
+    if (targetSlot.startTime) newEntry.startTime = targetSlot.startTime;
+    if (targetSlot.endTime) newEntry.endTime = targetSlot.endTime;
+    if (targetSlot.room) newEntry.room = targetSlot.room;
+  }
+
+  plannerEntries[cellKey] = newEntry;
   Render.after('lesson');
   showToast(`Pasted activity to ${course} (${section}) on ${dateKey}!`, "✓");
 }
@@ -861,4 +909,5 @@ if (typeof window !== 'undefined') {
   window.handleMatrixCellDrop = handleMatrixCellDrop;
   window._refreshSingleMatrixCell = _refreshSingleMatrixCell;
   window._refreshColumnCells = _refreshColumnCells;
+  window._resolveSectionSlot = _resolveSectionSlot;
 }

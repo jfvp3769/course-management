@@ -46,14 +46,14 @@ let plannerUndoStack = [];
 let plannerRedoStack = [];
 const MAX_PLANNER_HISTORY = 50;
 
-let rosterSortState = { col: 'default', direction: 'asc' };
+let rosterSortState = { col: 'name', direction: 'asc' };
 
 let gradebookCollapsedCats = {};
 let isAllGradebookSubActivitiesCollapsed = false;
 
 let draggedCategoryIdx = null;
 
-let gradebookSortState = { col: 'default', direction: 'asc' };
+let gradebookSortState = { col: 'name', direction: 'asc' };
 let gradebookStatsView = 'overview'; // 'overview' | 'distribution' | 'activities'
 
 let currentEditingScaleScope = '__default__';

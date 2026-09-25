@@ -5,20 +5,33 @@
  * ======================================================================== */
 
 function getRosterSortIndicator(colKey) {
-  if (rosterSortState.col !== colKey) {
+  const activeCol = (!rosterSortState.col || rosterSortState.col === 'default') ? 'name' : rosterSortState.col;
+  if (activeCol !== colKey) {
     return '<span class="text-[10px] text-slate-400 opacity-60 ml-1 inline-block">⇅</span>';
   }
-  return rosterSortState.direction === 'asc'
-    ? '<span class="text-[11px] app-themed-link font-black ml-1 inline-block">▲</span>'
-    : '<span class="text-[11px] app-themed-link font-black ml-1 inline-block">▼</span>';
+  return rosterSortState.direction === 'desc'
+    ? '<span class="text-[11px] app-themed-link font-black ml-1 inline-block">▼</span>'
+    : '<span class="text-[11px] app-themed-link font-black ml-1 inline-block">▲</span>';
 }
 
 function toggleRosterSort(colKey) {
-  if (rosterSortState.col === colKey) {
-    rosterSortState.direction = rosterSortState.direction === 'asc' ? 'desc' : 'asc';
+  saveAppState(true);
+  const defaultDir = (colKey === 'date') ? 'desc' : 'asc';
+  const secondDir = defaultDir === 'desc' ? 'asc' : 'desc';
+  const currentActiveCol = (!rosterSortState.col || rosterSortState.col === 'default') ? 'name' : rosterSortState.col;
+
+  if (currentActiveCol === colKey) {
+    if (rosterSortState.direction === defaultDir) {
+      rosterSortState.direction = secondDir;
+      rosterSortState.col = colKey;
+    } else {
+      // 3rd click resets back to default sort (Last Name A-Z)
+      rosterSortState.col = 'name';
+      rosterSortState.direction = 'asc';
+    }
   } else {
     rosterSortState.col = colKey;
-    rosterSortState.direction = (colKey === 'date') ? 'desc' : 'asc';
+    rosterSortState.direction = defaultDir;
   }
   renderStudentRoster();
 }
@@ -128,6 +141,8 @@ function toggleStudentEmailMenu(triggerBtn, email, section, first, last) {
 window.toggleStudentEmailMenu = toggleStudentEmailMenu;
 window.copyStudentEmail = copyStudentEmail;
 window.closeStudentEmailMenu = closeStudentEmailMenu;
+window.toggleRosterSort = toggleRosterSort;
+window.getRosterSortIndicator = getRosterSortIndicator;
 
 function renderStudentRoster() {
   const tbody = document.getElementById('student-table-body');
@@ -169,16 +184,25 @@ function renderStudentRoster() {
   });
 
   let sortedStudents = [...studentRoster];
-  if (rosterSortState.col === 'name') {
+  const isDefaultOrName = (!rosterSortState.col || rosterSortState.col === 'default' || rosterSortState.col === 'name');
+  if (isDefaultOrName) {
+    const isDesc = (rosterSortState.col === 'name' && rosterSortState.direction === 'desc');
     sortedStudents.sort((a, b) => {
       const cmp = (a.last || '').localeCompare(b.last || '', undefined, { sensitivity: 'base' });
-      return rosterSortState.direction === 'asc' ? cmp : -cmp;
+      if (cmp !== 0) return isDesc ? -cmp : cmp;
+      const firstCmp = (a.first || '').localeCompare(b.first || '', undefined, { sensitivity: 'base' });
+      if (firstCmp !== 0) return isDesc ? -firstCmp : firstCmp;
+      const idCmp = (a.id || '').localeCompare(b.id || '', undefined, { numeric: true });
+      return isDesc ? -idCmp : idCmp;
     });
   } else if (rosterSortState.col === 'date') {
     sortedStudents.sort((a, b) => {
       const dA = a.dateAdded || '2026-08-10';
       const dB = b.dateAdded || '2026-08-10';
-      return rosterSortState.direction === 'asc' ? dA.localeCompare(dB) : dB.localeCompare(dA);
+      const cmp = dA.localeCompare(dB);
+      if (cmp !== 0) return rosterSortState.direction === 'asc' ? cmp : -cmp;
+      const nameCmp = (a.last || '').localeCompare(b.last || '', undefined, { sensitivity: 'base' });
+      return rosterSortState.direction === 'asc' ? nameCmp : -nameCmp;
     });
   } else if (rosterSortState.col === 'id') {
     sortedStudents.sort((a, b) => {
@@ -451,6 +475,8 @@ function commitBulkImport() {
     }
   });
 
+  sortStudentRosterByName();
+  rosterSortState = { col: 'name', direction: 'asc' };
   saveAppState();
   closeBulkImportModal();
   const filterSelect = document.getElementById('roster-section-filter');
@@ -518,6 +544,8 @@ function saveSingleStudent() {
     fin: 85
   });
 
+  sortStudentRosterByName();
+  rosterSortState = { col: 'name', direction: 'asc' };
   saveAppState();
   closeSingleStudentModal();
   const filterSelect = document.getElementById('roster-section-filter');
@@ -527,3 +555,19 @@ function saveSingleStudent() {
   Render.views('enrollment');
   showToast('Student ' + first + ' ' + last + ' added.');
 }
+
+function sortStudentRosterByName() {
+  if (!Array.isArray(studentRoster)) return;
+  studentRoster.sort((a, b) => {
+    const cmp = (a.last || '').localeCompare(b.last || '', undefined, { sensitivity: 'base' });
+    if (cmp !== 0) return cmp;
+    const firstCmp = (a.first || '').localeCompare(b.first || '', undefined, { sensitivity: 'base' });
+    if (firstCmp !== 0) return firstCmp;
+    return (a.id || '').localeCompare(b.id || '', undefined, { numeric: true });
+  });
+}
+
+if (typeof window !== 'undefined') {
+  window.sortStudentRosterByName = sortStudentRosterByName;
+}
+

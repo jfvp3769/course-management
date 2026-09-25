@@ -279,12 +279,13 @@ function toggleAllGradebookSubActivities() {
 
 
 function getGradebookSortIndicator(colKey) {
-  if (gradebookSortState.col !== colKey) {
+  const activeCol = (!gradebookSortState.col || gradebookSortState.col === 'default') ? 'name' : gradebookSortState.col;
+  if (activeCol !== colKey) {
     return '<span class="text-[10px] text-slate-400 opacity-60 ml-1 inline-block">⇅</span>';
   }
-  return gradebookSortState.direction === 'asc'
-    ? '<span class="text-[11px] app-themed-link font-black ml-1 inline-block">▲</span>'
-    : '<span class="text-[11px] app-themed-link font-black ml-1 inline-block">▼</span>';
+  return gradebookSortState.direction === 'desc'
+    ? '<span class="text-[11px] app-themed-link font-black ml-1 inline-block">▼</span>'
+    : '<span class="text-[11px] app-themed-link font-black ml-1 inline-block">▲</span>';
 }
 
 function toggleGradebookSort(colKey) {
@@ -296,8 +297,8 @@ function toggleGradebookSort(colKey) {
     if (gradebookSortState.direction === defaultDir) {
       gradebookSortState.direction = secondDir;
     } else {
-      // 3rd click resets back to natural roster order
-      gradebookSortState.col = 'default';
+      // 3rd click resets back to default sort (Student Name A-Z)
+      gradebookSortState.col = 'name';
       gradebookSortState.direction = 'asc';
     }
   } else {
@@ -483,17 +484,10 @@ function _filterAndSortGradebookStudents(sectionStudents, config, selectedSec, g
     return matchesGrade && matchesStatus;
   });
 
-  // Apply intelligent column sorting
+  // Apply intelligent column sorting (Default: Student Name A-Z)
   if (gradebookSortState.col === 'id') {
     filtered.sort((a, b) => {
       const cmp = (a.id || '').localeCompare(b.id || '', undefined, { numeric: true, sensitivity: 'base' });
-      return gradebookSortState.direction === 'asc' ? cmp : -cmp;
-    });
-  } else if (gradebookSortState.col === 'name') {
-    filtered.sort((a, b) => {
-      const nameA = `${a.last || ''}, ${a.first || ''}`.trim().toLowerCase();
-      const nameB = `${b.last || ''}, ${b.first || ''}`.trim().toLowerCase();
-      const cmp = nameA.localeCompare(nameB, undefined, { sensitivity: 'base' });
       return gradebookSortState.direction === 'asc' ? cmp : -cmp;
     });
   } else if (gradebookSortState.col === 'total') {
@@ -502,7 +496,7 @@ function _filterAndSortGradebookStudents(sectionStudents, config, selectedSec, g
       const gradeB = (gradeCache.get(b.id) || calculateStudentGrade(b, config, selectedSec)).total || 0;
       return gradebookSortState.direction === 'asc' ? (gradeA - gradeB) : (gradeB - gradeA);
     });
-  } else if (gradebookSortState.col.startsWith('sub_')) {
+  } else if (gradebookSortState.col && gradebookSortState.col.startsWith('sub_')) {
     const subCol = gradebookSortState.col;
     let targetCat = null;
     let targetSub = null;
@@ -521,7 +515,7 @@ function _filterAndSortGradebookStudents(sectionStudents, config, selectedSec, g
       const valB = parseFloat(getStudentScore(b, actualSubId, catId, maxScore)) || 0;
       return gradebookSortState.direction === 'asc' ? (valA - valB) : (valB - valA);
     });
-  } else if (gradebookSortState.col.startsWith('cat_')) {
+  } else if (gradebookSortState.col && gradebookSortState.col.startsWith('cat_')) {
     const catCol = gradebookSortState.col;
     let targetCat = config.categories.find(c => c.id === catCol || 'cat_' + c.id === catCol);
     const actualCatId = targetCat ? targetCat.id : catCol.replace(/^cat_cat_/, 'cat_');
@@ -531,6 +525,16 @@ function _filterAndSortGradebookStudents(sectionStudents, config, selectedSec, g
       const valA = (gradeA.categoryTotals && gradeA.categoryTotals[actualCatId] !== undefined) ? gradeA.categoryTotals[actualCatId] : 0;
       const valB = (gradeB.categoryTotals && gradeB.categoryTotals[actualCatId] !== undefined) ? gradeB.categoryTotals[actualCatId] : 0;
       return gradebookSortState.direction === 'asc' ? (valA - valB) : (valB - valA);
+    });
+  } else {
+    // Default or 'name': Student Name A-Z (or Z-A if direction is 'desc')
+    const isDesc = (gradebookSortState.col === 'name' && gradebookSortState.direction === 'desc');
+    filtered.sort((a, b) => {
+      const nameA = `${a.last || ''}, ${a.first || ''}`.trim().toLowerCase();
+      const nameB = `${b.last || ''}, ${b.first || ''}`.trim().toLowerCase();
+      const cmp = nameA.localeCompare(nameB, undefined, { sensitivity: 'base' });
+      if (cmp !== 0) return isDesc ? -cmp : cmp;
+      return (a.id || '').localeCompare(b.id || '', undefined, { numeric: true });
     });
   }
 

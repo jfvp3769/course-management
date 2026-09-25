@@ -1,4 +1,3 @@
-# Faculty Course & Lesson Manager (v2.4.0)
 # Faculty Course & Lesson Manager (v2.5.0)
 
 [![Offline Ready](https://img.shields.io/badge/Offline-100%25%20Ready-success?style=flat-square&logo=pwa)](index.html)
@@ -51,6 +50,9 @@ Modern academic environments demand reliable digital tools that remain fully fun
 
 ### 1. Lesson Planner Matrix
 - **Matrix Grid View**: Interactive calendar grid mapping each teaching date across all course sections with distinctive weekday vs. weekend visual rhythm.
+- **Meeting Count & Remaining Term Badges**: Every planned activity card and scheduled empty slot displays crisp meeting indices (`Mtg #X`) and remaining meeting pills (`Y left` or `Final Mtg`), giving instructors immediate term pacing visibility.
+- **Meeting Context Banner**: The Lesson Planner modal features a real-time meeting context banner showing `Meeting #X of Y`, remaining meetings in the term, and celebration tags for final meetings or out-of-schedule special sessions.
+- **Context-Aware Cross-Section Copy & Paste**: Copying lesson plans between sections preserves pedagogical topics, activity types, and notes while dynamically inheriting the destination section's start time, end time, and assigned classroom venue.
 - **Interactive Drag & Drop**: Drag lecture cards, exam checkpoints, and laboratory sessions across calendar dates and sections to easily reschedule lessons.
 - **Multi-Level Undo/Redo Engine**: 50-step action history (`Ctrl+Z` / `Ctrl+Y`) for confident planning and instant reversal of mistakes.
 - **Interactive Column Resizing**: Drag column dividers to adjust course section widths, with a double-click reset to restore default balanced widths.
@@ -70,6 +72,8 @@ Modern academic environments demand reliable digital tools that remain fully fun
 - **No-Class Overrides**: Configure school-wide suspensions, local weather disruptions, or course-specific class cancellations with custom reasons.
 
 ### 4. Class List (Roster) & Faculty Communications
+- **Default Last Name (A-Z) Sorting**: Roster automatically sorts alphabetically by Last Name A-Z with 3-state cycling (A-Z `▲`, Z-A `▼`, default reset `▲`).
+- **Automatic Placement for Late Enrollments**: Enrolling a student via single-student entry, bulk paste, or CSV import immediately positions them in alphabetical order rather than appending them to the bottom.
 - **Student Roster Management**: ID, Last Name, First Name, Gender, Email, and Section assignment with instant sorting and multi-column search.
 - **Enrollment Capacity Meters**: Live capacity and gender breakdown progress meters per course section.
 - **Duplicate ID Auditor**: Detects and flags duplicate student ID anomalies across roster entries.
@@ -77,6 +81,7 @@ Modern academic environments demand reliable digital tools that remain fully fun
 - **RFC 4180 CSV Import/Export**: Import rosters from university SIS spreadsheet exports or copy-paste directly from Excel/Google Sheets.
 
 ### 5. Class Record & Offline Gradebook
+- **Default Student Name (A-Z) Sorting & Auto-Update**: Gradebook automatically maintains alphabetical order (A-Z) by default and instantly incorporates late-added students into their proper position.
 - **Dynamic Weighted Grading**: Fully customizable weighted grading categories (e.g., Quizzes 20%, Laboratory 20%, Midterm Exam 30%, Final Project 30%) with arbitrary sub-activities and max scores.
 - **Institutional Scale Evaluation**: Real-time conversion to official numeric grades (1.00–5.00) with automatic academic status flags (Passed, Incomplete, Failed, Dropped).
 - **Interactive Radar Cohort Filtering**:
@@ -238,8 +243,20 @@ All user data is stored entirely on the client side via the browser's `localStor
 
 ## Version History & Changelog
 
-### Version 2.4.0 (September 2026) — *Current Release*
 ### Version 2.5.0 (September 2026) — *Current Release*
+- **Meeting Numbers & Semester Remaining Count in Planning Experience**:
+  - **Matrix Activity Cards & Slots**: Every scheduled empty matrix slot and planned lesson card displays a meeting header (`Mtg #X`) and a remaining meetings pill (`Y left` or `Final Mtg`), giving instructors immediate term pacing visibility.
+  - **Lesson Planner Meeting Context Banner**: Added a dedicated meeting context banner to the Lesson Planner modal showing `Meeting #X of Y`, remaining meetings left in the term, and celebration tags for the final scheduled meeting or out-of-schedule special sessions.
+- **Context-Aware Cross-Section Activity Copy & Paste**:
+  - When copying and pasting lesson activities between different course sections in the Semester Schedule & Activity Matrix, pedagogical topics, activity types, and notes are preserved while start time, end time, and room/venue are automatically inherited from the destination section's schedule.
+- **Harmonized Lesson Planner Modal Action Buttons**:
+  - Standardized all 6 footer action buttons (`Mark "No Class"`, `Clear Activity`, `Prev Slot`, `Next Slot`, `Cancel`, `Save Activity`) into a consistent `h-9` (36px height), `rounded-xl` design with `font-bold text-xs` typography and crisp inline SVGs.
+- **Tab Header Button Hover State Harmonization**:
+  - Toolbar action button hover fill colors seamlessly match the tab header card surface in both light mode (`#ffffff`) and dark mode (`#0f172a`).
+- **Default A-Z Alphabetical Sorting with Automatic Placement on Enrollment**:
+  - **Grading Matrix & Class Record (Tab 5)**: Defaults to sorting by Student Name (A-Z) with an active `▲` indicator and 3-state cycling. Late enrollments are automatically sorted alphabetically into place.
+  - **Student Roster & Class Lists (Tab 4)**: Defaults to sorting by Last Name (A-Z) with an active `▲` indicator. Single student entry, bulk clipboard paste, and CSV import automatically re-sort the roster and place students in alphabetical order.
+  - **Startup & Storage Sync**: Offline-cached rosters and restored backups are guaranteed to be sorted alphabetically upon application boot.
 - **Full UI Dynamic Theme Harmonization (Tier 0 & Tier 1)**:
   - Synchronized remaining modals (`#grading-scale-modal`, `#grading-criteria-modal`, `#google-classroom-modal`) with `.app-themed-header` and `.app-themed-subtitle`.
   - Standardized all 8 primary save/commit buttons across all modals to `.app-themed-btn-primary`.
@@ -248,9 +265,8 @@ All user data is stored entirely on the client side via the browser's `localStor
   - Global input focus rings and checkboxes/radios dynamically glow with active theme accents.
 - **Unified Tab Header Action Buttons (`.tab-header-btn`)**:
   - Harmonized all action buttons across the toolbars of all 5 tabs (Lesson Planner, Weekly Timetable, Academic Calendar, Student Roster, Gradebook) into a consistent 32px height, 8px rounded card design.
-  - Replaced inconsistent legacy pastel colors (pink, yellow, purple, dark green) with clean white surfaces, slate borders, and active theme text/icons in light mode, and elevated slate cards in dark mode.
+  - Replaced inconsistent legacy pastel colors with clean white surfaces, slate borders, and active theme text/icons in light mode, and elevated slate cards in dark mode.
   - Dedicated danger variant (`.tab-header-btn-danger`) for destructive operations (`Remove All Students`, `Reset Filter`).
-  - Resolved Reset Filter button lifecycle by ensuring `.tab-header-btn.hidden` correctly hides with `display: none !important` when no filter is active.
 - **Themed Docked Sidebar Overview Toggles (`<< ... Overview`)**:
   - All 5 docked sidebar toggles (`Planner Overview`, `Timetable Overview`, `Calendar Overview`, `Roster Overview`, `Gradebook Overview`) dynamically inherit active theme colors and hover borders.
 - **Service Worker & Cache Upgrade**:

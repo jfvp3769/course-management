@@ -56,16 +56,16 @@ function openLessonModal(dateKey, subject, section, isWeekend) {
   if (shiftContainer) {
     if (isOutOfSchedule) {
       shiftContainer.innerHTML = `
-            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800/80 text-xs font-semibold">
-              <span>⚡</span>
+            <span class="h-9 inline-flex items-center gap-1.5 px-3.5 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800/80 text-xs font-bold shadow-2xs">
+              <svg class="w-3.5 h-3.5 shrink-0 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
               <span>${isWeekend ? 'Weekend Session' : 'Special / Makeup Session'} (Out-of-Schedule)</span>
             </span>
           `;
     } else if (isNoClass) {
       const wasPushed = entry ? (entry.pushedForward !== false) : true;
       shiftContainer.innerHTML = `
-            <button type="button" id="btn-remove-noclass-shift" data-action="removeNoClassFromModal" class="h-9 px-3.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white rounded-xl font-bold text-xs inline-flex items-center gap-1.5 shadow-sm transition" title="${wasPushed ? "Remove 'No Class' on this day and revert all subsequent planned meetings back to their original schedule" : "Remove 'No Class' marker on this day"}">
-              <span class="text-sm font-black">↺</span>
+            <button type="button" id="btn-remove-noclass-shift" data-action="removeNoClassFromModal" class="h-9 px-3.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white rounded-xl font-bold text-xs inline-flex items-center gap-1.5 shadow-2xs transition" title="${wasPushed ? "Remove 'No Class' on this day and revert all subsequent planned meetings back to their original schedule" : "Remove 'No Class' marker on this day"}">
+              <svg class="w-3.5 h-3.5 shrink-0 fill-none stroke-current" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>
               <span>${wasPushed ? 'Remove "No Class" & Revert Schedule' : 'Remove "No Class"'}</span>
             </button>
           `;
@@ -76,18 +76,18 @@ function openLessonModal(dateKey, subject, section, isWeekend) {
         : 'Mark this empty day as No Class (no schedule shift)';
 
       shiftContainer.innerHTML = `
-            <button type="button" id="btn-mark-noclass-shift" data-action="markMeetingAsNoClassAndShift" class="h-9 px-3 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/50 active:scale-95 text-rose-700 dark:text-rose-300 rounded-xl font-bold text-xs border border-rose-300 dark:border-rose-800/80 inline-flex items-center gap-1.5 transition shadow-2xs" title="${markBtnTitle}">
-              <span>🚫</span>
+            <button type="button" id="btn-mark-noclass-shift" data-action="markMeetingAsNoClassAndShift" class="h-9 px-3.5 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/50 active:scale-95 text-rose-700 dark:text-rose-300 rounded-xl font-bold text-xs border border-rose-200 dark:border-rose-800/80 inline-flex items-center gap-1.5 transition shadow-2xs" title="${markBtnTitle}">
+              <svg class="w-3.5 h-3.5 shrink-0 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
               <span>${markBtnText}</span>
             </button>
-            <div class="inline-flex items-center rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/80 p-0.5 shadow-2xs gap-0.5">
-              <button type="button" id="btn-pullback-schedule" data-action="pullBackScheduleFromModal" class="h-8 px-2.5 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold inline-flex items-center gap-1 transition active:scale-95 shadow-2xs border border-slate-200/80 dark:border-slate-700" title="Pull Back to Prev Slot: Move this activity and subsequent schedule back to previous meeting slot">
-                <span>◀</span>
+            <div class="flex items-center gap-1.5">
+              <button type="button" id="btn-pullback-schedule" data-action="pullBackScheduleFromModal" class="h-9 px-3 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl font-bold text-xs border border-slate-200 dark:border-slate-700 inline-flex items-center gap-1.5 transition active:scale-95 shadow-2xs" title="Pull Back to Prev Slot: Move this activity and subsequent schedule back to previous meeting slot">
+                <svg class="w-3.5 h-3.5 shrink-0 text-slate-500 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
                 <span>Prev Slot</span>
               </button>
-              <button type="button" id="btn-movelast-schedule" data-action="moveToNextViableSlotFromModal" class="h-8 px-2.5 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold inline-flex items-center gap-1 transition active:scale-95 shadow-2xs border border-slate-200/80 dark:border-slate-700" title="Move to Next Viable Slot: Move this activity forward to next meeting slot">
+              <button type="button" id="btn-movelast-schedule" data-action="moveToNextViableSlotFromModal" class="h-9 px-3 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl font-bold text-xs border border-slate-200 dark:border-slate-700 inline-flex items-center gap-1.5 transition active:scale-95 shadow-2xs" title="Move to Next Viable Slot: Move this activity forward to next meeting slot">
                 <span>Next Slot</span>
-                <span>▶</span>
+                <svg class="w-3.5 h-3.5 shrink-0 text-slate-500 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
               </button>
             </div>
           `;
