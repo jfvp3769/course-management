@@ -17,7 +17,7 @@
  * Bump CACHE_NAME on every release; `activate` purges older caches.
  * ========================================================================== */
 
-const CACHE_NAME = 'faculty-course-manager-v2.47';
+const CACHE_NAME = 'faculty-course-manager-v2.48';
 
 const SHELL = [
   './',
@@ -91,7 +91,11 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(async (cache) => {
       const results = await Promise.allSettled(
-        [...REQUIRED, ...OPTIONAL].map((url) => cache.add(url))
+        [...REQUIRED, ...OPTIONAL].map(async (url) => {
+          const res = await fetch(url, { cache: 'reload' });
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          await cache.put(url, res);
+        })
       );
       results.forEach((r, i) => {
         if (r.status === 'rejected') {
