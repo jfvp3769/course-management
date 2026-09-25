@@ -15,14 +15,14 @@ function highlightPlannerCalendarActivity(dateKey, courseCode = '', section = ''
   const calDay = document.getElementById('cal-day-' + dateKey);
   if (!calDay) return;
 
-  // 1. Add vibrant animated halo highlight to the entire day cell
+  // 1. Flash highlight the entire day cell (matching weekly row-flash-highlight)
   void calDay.offsetWidth;
   calDay.classList.add('cal-day-navigated-highlight');
   setTimeout(() => {
     if (calDay) calDay.classList.remove('cal-day-navigated-highlight');
-  }, 2400);
+  }, 1600);
 
-  // 2. Locate and highlight the specific class pill or academic event badge
+  // 2. Locate and highlight the specific class pill or academic event badge (matching weekly activity-navigated-highlight)
   let targetPill = null;
   if (courseCode && section) {
     const cellKey = `${dateKey}__${courseCode}__${section}`;
@@ -35,16 +35,16 @@ function highlightPlannerCalendarActivity(dateKey, courseCode = '', section = ''
 
   if (targetPill) {
     void targetPill.offsetWidth;
-    targetPill.classList.add('cal-pill-navigated-highlight');
+    targetPill.classList.add('cal-pill-navigated-highlight', 'activity-navigated-highlight');
     if (targetPill.parentElement && targetPill.parentElement.classList.contains('calendar-pill-slot')) {
       targetPill.parentElement.style.zIndex = '40';
       setTimeout(() => {
         if (targetPill && targetPill.parentElement) targetPill.parentElement.style.zIndex = '';
-      }, 2400);
+      }, 1400);
     }
     setTimeout(() => {
-      if (targetPill) targetPill.classList.remove('cal-pill-navigated-highlight');
-    }, 2400);
+      if (targetPill) targetPill.classList.remove('cal-pill-navigated-highlight', 'activity-navigated-highlight');
+    }, 1400);
   }
 
   // 3. Smoothly scroll day cell into view inside #calendar-view-scroll-wrapper, keeping it below sticky header
