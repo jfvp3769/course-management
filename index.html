@@ -109,39 +109,15 @@
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap">
 
   <!-- Stylesheet parts, in cascade order. See css/00-index.css. -->
-  <link rel="stylesheet" href="css/01-tokens.css?v=2.48">
-  <link rel="stylesheet" href="css/02-dark-components.css?v=2.48">
-  <link rel="stylesheet" href="css/03-dark-grades.css?v=2.48">
-  <link rel="stylesheet" href="css/04-dark-planner.css?v=2.48">
-  <link rel="stylesheet" href="css/05-dark-gradebook.css?v=2.48">
-  <link rel="stylesheet" href="css/07-components.css?v=2.48">
-  <link rel="stylesheet" href="css/08-dark-modals.css?v=2.48">
-  <link rel="stylesheet" href="css/09-responsive.css?v=2.48">
-  <link rel="stylesheet" href="css/10-components.css?v=2.48">
-  <script>
-    (function() {
-      var APP_VERSION = '2.48';
-      if (localStorage.getItem('faculty_app_version') !== APP_VERSION) {
-        localStorage.setItem('faculty_app_version', APP_VERSION);
-        if ('caches' in window) {
-          caches.keys().then(function(keys) {
-            keys.forEach(function(k) {
-              if (k !== 'faculty-course-manager-v2.48') {
-                caches.delete(k);
-              }
-            });
-          });
-        }
-        if ('serviceWorker' in navigator) {
-          navigator.serviceWorker.getRegistrations().then(function(regs) {
-            for (var r of regs) {
-              r.update();
-            }
-          }).catch(function() {});
-        }
-      }
-    })();
-  </script>
+  <link rel="stylesheet" href="css/01-tokens.css?v=2.49">
+  <link rel="stylesheet" href="css/02-dark-components.css?v=2.49">
+  <link rel="stylesheet" href="css/03-dark-grades.css?v=2.49">
+  <link rel="stylesheet" href="css/04-dark-planner.css?v=2.49">
+  <link rel="stylesheet" href="css/05-dark-gradebook.css?v=2.49">
+  <link rel="stylesheet" href="css/07-components.css?v=2.49">
+  <link rel="stylesheet" href="css/08-dark-modals.css?v=2.49">
+  <link rel="stylesheet" href="css/09-responsive.css?v=2.49">
+  <link rel="stylesheet" href="css/10-components.css?v=2.49">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#800000">
 </head>
@@ -384,8 +360,13 @@
         <div class="bg-white dark:bg-slate-900 main-table-card rounded-xl shadow-md border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col">
 
           <!-- Monthly Calendar View Container (Default) -->
-          <div id="planner-calendar-view-container" class="w-full flex-1 flex flex-col planner-calendar-scroll-wrapper relative">
-            <!-- Calendar Grid rendered here -->
+          <div id="planner-calendar-view-container" class="w-full flex-1 flex flex-col">
+            <div id="calendar-view-scroll-wrapper" class="overflow-x-auto overflow-y-auto relative main-table-scroll-wrapper w-full flex-1">
+              <!-- Calendar Grid rendered here -->
+            </div>
+            <div class="main-table-bottom-resizer" data-target="calendar-view-scroll-wrapper" data-tab="planner-calendar" title="Drag to adjust window height • Double-click to reset to auto-fit">
+              <div class="main-resizer-grip"></div>
+            </div>
           </div>
 
           <!-- Weekly Matrix View Container -->
@@ -3208,15 +3189,8 @@
   <script src="src/bootstrap.js"></script>
   <script>
     if ("serviceWorker" in navigator) {
-      let refreshing = false;
-      navigator.serviceWorker.addEventListener("controllerchange", () => {
-        if (!refreshing) {
-          refreshing = true;
-          window.location.reload();
-        }
-      });
       window.addEventListener("load", () => {
-        navigator.serviceWorker.register("./sw.js?v=2.48", { updateViaCache: 'none' }).then((reg) => {
+        navigator.serviceWorker.register("./sw.js?v=2.49", { updateViaCache: 'none' }).then((reg) => {
           reg.update();
         }).catch((err) => {
           console.warn("Offline cache registration failed:", err);

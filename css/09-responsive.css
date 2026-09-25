@@ -349,3 +349,96 @@ html.theme-dark #gradebook-table-body tr.row-flash-highlight > td {
   background-color: #854d0e !important;
   color: #fef08a !important;
 }
+
+/* =============================================================================
+ * SHORT VIEWPORT & 1366x768 LAPTOP OPTIMIZATIONS (height <= 800px)
+ * ========================================================================== */
+@media (max-height: 800px) {
+  /* Compact main layout margins */
+  main {
+    padding-top: 6px !important;
+    padding-bottom: 8px !important;
+  }
+
+  /* Compact Header Card */
+  .app-tab-header-card {
+    padding: 6px 12px !important;
+    margin-bottom: 6px !important;
+  }
+
+  /* Hide secondary descriptive subtitle text on short viewports to conserve vertical space */
+  .app-tab-header-card p {
+    display: none !important;
+  }
+
+  /* Compact Global Top Navigation Header & Tabs */
+  #main-header,
+  nav[aria-label="Main Navigation"] {
+    min-height: 40px !important;
+  }
+  
+  .tab-btn {
+    padding-top: 5px !important;
+    padding-bottom: 5px !important;
+  }
+
+  /* Compact vertical gap between header card and table card */
+  #tab-content-planner .space-y-3 > :not([hidden]) ~ :not([hidden]) {
+    margin-top: 6px !important;
+  }
+
+  /* Compact Sticky Calendar Day Header (SUN..SAT) */
+  .planner-calendar-header-day {
+    padding-top: 4px !important;
+    padding-bottom: 4px !important;
+    font-size: 10.5px !important;
+  }
+
+  /* Compact Calendar Day Cells on Short Screens */
+  .planner-calendar-cell {
+    min-height: 98px !important;
+    padding: 2px 3px !important;
+  }
+
+  .planner-calendar-cell .planner-day-header {
+    margin-bottom: 2px !important;
+  }
+
+  /* Tighten 2-column container */
+  .calendar-2col-container {
+    margin-top: 2px !important;
+    gap: 2px !important;
+  }
+
+  /* Compact subgrid slots & pills */
+  .calendar-subgrid-col,
+  .calendar-subgrid-row {
+    grid-template-rows: repeat(9, minmax(8px, 1fr)) !important;
+    gap: 1.5px !important;
+    padding: 1px !important;
+  }
+
+  .planner-empty-slot {
+    min-height: 8px !important;
+  }
+
+  .planner-calendar-pill {
+    min-height: 8px !important;
+    padding: 1px 3px !important;
+    border-radius: 3px !important;
+  }
+
+  .planner-pill-code {
+    font-size: 8.5px !important;
+    line-height: 1.1 !important;
+  }
+
+  .planner-pill-section {
+    font-size: 7.5px !important;
+    line-height: 1 !important;
+  }
+
+  .planner-slot-time-label {
+    font-size: 7px !important;
+  }
+}

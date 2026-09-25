@@ -835,14 +835,11 @@ setTimeout(() => {
 
         const calContainer = document.getElementById('planner-calendar-view-container');
         if (!calContainer) return false;
-        if (!calContainer.classList.contains('planner-calendar-scroll-wrapper')) return false;
 
-        // Verify sticky 7-day column header row
-        const headerRow = calContainer.querySelector('.planner-calendar-header-row');
-        if (!headerRow || !headerRow.classList.contains('sticky')) return false;
+        // Verify 7-day column headers
         const headerDays = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
         for (const h of headerDays) {
-          if (!headerRow.textContent.includes(h)) return false;
+          if (!calContainer.textContent.includes(h)) return false;
         }
 
         // Verify day cells rendered (at least 28 cells)
@@ -852,6 +849,14 @@ setTimeout(() => {
         // Verify day cells contain date keys
         const firstCell = cells[0];
         if (!firstCell.getAttribute('data-date')) return false;
+
+        // Verify scroll wrapper, height adjuster resizer, and sticky header
+        const scrollWrapper = document.getElementById('calendar-view-scroll-wrapper');
+        if (!scrollWrapper) return false;
+        const resizer = calContainer.querySelector('.main-table-bottom-resizer[data-target="calendar-view-scroll-wrapper"]');
+        if (!resizer) return false;
+        const stickyHeader = calContainer.querySelector('.planner-calendar-header-row');
+        if (!stickyHeader) return false;
 
         return true;
       })()`);

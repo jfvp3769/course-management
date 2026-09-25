@@ -1469,8 +1469,24 @@ html.theme-dark input[type="date"]::-webkit-calendar-picker-indicator {
  * MONTHLY PLANNER CALENDAR VIEW COMPONENT STYLES
  * ========================================================================== */
 
+#calendar-view-scroll-wrapper {
+  min-height: 280px;
+  overflow-y: auto;
+  overflow-x: auto;
+  position: relative;
+  overscroll-behavior: contain;
+}
+
+.planner-calendar-header-row {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.08), 0 1px 2px -1px rgba(0, 0, 0, 0.08);
+}
+
 .planner-calendar-cell {
   position: relative;
+  min-height: 110px;
   transition: background-color 0.15s ease, box-shadow 0.15s ease;
 }
 
@@ -1707,169 +1723,5 @@ html.theme-dark .day-campus-suspended {
 
 #planner-calendar-popover {
   transition: opacity 0.15s cubic-bezier(0.16, 1, 0.3, 1), transform 0.15s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-/* =============================================================================
- * MONTHLY PLANNER CALENDAR - SCROLL WRAPPER & STICKY HEADER (Option C)
- * ========================================================================== */
-
-.planner-calendar-scroll-wrapper {
-  height: calc(100vh - 250px);
-  min-height: 380px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  position: relative;
-  scrollbar-width: thin !important;
-  scrollbar-color: #cbd5e1 rgba(241, 245, 249, 0.75) !important;
-}
-
-.planner-calendar-header-row {
-  position: sticky;
-  top: 0;
-  z-index: 30 !important;
-  background-color: #f1f5f9;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.08);
-}
-
-html.theme-dark .planner-calendar-header-row {
-  background-color: #0f172a;
-  border-color: #334155;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.35);
-}
-
-/* Custom Scrollbar for planner-calendar-scroll-wrapper */
-.planner-calendar-scroll-wrapper::-webkit-scrollbar {
-  height: 12px !important;
-  width: 8px !important;
-}
-
-.planner-calendar-scroll-wrapper::-webkit-scrollbar-track {
-  background: rgba(241, 245, 249, 0.75) !important;
-}
-
-.planner-calendar-scroll-wrapper::-webkit-scrollbar-thumb {
-  background-color: #cbd5e1 !important;
-  border-radius: 9999px !important;
-  border: 2px solid transparent !important;
-  background-clip: padding-box !important;
-}
-
-.planner-calendar-scroll-wrapper::-webkit-scrollbar-thumb:hover {
-  background-color: #94a3b8 !important;
-}
-
-html.theme-dark .planner-calendar-scroll-wrapper {
-  scrollbar-color: #475569 rgba(15, 23, 42, 0.75) !important;
-}
-
-html.theme-dark .planner-calendar-scroll-wrapper::-webkit-scrollbar-track {
-  background: rgba(15, 23, 42, 0.75) !important;
-}
-
-html.theme-dark .planner-calendar-scroll-wrapper::-webkit-scrollbar-thumb {
-  background-color: #475569 !important;
-}
-
-html.theme-dark .planner-calendar-scroll-wrapper::-webkit-scrollbar-thumb:hover {
-  background-color: #64748b !important;
-}
-
-/* =============================================================================
- * VIEWPORT HEIGHT OPTIMIZATION (Option B - Smaller Screens <= 800px, e.g. 1366x768)
- * ========================================================================== */
-
-@media (max-height: 800px) {
-  :root {
-    --subgrid-row-min: 8.5px;
-    --subgrid-row-gap: 1px;
-  }
-
-  /* 1. Header & navigation bar tightening */
-  header nav {
-    padding-top: 0.25rem !important;
-    padding-bottom: 0.25rem !important;
-  }
-
-  main {
-    padding-top: 0.5rem !important;
-    padding-bottom: 0.75rem !important;
-  }
-
-  /* 2. Planner Tab Header Card */
-  .app-tab-header-card {
-    padding: 0.375rem 0.75rem !important;
-    min-height: 3rem !important;
-    gap: 0.375rem !important;
-  }
-
-  .app-tab-header-card p {
-    display: none !important; /* Hide secondary subtitle to reclaim vertical space */
-  }
-
-  #planner-term-label {
-    font-size: 13px !important;
-  }
-
-  /* 3. Tab main window spacing */
-  .tab-main-window.space-y-3 > :not([hidden]) ~ :not([hidden]),
-  .tab-layout-container > .space-y-3 > :not([hidden]) ~ :not([hidden]) {
-    margin-top: 0.375rem !important;
-  }
-
-  /* 4. Calendar Scroll Wrapper Height */
-  .planner-calendar-scroll-wrapper {
-    height: calc(100vh - 200px) !important;
-    min-height: 320px !important;
-  }
-
-  /* 5. Calendar Day Cells - Compact Density */
-  .planner-calendar-cell {
-    min-height: 108px !important;
-    padding: 2px 3px !important;
-  }
-
-  .planner-cell-header {
-    margin-bottom: 2px !important;
-  }
-
-  .planner-cell-date-num {
-    font-size: 11px !important;
-  }
-
-  .planner-empty-slot {
-    min-height: 8px !important;
-  }
-
-  .planner-slot-time-label {
-    font-size: 7.5px !important;
-  }
-
-  .planner-calendar-pill {
-    min-height: 10px !important;
-    padding: 2px 4px !important;
-  }
-
-  .planner-pill-code {
-    font-size: 9px !important;
-    line-height: 1.1 !important;
-  }
-
-  .planner-pill-section {
-    font-size: 7.5px !important;
-    line-height: 1.1 !important;
-  }
-
-  .planner-suspension-banner {
-    padding: 1px 4px !important;
-    font-size: 8px !important;
-    margin-bottom: 2px !important;
-  }
-
-  /* 6. Calendar Sticky Header Row */
-  .planner-calendar-header-row > div {
-    padding-top: 0.375rem !important;
-    padding-bottom: 0.375rem !important;
-    font-size: 10px !important;
-  }
 }
 

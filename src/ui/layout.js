@@ -71,8 +71,8 @@ function nextGuideStep() {
 
 
 const MAIN_WINDOW_CONFIGS = [
-  { wrapperId: 'planner-calendar-view-container', tabId: 'planner' },
   { wrapperId: 'matrix-scroll-wrapper', tabId: 'planner' },
+  { wrapperId: 'calendar-view-scroll-wrapper', tabId: 'planner-calendar' },
   { wrapperId: 'timetable-scroll-wrapper', tabId: 'timetable' },
   { wrapperId: 'calendar-scroll-wrapper', tabId: 'calendar' },
   { wrapperId: 'roster-scroll-wrapper', tabId: 'roster' },
@@ -160,14 +160,18 @@ function autoResizeContentWindows() {
       }
     }
 
-    // Only compute viewport-fit if the tab is currently visible
-    const tabSection = document.getElementById('tab-content-' + tabId);
+    // Only compute viewport-fit if the parent tab is currently visible
+    const sectionId = (tabId === 'planner' || tabId === 'planner-calendar') ? 'tab-content-planner' : 'tab-content-' + tabId;
+    const tabSection = document.getElementById(sectionId);
     if (tabSection && tabSection.classList.contains('hidden')) {
       return;
     }
 
-    // Skip elements that are currently hidden (e.g. alternate view mode in Planner)
-    if (el.classList.contains('hidden') || el.offsetParent === null) {
+    // For planner sub-views, only resize the currently active view mode
+    if (tabId === 'planner' && typeof plannerViewMode !== 'undefined' && plannerViewMode === 'month') {
+      return;
+    }
+    if (tabId === 'planner-calendar' && typeof plannerViewMode !== 'undefined' && plannerViewMode === 'week') {
       return;
     }
 

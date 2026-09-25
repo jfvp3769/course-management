@@ -149,18 +149,23 @@ function setPlannerViewMode(mode) {
 
   if (plannerViewMode === 'month') {
     renderPlannerMonthCalendar();
+    if (typeof initMainWindowResizers === 'function') {
+      initMainWindowResizers();
+    }
+    if (typeof autoResizeContentWindows === 'function') {
+      autoResizeContentWindows();
+    }
     showToast('Switched to Monthly View', '📅');
   } else {
     renderMatrixTable();
+    if (typeof autoResizeContentWindows === 'function') {
+      autoResizeContentWindows();
+    }
     showToast('Switched to Weekly View', '⊞');
     // Ensure synchronized scrollbars and layout match in weekly view
     if (typeof setupSynchronizedScrollbars === 'function') {
       requestAnimationFrame(() => setupSynchronizedScrollbars());
     }
-  }
-
-  if (typeof autoResizeContentWindows === 'function') {
-    requestAnimationFrame(() => autoResizeContentWindows());
   }
 }
 
@@ -301,8 +306,11 @@ function renderPlannerMonthCalendar() {
   const container = document.getElementById('planner-calendar-view-container');
   if (!container) return;
 
+  const scrollWrapper = document.getElementById('calendar-view-scroll-wrapper');
+  const target = scrollWrapper || container;
+
   if (!Array.isArray(semesterDates) || semesterDates.length === 0) {
-    container.innerHTML = '<div class="p-8 text-center text-slate-400">Loading semester dates...</div>';
+    target.innerHTML = '<div class="p-8 text-center text-slate-400">Loading semester dates...</div>';
     return;
   }
 
@@ -396,10 +404,10 @@ function renderPlannerMonthCalendar() {
   ];
 
   let html = `
-    <!-- 7-Day Header -->
+    <!-- 7-Day Header (Sticky inside scroll container) -->
     <div class="planner-calendar-header-row grid grid-cols-7 border-b border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 sticky top-0 z-30 select-none shadow-xs">
       ${daysHeader.map(h => `
-        <div class="py-1.5 sm:py-2 px-1 text-center font-extrabold text-[10px] sm:text-xs tracking-wider border-r last:border-r-0 border-slate-200/80 dark:border-slate-800 ${h.isWeekend ? 'text-slate-500 dark:text-slate-400 bg-[#f8fafc] dark:bg-[#0f172a]' : 'text-slate-700 dark:text-slate-300'}">
+        <div class="planner-calendar-header-day py-1.5 sm:py-2 px-1 text-center font-extrabold text-[11px] sm:text-xs tracking-wider border-r last:border-r-0 border-slate-200/80 dark:border-slate-800 ${h.isWeekend ? 'text-slate-500 dark:text-slate-400 bg-[#f8fafc] dark:bg-[#0f172a]' : 'text-slate-700 dark:text-slate-300'}">
           <span>${h.code}</span>
         </div>
       `).join('')}
@@ -411,7 +419,7 @@ function renderPlannerMonthCalendar() {
     </div>
   `;
 
-  container.innerHTML = html;
+  target.innerHTML = html;
 }
 
 /**
@@ -724,7 +732,7 @@ function _renderSubgridColumn(period, dateKey, classes, isWeekend, isNoClassDate
 
   return `
     <div class="calendar-subgrid-col calendar-subgrid-row relative rounded border border-slate-200/50 dark:border-slate-800/60 bg-transparent p-0.5" 
-         style="display: grid; grid-template-rows: repeat(9, minmax(var(--subgrid-row-min, 14px), 1fr)); grid-template-columns: repeat(${maxTracks}, minmax(0, 1fr)); gap: var(--subgrid-row-gap, 2px);">
+         style="display: grid; grid-template-rows: repeat(9, minmax(14px, 1fr)); grid-template-columns: repeat(${maxTracks}, minmax(0, 1fr)); gap: 2px;">
       <!-- Layer 1: Background 9 30-min empty slot units -->
       ${slotsHtml.join('')}
       <!-- Layer 2: Foreground Class Pills -->
@@ -831,9 +839,9 @@ function _renderCalendarDayCell(g, isCurrentMonth, todayKey, timetableMap, meeti
   const todayBorder = isToday ? 'ring-2 ring-inset ring-msu-maroon dark:ring-rose-500 shadow-sm z-10' : '';
 
   return `
-    <div id="cal-day-${dateKey}" data-date="${dateKey}" class="planner-calendar-cell flex flex-col p-1 sm:p-1.5 min-h-[175px] sm:min-h-[185px] border-r border-b border-slate-200 dark:border-slate-800 ${cellBgClass} ${todayBorder} transition-colors group/cal-cell relative">
+    <div id="cal-day-${dateKey}" data-date="${dateKey}" class="planner-calendar-cell flex flex-col p-1 sm:p-1.5 min-h-[110px] sm:min-h-[125px] border-r border-b border-slate-200 dark:border-slate-800 ${cellBgClass} ${todayBorder} transition-colors group/cal-cell relative">
       <!-- Day Cell Top Header -->
-      <div class="planner-cell-header flex items-center justify-between gap-1 mb-1 shrink-0">
+      <div class="planner-day-header flex items-center justify-between gap-1 mb-1 shrink-0">
         <!-- Date Number & Today Pill -->
         <div class="flex items-center gap-1">
           ${isToday ? `
@@ -842,7 +850,7 @@ function _renderCalendarDayCell(g, isCurrentMonth, todayKey, timetableMap, meeti
               <span class="text-[8px] uppercase tracking-wider font-extrabold hidden sm:inline">TODAY</span>
             </span>
           ` : `
-            <span class="planner-cell-date-num font-extrabold text-xs sm:text-[13px] ${isCurrentMonth ? 'text-slate-800 dark:text-slate-100' : 'text-slate-400 dark:text-slate-600'} leading-none">${dayNum}</span>
+            <span class="font-extrabold text-xs sm:text-[13px] ${isCurrentMonth ? 'text-slate-800 dark:text-slate-100' : 'text-slate-400 dark:text-slate-600'} leading-none">${dayNum}</span>
           `}
         </div>
 
@@ -864,7 +872,7 @@ function _renderCalendarDayCell(g, isCurrentMonth, todayKey, timetableMap, meeti
 
       <!-- Campus Suspension Banner -->
       ${isNoClassDate ? `
-        <div class="planner-suspension-banner py-0.5 px-1 rounded bg-rose-50/90 dark:bg-rose-950/40 border border-rose-200/80 dark:border-rose-900/60 text-center text-[9px] font-bold text-rose-700 dark:text-rose-400 mb-1 select-none">
+        <div class="py-0.5 px-1 rounded bg-rose-50/90 dark:bg-rose-950/40 border border-rose-200/80 dark:border-rose-900/60 text-center text-[9px] font-bold text-rose-700 dark:text-rose-400 mb-1 select-none">
           🚫 Campus Suspended
         </div>
       ` : ''}
