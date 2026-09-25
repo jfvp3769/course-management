@@ -453,38 +453,47 @@ function formatTimeDisplay(timeStr) {
 }
 
 /**
- * Map start and end minutes to CSS grid columns (1-based, 1..9, span 1..9).
- * Row 1 (AM): 7:30 AM (450m) – 12:00 PM (720m) -> 9 units of 30 mins
- * Row 2 (PM): 1:00 PM (780m) – 5:30 PM (1050m) -> 9 units of 30 mins
+ * Map start and end minutes to CSS grid rows (1-based, 1..9, span 1..9).
+ * Column 1 (AM): 7:30 AM (450m) – 12:00 PM (720m) -> 9 vertical rows of 30 mins
+ * Column 2 (PM): 1:00 PM (780m) – 5:30 PM (1050m) -> 9 vertical rows of 30 mins
  */
-function mapTimeToGridColumn(startMins, endMins, period) {
+function mapTimeToGridRow(startMins, endMins, period) {
   const base = period === 'AM' ? 450 : 780;
-  const startCol = Math.max(1, Math.min(9, Math.floor((startMins - base) / 30) + 1));
-  const endCol = Math.max(startCol + 1, Math.min(10, Math.ceil((endMins - base) / 30) + 1));
-  const span = Math.max(1, Math.min(10 - startCol, endCol - startCol));
-  return { startCol, span };
+  const s = (startMins !== null && !isNaN(startMins)) ? startMins : base;
+  const e = (endMins !== null && !isNaN(endMins)) ? endMins : (s + 60);
+
+  const startRow = Math.max(1, Math.min(9, Math.floor((s - base) / 30) + 1));
+  const endRow = Math.max(startRow + 1, Math.min(10, Math.ceil((e - base) / 30) + 1));
+  const span = Math.max(1, Math.min(10 - startRow, endRow - startRow));
+  return { startRow, span, startCol: startRow };
+}
+
+function mapTimeToGridColumn(startMins, endMins, period) {
+  return mapTimeToGridRow(startMins, endMins, period);
 }
 
 /**
- * Assign grid tracks (rows) to prevent collision when classes in the same period overlap.
+ * Assign grid tracks (columns) to prevent collision when classes in the same period overlap.
  */
 function assignGridTracks(classes) {
   const tracks = [];
   classes.forEach(c => {
     let placedTrack = 1;
+    const s = c.startRow ?? c.startCol ?? 1;
+    const sp = c.span ?? 1;
     for (let t = 0; t < tracks.length; t++) {
       const hasCollision = tracks[t].some(occ => {
-        return Math.max(c.startCol, occ.startCol) < Math.min(c.startCol + c.span, occ.startCol + occ.span);
+        return Math.max(s, occ.startRow) < Math.min(s + sp, occ.startRow + occ.span);
       });
       if (!hasCollision) {
         placedTrack = t + 1;
-        tracks[t].push({ startCol: c.startCol, span: c.span });
+        tracks[t].push({ startRow: s, span: sp, startCol: s });
         c.track = placedTrack;
         return;
       }
     }
     placedTrack = tracks.length + 1;
-    tracks.push([{ startCol: c.startCol, span: c.span }]);
+    tracks.push([{ startRow: s, span: sp, startCol: s }]);
     c.track = placedTrack;
   });
 }
@@ -536,22 +545,23 @@ function getSubjectPillStyles(courseCode, hasPlannedActivity, isNoClass) {
 }
 
 /**
- * Render a 9-column subgrid row for AM (7:30–12:00) or PM (1:00–5:30).
+ * Render a vertical 9-row subgrid column for AM (7:30–12:00) or PM (1:00–5:30).
+ * display: grid; grid-template-rows: repeat(9, minmax(14px, 1fr)); grid-template-columns: 1fr; gap: 2px;
+ * Completely without time labels or column headers.
  */
-function _renderSubgridRow(period, dateKey, classes, isWeekend, isNoClassDate, isCurrentMonth) {
+function _renderSubgridColumn(period, dateKey, classes, isWeekend, isNoClassDate, isCurrentMonth) {
   const baseMinutes = period === 'AM' ? 450 : 780; // 07:30 AM (450) vs 1:00 PM (780)
 
-  // 1. Generate 9 background 30-minute empty slot units
+  // 1. Generate 9 background 30-minute empty slot units (Rows 1–9)
   const slotsHtml = [];
   for (let u = 1; u <= 9; u++) {
     const startM = baseMinutes + (u - 1) * 30;
     const endM = startM + 30;
     const startStr = formatMinutesToHHMM(startM);
-    const endStr = formatMinutesToHHMM(endM);
 
     if (!isCurrentMonth) {
       slotsHtml.push(`
-        <div style="grid-column: ${u} / span 1; grid-row: 1;" class="h-full rounded-xs border border-dashed border-slate-200/40 dark:border-slate-800/40 pointer-events-none"></div>
+        <div style="grid-row: ${u} / span 1; grid-column: 1 / -1;" class="h-full rounded-xs border border-dashed border-slate-200/40 dark:border-slate-800/40 pointer-events-none"></div>
       `);
     } else {
       slotsHtml.push(`
@@ -562,7 +572,7 @@ function _renderSubgridRow(period, dateKey, classes, isWeekend, isNoClassDate, i
           data-unit="${u}" 
           data-start-time="${startStr}" 
           data-end-time="${formatMinutesToHHMM(startM + 60)}"
-          style="grid-column: ${u} / span 1; grid-row: 1;" 
+          style="grid-row: ${u} / span 1; grid-column: 1 / -1;" 
           class="planner-empty-slot w-full h-full select-none" 
           title="Click to add activity at ${formatTimeDisplay(startStr)} (${period})">
         </button>
@@ -574,12 +584,15 @@ function _renderSubgridRow(period, dateKey, classes, isWeekend, isNoClassDate, i
   classes.forEach(c => {
     const startM = parseTimeToMinutes(c.startTime) ?? baseMinutes;
     const endM = parseTimeToMinutes(c.endTime) ?? (startM + 90);
-    const { startCol, span } = mapTimeToGridColumn(startM, endM, period);
-    c.startCol = startCol;
+    const { startRow, span } = mapTimeToGridRow(startM, endM, period);
+    c.startRow = startRow;
     c.span = span;
+    c.startCol = startRow; // backward compatibility
   });
 
   assignGridTracks(classes);
+
+  const maxTracks = classes.reduce((max, c) => Math.max(max, c.track || 1), 1);
 
   const pillsHtml = classes.map(c => {
     const hasActivity = !!(c.hasPlannedActivity);
@@ -605,28 +618,27 @@ function _renderSubgridRow(period, dateKey, classes, isWeekend, isNoClassDate, i
         data-total-meetings="${c.stats.totalMeetings || ''}"
         data-meetings-left="${c.stats.meetingsLeft || ''}"
         data-has-activity="${hasActivity ? 'true' : 'false'}"
-        style="grid-column: ${c.startCol} / span ${c.span}; grid-row: ${c.track || 1}; min-height: 28px;" 
+        style="grid-row: ${c.startRow} / span ${c.span}; grid-column: ${c.track || 1} / span 1; z-index: 10;" 
         class="planner-calendar-pill planner-class-pill pointer-events-auto cursor-pointer flex flex-col justify-center select-none ${styleClasses}"
         title="${escapeHtml(tooltipText)}">
-        <span class="text-[9px] font-black leading-tight truncate text-left w-full">${escapeHtml(c.course)}</span>
-        <span class="text-[8px] font-bold leading-tight truncate text-left w-full opacity-90">${escapeHtml(c.section)}</span>
+        <span class="text-[9.5px] font-black leading-tight truncate text-left w-full">${escapeHtml(c.course)}</span>
+        <span class="text-[8.5px] font-bold leading-tight truncate text-left w-full opacity-90">${escapeHtml(c.section)}</span>
       </div>
     `;
   }).join('');
 
   return `
-    <div class="calendar-subgrid-row relative min-h-[30px] p-0.5">
+    <div class="calendar-subgrid-col calendar-subgrid-row relative rounded border border-slate-200/70 dark:border-slate-800/80 bg-slate-50/40 dark:bg-slate-900/40 p-0.5" 
+         style="display: grid; grid-template-rows: repeat(9, minmax(14px, 1fr)); grid-template-columns: repeat(${maxTracks}, minmax(0, 1fr)); gap: 2px;">
       <!-- Layer 1: Background 9 30-min empty slot units -->
-      <div class="grid grid-cols-9 gap-0.5 absolute inset-0 p-0.5 z-0" style="grid-template-columns: repeat(9, minmax(0, 1fr));">
-        ${slotsHtml.join('')}
-      </div>
+      ${slotsHtml.join('')}
       <!-- Layer 2: Foreground Class Pills -->
-      <div class="grid grid-cols-9 gap-0.5 relative z-10 pointer-events-none" style="grid-template-columns: repeat(9, minmax(0, 1fr));">
-        ${pillsHtml}
-      </div>
+      ${pillsHtml}
     </div>
   `;
 }
+
+const _renderSubgridRow = _renderSubgridColumn;
 
 /**
  * Render a single calendar cell in the 7-day grid with 9-column AM and PM subgrids.
@@ -724,7 +736,7 @@ function _renderCalendarDayCell(g, isCurrentMonth, todayKey, timetableMap, meeti
   const todayBorder = isToday ? 'ring-2 ring-inset ring-msu-maroon dark:ring-rose-500 shadow-sm z-10' : '';
 
   return `
-    <div id="cal-day-${dateKey}" data-date="${dateKey}" class="planner-calendar-cell flex flex-col p-1 sm:p-1.5 min-h-[125px] sm:min-h-[140px] border-r border-b border-slate-200 dark:border-slate-800 ${cellBgClass} ${todayBorder} transition-colors group/cal-cell relative">
+    <div id="cal-day-${dateKey}" data-date="${dateKey}" class="planner-calendar-cell flex flex-col p-1 sm:p-1.5 min-h-[175px] sm:min-h-[185px] border-r border-b border-slate-200 dark:border-slate-800 ${cellBgClass} ${todayBorder} transition-colors group/cal-cell relative">
       <!-- Day Cell Top Header -->
       <div class="flex items-center justify-between gap-1 mb-1 shrink-0">
         <!-- Date Number & Today Pill -->
@@ -762,10 +774,10 @@ function _renderCalendarDayCell(g, isCurrentMonth, todayKey, timetableMap, meeti
         </div>
       ` : ''}
 
-      <!-- 9-Column Subgrid Rows (AM & PM) with no gap -->
-      <div class="calendar-subgrid-box flex flex-col rounded border border-slate-200/70 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-900/40 divide-y divide-slate-200/60 dark:divide-slate-800/60 mt-1 overflow-hidden">
-        ${_renderSubgridRow('AM', dateKey, amClasses, isWeekend, isNoClassDate, isCurrentMonth)}
-        ${_renderSubgridRow('PM', dateKey, pmClasses, isWeekend, isNoClassDate, isCurrentMonth)}
+      <!-- 2-Column Vertical Subgrid (AM on Left, PM on Right, No Time Labels) -->
+      <div class="calendar-2col-container grid grid-cols-2 gap-1 mt-1 w-full flex-1">
+        ${_renderSubgridColumn('AM', dateKey, amClasses, isWeekend, isNoClassDate, isCurrentMonth)}
+        ${_renderSubgridColumn('PM', dateKey, pmClasses, isWeekend, isNoClassDate, isCurrentMonth)}
       </div>
     </div>
   `;
@@ -1448,6 +1460,9 @@ if (typeof window !== 'undefined') {
   window.formatMinutesToHHMM = formatMinutesToHHMM;
   window.formatTimeDisplay = formatTimeDisplay;
   window.mapTimeToGridColumn = mapTimeToGridColumn;
+  window.mapTimeToGridRow = mapTimeToGridRow;
+  window._renderSubgridColumn = _renderSubgridColumn;
+  window._renderSubgridRow = _renderSubgridRow;
   window.getSubjectPillStyles = getSubjectPillStyles;
   window.showPlannerPillPopover = showPlannerPillPopover;
   window.hidePlannerPillPopover = hidePlannerPillPopover;

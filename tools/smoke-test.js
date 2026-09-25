@@ -966,30 +966,37 @@ setTimeout(() => {
         return true;
       })()`);
     }],
-    ['planner calendar day cells render 9-column subgrid rows for AM and PM with dynamic column spanning', () => {
+    ['planner calendar day cells render 2-column vertical subgrids for AM and PM with dynamic row spanning and no time labels', () => {
       return window.__probe(`(() => {
         setPlannerViewMode('month');
         renderPlannerMonthCalendar();
 
-        // 1. Check mapping math
-        const m1 = mapTimeToGridColumn(450, 540, 'AM'); // 7:30–9:00
-        const m2 = mapTimeToGridColumn(480, 540, 'AM'); // 8:00–9:00
-        const m3 = mapTimeToGridColumn(780, 960, 'PM'); // 1:00–4:00
-        const m4 = mapTimeToGridColumn(960, 1020, 'PM'); // 4:00–5:00
+        // 1. Check mapping math for vertical rows (Row 1–9)
+        const m1 = mapTimeToGridRow(450, 540, 'AM'); // 7:30–9:00 -> row 1, span 3
+        const m2 = mapTimeToGridRow(480, 540, 'AM'); // 8:00–9:00 -> row 2, span 2
+        const m3 = mapTimeToGridRow(780, 870, 'PM'); // 1:00–2:30 -> row 1, span 3
+        const m4 = mapTimeToGridRow(960, 1020, 'PM'); // 4:00–5:00 -> row 7, span 2
 
-        if (m1.startCol !== 1 || m1.span !== 3) return false;
-        if (m2.startCol !== 2 || m2.span !== 2) return false;
-        if (m3.startCol !== 1 || m3.span !== 6) return false;
-        if (m4.startCol !== 7 || m4.span !== 2) return false;
+        if (m1.startRow !== 1 || m1.span !== 3) return false;
+        if (m2.startRow !== 2 || m2.span !== 2) return false;
+        if (m3.startRow !== 1 || m3.span !== 3) return false;
+        if (m4.startRow !== 7 || m4.span !== 2) return false;
 
-        // 2. Check DOM subgrids in rendered cells
-        const subgridRows = Array.from(document.querySelectorAll('#planner-calendar-view-container .calendar-subgrid-row'));
-        if (subgridRows.length === 0) return false;
+        // 2. Check 2-column containers exist in rendered cells
+        const twoColContainers = Array.from(document.querySelectorAll('#planner-calendar-view-container .calendar-2col-container'));
+        if (twoColContainers.length === 0) return false;
 
-        // 3. Check 9 empty slot buttons exist in an active month day row
-        const activeRow = subgridRows.find(row => row.querySelectorAll('.planner-empty-slot').length > 0);
-        if (!activeRow) return false;
-        const slots = activeRow.querySelectorAll('.planner-empty-slot');
+        // 3. Verify absence of time labels (no "AM (" or "PM (" displayed in cells)
+        const firstCell = document.querySelector('#planner-calendar-view-container .planner-calendar-cell');
+        if (!firstCell) return false;
+        if (firstCell.textContent.includes('AM (') || firstCell.textContent.includes('PM (')) return false;
+
+        // 4. Check 9 vertical empty slot rows exist in an active month day column
+        const subgridCols = Array.from(document.querySelectorAll('#planner-calendar-view-container .calendar-subgrid-col'));
+        if (subgridCols.length === 0) return false;
+        const activeCol = subgridCols.find(col => col.querySelectorAll('.planner-empty-slot').length > 0);
+        if (!activeCol) return false;
+        const slots = activeCol.querySelectorAll('.planner-empty-slot');
         if (slots.length !== 9) return false;
 
         // Verify slot attributes
