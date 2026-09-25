@@ -835,11 +835,14 @@ setTimeout(() => {
 
         const calContainer = document.getElementById('planner-calendar-view-container');
         if (!calContainer) return false;
+        if (!calContainer.classList.contains('planner-calendar-scroll-wrapper')) return false;
 
-        // Verify 7-day column headers
+        // Verify sticky 7-day column header row
+        const headerRow = calContainer.querySelector('.planner-calendar-header-row');
+        if (!headerRow || !headerRow.classList.contains('sticky')) return false;
         const headerDays = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
         for (const h of headerDays) {
-          if (!calContainer.textContent.includes(h)) return false;
+          if (!headerRow.textContent.includes(h)) return false;
         }
 
         // Verify day cells rendered (at least 28 cells)

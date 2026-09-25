@@ -71,6 +71,7 @@ function nextGuideStep() {
 
 
 const MAIN_WINDOW_CONFIGS = [
+  { wrapperId: 'planner-calendar-view-container', tabId: 'planner' },
   { wrapperId: 'matrix-scroll-wrapper', tabId: 'planner' },
   { wrapperId: 'timetable-scroll-wrapper', tabId: 'timetable' },
   { wrapperId: 'calendar-scroll-wrapper', tabId: 'calendar' },
@@ -162,6 +163,11 @@ function autoResizeContentWindows() {
     // Only compute viewport-fit if the tab is currently visible
     const tabSection = document.getElementById('tab-content-' + tabId);
     if (tabSection && tabSection.classList.contains('hidden')) {
+      return;
+    }
+
+    // Skip elements that are currently hidden (e.g. alternate view mode in Planner)
+    if (el.classList.contains('hidden') || el.offsetParent === null) {
       return;
     }
 
