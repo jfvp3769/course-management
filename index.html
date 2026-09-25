@@ -109,15 +109,39 @@
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap">
 
   <!-- Stylesheet parts, in cascade order. See css/00-index.css. -->
-  <link rel="stylesheet" href="css/01-tokens.css">
-  <link rel="stylesheet" href="css/02-dark-components.css">
-  <link rel="stylesheet" href="css/03-dark-grades.css">
-  <link rel="stylesheet" href="css/04-dark-planner.css">
-  <link rel="stylesheet" href="css/05-dark-gradebook.css">
-  <link rel="stylesheet" href="css/07-components.css">
-  <link rel="stylesheet" href="css/08-dark-modals.css">
-  <link rel="stylesheet" href="css/09-responsive.css">
-  <link rel="stylesheet" href="css/10-components.css">
+  <link rel="stylesheet" href="css/01-tokens.css?v=2.48">
+  <link rel="stylesheet" href="css/02-dark-components.css?v=2.48">
+  <link rel="stylesheet" href="css/03-dark-grades.css?v=2.48">
+  <link rel="stylesheet" href="css/04-dark-planner.css?v=2.48">
+  <link rel="stylesheet" href="css/05-dark-gradebook.css?v=2.48">
+  <link rel="stylesheet" href="css/07-components.css?v=2.48">
+  <link rel="stylesheet" href="css/08-dark-modals.css?v=2.48">
+  <link rel="stylesheet" href="css/09-responsive.css?v=2.48">
+  <link rel="stylesheet" href="css/10-components.css?v=2.48">
+  <script>
+    (function() {
+      var APP_VERSION = '2.48';
+      if (localStorage.getItem('faculty_app_version') !== APP_VERSION) {
+        localStorage.setItem('faculty_app_version', APP_VERSION);
+        if ('caches' in window) {
+          caches.keys().then(function(keys) {
+            keys.forEach(function(k) {
+              if (k !== 'faculty-course-manager-v2.48') {
+                caches.delete(k);
+              }
+            });
+          });
+        }
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.getRegistrations().then(function(regs) {
+            for (var r of regs) {
+              r.update();
+            }
+          }).catch(function() {});
+        }
+      }
+    })();
+  </script>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#800000">
 </head>
@@ -3192,7 +3216,7 @@
         }
       });
       window.addEventListener("load", () => {
-        navigator.serviceWorker.register("./sw.js").then((reg) => {
+        navigator.serviceWorker.register("./sw.js?v=2.48", { updateViaCache: 'none' }).then((reg) => {
           reg.update();
         }).catch((err) => {
           console.warn("Offline cache registration failed:", err);
