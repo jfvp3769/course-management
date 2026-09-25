@@ -1800,8 +1800,77 @@ html.theme-dark .day-campus-suspended {
   overflow: visible !important;
 }
 
+.planner-calendar-cell {
+  overflow: visible !important;
+}
+
 .planner-calendar-cell:hover {
   z-index: 35 !important;
+}
+
+/* Prevent calendar hover cards from overflowing viewport on weekend / edge columns */
+.planner-calendar-cell:nth-child(7n + 1) .planner-calendar-expanded-card,
+.planner-calendar-cell:nth-child(7n + 2) .planner-calendar-expanded-card,
+.planner-calendar-cell:nth-child(7n + 3) .planner-calendar-expanded-card {
+  left: 0 !important;
+  right: auto !important;
+  transform-origin: left center !important;
+}
+
+.planner-calendar-cell:nth-child(7n + 1) .planner-calendar-expanded-card.top-0,
+.planner-calendar-cell:nth-child(7n + 2) .planner-calendar-expanded-card.top-0,
+.planner-calendar-cell:nth-child(7n + 3) .planner-calendar-expanded-card.top-0 {
+  transform-origin: left top !important;
+}
+
+.planner-calendar-cell:nth-child(7n + 1) .planner-calendar-expanded-card.bottom-0,
+.planner-calendar-cell:nth-child(7n + 2) .planner-calendar-expanded-card.bottom-0,
+.planner-calendar-cell:nth-child(7n + 3) .planner-calendar-expanded-card.bottom-0 {
+  transform-origin: left bottom !important;
+}
+
+.planner-calendar-cell:nth-child(7n + 5) .planner-calendar-expanded-card,
+.planner-calendar-cell:nth-child(7n + 6) .planner-calendar-expanded-card,
+.planner-calendar-cell:nth-child(7n) .planner-calendar-expanded-card {
+  right: 0 !important;
+  left: auto !important;
+  transform-origin: right center !important;
+}
+
+.planner-calendar-cell:nth-child(7n + 5) .planner-calendar-expanded-card.top-0,
+.planner-calendar-cell:nth-child(7n + 6) .planner-calendar-expanded-card.top-0,
+.planner-calendar-cell:nth-child(7n) .planner-calendar-expanded-card.top-0 {
+  transform-origin: right top !important;
+}
+
+.planner-calendar-cell:nth-child(7n + 5) .planner-calendar-expanded-card.bottom-0,
+.planner-calendar-cell:nth-child(7n + 6) .planner-calendar-expanded-card.bottom-0,
+.planner-calendar-cell:nth-child(7n) .planner-calendar-expanded-card.bottom-0 {
+  transform-origin: right bottom !important;
+}
+
+.planner-calendar-expanded-card.left-0 {
+  transform-origin: left center;
+}
+
+.planner-calendar-expanded-card.right-0 {
+  transform-origin: right center;
+}
+
+.planner-calendar-expanded-card.top-0.left-0 {
+  transform-origin: left top;
+}
+
+.planner-calendar-expanded-card.bottom-0.left-0 {
+  transform-origin: left bottom;
+}
+
+.planner-calendar-expanded-card.top-0.right-0 {
+  transform-origin: right top;
+}
+
+.planner-calendar-expanded-card.bottom-0.right-0 {
+  transform-origin: right bottom;
 }
 
 

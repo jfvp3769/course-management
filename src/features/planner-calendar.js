@@ -592,8 +592,17 @@ function getSubjectPillStyles(courseCode, hasPlannedActivity, isNoClass) {
  * display: grid; grid-template-rows: repeat(9, minmax(14px, 1fr)); grid-template-columns: 1fr; gap: 2px;
  * Completely without time labels or column headers.
  */
-function _renderSubgridColumn(period, dateKey, classes, isWeekend, isNoClassDate, isCurrentMonth) {
+function _renderSubgridColumn(period, dateKey, classes, isWeekend, isNoClassDate, isCurrentMonth, dayOfWeekIdx) {
   const baseMinutes = period === 'AM' ? 450 : 780; // 07:30 AM (450) vs 1:00 PM (780)
+
+  // Resolve day of week column index (0 = Sunday ... 6 = Saturday)
+  let colIdx = typeof dayOfWeekIdx === 'number' ? dayOfWeekIdx : -1;
+  if (colIdx < 0 && dateKey) {
+    const parts = dateKey.split('-');
+    if (parts.length === 3) {
+      colIdx = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10)).getDay();
+    }
+  }
 
   // 1. Generate 9 background 30-minute empty slot units (Rows 1–9)
   // Transparent/clean white space with interactive hover outline
@@ -664,7 +673,11 @@ function _renderSubgridColumn(period, dateKey, classes, isWeekend, isNoClassDate
 
     const isTopHalf = (c.startRow < 6);
     const vPosClass = isTopHalf ? 'top-0' : 'bottom-0';
-    const hPosClass = (period === 'AM') ? 'left-0' : 'right-0';
+    const hPosClass = (colIdx >= 0 && colIdx <= 2)
+      ? 'left-0'
+      : (colIdx >= 4
+          ? 'right-0'
+          : (period === 'AM' ? 'left-0' : 'right-0'));
     const meetingNum = c.stats.meetingNum || '';
     const isCompleted = c.isDone;
 
@@ -896,8 +909,8 @@ function _renderCalendarDayCell(g, isCurrentMonth, todayKey, timetableMap, meeti
 
       <!-- 2-Column Vertical Subgrid (AM & PM) across all days -->
       <div class="calendar-2col-container grid grid-cols-2 gap-1 mt-1 w-full flex-1">
-        ${_renderSubgridColumn('AM', dateKey, amClasses, isWeekend, isNoClassDate, isCurrentMonth)}
-        ${_renderSubgridColumn('PM', dateKey, pmClasses, isWeekend, isNoClassDate, isCurrentMonth)}
+        ${_renderSubgridColumn('AM', dateKey, amClasses, isWeekend, isNoClassDate, isCurrentMonth, dayOfWeekIdx)}
+        ${_renderSubgridColumn('PM', dateKey, pmClasses, isWeekend, isNoClassDate, isCurrentMonth, dayOfWeekIdx)}
       </div>
     </div>
   `;
