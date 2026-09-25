@@ -599,30 +599,103 @@ function _renderSubgridColumn(period, dateKey, classes, isWeekend, isNoClassDate
     const styleClasses = getSubjectPillStyles(c.course, hasActivity, c.isNoClass);
     const tooltipText = `${c.course} (${c.section}) • ${formatTimeDisplay(c.startTime)} – ${formatTimeDisplay(c.endTime)}\n${c.room ? 'Room: ' + c.room + '\n' : ''}${c.stats.meetingNum ? 'Mtg #' + c.stats.meetingNum + ' (' + c.stats.meetingsLeft + ' left)\n' : ''}${c.topic || 'No topic planned yet'}`;
 
+    const sub = (courseData && Array.isArray(courseData.subjects))
+      ? courseData.subjects.find(s => s.code === c.course)
+      : (c.sub || null);
+
+    let badgeColor = (sub && sub.badgeBg)
+      ? sub.badgeBg
+      : 'bg-blue-100 dark:bg-[#0f274a] text-blue-800 dark:text-blue-200 border-blue-300 dark:border-blue-600';
+
+    if (c.type === 'Exam') {
+      badgeColor = 'bg-amber-100 dark:bg-amber-950/70 text-amber-900 dark:text-amber-200 border-amber-300 dark:border-amber-800';
+    } else if (c.isNoClass) {
+      badgeColor = 'bg-rose-100 dark:bg-rose-950/70 text-rose-800 dark:text-rose-200 border-rose-300 dark:border-rose-800';
+    } else if (c.type === 'Makeup Class') {
+      badgeColor = 'bg-amber-50/90 dark:bg-amber-950/60 text-amber-950 dark:text-amber-200 border-amber-300 dark:border-amber-700';
+    } else if (c.type === 'Special Session') {
+      badgeColor = 'bg-violet-50/90 dark:bg-violet-950/60 text-violet-950 dark:text-violet-200 border-violet-300 dark:border-violet-700';
+    }
+
+    const isTopHalf = (c.startRow < 6);
+    const vPosClass = isTopHalf ? 'top-0' : 'bottom-0';
+    const hPosClass = (period === 'AM') ? 'left-0' : 'right-0';
+    const meetingNum = c.stats.meetingNum || '';
+    const isCompleted = c.isDone;
+
     return `
-      <div 
-        data-action="openLessonModal" 
-        data-date="${dateKey}" 
-        data-course="${escapeHtml(c.course)}" 
-        data-section="${escapeHtml(c.section)}" 
-        data-weekend="${isWeekend ? 'true' : 'false'}"
-        data-subject-title="${escapeHtml(c.sub?.title || c.course)}"
-        data-topic="${escapeHtml(c.topic || '')}"
-        data-activity="${escapeHtml(c.activity || '')}"
-        data-room="${escapeHtml(c.room || '')}"
-        data-start-time="${escapeHtml(c.startTime || '')}"
-        data-end-time="${escapeHtml(c.endTime || '')}"
-        data-type="${escapeHtml(c.type || 'Lecture')}"
-        data-status="${escapeHtml(c.entry?.status || 'Planned')}"
-        data-meeting-num="${c.stats.meetingNum || ''}"
-        data-total-meetings="${c.stats.totalMeetings || ''}"
-        data-meetings-left="${c.stats.meetingsLeft || ''}"
-        data-has-activity="${hasActivity ? 'true' : 'false'}"
-        style="grid-row: ${c.startRow} / span ${c.span}; grid-column: ${c.track || 1} / span 1; z-index: 10;" 
-        class="planner-calendar-pill planner-class-pill pointer-events-auto cursor-pointer flex flex-col justify-center select-none ${styleClasses}"
-        title="${escapeHtml(tooltipText)}">
-        <span class="text-[9.5px] font-black leading-tight truncate text-left w-full">${escapeHtml(c.course)}</span>
-        <span class="text-[8.5px] font-bold leading-tight truncate text-left w-full opacity-90">${escapeHtml(c.section)}</span>
+      <div class="calendar-pill-slot relative group/cal-card" 
+           style="grid-row: ${c.startRow} / span ${c.span}; grid-column: ${c.track || 1} / span 1;">
+        
+        <!-- Collapsed Compact State (matches pill requirements) -->
+        <div 
+          data-action="openLessonModal" 
+          data-date="${dateKey}" 
+          data-course="${escapeHtml(c.course)}" 
+          data-section="${escapeHtml(c.section)}" 
+          data-weekend="${isWeekend ? 'true' : 'false'}"
+          data-subject-title="${escapeHtml(c.sub?.title || c.course)}"
+          data-topic="${escapeHtml(c.topic || '')}"
+          data-activity="${escapeHtml(c.activity || '')}"
+          data-room="${escapeHtml(c.room || '')}"
+          data-start-time="${escapeHtml(c.startTime || '')}"
+          data-end-time="${escapeHtml(c.endTime || '')}"
+          data-type="${escapeHtml(c.type || 'Lecture')}"
+          data-status="${escapeHtml(c.entry?.status || 'Planned')}"
+          data-meeting-num="${c.stats.meetingNum || ''}"
+          data-total-meetings="${c.stats.totalMeetings || ''}"
+          data-meetings-left="${c.stats.meetingsLeft || ''}"
+          data-has-activity="${hasActivity ? 'true' : 'false'}"
+          class="planner-calendar-pill planner-class-pill pointer-events-auto cursor-pointer flex flex-col justify-center select-none w-full h-full ${styleClasses}"
+          title="${escapeHtml(tooltipText)}">
+          <span class="text-[9.5px] font-black leading-tight truncate text-left w-full">${escapeHtml(c.course)}</span>
+          <span class="text-[8.5px] font-bold leading-tight truncate text-left w-full opacity-90">${escapeHtml(c.section)}</span>
+        </div>
+
+        <!-- In-Place Expanding Card on Hover (Weekly View Behavior) -->
+        <div 
+          data-action="openLessonModal" 
+          data-date="${dateKey}" 
+          data-course="${escapeHtml(c.course)}" 
+          data-section="${escapeHtml(c.section)}" 
+          data-weekend="${isWeekend ? 'true' : 'false'}"
+          class="planner-calendar-expanded-card ${vPosClass} ${hPosClass} p-1.5 rounded-lg border ${badgeColor} shadow-xl flex flex-col gap-0.5 cursor-pointer select-none">
+          
+          <!-- Top Row: Meeting # & Status / Type Badges -->
+          <div class="flex items-center justify-between gap-1 overflow-hidden leading-tight">
+            ${!c.isNoClass ? `
+              <span class="font-extrabold text-[8.5px] uppercase tracking-tight truncate">Mtg #${meetingNum}</span>
+            ` : `
+              <span class="font-extrabold text-[8.5px] uppercase tracking-tight text-rose-700 dark:text-rose-300 truncate">${escapeHtml(c.type || 'No Class')}</span>
+            `}
+            <div class="flex items-center gap-1 shrink-0">
+              ${isCompleted ? '<span class="text-[7.5px] px-1 py-0.2 rounded font-black bg-emerald-600 text-white shrink-0">✓ Done</span>' : ''}
+              <span class="text-[7.5px] px-1 py-0.2 rounded font-bold bg-white/90 dark:bg-slate-900/90 text-slate-800 dark:text-slate-200 border border-slate-300/60 dark:border-slate-700 shrink-0">${escapeHtml(c.type || 'Lecture')}</span>
+            </div>
+          </div>
+
+          <!-- Course & Section Subtitle -->
+          <div class="text-[8px] font-extrabold uppercase tracking-tight opacity-75 truncate -mb-0.5">${escapeHtml(c.course)} (${escapeHtml(c.section)})</div>
+
+          <!-- Topic Title -->
+          <div class="font-bold text-[10.5px] leading-tight text-current truncate" title="${escapeHtml(c.topic || c.sub?.title || c.course)}">${escapeHtml(c.topic || c.sub?.title || 'Planned Activity')}</div>
+          
+          <!-- Activity Description (if present) -->
+          ${c.activity ? `<div class="text-[8.5px] opacity-80 leading-tight truncate" title="${escapeHtml(c.activity)}">${escapeHtml(c.activity)}</div>` : ''}
+
+          <!-- Time & Room Strip -->
+          <div class="flex items-center justify-between text-[8.5px] font-mono font-bold pt-1 mt-0.5 border-t border-current/15 text-current opacity-90 leading-tight">
+            <span class="truncate whitespace-nowrap">🕒 ${formatTime12(c.startTime)} – ${formatTime12(c.endTime)}</span>
+            <span class="px-1 py-0.2 rounded bg-white/90 dark:bg-slate-900/90 text-slate-800 dark:text-slate-200 border border-slate-300/60 dark:border-slate-700 font-sans font-semibold shrink-0">${escapeHtml(c.room || 'TBA')}</span>
+          </div>
+
+          <!-- Action Buttons Strip -->
+          <div class="flex items-center justify-end gap-1 pt-1 mt-0.5 border-t border-current/15">
+            <button type="button" data-action="copyMatrixActivity" data-stop-propagation="true" data-date="${dateKey}" data-course="${escapeHtml(c.course)}" data-section="${escapeHtml(c.section)}" class="flex-1 py-1 px-1 rounded-md bg-white/95 dark:bg-slate-800 hover:bg-white dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-[10px] font-bold border border-slate-300 dark:border-slate-600 shadow-2xs inline-flex items-center justify-center gap-0.5 cursor-pointer transition" title="Copy Activity">📋 Copy</button>
+            <button type="button" data-action="pasteMatrixActivity" data-stop-propagation="true" data-date="${dateKey}" data-course="${escapeHtml(c.course)}" data-section="${escapeHtml(c.section)}" class="flex-1 py-1 px-1 rounded-md bg-white/95 dark:bg-slate-800 hover:bg-white dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-[10px] font-bold border border-slate-300 dark:border-slate-600 shadow-2xs inline-flex items-center justify-center gap-0.5 cursor-pointer transition" title="Paste Copied Activity">📥 Paste</button>
+            <button type="button" data-action="openLessonModal" data-stop-propagation="true" data-date="${dateKey}" data-course="${escapeHtml(c.course)}" data-section="${escapeHtml(c.section)}" data-weekend="${isWeekend ? 'true' : 'false'}" class="flex-1 py-1 px-1 rounded-md bg-white/95 dark:bg-slate-800 hover:bg-white dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-[10px] font-bold border border-slate-300 dark:border-slate-600 shadow-2xs inline-flex items-center justify-center gap-0.5 cursor-pointer transition" title="Edit Activity">✏️ Edit</button>
+          </div>
+        </div>
       </div>
     `;
   }).join('');
@@ -1095,21 +1168,8 @@ function hidePlannerPillPopover() {
   }
 }
 
+// Floating popover disabled in favor of in-place expanding cards (matching weekly view)
 if (typeof document !== 'undefined') {
-  document.addEventListener('mouseover', (e) => {
-    const pill = e.target.closest('.planner-calendar-pill');
-    if (pill) {
-      showPlannerPillPopover(pill);
-    }
-  });
-
-  document.addEventListener('mouseout', (e) => {
-    const pill = e.target.closest('.planner-calendar-pill');
-    if (pill) {
-      hidePlannerPillPopover();
-    }
-  });
-
   window.addEventListener('scroll', () => hidePlannerPillPopover(), true);
 }
 

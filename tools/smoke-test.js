@@ -1036,6 +1036,15 @@ setTimeout(() => {
         if (!popover) return false;
         hidePlannerPillPopover();
 
+        // Expanding Card verification (Weekly View behavior on hover)
+        const expandedCards = document.querySelectorAll('#planner-calendar-view-container .planner-calendar-expanded-card');
+        if (expandedCards.length === 0) return false;
+        const firstExpandedCard = expandedCards[0];
+        const copyBtn = firstExpandedCard.querySelector('[data-action="copyMatrixActivity"]');
+        const pasteBtn = firstExpandedCard.querySelector('[data-action="pasteMatrixActivity"]');
+        const editBtn = firstExpandedCard.querySelector('[data-action="openLessonModal"]');
+        if (!copyBtn || !pasteBtn || !editBtn) return false;
+
         return true;
       })()`);
     }],
