@@ -1503,3 +1503,60 @@ html.theme-dark input[type="date"]::-webkit-calendar-picker-indicator {
   z-index: 15 !important;
 }
 
+/* ==========================================================================
+ * 9-COLUMN SUBGRID SYSTEM FOR MONTHLY PLANNER CALENDAR
+ * ========================================================================== */
+
+.calendar-subgrid-row {
+  position: relative;
+  width: 100%;
+  min-height: 32px;
+}
+
+.planner-empty-slot {
+  height: 100%;
+  min-height: 28px;
+  border-radius: 4px;
+  border: 1px dashed rgba(203, 213, 225, 0.8);
+  background-color: transparent;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+}
+
+html.theme-dark .planner-empty-slot {
+  border-color: rgba(51, 65, 85, 0.7);
+}
+
+.planner-empty-slot:hover {
+  background-color: rgba(144, 27, 43, 0.08);
+  border-color: rgba(144, 27, 43, 0.4);
+  transform: scale(0.97);
+}
+
+html.theme-dark .planner-empty-slot:hover {
+  background-color: rgba(244, 63, 94, 0.15);
+  border-color: rgba(244, 63, 94, 0.5);
+}
+
+.planner-calendar-pill {
+  position: relative;
+  border-radius: 4px;
+  padding: 2px 4px;
+  cursor: pointer;
+  overflow: hidden;
+  user-select: none;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
+  min-height: 28px;
+}
+
+.planner-calendar-pill:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 6px -1px rgba(0, 0, 0, 0.12), 0 2px 4px -2px rgba(0, 0, 0, 0.08);
+  filter: brightness(1.03);
+  z-index: 25 !important;
+}
+
+#planner-calendar-popover {
+  transition: opacity 0.15s cubic-bezier(0.16, 1, 0.3, 1), transform 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+

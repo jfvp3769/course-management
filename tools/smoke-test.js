@@ -965,6 +965,144 @@ setTimeout(() => {
 
         return true;
       })()`);
+    }],
+    ['planner calendar day cells render 9-column subgrid rows for AM and PM with dynamic column spanning', () => {
+      return window.__probe(`(() => {
+        setPlannerViewMode('month');
+        renderPlannerMonthCalendar();
+
+        // 1. Check mapping math
+        const m1 = mapTimeToGridColumn(450, 540, 'AM'); // 7:30–9:00
+        const m2 = mapTimeToGridColumn(480, 540, 'AM'); // 8:00–9:00
+        const m3 = mapTimeToGridColumn(780, 960, 'PM'); // 1:00–4:00
+        const m4 = mapTimeToGridColumn(960, 1020, 'PM'); // 4:00–5:00
+
+        if (m1.startCol !== 1 || m1.span !== 3) return false;
+        if (m2.startCol !== 2 || m2.span !== 2) return false;
+        if (m3.startCol !== 1 || m3.span !== 6) return false;
+        if (m4.startCol !== 7 || m4.span !== 2) return false;
+
+        // 2. Check DOM subgrids in rendered cells
+        const subgridRows = Array.from(document.querySelectorAll('#planner-calendar-view-container .calendar-subgrid-row'));
+        if (subgridRows.length === 0) return false;
+
+        // 3. Check 9 empty slot buttons exist in an active month day row
+        const activeRow = subgridRows.find(row => row.querySelectorAll('.planner-empty-slot').length > 0);
+        if (!activeRow) return false;
+        const slots = activeRow.querySelectorAll('.planner-empty-slot');
+        if (slots.length !== 9) return false;
+
+        // Verify slot attributes
+        const slot1 = slots[0];
+        if (!slot1.getAttribute('data-action') || slot1.getAttribute('data-action') !== 'openAddActivityModal') return false;
+        if (!slot1.getAttribute('data-start-time')) return false;
+
+        return true;
+      })()`);
+    }],
+    ['planner calendar pills strictly display Subject Code and Section with state-based styling and popover', () => {
+      return window.__probe(`(() => {
+        setPlannerViewMode('month');
+        renderPlannerMonthCalendar();
+
+        const pills = document.querySelectorAll('#planner-calendar-view-container .planner-calendar-pill');
+        if (pills.length === 0) return false;
+
+        const firstPill = pills[0];
+        const spans = firstPill.querySelectorAll('span');
+        if (spans.length !== 2) return false;
+
+        // Line 1: Subject Code, Line 2: Section
+        const code = firstPill.getAttribute('data-course');
+        const sec = firstPill.getAttribute('data-section');
+        if (spans[0].textContent.trim() !== code || spans[1].textContent.trim() !== sec) return false;
+
+        // Check solid vs muted style functions
+        const solidStyle = getSubjectPillStyles('CVE111', true, false);
+        const mutedStyle = getSubjectPillStyles('CVE111', false, false);
+        if (!solidStyle.includes('text-white') || !solidStyle.includes('shadow-2xs')) return false;
+        if (!mutedStyle.includes('border-dashed')) return false;
+
+        // Popover functions
+        showPlannerPillPopover(firstPill);
+        const popover = document.getElementById('planner-calendar-popover');
+        if (!popover) return false;
+        hidePlannerPillPopover();
+
+        return true;
+      })()`);
+    }],
+    ['add activity modal opens on empty slot click with scope options, auto-fill, and overlap validation', () => {
+      return window.__probe(`(() => {
+        const modal = document.getElementById('add-activity-modal');
+        if (!modal) return false;
+
+        const testDate = '2026-08-17'; // Monday
+        // 1. Open modal for 7:30 slot
+        openAddActivityModal({
+          dateKey: testDate,
+          startTime: '07:30',
+          endTime: '08:30',
+          period: 'AM',
+          unit: 1
+        });
+
+        if (modal.classList.contains('hidden')) return false;
+
+        // Check prefilled inputs
+        const startTimeEl = document.getElementById('add-modal-start-time');
+        const endTimeEl = document.getElementById('add-modal-end-time');
+        if (!startTimeEl || startTimeEl.value !== '07:30') return false;
+
+        // Check scope radios
+        const radioRegular = document.getElementById('scope-regular');
+        const radioOther = document.getElementById('scope-other');
+        if (!radioRegular || !radioOther) return false;
+
+        // Toggle to Other Subject / Makeup
+        radioOther.checked = true;
+        onSubjectScopeRadioChange(null, radioOther);
+        const typeEl = document.getElementById('add-modal-type');
+        if (!typeEl || typeEl.value !== 'Makeup Class') return false;
+
+        // Check subject select has all active subjects
+        const select = document.getElementById('add-activity-subject-select');
+        if (!select || select.options.length === 0) return false;
+
+        // Test overlap validation: Monday 09:00 has CVE111 B15.1 scheduled (09:00-11:30)
+        startTimeEl.value = '09:30';
+        endTimeEl.value = '11:00';
+        const hasNoConflict = validateAddActivityTimeLive();
+        // Since 09:30-11:00 overlaps with 09:00-11:30 on Monday, conflict must be detected (false)
+        const errorBanner = document.getElementById('add-activity-error-banner');
+        if (hasNoConflict === true || errorBanner.classList.contains('hidden')) return false;
+
+        // Test non-overlapping time
+        startTimeEl.value = '07:30';
+        endTimeEl.value = '08:30';
+        const validResult = validateAddActivityTimeLive();
+        if (validResult !== true || !errorBanner.classList.contains('hidden')) return false;
+
+        // Test Save
+        const testTopic = 'SMOKE TEST ADD ACTIVITY';
+        document.getElementById('add-modal-topic').value = testTopic;
+        select.value = 'CVE155__I15';
+        saveAddActivityModal();
+
+        // Verify entry saved in plannerEntries
+        const savedKey = testDate + '__CVE155__I15';
+        const savedEntry = plannerEntries[savedKey];
+        if (!savedEntry || savedEntry.topic !== testTopic) return false;
+
+        // Clean up
+        delete plannerEntries[savedKey];
+        saveAppState();
+
+        closeAddActivityModal();
+        if (!modal.classList.contains('hidden')) return false;
+
+        return true;
+      })()`);
     }]
   ];
 

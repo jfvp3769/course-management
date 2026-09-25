@@ -411,7 +411,231 @@ function renderPlannerMonthCalendar() {
 }
 
 /**
- * Render a single calendar cell in the 7-day grid.
+ * Parse time string (e.g., '07:30', '7:30', '1:00 PM', '13:00') to minutes from midnight.
+ */
+function parseTimeToMinutes(timeStr) {
+  if (!timeStr || typeof timeStr !== 'string') return null;
+  const s = timeStr.trim().toUpperCase();
+  const isPM = s.includes('PM');
+  const isAM = s.includes('AM');
+  const clean = s.replace(/[A-Z]/g, '').trim();
+  const parts = clean.split(':');
+  if (parts.length < 2) return null;
+  let hours = parseInt(parts[0], 10);
+  const minutes = parseInt(parts[1], 10);
+  if (isNaN(hours) || isNaN(minutes)) return null;
+
+  if (isPM && hours < 12) hours += 12;
+  if (isAM && hours === 12) hours = 0;
+  return hours * 60 + minutes;
+}
+
+/**
+ * Format minutes from midnight to HH:mm string.
+ */
+function formatMinutesToHHMM(minutes) {
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+}
+
+/**
+ * Format 24-hr time string to 12-hr display (e.g. '07:30' -> '7:30 AM').
+ */
+function formatTimeDisplay(timeStr) {
+  const mins = parseTimeToMinutes(timeStr);
+  if (mins === null) return timeStr || '';
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  const displayH = h % 12 === 0 ? 12 : h % 12;
+  return `${displayH}:${String(m).padStart(2, '0')} ${ampm}`;
+}
+
+/**
+ * Map start and end minutes to CSS grid columns (1-based, 1..9, span 1..9).
+ * Row 1 (AM): 7:30 AM (450m) – 12:00 PM (720m) -> 9 units of 30 mins
+ * Row 2 (PM): 1:00 PM (780m) – 5:30 PM (1050m) -> 9 units of 30 mins
+ */
+function mapTimeToGridColumn(startMins, endMins, period) {
+  const base = period === 'AM' ? 450 : 780;
+  const startCol = Math.max(1, Math.min(9, Math.floor((startMins - base) / 30) + 1));
+  const endCol = Math.max(startCol + 1, Math.min(10, Math.ceil((endMins - base) / 30) + 1));
+  const span = Math.max(1, Math.min(10 - startCol, endCol - startCol));
+  return { startCol, span };
+}
+
+/**
+ * Assign grid tracks (rows) to prevent collision when classes in the same period overlap.
+ */
+function assignGridTracks(classes) {
+  const tracks = [];
+  classes.forEach(c => {
+    let placedTrack = 1;
+    for (let t = 0; t < tracks.length; t++) {
+      const hasCollision = tracks[t].some(occ => {
+        return Math.max(c.startCol, occ.startCol) < Math.min(c.startCol + c.span, occ.startCol + occ.span);
+      });
+      if (!hasCollision) {
+        placedTrack = t + 1;
+        tracks[t].push({ startCol: c.startCol, span: c.span });
+        c.track = placedTrack;
+        return;
+      }
+    }
+    placedTrack = tracks.length + 1;
+    tracks.push([{ startCol: c.startCol, span: c.span }]);
+    c.track = placedTrack;
+  });
+}
+
+/**
+ * Returns state-based styling for a subject pill according to palette and planned activity state.
+ * - With Planned Activity: Solid/proper theme color (high contrast, full saturation/opacity).
+ * - No Planned Activity: Muted/pale styling of the subject color (low opacity tint/light pastel fill with dashed border).
+ */
+function getSubjectPillStyles(courseCode, hasPlannedActivity, isNoClass) {
+  if (isNoClass) {
+    return 'bg-rose-100 dark:bg-rose-950/70 text-rose-800 dark:text-rose-300 border border-rose-300 dark:border-rose-800 line-through opacity-85';
+  }
+
+  const sub = (courseData && Array.isArray(courseData.subjects))
+    ? courseData.subjects.find(s => s.code === courseCode)
+    : null;
+  const theme = (sub && sub.colorTheme ? sub.colorTheme.toLowerCase() : 'blue');
+
+  const solidThemes = {
+    blue: 'bg-blue-600 dark:bg-blue-700 text-white border border-blue-700 dark:border-blue-500 shadow-2xs',
+    emerald: 'bg-emerald-600 dark:bg-emerald-700 text-white border border-emerald-700 dark:border-emerald-500 shadow-2xs',
+    amber: 'bg-amber-600 dark:bg-amber-700 text-white border border-amber-700 dark:border-amber-500 shadow-2xs',
+    purple: 'bg-purple-600 dark:bg-purple-700 text-white border border-purple-700 dark:border-purple-500 shadow-2xs',
+    teal: 'bg-teal-600 dark:bg-teal-700 text-white border border-teal-700 dark:border-teal-500 shadow-2xs',
+    rose: 'bg-rose-600 dark:bg-rose-700 text-white border border-rose-700 dark:border-rose-500 shadow-2xs',
+    indigo: 'bg-indigo-600 dark:bg-indigo-700 text-white border border-indigo-700 dark:border-indigo-500 shadow-2xs',
+    cyan: 'bg-cyan-600 dark:bg-cyan-700 text-white border border-cyan-700 dark:border-cyan-500 shadow-2xs',
+    slate: 'bg-slate-700 dark:bg-slate-700 text-white border border-slate-800 dark:border-slate-600 shadow-2xs'
+  };
+
+  const mutedThemes = {
+    blue: 'bg-blue-50/90 dark:bg-blue-950/40 text-blue-900 dark:text-blue-200 border border-dashed border-blue-300 dark:border-blue-700/80',
+    emerald: 'bg-emerald-50/90 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-200 border border-dashed border-emerald-300 dark:border-emerald-700/80',
+    amber: 'bg-amber-50/90 dark:bg-amber-950/40 text-amber-900 dark:text-amber-200 border border-dashed border-amber-300 dark:border-amber-700/80',
+    purple: 'bg-purple-50/90 dark:bg-purple-950/40 text-purple-900 dark:text-purple-200 border border-dashed border-purple-300 dark:border-purple-700/80',
+    teal: 'bg-teal-50/90 dark:bg-teal-950/40 text-teal-900 dark:text-teal-200 border border-dashed border-teal-300 dark:border-teal-700/80',
+    rose: 'bg-rose-50/90 dark:bg-rose-950/40 text-rose-900 dark:text-rose-200 border border-dashed border-rose-300 dark:border-rose-700/80',
+    indigo: 'bg-indigo-50/90 dark:bg-indigo-950/40 text-indigo-900 dark:text-indigo-200 border border-dashed border-indigo-300 dark:border-indigo-700/80',
+    cyan: 'bg-cyan-50/90 dark:bg-cyan-950/40 text-cyan-900 dark:text-cyan-200 border border-dashed border-cyan-300 dark:border-cyan-700/80',
+    slate: 'bg-slate-100/90 dark:bg-slate-800/60 text-slate-800 dark:text-slate-200 border border-dashed border-slate-300 dark:border-slate-700'
+  };
+
+  if (hasPlannedActivity) {
+    return solidThemes[theme] || solidThemes.slate;
+  } else {
+    return mutedThemes[theme] || mutedThemes.slate;
+  }
+}
+
+/**
+ * Render a 9-column subgrid row for AM (7:30–12:00) or PM (1:00–5:30).
+ */
+function _renderSubgridRow(period, dateKey, classes, isWeekend, isNoClassDate, isCurrentMonth) {
+  const baseMinutes = period === 'AM' ? 450 : 780; // 07:30 AM (450) vs 1:00 PM (780)
+  const periodLabel = period === 'AM' ? 'AM (7:30–12:00)' : 'PM (1:00–5:30)';
+
+  // 1. Generate 9 background 30-minute empty slot units
+  const slotsHtml = [];
+  for (let u = 1; u <= 9; u++) {
+    const startM = baseMinutes + (u - 1) * 30;
+    const endM = startM + 30;
+    const startStr = formatMinutesToHHMM(startM);
+    const endStr = formatMinutesToHHMM(endM);
+
+    if (!isCurrentMonth) {
+      slotsHtml.push(`
+        <div style="grid-column: ${u} / span 1; grid-row: 1;" class="h-full rounded-xs border border-dashed border-slate-200/40 dark:border-slate-800/40 pointer-events-none"></div>
+      `);
+    } else {
+      slotsHtml.push(`
+        <button type="button" 
+          data-action="openAddActivityModal" 
+          data-date="${dateKey}" 
+          data-period="${period}" 
+          data-unit="${u}" 
+          data-start-time="${startStr}" 
+          data-end-time="${formatMinutesToHHMM(startM + 60)}"
+          style="grid-column: ${u} / span 1; grid-row: 1;" 
+          class="planner-empty-slot w-full h-full select-none" 
+          title="Click to add activity at ${formatTimeDisplay(startStr)} (${period})">
+        </button>
+      `);
+    }
+  }
+
+  // 2. Map and layout class pills
+  classes.forEach(c => {
+    const startM = parseTimeToMinutes(c.startTime) ?? baseMinutes;
+    const endM = parseTimeToMinutes(c.endTime) ?? (startM + 90);
+    const { startCol, span } = mapTimeToGridColumn(startM, endM, period);
+    c.startCol = startCol;
+    c.span = span;
+  });
+
+  assignGridTracks(classes);
+
+  const pillsHtml = classes.map(c => {
+    const hasActivity = !!(c.hasPlannedActivity);
+    const styleClasses = getSubjectPillStyles(c.course, hasActivity, c.isNoClass);
+    const tooltipText = `${c.course} (${c.section}) • ${formatTimeDisplay(c.startTime)} – ${formatTimeDisplay(c.endTime)}\n${c.room ? 'Room: ' + c.room + '\n' : ''}${c.stats.meetingNum ? 'Mtg #' + c.stats.meetingNum + ' (' + c.stats.meetingsLeft + ' left)\n' : ''}${c.topic || 'No topic planned yet'}`;
+
+    return `
+      <div 
+        data-action="openLessonModal" 
+        data-date="${dateKey}" 
+        data-course="${escapeHtml(c.course)}" 
+        data-section="${escapeHtml(c.section)}" 
+        data-weekend="${isWeekend ? 'true' : 'false'}"
+        data-subject-title="${escapeHtml(c.sub?.title || c.course)}"
+        data-topic="${escapeHtml(c.topic || '')}"
+        data-activity="${escapeHtml(c.activity || '')}"
+        data-room="${escapeHtml(c.room || '')}"
+        data-start-time="${escapeHtml(c.startTime || '')}"
+        data-end-time="${escapeHtml(c.endTime || '')}"
+        data-type="${escapeHtml(c.type || 'Lecture')}"
+        data-status="${escapeHtml(c.entry?.status || 'Planned')}"
+        data-meeting-num="${c.stats.meetingNum || ''}"
+        data-total-meetings="${c.stats.totalMeetings || ''}"
+        data-meetings-left="${c.stats.meetingsLeft || ''}"
+        data-has-activity="${hasActivity ? 'true' : 'false'}"
+        style="grid-column: ${c.startCol} / span ${c.span}; grid-row: ${c.track || 1}; min-height: 28px;" 
+        class="planner-calendar-pill planner-class-pill pointer-events-auto cursor-pointer flex flex-col justify-center select-none ${styleClasses}"
+        title="${escapeHtml(tooltipText)}">
+        <span class="text-[9px] font-black leading-tight truncate text-left w-full">${escapeHtml(c.course)}</span>
+        <span class="text-[8px] font-bold leading-tight truncate text-left w-full opacity-90">${escapeHtml(c.section)}</span>
+      </div>
+    `;
+  }).join('');
+
+  return `
+    <div class="calendar-period-row flex flex-col mb-1 last:mb-0">
+      <div class="flex items-center justify-between text-[7px] sm:text-[7.5px] font-extrabold uppercase text-slate-400 dark:text-slate-500 mb-0.5 select-none px-0.5 tracking-wider">
+        <span>${periodLabel}</span>
+      </div>
+      <div class="calendar-subgrid-row relative min-h-[30px] rounded border border-slate-200/60 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-900/40 p-0.5">
+        <!-- Layer 1: Background 9 30-min empty slot units -->
+        <div class="grid grid-cols-9 gap-0.5 absolute inset-0 p-0.5 z-0" style="grid-template-columns: repeat(9, minmax(0, 1fr));">
+          ${slotsHtml.join('')}
+        </div>
+        <!-- Layer 2: Foreground Class Pills -->
+        <div class="grid grid-cols-9 gap-0.5 relative z-10 pointer-events-none" style="grid-template-columns: repeat(9, minmax(0, 1fr));">
+          ${pillsHtml}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * Render a single calendar cell in the 7-day grid with 9-column AM and PM subgrids.
  */
 function _renderCalendarDayCell(g, isCurrentMonth, todayKey, timetableMap, meetingStats) {
   const { dateKey, dayNum, dateObj } = g;
@@ -428,7 +652,6 @@ function _renderCalendarDayCell(g, isCurrentMonth, todayKey, timetableMap, meeti
   const calendarEvent = (typeof getCalendarEventForDate === 'function')
     ? getCalendarEventForDate(dateKey)
     : (semesterEntry ? semesterEntry.event : null);
-  const customNote = dailyNotes[dateKey] || '';
 
   // Gather scheduled classes for this date
   const dayClasses = [];
@@ -437,7 +660,6 @@ function _renderCalendarDayCell(g, isCurrentMonth, todayKey, timetableMap, meeti
     courseData.subjects.forEach(sub => {
       (sub.sections || []).forEach(sec => {
         const fullSecKey = `${sub.code} - ${sec}`;
-        // Strategy 2: If filtered to a specific section, ignore others
         if (plannerSectionFilter !== 'all' && plannerSectionFilter !== fullSecKey) {
           return;
         }
@@ -454,6 +676,7 @@ function _renderCalendarDayCell(g, isCurrentMonth, todayKey, timetableMap, meeti
           const stats = meetingStats[cellKey] || { meetingNum: 0, totalMeetings: 0, meetingsLeft: 0 };
           const isDone = entry && (entry.status === 'Completed' || (dateKey < todayKey && entry.status !== 'Cancelled'));
           const isNoClass = entry && (entry.type === 'No Class' || (entry.topic && entry.topic.toLowerCase().includes('no class')));
+          const hasPlannedActivity = !!(!isNoClass && entry && ((entry.topic && entry.topic.trim()) || (entry.activity && entry.activity.trim())));
 
           dayClasses.push({
             course: sub.code,
@@ -466,6 +689,7 @@ function _renderCalendarDayCell(g, isCurrentMonth, todayKey, timetableMap, meeti
             entry,
             isDone,
             isNoClass,
+            hasPlannedActivity,
             stats,
             cellKey,
             startTime: (entry && entry.startTime) || (timetableSlot && timetableSlot.startTime) || '07:30',
@@ -483,6 +707,18 @@ function _renderCalendarDayCell(g, isCurrentMonth, todayKey, timetableMap, meeti
   // Sort classes chronologically by start time
   dayClasses.sort((a, b) => (a.startTime || '').localeCompare(b.startTime || ''));
 
+  // Split into AM and PM classes (threshold: start minutes < 750 / 12:30 PM)
+  const amClasses = [];
+  const pmClasses = [];
+  dayClasses.forEach(c => {
+    const sMin = parseTimeToMinutes(c.startTime) ?? 450;
+    if (sMin < 750) {
+      amClasses.push(c);
+    } else {
+      pmClasses.push(c);
+    }
+  });
+
   // Cell Background & Text Theme
   let cellBgClass = 'bg-white dark:bg-slate-900';
   if (!isCurrentMonth) {
@@ -493,14 +729,8 @@ function _renderCalendarDayCell(g, isCurrentMonth, todayKey, timetableMap, meeti
 
   const todayBorder = isToday ? 'ring-2 ring-inset ring-msu-maroon dark:ring-rose-500 shadow-sm z-10' : '';
 
-  // Limit visible classes in cell (Strategy 1: Compact Pills + Popover)
-  // If filtered to 1 section, show up to 3; otherwise show up to 2 pills to keep row height uniform
-  const maxVisible = (plannerSectionFilter !== 'all' || dayClasses.length <= 2) ? 3 : 2;
-  const visibleClasses = dayClasses.slice(0, maxVisible);
-  const hiddenCount = Math.max(0, dayClasses.length - maxVisible);
-
   return `
-    <div id="cal-day-${dateKey}" data-date="${dateKey}" class="planner-calendar-cell flex flex-col p-1.5 min-h-[120px] sm:min-h-[135px] border-r border-b border-slate-200 dark:border-slate-800 ${cellBgClass} ${todayBorder} transition-colors group/cal-cell relative">
+    <div id="cal-day-${dateKey}" data-date="${dateKey}" class="planner-calendar-cell flex flex-col p-1 sm:p-1.5 min-h-[125px] sm:min-h-[140px] border-r border-b border-slate-200 dark:border-slate-800 ${cellBgClass} ${todayBorder} transition-colors group/cal-cell relative">
       <!-- Day Cell Top Header -->
       <div class="flex items-center justify-between gap-1 mb-1 shrink-0">
         <!-- Date Number & Today Pill -->
@@ -538,54 +768,10 @@ function _renderCalendarDayCell(g, isCurrentMonth, todayKey, timetableMap, meeti
         </div>
       ` : ''}
 
-      <!-- Class Pills Container (Strategy 1) -->
-      <div class="space-y-1 flex-1 min-h-0 overflow-hidden">
-        ${visibleClasses.map(c => {
-          const pillBorder = c.sub ? c.sub.headerBg : 'bg-slate-700 text-white';
-          const topicDisplay = c.topic || '+ Click to plan';
-          const isUnplanned = !c.topic;
-          const timeSnippet = c.startTime ? c.startTime.replace(/^0/, '') : '';
-
-          let pillBg = 'bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 border-slate-300 dark:border-slate-700';
-          if (c.isNoClass) {
-            pillBg = 'bg-rose-50 dark:bg-rose-950/50 text-rose-800 dark:text-rose-300 border-rose-200 dark:border-rose-800/80';
-          } else if (c.type === 'Exam') {
-            pillBg = 'bg-amber-50 dark:bg-amber-950/50 text-amber-900 dark:text-amber-300 border-amber-300 dark:border-amber-800/80';
-          } else if (c.isSpecialSession) {
-            pillBg = 'bg-indigo-50/80 dark:bg-indigo-950/40 text-indigo-900 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800/80';
-          }
-
-          const tooltip = `${c.course} (${c.section}) • ${c.startTime} - ${c.endTime} • ${c.room || 'No Room'}\n${c.stats.meetingNum ? `Meeting #${c.stats.meetingNum} (${c.stats.meetingsLeft} left)\n` : ''}${c.topic || 'No topic planned yet'}`;
-
-          return `
-            <div data-action="openLessonModal" data-date="${dateKey}" data-course="${escapeHtml(c.course)}" data-section="${escapeHtml(c.section)}" data-weekend="${isWeekend ? 'true' : 'false'}" class="planner-class-pill flex items-center justify-between gap-1 px-1.5 py-0.5 rounded-md border ${pillBg} cursor-pointer hover:shadow-xs hover:scale-[1.01] active:scale-95 transition select-none" title="${escapeHtml(tooltip)}">
-              <div class="flex items-center gap-1 min-w-0 truncate">
-                ${c.isDone ? '<span class="text-[8.5px] font-black text-emerald-600 dark:text-emerald-400 shrink-0">✓</span>' : ''}
-                <span class="font-extrabold text-[10px] text-slate-900 dark:text-white shrink-0">${escapeHtml(c.course)}</span>
-                <span class="text-[8.5px] text-slate-500 dark:text-slate-400 shrink-0">(${escapeHtml(c.section)})</span>
-                <span class="text-[9px] ${isUnplanned ? 'text-slate-400 italic' : 'font-medium text-slate-700 dark:text-slate-300'} truncate opacity-90">${escapeHtml(topicDisplay)}</span>
-              </div>
-              <span class="text-[8.5px] font-mono text-slate-500 dark:text-slate-400 shrink-0">${escapeHtml(timeSnippet)}</span>
-            </div>
-          `;
-        }).join('')}
-
-        <!-- "+X more classes" Badge (Strategy 1) -->
-        ${hiddenCount > 0 ? `
-          <button type="button" data-action="openPlannerDayInspector" data-date="${dateKey}" class="w-full text-center py-0.5 px-1 rounded-md text-[9.5px] font-bold text-msu-maroon dark:text-rose-300 bg-rose-50/80 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 border border-rose-200/90 dark:border-rose-800/70 transition shadow-2xs mt-0.5 flex items-center justify-center gap-1">
-            <span>+${hiddenCount} more classes</span>
-            <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-          </button>
-        ` : ''}
-
-        <!-- Empty slot quick-plan hover affordance if no classes -->
-        ${dayClasses.length === 0 && !isNoClassDate && isCurrentMonth && !isWeekend ? `
-          <div class="flex-1 flex items-center justify-center opacity-0 group-hover/cal-cell:opacity-100 transition py-1">
-            <button type="button" data-action="openPlannerDayInspector" data-date="${dateKey}" class="text-[10px] text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 font-semibold px-2 py-0.5 rounded hover:bg-slate-100 dark:hover:bg-slate-800 transition">
-              + Plan
-            </button>
-          </div>
-        ` : ''}
+      <!-- 9-Column Subgrid Rows (AM & PM) -->
+      <div class="flex-1 flex flex-col justify-between space-y-1 min-h-0">
+        ${_renderSubgridRow('AM', dateKey, amClasses, isWeekend, isNoClassDate, isCurrentMonth)}
+        ${_renderSubgridRow('PM', dateKey, pmClasses, isWeekend, isNoClassDate, isCurrentMonth)}
       </div>
     </div>
   `;
@@ -801,6 +987,443 @@ function closePlannerDayInspector() {
   activeDayInspectorDate = null;
 }
 
+/* ===========================================================================
+ * HOVER POPOVER LOGIC (150ms Delay with Subject Title, Topic, Room & Time)
+ * ======================================================================== */
+let popoverTimer = null;
+let activeHoveredPill = null;
+
+function showPlannerPillPopover(pill) {
+  if (!pill) return;
+  clearTimeout(popoverTimer);
+  activeHoveredPill = pill;
+
+  popoverTimer = setTimeout(() => {
+    if (activeHoveredPill !== pill) return;
+    const popover = document.getElementById('planner-calendar-popover');
+    const content = document.getElementById('planner-calendar-popover-content');
+    if (!popover || !content) return;
+
+    const course = pill.getAttribute('data-course') || '';
+    const section = pill.getAttribute('data-section') || '';
+    const subjectTitle = pill.getAttribute('data-subject-title') || course;
+    const topic = pill.getAttribute('data-topic') || '';
+    const activity = pill.getAttribute('data-activity') || '';
+    const room = pill.getAttribute('data-room') || '';
+    const startTime = pill.getAttribute('data-start-time') || '';
+    const endTime = pill.getAttribute('data-end-time') || '';
+    const type = pill.getAttribute('data-type') || 'Lecture';
+    const meetingNum = pill.getAttribute('data-meeting-num') || '';
+    const meetingsLeft = pill.getAttribute('data-meetings-left') || '';
+
+    content.innerHTML = `
+      <div class="border-b border-slate-700/60 pb-1.5">
+        <div class="font-black text-xs text-white flex items-center justify-between gap-2">
+          <span>${escapeHtml(course)} (${escapeHtml(section)})</span>
+          <span class="text-[9px] px-1.5 py-0.5 rounded font-bold uppercase bg-white/10 text-slate-200 shrink-0">${escapeHtml(type)}</span>
+        </div>
+        <div class="text-[10.5px] text-slate-300 font-semibold truncate mt-0.5">${escapeHtml(subjectTitle)}</div>
+      </div>
+      <div class="space-y-0.5 text-[10.5px] text-slate-300 pt-0.5">
+        <div class="flex items-center gap-1.5 font-medium">
+          <svg class="w-3 h-3 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <span class="font-mono">${formatTimeDisplay(startTime)} – ${formatTimeDisplay(endTime)}</span>
+        </div>
+        ${room ? `
+          <div class="flex items-center gap-1.5 font-medium">
+            <svg class="w-3 h-3 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            <span>Room: <strong class="text-white">${escapeHtml(room)}</strong></span>
+          </div>
+        ` : ''}
+        ${meetingNum ? `
+          <div class="flex items-center gap-1.5 text-[10px] text-amber-300 font-bold pt-0.5">
+            <span>Mtg #${meetingNum}</span>
+            <span class="text-slate-400">•</span>
+            <span>${meetingsLeft} left in term</span>
+          </div>
+        ` : ''}
+      </div>
+      <div class="pt-1 border-t border-slate-700/60 text-[10.5px]">
+        ${topic ? `
+          <div class="text-slate-100 font-semibold leading-snug">
+            <span class="text-slate-400 font-normal">Topic: </span>${escapeHtml(topic)}
+          </div>
+        ` : '<div class="text-slate-400 italic">No topic planned yet</div>'}
+        ${activity ? `
+          <div class="text-slate-300 text-[10px] leading-snug mt-0.5">
+            <span class="text-slate-400">Activity: </span>${escapeHtml(activity)}
+          </div>
+        ` : ''}
+      </div>
+    `;
+
+    popover.classList.remove('hidden');
+    popover.style.opacity = '0';
+    popover.style.display = 'block';
+
+    const rect = pill.getBoundingClientRect();
+    const popRect = popover.getBoundingClientRect();
+    let top = rect.top - popRect.height - 8;
+    if (top < 10) {
+      top = rect.bottom + 8;
+    }
+    let left = rect.left + (rect.width / 2) - (popRect.width / 2);
+    if (left < 10) left = 10;
+    if (typeof window !== 'undefined' && left + popRect.width > window.innerWidth - 10) {
+      left = window.innerWidth - popRect.width - 10;
+    }
+
+    popover.style.top = `${Math.round(top)}px`;
+    popover.style.left = `${Math.round(left)}px`;
+    popover.style.opacity = '1';
+  }, 150);
+}
+
+function hidePlannerPillPopover() {
+  clearTimeout(popoverTimer);
+  activeHoveredPill = null;
+  const popover = document.getElementById('planner-calendar-popover');
+  if (popover) {
+    popover.classList.add('hidden');
+    popover.style.opacity = '0';
+  }
+}
+
+if (typeof document !== 'undefined') {
+  document.addEventListener('mouseover', (e) => {
+    const pill = e.target.closest('.planner-calendar-pill');
+    if (pill) {
+      showPlannerPillPopover(pill);
+    }
+  });
+
+  document.addEventListener('mouseout', (e) => {
+    const pill = e.target.closest('.planner-calendar-pill');
+    if (pill) {
+      hidePlannerPillPopover();
+    }
+  });
+
+  window.addEventListener('scroll', () => hidePlannerPillPopover(), true);
+}
+
+/* ===========================================================================
+ * "ADD ACTIVITY" MODAL ON EMPTY SLOT CLICK
+ * ======================================================================== */
+let currentAddActivityContext = null;
+
+function openAddActivityModal(context) {
+  if (!context || !context.dateKey) return;
+  hidePlannerPillPopover();
+  currentAddActivityContext = context;
+
+  const modal = document.getElementById('add-activity-modal');
+  if (!modal) return;
+
+  const { dateKey, startTime, endTime, period, unit } = context;
+
+  // Format Subtitle
+  const dateParts = dateKey.split('-');
+  const y = parseInt(dateParts[0], 10);
+  const m = parseInt(dateParts[1], 10);
+  const d = parseInt(dateParts[2], 10);
+  const dObj = new Date(y, m - 1, d);
+  const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const fullDay = dayNames[dObj.getDay()];
+  const isWeekend = (dObj.getDay() === 0 || dObj.getDay() === 6);
+
+  const dateDisplay = dObj.toLocaleDateString('en-US', {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric'
+  });
+
+  const subtitleEl = document.getElementById('add-modal-subtitle');
+  if (subtitleEl) {
+    subtitleEl.innerText = `${dateDisplay} • ${formatTimeDisplay(startTime)} Slot (${period})`;
+  }
+
+  const startTimeEl = document.getElementById('add-modal-start-time');
+  const endTimeEl = document.getElementById('add-modal-end-time');
+  const topicEl = document.getElementById('add-modal-topic');
+  const actEl = document.getElementById('add-modal-activity');
+  const notesEl = document.getElementById('add-modal-notes');
+  const errorBanner = document.getElementById('add-activity-error-banner');
+
+  if (startTimeEl) startTimeEl.value = startTime || (period === 'AM' ? '07:30' : '13:00');
+  if (endTimeEl) endTimeEl.value = endTime || formatMinutesToHHMM((parseTimeToMinutes(startTimeEl.value) || 450) + 60);
+  if (topicEl) topicEl.value = '';
+  if (actEl) actEl.value = '';
+  if (notesEl) notesEl.value = '';
+  if (errorBanner) errorBanner.classList.add('hidden');
+
+  // Determine available subjects scheduled on fullDay
+  const regularSlots = (Array.isArray(weeklyTimetable) ? weeklyTimetable : []).filter(t => t.day === fullDay);
+
+  const radioRegular = document.getElementById('scope-regular');
+  const radioOther = document.getElementById('scope-other');
+
+  if (regularSlots.length > 0 && !isWeekend) {
+    if (radioRegular) radioRegular.checked = true;
+    _populateAddSubjectSelect('regular', fullDay);
+  } else {
+    if (radioOther) radioOther.checked = true;
+    _populateAddSubjectSelect('other', fullDay);
+  }
+
+  // Trigger initial auto-fill
+  onAddActivitySubjectSelectChange();
+
+  modal.classList.remove('hidden');
+}
+
+function closeAddActivityModal() {
+  const modal = document.getElementById('add-activity-modal');
+  if (modal) modal.classList.add('hidden');
+  currentAddActivityContext = null;
+}
+
+function _populateAddSubjectSelect(scope, fullDay) {
+  const select = document.getElementById('add-activity-subject-select');
+  if (!select) return;
+
+  let optionsHtml = '';
+
+  if (scope === 'regular') {
+    const regularSlots = (Array.isArray(weeklyTimetable) ? weeklyTimetable : []).filter(t => t.day === fullDay);
+    if (regularSlots.length === 0) {
+      optionsHtml = '<option value="" disabled selected>(No subjects scheduled on this weekday)</option>';
+    } else {
+      regularSlots.forEach(t => {
+        const sub = (courseData?.subjects || []).find(s => s.code === t.course);
+        const title = sub ? sub.title : t.course;
+        optionsHtml += `<option value="${escapeHtml(t.course)}__${escapeHtml(t.section)}">${escapeHtml(t.course)} (${escapeHtml(t.section)}) - ${escapeHtml(title)}</option>`;
+      });
+    }
+  } else {
+    // Other Subject / Makeup - all active subjects
+    if (courseData && Array.isArray(courseData.subjects)) {
+      courseData.subjects.forEach(sub => {
+        (sub.sections || []).forEach(sec => {
+          optionsHtml += `<option value="${escapeHtml(sub.code)}__${escapeHtml(sec)}">${escapeHtml(sub.code)} (${escapeHtml(sec)}) - ${escapeHtml(sub.title || sub.code)}</option>`;
+        });
+      });
+    }
+  }
+
+  select.innerHTML = optionsHtml;
+}
+
+function onSubjectScopeRadioChange(e, target) {
+  const radio = target || document.querySelector('input[name="add-subject-scope"]:checked');
+  const scope = radio ? radio.value : 'regular';
+
+  let fullDay = 'Monday';
+  if (currentAddActivityContext && currentAddActivityContext.dateKey) {
+    const parts = currentAddActivityContext.dateKey.split('-');
+    const dObj = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+    const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    fullDay = dayNames[dObj.getDay()];
+  }
+
+  _populateAddSubjectSelect(scope, fullDay);
+
+  const typeEl = document.getElementById('add-modal-type');
+  if (typeEl) {
+    typeEl.value = (scope === 'other') ? 'Makeup Class' : 'Lecture';
+  }
+
+  onAddActivitySubjectSelectChange();
+}
+
+function onAddActivitySubjectSelectChange(e, target) {
+  const select = document.getElementById('add-activity-subject-select');
+  const roomEl = document.getElementById('add-modal-room');
+  const startTimeEl = document.getElementById('add-modal-start-time');
+  const endTimeEl = document.getElementById('add-modal-end-time');
+  const typeEl = document.getElementById('add-modal-type');
+
+  if (!select || !select.value) return;
+
+  const [course, section] = select.value.split('__');
+  if (!course || !section) return;
+
+  let fullDay = '';
+  if (currentAddActivityContext && currentAddActivityContext.dateKey) {
+    const parts = currentAddActivityContext.dateKey.split('-');
+    const dObj = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+    const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    fullDay = dayNames[dObj.getDay()];
+  }
+
+  const timetableSlots = Array.isArray(weeklyTimetable) ? weeklyTimetable : [];
+  const slot = timetableSlots.find(t => t.course === course && t.section === section && t.day === fullDay)
+    || timetableSlots.find(t => t.course === course && t.section === section);
+
+  // Auto-populate default Room
+  if (roomEl && slot && slot.room) {
+    roomEl.value = slot.room;
+  }
+
+  // Auto-populate standard duration
+  if (slot && slot.startTime && slot.endTime && startTimeEl && endTimeEl) {
+    const sM = parseTimeToMinutes(slot.startTime);
+    const eM = parseTimeToMinutes(slot.endTime);
+    if (sM !== null && eM !== null && eM > sM) {
+      const dur = eM - sM;
+      const curStart = parseTimeToMinutes(startTimeEl.value) ?? 450;
+      endTimeEl.value = formatMinutesToHHMM(curStart + dur);
+    }
+  }
+
+  // Activity type default logic
+  const radioOther = document.getElementById('scope-other');
+  if (radioOther && radioOther.checked) {
+    if (typeEl) typeEl.value = 'Makeup Class';
+  } else if (slot && slot.type && typeEl) {
+    typeEl.value = slot.type;
+  }
+
+  validateAddActivityTimeLive();
+}
+
+function validateAddActivityTimeLive() {
+  const errorBanner = document.getElementById('add-activity-error-banner');
+  const errorText = document.getElementById('add-activity-error-text');
+  const startTimeEl = document.getElementById('add-modal-start-time');
+  const endTimeEl = document.getElementById('add-modal-end-time');
+  const select = document.getElementById('add-activity-subject-select');
+
+  if (!errorBanner || !errorText || !startTimeEl || !endTimeEl) return true;
+
+  const startM = parseTimeToMinutes(startTimeEl.value);
+  const endM = parseTimeToMinutes(endTimeEl.value);
+
+  if (startM === null || endM === null) {
+    errorText.innerText = 'Please enter valid start and end times.';
+    errorBanner.classList.remove('hidden');
+    return false;
+  }
+
+  if (endM <= startM) {
+    errorText.innerText = 'End time must be after start time.';
+    errorBanner.classList.remove('hidden');
+    return false;
+  }
+
+  if (!currentAddActivityContext || !currentAddActivityContext.dateKey) {
+    errorBanner.classList.add('hidden');
+    return true;
+  }
+
+  const { dateKey } = currentAddActivityContext;
+  const parts = dateKey.split('-');
+  const dObj = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+  const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const fullDay = dayNames[dObj.getDay()];
+  const isWeekend = (dObj.getDay() === 0 || dObj.getDay() === 6);
+
+  const [selectedCourse, selectedSection] = (select && select.value) ? select.value.split('__') : ['', ''];
+
+  // Check overlap against all classes scheduled in that day's subgrid
+  const timetableSlots = Array.isArray(weeklyTimetable) ? weeklyTimetable : [];
+  const scheduledToday = timetableSlots.filter(t => t.day === fullDay);
+
+  let conflict = null;
+
+  // 1. Regular timetable slots on this date
+  if (!isWeekend) {
+    for (const t of scheduledToday) {
+      if (t.course === selectedCourse && t.section === selectedSection) continue;
+      const cellKey = `${dateKey}__${t.course}__${t.section}`;
+      const entry = plannerEntries[cellKey];
+      if (entry && (entry.type === 'No Class' || (entry.topic && entry.topic.toLowerCase().includes('no class')))) {
+        continue;
+      }
+      const tStart = parseTimeToMinutes((entry && entry.startTime) || t.startTime);
+      const tEnd = parseTimeToMinutes((entry && entry.endTime) || t.endTime);
+      if (tStart !== null && tEnd !== null) {
+        if (Math.max(startM, tStart) < Math.min(endM, tEnd)) {
+          conflict = { course: t.course, section: t.section, start: (entry && entry.startTime) || t.startTime, end: (entry && entry.endTime) || t.endTime };
+          break;
+        }
+      }
+    }
+  }
+
+  // 2. Out-of-schedule entries in plannerEntries for this date
+  if (!conflict) {
+    Object.keys(plannerEntries).forEach(k => {
+      if (!k.startsWith(`${dateKey}__`)) return;
+      const [, cCode, cSec] = k.split('__');
+      if (cCode === selectedCourse && cSec === selectedSection) return;
+      const entry = plannerEntries[k];
+      if (!entry || entry.type === 'No Class') return;
+      if (scheduledToday.some(t => t.course === cCode && t.section === cSec)) return;
+
+      const tStart = parseTimeToMinutes(entry.startTime);
+      const tEnd = parseTimeToMinutes(entry.endTime);
+      if (tStart !== null && tEnd !== null) {
+        if (Math.max(startM, tStart) < Math.min(endM, tEnd)) {
+          conflict = { course: cCode, section: cSec, start: entry.startTime, end: entry.endTime };
+        }
+      }
+    });
+  }
+
+  if (conflict) {
+    errorText.innerText = `Time conflict: Overlaps with ${conflict.course} (${conflict.section}) scheduled at ${formatTimeDisplay(conflict.start)} – ${formatTimeDisplay(conflict.end)}.`;
+    errorBanner.classList.remove('hidden');
+    return false;
+  }
+
+  errorBanner.classList.add('hidden');
+  return true;
+}
+
+function saveAddActivityModal() {
+  if (!validateAddActivityTimeLive()) return;
+
+  const select = document.getElementById('add-activity-subject-select');
+  if (!select || !select.value) {
+    showToast('Please select a subject and section.', '⚠️');
+    return;
+  }
+
+  const [course, section] = select.value.split('__');
+  if (!course || !section || !currentAddActivityContext) return;
+
+  const { dateKey } = currentAddActivityContext;
+  const topic = document.getElementById('add-modal-topic')?.value.trim() || '';
+  const activity = document.getElementById('add-modal-activity')?.value.trim() || '';
+  const type = document.getElementById('add-modal-type')?.value || 'Lecture';
+  const status = document.getElementById('add-modal-status')?.value || 'Planned';
+  const notes = document.getElementById('add-modal-notes')?.value.trim() || '';
+  const startTime = document.getElementById('add-modal-start-time')?.value || '';
+  const endTime = document.getElementById('add-modal-end-time')?.value || '';
+  const room = document.getElementById('add-modal-room')?.value.trim() || '';
+
+  pushPlannerUndo(`Add Activity: ${course} (${section})`);
+
+  const cellKey = `${dateKey}__${course}__${section}`;
+  plannerEntries[cellKey] = {
+    topic: topic || `${type}`,
+    activity,
+    type,
+    status,
+    notes,
+    startTime,
+    endTime,
+    room
+  };
+
+  saveAppState();
+  closeAddActivityModal();
+  Render.views('planner');
+  showToast(`Added ${type} for ${course} (${section}) on ${dateKey}`, '✓');
+}
+
 /**
  * Master Planner View coordinator called by VIEWS.matrix in render.js.
  */
@@ -827,4 +1450,18 @@ if (typeof window !== 'undefined') {
   window.closePlannerDayInspector = closePlannerDayInspector;
   window._calculateCalendarMeetingStats = _calculateCalendarMeetingStats;
   window._syncPlannerViewContainers = _syncPlannerViewContainers;
+  window.parseTimeToMinutes = parseTimeToMinutes;
+  window.formatMinutesToHHMM = formatMinutesToHHMM;
+  window.formatTimeDisplay = formatTimeDisplay;
+  window.mapTimeToGridColumn = mapTimeToGridColumn;
+  window.getSubjectPillStyles = getSubjectPillStyles;
+  window.showPlannerPillPopover = showPlannerPillPopover;
+  window.hidePlannerPillPopover = hidePlannerPillPopover;
+  window.openAddActivityModal = openAddActivityModal;
+  window.closeAddActivityModal = closeAddActivityModal;
+  window.onSubjectScopeRadioChange = onSubjectScopeRadioChange;
+  window.onAddActivitySubjectSelectChange = onAddActivitySubjectSelectChange;
+  window.validateAddActivityTimeLive = validateAddActivityTimeLive;
+  window.saveAddActivityModal = saveAddActivityModal;
 }
+

@@ -227,6 +227,31 @@
     closePlannerDayInspector: () => {
       if (typeof window.closePlannerDayInspector === 'function') window.closePlannerDayInspector();
     },
+    openAddActivityModal: (e, target, data) => {
+      const dateKey = data.date || (target ? target.getAttribute('data-date') : '');
+      const startTime = data.startTime || (target ? target.getAttribute('data-start-time') : '');
+      const endTime = data.endTime || (target ? target.getAttribute('data-end-time') : '');
+      const period = data.period || (target ? target.getAttribute('data-period') : '');
+      const unit = data.unit || (target ? target.getAttribute('data-unit') : '');
+      if (typeof window.openAddActivityModal === 'function') {
+        window.openAddActivityModal({ dateKey, startTime, endTime, period, unit });
+      }
+    },
+    closeAddActivityModal: () => {
+      if (typeof window.closeAddActivityModal === 'function') window.closeAddActivityModal();
+    },
+    onSubjectScopeRadioChange: (e, target) => {
+      if (typeof window.onSubjectScopeRadioChange === 'function') window.onSubjectScopeRadioChange(e, target);
+    },
+    onAddActivitySubjectSelectChange: (e, target) => {
+      if (typeof window.onAddActivitySubjectSelectChange === 'function') window.onAddActivitySubjectSelectChange(e, target);
+    },
+    validateAddActivityTimeLive: () => {
+      if (typeof window.validateAddActivityTimeLive === 'function') window.validateAddActivityTimeLive();
+    },
+    saveAddActivityModal: () => {
+      if (typeof window.saveAddActivityModal === 'function') window.saveAddActivityModal();
+    },
     setRadarFilter: (e, target, data) => {
       if (typeof window.setRadarFilter === 'function') window.setRadarFilter(data.filter);
     },
