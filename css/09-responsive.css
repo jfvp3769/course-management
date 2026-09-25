@@ -59,24 +59,34 @@ padding: 2px !important;
 #widget-next-activities,
 .sidebar-widget-next-activities {
   resize: none !important;
-  overflow: hidden !important;
+  overflow: visible !important;
   display: flex !important;
   flex-direction: column !important;
-  min-height: 240px !important;
-  max-height: 85vh !important;
-  height: 480px;
+  min-height: 0 !important;
+  max-height: none !important;
+  height: auto !important;
 }
 
 #planner-milestones-list,
 #next-activities-list,
 .next-activities-scroll-area {
-  flex: 1 1 0% !important;
+  flex: none !important;
   min-height: 0 !important;
   max-height: none !important;
-  overflow-y: auto !important;
-  overscroll-behavior: contain !important;
+  overflow-y: visible !important;
+  overscroll-behavior: auto !important;
   padding-right: 4px !important;
   padding-bottom: 8px !important;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+#planner-milestones-list::-webkit-scrollbar,
+#next-activities-list::-webkit-scrollbar,
+.next-activities-scroll-area::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
 }
 
 /* --- Clean Floating Sidebar Widgets (No Outer Background Card) --- */

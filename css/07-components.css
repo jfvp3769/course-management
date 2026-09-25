@@ -716,10 +716,20 @@ button:active, .tab-btn:active {
   width: 336px;
   flex-shrink: 0;
   overflow-x: hidden;
-  overflow-y: auto !important;
-  max-height: calc(100vh - 120px) !important;
+  overflow-y: visible !important;
+  max-height: none !important;
+  height: auto !important;
   padding: 52px 10px 3rem 6px !important;
   will-change: width, opacity, transform;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+.tab-sidebar::-webkit-scrollbar,
+.tab-sidebar *::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
 }
 
 .tab-sidebar > div[id]:first-child,
@@ -952,7 +962,7 @@ html.theme-dark .activity-navigated-highlight {
   position: relative !important;
   display: flex !important;
   flex-direction: column !important;
-  overflow: hidden !important;
+  overflow: visible !important;
   min-height: 80px !important;
   box-shadow: 3px 4px 8px -1px rgba(0, 0, 0, 0.12), 1px 2px 4px -1px rgba(0, 0, 0, 0.08) !important;
   transition: box-shadow 0.2s ease, border-color 0.2s ease !important;
@@ -1156,7 +1166,29 @@ body.resizing-main-window-active {
   flex: 1 1 auto;
   min-height: 0;
   max-height: none !important;
-  overflow-y: auto;
+  overflow-y: visible !important;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+.tab-sidebar > div[id] #planner-milestones-list::-webkit-scrollbar,
+.tab-sidebar > div[id] #planner-pacing-stats::-webkit-scrollbar,
+.tab-sidebar > div[id] #planner-subject-pace-list::-webkit-scrollbar,
+.tab-sidebar > div[id] #timetable-load-scroll-container::-webkit-scrollbar,
+.tab-sidebar > div[id] #timetable-conflicts-container::-webkit-scrollbar,
+.tab-sidebar > div[id] #timetable-today-agenda::-webkit-scrollbar,
+.tab-sidebar > div[id] #calendar-upcoming-deadlines::-webkit-scrollbar,
+.tab-sidebar > div[id] #calendar-lost-days-list::-webkit-scrollbar,
+.tab-sidebar > div[id] #calendar-events-distribution::-webkit-scrollbar,
+.tab-sidebar > div[id] #roster-sections-breakdown::-webkit-scrollbar,
+.tab-sidebar > div[id] #roster-communications-actions::-webkit-scrollbar,
+.tab-sidebar > div[id] #roster-health-status::-webkit-scrollbar,
+.tab-sidebar > div[id] #gradebook-errors-list::-webkit-scrollbar,
+.tab-sidebar > div[id] #gradebook-atrisk-list::-webkit-scrollbar,
+.tab-sidebar > div[id] #gradebook-stats-scroll-container::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
 }
 
 /* Teaching Radar Filter Pills */
