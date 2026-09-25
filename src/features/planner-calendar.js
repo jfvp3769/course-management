@@ -540,7 +540,6 @@ function getSubjectPillStyles(courseCode, hasPlannedActivity, isNoClass) {
  */
 function _renderSubgridRow(period, dateKey, classes, isWeekend, isNoClassDate, isCurrentMonth) {
   const baseMinutes = period === 'AM' ? 450 : 780; // 07:30 AM (450) vs 1:00 PM (780)
-  const periodLabel = period === 'AM' ? 'AM (7:30–12:00)' : 'PM (1:00–5:30)';
 
   // 1. Generate 9 background 30-minute empty slot units
   const slotsHtml = [];
@@ -616,19 +615,14 @@ function _renderSubgridRow(period, dateKey, classes, isWeekend, isNoClassDate, i
   }).join('');
 
   return `
-    <div class="calendar-period-row flex flex-col mb-1 last:mb-0">
-      <div class="flex items-center justify-between text-[7px] sm:text-[7.5px] font-extrabold uppercase text-slate-400 dark:text-slate-500 mb-0.5 select-none px-0.5 tracking-wider">
-        <span>${periodLabel}</span>
+    <div class="calendar-subgrid-row relative min-h-[30px] p-0.5">
+      <!-- Layer 1: Background 9 30-min empty slot units -->
+      <div class="grid grid-cols-9 gap-0.5 absolute inset-0 p-0.5 z-0" style="grid-template-columns: repeat(9, minmax(0, 1fr));">
+        ${slotsHtml.join('')}
       </div>
-      <div class="calendar-subgrid-row relative min-h-[30px] rounded border border-slate-200/60 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-900/40 p-0.5">
-        <!-- Layer 1: Background 9 30-min empty slot units -->
-        <div class="grid grid-cols-9 gap-0.5 absolute inset-0 p-0.5 z-0" style="grid-template-columns: repeat(9, minmax(0, 1fr));">
-          ${slotsHtml.join('')}
-        </div>
-        <!-- Layer 2: Foreground Class Pills -->
-        <div class="grid grid-cols-9 gap-0.5 relative z-10 pointer-events-none" style="grid-template-columns: repeat(9, minmax(0, 1fr));">
-          ${pillsHtml}
-        </div>
+      <!-- Layer 2: Foreground Class Pills -->
+      <div class="grid grid-cols-9 gap-0.5 relative z-10 pointer-events-none" style="grid-template-columns: repeat(9, minmax(0, 1fr));">
+        ${pillsHtml}
       </div>
     </div>
   `;
@@ -768,8 +762,8 @@ function _renderCalendarDayCell(g, isCurrentMonth, todayKey, timetableMap, meeti
         </div>
       ` : ''}
 
-      <!-- 9-Column Subgrid Rows (AM & PM) -->
-      <div class="flex-1 flex flex-col justify-between space-y-1 min-h-0">
+      <!-- 9-Column Subgrid Rows (AM & PM) with no gap -->
+      <div class="calendar-subgrid-box flex flex-col rounded border border-slate-200/70 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-900/40 divide-y divide-slate-200/60 dark:divide-slate-800/60 mt-1 overflow-hidden">
         ${_renderSubgridRow('AM', dateKey, amClasses, isWeekend, isNoClassDate, isCurrentMonth)}
         ${_renderSubgridRow('PM', dateKey, pmClasses, isWeekend, isNoClassDate, isCurrentMonth)}
       </div>
