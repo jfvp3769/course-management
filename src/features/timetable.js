@@ -31,7 +31,7 @@ function renderWeeklyTimetable() {
 
       const sub = courseData.subjects.find(s => s.code === slot.course) || {};
       const secIndex = sub.sections ? sub.sections.indexOf(slot.section) : 0;
-      const accentBarClass = getSectionAccent(secIndex >= 0 ? secIndex : 0);
+      const accentBarClass = (typeof getSectionAccent === 'function') ? getSectionAccent(secIndex >= 0 ? secIndex : 0, sub.colorTheme) : '';
 
       // Detect schedule collision / overlap
       const hasOverlap = daySlots.some(other => {

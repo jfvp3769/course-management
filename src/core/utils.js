@@ -16,24 +16,20 @@ nextIdx = Math.floor(Math.random() * PORTAL_TIPS.length);
   return { ...PORTAL_TIPS[nextIdx], index: nextIdx };
 }
 
-function getSectionAccent(secIndex) {
-  return sectionAccentColors[secIndex % sectionAccentColors.length];
-}
-
 const SECTION_PALETTE_ITEMS = [
-  { key: 'amber',   border: 'border-t-4 border-t-amber-400 dark:border-t-amber-300',   badge: 'border-amber-500 text-amber-900 bg-amber-100/90 dark:border-amber-400 dark:text-amber-100 dark:bg-amber-950/80' },
-  { key: 'blue',    border: 'border-t-4 border-t-blue-400 dark:border-t-blue-300',       badge: 'border-blue-500 text-blue-900 bg-blue-100/90 dark:border-blue-400 dark:text-blue-100 dark:bg-blue-950/80' },
-  { key: 'emerald', border: 'border-t-4 border-t-emerald-400 dark:border-t-emerald-300', badge: 'border-emerald-500 text-emerald-900 bg-emerald-100/90 dark:border-emerald-400 dark:text-emerald-100 dark:bg-emerald-950/80' },
-  { key: 'fuchsia', border: 'border-t-4 border-t-fuchsia-400 dark:border-t-fuchsia-300', badge: 'border-fuchsia-500 text-fuchsia-900 bg-fuchsia-100/90 dark:border-fuchsia-400 dark:text-fuchsia-100 dark:bg-fuchsia-950/80' },
-  { key: 'cyan',    border: 'border-t-4 border-t-cyan-400 dark:border-t-cyan-300',       badge: 'border-cyan-500 text-cyan-900 bg-cyan-100/90 dark:border-cyan-400 dark:text-cyan-100 dark:bg-cyan-950/80' },
-  { key: 'rose',    border: 'border-t-4 border-t-rose-400 dark:border-t-rose-300',       badge: 'border-rose-500 text-rose-900 bg-rose-100/90 dark:border-rose-400 dark:text-rose-100 dark:bg-rose-950/80' },
-  { key: 'orange',  border: 'border-t-4 border-t-orange-400 dark:border-t-orange-300',   badge: 'border-orange-500 text-orange-900 bg-orange-100/90 dark:border-orange-400 dark:text-orange-100 dark:bg-orange-950/80' },
-  { key: 'purple',  border: 'border-t-4 border-t-purple-400 dark:border-t-purple-300',   badge: 'border-purple-500 text-purple-900 bg-purple-100/90 dark:border-purple-400 dark:text-purple-100 dark:bg-purple-950/80' },
-  { key: 'teal',    border: 'border-t-4 border-t-teal-400 dark:border-t-teal-300',       badge: 'border-teal-500 text-teal-900 bg-teal-100/90 dark:border-teal-400 dark:text-teal-100 dark:bg-teal-950/80' },
-  { key: 'lime',    border: 'border-t-4 border-t-lime-400 dark:border-t-lime-300',       badge: 'border-lime-500 text-lime-900 bg-lime-100/90 dark:border-lime-400 dark:text-lime-100 dark:bg-lime-950/80' },
-  { key: 'sky',     border: 'border-t-4 border-t-sky-400 dark:border-t-sky-300',         badge: 'border-sky-500 text-sky-900 bg-sky-100/90 dark:border-sky-400 dark:text-sky-100 dark:bg-sky-950/80' },
-  { key: 'pink',    border: 'border-t-4 border-t-pink-400 dark:border-t-pink-300',       badge: 'border-pink-500 text-pink-900 bg-pink-100/90 dark:border-pink-400 dark:text-pink-100 dark:bg-pink-950/80' },
-  { key: 'indigo',  border: 'border-t-4 border-t-indigo-400 dark:border-t-indigo-300',   badge: 'border-indigo-500 text-indigo-900 bg-indigo-100/90 dark:border-indigo-400 dark:text-indigo-100 dark:bg-indigo-950/80' }
+  { key: 'amber',   border: 'border-t-4 border-t-amber-400 dark:border-t-amber-300',   accent: 'border-l-4 border-l-amber-400 dark:border-l-amber-300',   badge: 'border-amber-500 text-amber-900 bg-amber-100/90 dark:border-amber-400 dark:text-amber-100 dark:bg-amber-950/80' },
+  { key: 'blue',    border: 'border-t-4 border-t-blue-400 dark:border-t-blue-300',       accent: 'border-l-4 border-l-blue-400 dark:border-l-blue-300',       badge: 'border-blue-500 text-blue-900 bg-blue-100/90 dark:border-blue-400 dark:text-blue-100 dark:bg-blue-950/80' },
+  { key: 'emerald', border: 'border-t-4 border-t-emerald-400 dark:border-t-emerald-300', accent: 'border-l-4 border-l-emerald-400 dark:border-l-emerald-300', badge: 'border-emerald-500 text-emerald-900 bg-emerald-100/90 dark:border-emerald-400 dark:text-emerald-100 dark:bg-emerald-950/80' },
+  { key: 'fuchsia', border: 'border-t-4 border-t-fuchsia-400 dark:border-t-fuchsia-300', accent: 'border-l-4 border-l-fuchsia-400 dark:border-l-fuchsia-300', badge: 'border-fuchsia-500 text-fuchsia-900 bg-fuchsia-100/90 dark:border-fuchsia-400 dark:text-fuchsia-100 dark:bg-fuchsia-950/80' },
+  { key: 'cyan',    border: 'border-t-4 border-t-cyan-400 dark:border-t-cyan-300',       accent: 'border-l-4 border-l-cyan-400 dark:border-l-cyan-300',       badge: 'border-cyan-500 text-cyan-900 bg-cyan-100/90 dark:border-cyan-400 dark:text-cyan-100 dark:bg-cyan-950/80' },
+  { key: 'rose',    border: 'border-t-4 border-t-rose-400 dark:border-t-rose-300',       accent: 'border-l-4 border-l-rose-400 dark:border-l-rose-300',       badge: 'border-rose-500 text-rose-900 bg-rose-100/90 dark:border-rose-400 dark:text-rose-100 dark:bg-rose-950/80' },
+  { key: 'orange',  border: 'border-t-4 border-t-orange-400 dark:border-t-orange-300',   accent: 'border-l-4 border-l-orange-400 dark:border-l-orange-300',   badge: 'border-orange-500 text-orange-900 bg-orange-100/90 dark:border-orange-400 dark:text-orange-100 dark:bg-orange-950/80' },
+  { key: 'purple',  border: 'border-t-4 border-t-purple-400 dark:border-t-purple-300',   accent: 'border-l-4 border-l-purple-400 dark:border-l-purple-300',   badge: 'border-purple-500 text-purple-900 bg-purple-100/90 dark:border-purple-400 dark:text-purple-100 dark:bg-purple-950/80' },
+  { key: 'teal',    border: 'border-t-4 border-t-teal-400 dark:border-t-teal-300',       accent: 'border-l-4 border-l-teal-400 dark:border-l-teal-300',       badge: 'border-teal-500 text-teal-900 bg-teal-100/90 dark:border-teal-400 dark:text-teal-100 dark:bg-teal-950/80' },
+  { key: 'lime',    border: 'border-t-4 border-t-lime-400 dark:border-t-lime-300',       accent: 'border-l-4 border-l-lime-400 dark:border-l-lime-300',       badge: 'border-lime-500 text-lime-900 bg-lime-100/90 dark:border-lime-400 dark:text-lime-100 dark:bg-lime-950/80' },
+  { key: 'sky',     border: 'border-t-4 border-t-sky-400 dark:border-t-sky-300',         accent: 'border-l-4 border-l-sky-400 dark:border-l-sky-300',         badge: 'border-sky-500 text-sky-900 bg-sky-100/90 dark:border-sky-400 dark:text-sky-100 dark:bg-sky-950/80' },
+  { key: 'pink',    border: 'border-t-4 border-t-pink-400 dark:border-t-pink-300',       accent: 'border-l-4 border-l-pink-400 dark:border-l-pink-300',       badge: 'border-pink-500 text-pink-900 bg-pink-100/90 dark:border-pink-400 dark:text-pink-100 dark:bg-pink-950/80' },
+  { key: 'indigo',  border: 'border-t-4 border-t-indigo-400 dark:border-t-indigo-300',   accent: 'border-l-4 border-l-indigo-400 dark:border-l-indigo-300',   badge: 'border-indigo-500 text-indigo-900 bg-indigo-100/90 dark:border-indigo-400 dark:text-indigo-100 dark:bg-indigo-950/80' }
 ];
 
 function _getFilteredSectionPalettes(subTheme) {
@@ -57,6 +53,12 @@ function _getFilteredSectionPalettes(subTheme) {
   const toSkip = conflicts[normTheme] || [normTheme];
   const filtered = SECTION_PALETTE_ITEMS.filter(item => !toSkip.includes(item.key));
   return filtered.length > 0 ? filtered : SECTION_PALETTE_ITEMS;
+}
+
+function getSectionAccent(secIndex, subTheme = '') {
+  const palettes = _getFilteredSectionPalettes(subTheme);
+  const idx = Math.max(0, parseInt(secIndex, 10) || 0);
+  return palettes[idx % palettes.length].accent;
 }
 
 function getSectionBadgeStyle(secIndex, subTheme = '') {

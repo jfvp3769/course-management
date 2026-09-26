@@ -684,7 +684,7 @@ function _renderSubgridColumn(period, dateKey, classes, isWeekend, isNoClassDate
           : (period === 'AM' ? 'left-0' : 'right-0'));
     const meetingNum = c.stats.meetingNum || '';
     const isCompleted = c.isDone;
-    const badgeInfo = getActivityTypeBadgeInfo(c.type, c.isNoClass);
+    const badgeInfo = (hasActivity && !c.isNoClass) ? getActivityTypeBadgeInfo(c.type, c.isNoClass) : null;
     const cornerBadgeHtml = badgeInfo ? `
           <div class="planner-pill-corner-badge text-current" title="${escapeHtml(badgeInfo.type)}">
             ${badgeInfo.svg}

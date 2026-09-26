@@ -207,7 +207,8 @@ function _renderMatrixCell(d, sub, sec, secIdx, timetableMap, meetingCounters, t
                   <div class="flex items-center gap-1 shrink-0">
                     ${isEntryCompleted ? '<span class="text-[7.5px] px-1 py-0.2 rounded font-black bg-emerald-600 text-white shrink-0">✓ Done</span>' : ''}
                     ${(() => {
-                      const bi = (typeof getActivityTypeBadgeInfo === 'function') ? getActivityTypeBadgeInfo(weekendEntry.type, false) : null;
+                      const hasAct = !!(weekendEntry && ((weekendEntry.topic && weekendEntry.topic.trim()) || (weekendEntry.activity && weekendEntry.activity.trim())));
+                      const bi = (hasAct && typeof getActivityTypeBadgeInfo === 'function') ? getActivityTypeBadgeInfo(weekendEntry.type, false) : null;
                       return bi ? `<span class="inline-flex items-center justify-center shrink-0 ${bi.textClass}" title="${escapeHtml(bi.type)}">${bi.svg}</span>` : '';
                     })()}
                   </div>
@@ -276,7 +277,8 @@ function _renderMatrixCell(d, sub, sec, secIdx, timetableMap, meetingCounters, t
                   <div class="flex items-center gap-1 shrink-0">
                     ${isEntryCompleted ? '<span class="text-[7.5px] px-1 py-0.2 rounded font-black bg-emerald-600 text-white shrink-0">✓ Done</span>' : ''}
                     ${(() => {
-                      const bi = (typeof getActivityTypeBadgeInfo === 'function') ? getActivityTypeBadgeInfo(entry.type, isNoClass) : null;
+                      const hasAct = !isNoClass && !!(entry && ((entry.topic && entry.topic.trim()) || (entry.activity && entry.activity.trim())));
+                      const bi = (hasAct && typeof getActivityTypeBadgeInfo === 'function') ? getActivityTypeBadgeInfo(entry.type, isNoClass) : null;
                       return bi ? `<span class="inline-flex items-center justify-center shrink-0 ${bi.textClass}" title="${escapeHtml(bi.type)}">${bi.svg}</span>` : '';
                     })()}
                   </div>
@@ -332,7 +334,8 @@ function _renderMatrixCell(d, sub, sec, secIdx, timetableMap, meetingCounters, t
                   <div class="flex items-center gap-1 shrink-0">
                     ${isEntryCompleted ? '<span class="text-[7.5px] px-1 py-0.2 rounded font-black bg-emerald-600 text-white shrink-0">✓ Done</span>' : ''}
                     ${(() => {
-                      const bi = (typeof getActivityTypeBadgeInfo === 'function') ? getActivityTypeBadgeInfo(entry.type, isNoClass) : null;
+                      const hasAct = !isNoClass && !!(entry && ((entry.topic && entry.topic.trim()) || (entry.activity && entry.activity.trim())));
+                      const bi = (hasAct && typeof getActivityTypeBadgeInfo === 'function') ? getActivityTypeBadgeInfo(entry.type, isNoClass) : null;
                       return bi ? `<span class="inline-flex items-center justify-center shrink-0 ${bi.textClass}" title="${escapeHtml(bi.type)}">${bi.svg}</span>` : '';
                     })()}
                   </div>

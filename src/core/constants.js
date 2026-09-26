@@ -118,22 +118,19 @@ const FULL_DAY_NAMES = {
 };
 
 const sectionAccentColors = [
-  'border-l-4 border-l-blue-600',
-  'border-l-4 border-l-amber-500',
-  'border-l-4 border-l-emerald-600',
-  'border-l-4 border-l-purple-600',
-  'border-l-4 border-l-rose-600',
-  'border-l-4 border-l-cyan-600',
-  'border-l-4 border-l-indigo-600',
-  'border-l-4 border-l-teal-600',
-  'border-l-4 border-l-orange-500',
-  'border-l-4 border-l-slate-600',
-  'border-l-4 border-l-lime-600',
-  'border-l-4 border-l-sky-600',
-  'border-l-4 border-l-pink-600',
-  'border-l-4 border-l-fuchsia-600',
-  'border-l-4 border-l-red-600',
-  'border-l-4 border-l-msu-maroon'
+  'border-l-4 border-l-amber-400 dark:border-l-amber-300',
+  'border-l-4 border-l-emerald-400 dark:border-l-emerald-300',
+  'border-l-4 border-l-fuchsia-400 dark:border-l-fuchsia-300',
+  'border-l-4 border-l-cyan-400 dark:border-l-cyan-300',
+  'border-l-4 border-l-rose-400 dark:border-l-rose-300',
+  'border-l-4 border-l-blue-400 dark:border-l-blue-300',
+  'border-l-4 border-l-orange-400 dark:border-l-orange-300',
+  'border-l-4 border-l-purple-400 dark:border-l-purple-300',
+  'border-l-4 border-l-teal-400 dark:border-l-teal-300',
+  'border-l-4 border-l-lime-400 dark:border-l-lime-300',
+  'border-l-4 border-l-sky-400 dark:border-l-sky-300',
+  'border-l-4 border-l-pink-400 dark:border-l-pink-300',
+  'border-l-4 border-l-indigo-400 dark:border-l-indigo-300'
 ];
 
 const sectionBadgeBorders = [

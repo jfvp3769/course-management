@@ -209,7 +209,7 @@ function openManageCoursesModal() {
               <div class="space-y-1.5">
                 ${sub.sections.map((sec, secIdx) => {
               const secSlots = subSlots.filter(s => s.section === sec);
-              const accentBar = getSectionAccent(secIdx);
+              const accentBar = (typeof getSectionAccent === 'function') ? getSectionAccent(secIdx, sub.colorTheme) : '';
               const isFirstSec = (secIdx === 0);
               const isLastSec = (secIdx === sub.sections.length - 1);
               const safeSec = sec.replace(/[^a-zA-Z0-9_-]/g, '_');
