@@ -186,26 +186,58 @@ html.theme-dark .planner-action-btn:disabled {
   background-color: #0f172a !important;
 }
 
-/* Planner Week Navigator Theming */
+/* Planner Month & Week Navigator Theming */
+.planner-month-nav-btn,
 .planner-week-nav-btn {
   color: var(--app-header-primary, #800000) !important;
   transition: all 0.2s ease !important;
 }
 
+.planner-month-nav-btn svg,
+.planner-week-nav-btn svg {
+  color: var(--app-header-primary, #800000) !important;
+}
+
+.planner-month-nav-btn:hover,
 .planner-week-nav-btn:hover {
   border-color: var(--app-header-primary, #800000) !important;
   background-color: var(--white, #ffffff) !important;
   color: var(--app-header-primary, #800000) !important;
 }
 
+.planner-month-nav-btn:hover svg,
+.planner-week-nav-btn:hover svg {
+  color: var(--app-header-primary, #800000) !important;
+}
+
+html.theme-dark .planner-month-nav-btn,
 html.theme-dark .planner-week-nav-btn {
   color: var(--app-header-accent, #daa520) !important;
 }
 
+html.theme-dark .planner-month-nav-btn svg,
+html.theme-dark .planner-week-nav-btn svg {
+  color: var(--app-header-accent, #daa520) !important;
+}
+
+html.theme-dark .planner-month-nav-btn:hover,
 html.theme-dark .planner-week-nav-btn:hover {
   border-color: var(--app-header-accent, #daa520) !important;
   background-color: #0f172a !important;
   color: var(--app-header-tab-text, #fde047) !important;
+}
+
+html.theme-dark .planner-month-nav-btn:hover svg,
+html.theme-dark .planner-week-nav-btn:hover svg {
+  color: var(--app-header-tab-text, #fde047) !important;
+}
+
+#planner-month-select {
+  color: var(--app-header-primary, #800000) !important;
+}
+
+html.theme-dark #planner-month-select {
+  color: var(--app-header-accent, #daa520) !important;
 }
 
 #current-week-nav-label {
@@ -215,6 +247,41 @@ html.theme-dark .planner-week-nav-btn:hover {
 html.theme-dark #current-week-nav-label {
   color: var(--app-header-accent, #daa520) !important;
 }
+
+.planner-action-btn .planner-btn-label {
+  color: var(--app-header-primary, #800000) !important;
+}
+
+html.theme-dark .planner-action-btn .planner-btn-label {
+  color: var(--app-header-accent, #daa520) !important;
+}
+
+#btn-planner-view-month.app-themed-text,
+#btn-planner-view-week.app-themed-text {
+  color: var(--app-header-primary, #800000) !important;
+}
+
+#btn-planner-view-month.app-themed-text svg,
+#btn-planner-view-week.app-themed-text svg {
+  color: var(--app-header-primary, #800000) !important;
+}
+
+html.theme-dark #btn-planner-view-month.app-themed-text,
+html.theme-dark #btn-planner-view-week.app-themed-text {
+  color: var(--app-header-accent, #daa520) !important;
+}
+
+html.theme-dark #btn-planner-view-month.app-themed-text svg,
+html.theme-dark #btn-planner-view-week.app-themed-text svg {
+  color: var(--app-header-accent, #daa520) !important;
+}
+
+/* Table Header Day & Date Column Headers */
+.sticky-header-day,
+.sticky-header-date {
+  color: var(--app-header-accent, #daa520) !important;
+}
+
 
 /* ================= UNIFIED COMPACT TAB HEADER CARDS ================= */
 .app-tab-header-card {

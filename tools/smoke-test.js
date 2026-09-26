@@ -873,6 +873,7 @@ setTimeout(() => {
         const matrixContainer = document.getElementById('planner-matrix-view-container');
         const monthNav = document.getElementById('planner-month-nav-container');
         const weekNav = document.getElementById('planner-week-nav-container');
+        const sectionFilterContainer = document.getElementById('planner-section-filter-container');
         const btnMonth = document.getElementById('btn-planner-view-month');
         const btnWeek = document.getElementById('btn-planner-view-week');
 
@@ -883,7 +884,15 @@ setTimeout(() => {
         if (matrixContainer.classList.contains('hidden')) return false;
         if (!monthNav.classList.contains('hidden')) return false;
         if (weekNav.classList.contains('hidden')) return false;
+        if (!sectionFilterContainer.classList.contains('hidden')) return false;
         if (!btnWeek.classList.contains('font-bold')) return false;
+        if (!btnWeek.classList.contains('app-themed-text')) return false;
+        if (btnMonth.classList.contains('app-themed-text')) return false;
+
+        // Verify matrix day & date badges have app-themed-text
+        const matrixDays = document.querySelectorAll('#matrix-body .sticky-col-day span.app-themed-text');
+        const matrixDates = document.querySelectorAll('#matrix-body .sticky-col-date.app-themed-text');
+        if (matrixDays.length === 0 || matrixDates.length === 0) return false;
 
         // 2. Switch back to Monthly View
         setPlannerViewMode('month');
@@ -892,7 +901,15 @@ setTimeout(() => {
         if (!matrixContainer.classList.contains('hidden')) return false;
         if (monthNav.classList.contains('hidden')) return false;
         if (!weekNav.classList.contains('hidden')) return false;
+        if (sectionFilterContainer.classList.contains('hidden')) return false;
         if (!btnMonth.classList.contains('font-bold')) return false;
+        if (!btnMonth.classList.contains('app-themed-text')) return false;
+        if (btnWeek.classList.contains('app-themed-text')) return false;
+
+        // Verify calendar weekday headers and day numbers have app-themed-text
+        const calHeaders = document.querySelectorAll('.planner-calendar-header-day.app-themed-text');
+        const calDayNums = document.querySelectorAll('.planner-day-header .app-themed-text');
+        if (calHeaders.length === 0 || calDayNums.length === 0) return false;
 
         return true;
       })()`);

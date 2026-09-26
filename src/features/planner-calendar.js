@@ -82,17 +82,17 @@ function _updateViewSwitcherButtons() {
   const btnWeek = document.getElementById('btn-planner-view-week');
   if (!btnMonth || !btnWeek) return;
 
-  const activeClasses = ['bg-white', 'dark:bg-slate-700', 'text-slate-900', 'dark:text-slate-100', 'font-bold', 'shadow-2xs'];
+  const activeClasses = ['bg-white', 'dark:bg-slate-700', 'app-themed-text', 'font-bold', 'shadow-2xs'];
   const inactiveClasses = ['text-slate-500', 'hover:text-slate-800', 'dark:hover:text-slate-200', 'font-semibold', 'bg-transparent'];
 
   if (plannerViewMode === 'month') {
     btnMonth.classList.add(...activeClasses);
-    btnMonth.classList.remove(...inactiveClasses);
+    btnMonth.classList.remove(...inactiveClasses, 'text-slate-900', 'dark:text-slate-100');
     btnWeek.classList.add(...inactiveClasses);
     btnWeek.classList.remove(...activeClasses);
   } else {
     btnWeek.classList.add(...activeClasses);
-    btnWeek.classList.remove(...inactiveClasses);
+    btnWeek.classList.remove(...inactiveClasses, 'text-slate-900', 'dark:text-slate-100');
     btnMonth.classList.add(...inactiveClasses);
     btnMonth.classList.remove(...activeClasses);
   }
@@ -103,6 +103,7 @@ function _syncPlannerViewContainers() {
   const matrixContainer = document.getElementById('planner-matrix-view-container');
   const monthNav = document.getElementById('planner-month-nav-container');
   const weekNav = document.getElementById('planner-week-nav-container');
+  const sectionFilterContainer = document.getElementById('planner-section-filter-container');
 
   if (plannerViewMode === 'month') {
     if (calContainer) {
@@ -121,6 +122,10 @@ function _syncPlannerViewContainers() {
       weekNav.classList.add('hidden');
       weekNav.classList.remove('flex');
     }
+    if (sectionFilterContainer) {
+      sectionFilterContainer.classList.remove('hidden');
+      sectionFilterContainer.classList.add('flex');
+    }
   } else {
     if (calContainer) {
       calContainer.classList.add('hidden');
@@ -137,6 +142,10 @@ function _syncPlannerViewContainers() {
     if (weekNav) {
       weekNav.classList.remove('hidden');
       weekNav.classList.add('flex');
+    }
+    if (sectionFilterContainer) {
+      sectionFilterContainer.classList.add('hidden');
+      sectionFilterContainer.classList.remove('flex');
     }
   }
 }
@@ -416,7 +425,7 @@ function renderPlannerMonthCalendar() {
     <!-- 7-Day Header (Sticky inside scroll container) -->
     <div class="planner-calendar-header-row grid grid-cols-7 border-b border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 sticky top-0 z-30 select-none shadow-xs min-w-[700px] sm:min-w-0">
       ${daysHeader.map(h => `
-        <div class="planner-calendar-header-day py-1.5 sm:py-2 px-1 text-center font-extrabold text-[11px] sm:text-xs tracking-wider border-r last:border-r-0 border-slate-200/80 dark:border-slate-800 ${h.isWeekend ? 'text-slate-500 dark:text-slate-400 bg-[#f8fafc] dark:bg-[#0f172a]' : 'text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-900'}">
+        <div class="planner-calendar-header-day py-1.5 sm:py-2 px-1 text-center font-extrabold text-[11px] sm:text-xs tracking-wider border-r last:border-r-0 border-slate-200/80 dark:border-slate-800 ${h.isWeekend ? 'text-slate-500 dark:text-slate-400 bg-[#f8fafc] dark:bg-[#0f172a]' : 'app-themed-text bg-slate-100 dark:bg-slate-900'}">
           <span>${h.code}</span>
         </div>
       `).join('')}
@@ -890,12 +899,12 @@ function _renderCalendarDayCell(g, isCurrentMonth, todayKey, timetableMap, meeti
         <!-- Date Number & Today Pill -->
         <div class="flex items-center gap-1">
           ${isToday ? `
-            <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-msu-maroon dark:bg-rose-600 text-white font-black text-[10px] shadow-2xs leading-none">
+            <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full app-themed-bg text-white dark:text-slate-950 font-black text-[10px] shadow-2xs leading-none">
               <span>${dayNum}</span>
               <span class="text-[8px] uppercase tracking-wider font-extrabold hidden sm:inline">TODAY</span>
             </span>
           ` : `
-            <span class="font-extrabold text-xs sm:text-[13px] ${isCurrentMonth ? 'text-slate-800 dark:text-slate-100' : 'text-slate-400 dark:text-slate-600'} leading-none">${dayNum}</span>
+            <span class="font-extrabold text-xs sm:text-[13px] ${isCurrentMonth ? 'app-themed-text' : 'text-slate-400 dark:text-slate-600'} leading-none">${dayNum}</span>
           `}
         </div>
 

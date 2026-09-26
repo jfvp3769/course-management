@@ -113,6 +113,30 @@ html.theme-dark .app-themed-link {
   color: var(--app-header-accent, #daa520) !important;
 }
 
+.app-themed-text {
+  color: var(--app-header-primary, #800000) !important;
+}
+
+html.theme-dark .app-themed-text {
+  color: var(--app-header-accent, #daa520) !important;
+}
+
+.app-themed-text svg {
+  color: var(--app-header-primary, #800000) !important;
+}
+
+html.theme-dark .app-themed-text svg {
+  color: var(--app-header-accent, #daa520) !important;
+}
+
+.app-themed-bg {
+  background-color: var(--app-header-primary, #800000) !important;
+}
+
+html.theme-dark .app-themed-bg {
+  background-color: var(--app-header-accent, #daa520) !important;
+}
+
 #header-school-logo-ring {
   border-color: var(--app-header-accent, #daa520) !important;
 }

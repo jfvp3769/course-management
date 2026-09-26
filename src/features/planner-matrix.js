@@ -421,6 +421,10 @@ function renderMatrixTable() {
   table.style.tableLayout = 'fixed';
   updateMatrixTableWidth();
 
+  if (typeof _syncPlannerViewContainers === 'function') {
+    _syncPlannerViewContainers();
+  }
+
   let filteredDates = semesterDates;
   if (selectedMonthFilter !== 'all') {
     filteredDates = semesterDates.filter(d => d.monthNum === selectedMonthFilter);
@@ -465,7 +469,7 @@ function renderMatrixTable() {
 
     const dayWeekendBadge = d.isWeekend
       ? 'bg-amber-100 text-amber-900 border border-amber-300 dark:bg-amber-950/80 dark:text-amber-300 dark:border-amber-800/80 font-bold'
-      : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold border border-slate-200 dark:border-slate-700';
+      : 'bg-slate-100 dark:bg-slate-800 app-themed-text font-bold border border-slate-200 dark:border-slate-700';
 
     const weekendDivider = d.dayOfWeek === 'Sat'
       ? 'border-t-2 border-slate-300 dark:border-slate-700'
@@ -477,7 +481,7 @@ function renderMatrixTable() {
               <span class="inline-block px-1.5 py-0.5 rounded text-[10px] sm:text-[10.5px] ${dayWeekendBadge}">${d.dayOfWeek}</span>
             </td>
 
-            <td class="sticky-col-date p-1 text-center font-bold font-mono text-[11px] border-r border-slate-200 dark:border-slate-800 ${d.isWeekend ? 'bg-[#dce3ec] dark:bg-[#111826] text-amber-900 dark:text-amber-300' : 'bg-slate-50 dark:bg-slate-950 text-slate-700 dark:text-slate-300'}">
+            <td class="sticky-col-date p-1 text-center font-bold font-mono text-[11px] border-r border-slate-200 dark:border-slate-800 ${d.isWeekend ? 'bg-[#dce3ec] dark:bg-[#111826] text-amber-900 dark:text-amber-300' : 'bg-slate-50 dark:bg-slate-950 app-themed-text'}">
               ${d.displayDate}
             </td>
         `;
