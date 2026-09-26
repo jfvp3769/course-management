@@ -655,12 +655,30 @@ function scrollToToday() {
   }
 
   setTimeout(() => {
-    // 1. Highlight Monthly View calendar cell if visible
+    // 1. Highlight Monthly View calendar cell & date badge if visible
     const calCell = document.getElementById('cal-day-' + todayKey);
     if (calCell) {
-      calCell.classList.remove('cal-today-pulse');
+      if (typeof window.highlightPlannerCalendarActivity === 'function') {
+        window.highlightPlannerCalendarActivity(todayKey);
+      }
+      calCell.classList.remove('cal-today-pulse', 'cal-day-navigated-highlight');
       void calCell.offsetWidth;
-      calCell.classList.add('cal-today-pulse');
+      calCell.classList.add('cal-today-pulse', 'cal-day-navigated-highlight');
+
+      const todayBadge = calCell.querySelector('.planner-day-header span');
+      if (todayBadge) {
+        todayBadge.classList.remove('cal-today-badge-highlight');
+        void todayBadge.offsetWidth;
+        todayBadge.classList.add('cal-today-badge-highlight');
+        setTimeout(() => {
+          if (todayBadge) todayBadge.classList.remove('cal-today-badge-highlight');
+        }, 1800);
+      }
+
+      setTimeout(() => {
+        if (calCell) calCell.classList.remove('cal-day-navigated-highlight');
+      }, 1600);
+
       if (typeof calCell.scrollIntoView === 'function') {
         calCell.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }
@@ -696,9 +714,23 @@ function scrollToToday() {
         scrollMatrixToRow(row, 'smooth');
       }
 
-      row.classList.remove('row-today-pulse');
+      row.classList.remove('row-today-pulse', 'row-flash-highlight');
       void row.offsetWidth;
-      row.classList.add('row-today-pulse');
+      row.classList.add('row-today-pulse', 'row-flash-highlight');
+      setTimeout(() => {
+        if (row) row.classList.remove('row-flash-highlight');
+      }, 1600);
+
+      // Highlight the date badge / cell in weekly view
+      const dateCell = row.querySelector('.day-badge') || row.querySelector('td:nth-child(2)') || row.querySelector('td');
+      if (dateCell) {
+        dateCell.classList.remove('day-navigated-highlight');
+        void dateCell.offsetWidth;
+        dateCell.classList.add('day-navigated-highlight');
+        setTimeout(() => {
+          if (dateCell) dateCell.classList.remove('day-navigated-highlight');
+        }, 1600);
+      }
 
       showToast('Focused on date: ' + (calCell ? todayKey : row.id.replace('row-', '')));
     }

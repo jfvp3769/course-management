@@ -205,7 +205,10 @@ function _renderMatrixCell(d, sub, sec, secIdx, timetableMap, meetingCounters, t
                   <span class="font-extrabold text-[8.5px] uppercase tracking-tight text-amber-800 dark:text-amber-300 truncate">⚡ ${escapeHtml(weekendEntry.type || 'Weekend')}</span>
                   <div class="flex items-center gap-1 shrink-0">
                     ${isEntryCompleted ? '<span class="text-[7.5px] px-1 py-0.2 rounded font-black bg-emerald-600 text-white shrink-0">✓ Done</span>' : ''}
-                    <span class="text-[7.5px] px-1 py-0.2 rounded font-bold bg-white/80 dark:bg-slate-900/80 text-slate-800 dark:text-slate-200 shrink-0 border border-black/10 dark:border-white/10">${escapeHtml(weekendEntry.type || 'Weekend')}</span>
+                    ${(() => {
+                      const bi = (typeof getActivityTypeBadgeInfo === 'function') ? getActivityTypeBadgeInfo(weekendEntry.type, false) : null;
+                      return bi ? `<span class="inline-flex items-center justify-center w-5 h-5 rounded-full ${bi.bgClass} shadow-2xs shrink-0 ring-1 ring-white/60 dark:ring-slate-900/60" title="${escapeHtml(bi.type)}">${bi.svg}</span>` : '';
+                    })()}
                   </div>
                 </div>
                 <div class="font-bold text-[10.5px] leading-tight truncate group-hover/card-cell:whitespace-normal group-hover/card-cell:overflow-visible transition-all max-w-full" title="${escapeHtml(weekendEntry.topic || 'Planned Activity')}">${escapeHtml(weekendEntry.topic || 'Planned Activity')}</div>
@@ -270,7 +273,10 @@ function _renderMatrixCell(d, sub, sec, secIdx, timetableMap, meetingCounters, t
                   ${!isNoClass ? `<span class="font-extrabold text-[8.5px] uppercase tracking-tight truncate">Mtg #${meetingNum}</span>` : `<span class="font-extrabold text-[8.5px] uppercase tracking-tight text-rose-700 dark:text-rose-300 truncate">${escapeHtml(entry.type || 'No Class')}</span>`}
                   <div class="flex items-center gap-1 shrink-0">
                     ${isEntryCompleted ? '<span class="text-[7.5px] px-1 py-0.2 rounded font-black bg-emerald-600 text-white shrink-0">✓ Done</span>' : ''}
-                    <span class="text-[7.5px] px-1 py-0.2 rounded font-bold bg-white/80 dark:bg-slate-900/80 text-slate-800 dark:text-slate-200 shrink-0">${escapeHtml(entry.type)}</span>
+                    ${(() => {
+                      const bi = (typeof getActivityTypeBadgeInfo === 'function') ? getActivityTypeBadgeInfo(entry.type, isNoClass) : null;
+                      return bi ? `<span class="inline-flex items-center justify-center w-5 h-5 rounded-full ${bi.bgClass} shadow-2xs shrink-0 ring-1 ring-white/60 dark:ring-slate-900/60" title="${escapeHtml(bi.type)}">${bi.svg}</span>` : '';
+                    })()}
                   </div>
                 </div>
                 <div class="font-bold text-[10.5px] leading-tight truncate group-hover/card-cell:whitespace-normal group-hover/card-cell:overflow-visible transition-all max-w-full" title="${escapeHtml(entry.topic || 'Planned Activity')}">${escapeHtml(entry.topic || 'Planned Activity')}</div>
@@ -322,7 +328,10 @@ function _renderMatrixCell(d, sub, sec, secIdx, timetableMap, meetingCounters, t
                   <span class="font-extrabold text-[8.5px] uppercase tracking-tight text-amber-800 dark:text-amber-300 truncate">⚡ ${escapeHtml(displayType)}</span>
                   <div class="flex items-center gap-1 shrink-0">
                     ${isEntryCompleted ? '<span class="text-[7.5px] px-1 py-0.2 rounded font-black bg-emerald-600 text-white shrink-0">✓ Done</span>' : ''}
-                    <span class="text-[7.5px] px-1 py-0.2 rounded font-bold bg-white/80 dark:bg-slate-900/80 text-slate-800 dark:text-slate-200 shrink-0 border border-black/10 dark:border-white/10">${escapeHtml(entry.type || 'Special')}</span>
+                    ${(() => {
+                      const bi = (typeof getActivityTypeBadgeInfo === 'function') ? getActivityTypeBadgeInfo(entry.type, isNoClass) : null;
+                      return bi ? `<span class="inline-flex items-center justify-center w-5 h-5 rounded-full ${bi.bgClass} shadow-2xs shrink-0 ring-1 ring-white/60 dark:ring-slate-900/60" title="${escapeHtml(bi.type)}">${bi.svg}</span>` : '';
+                    })()}
                   </div>
                 </div>
                 <div class="font-bold text-[10.5px] leading-tight truncate group-hover/card-cell:whitespace-normal group-hover/card-cell:overflow-visible transition-all max-w-full" title="${escapeHtml(entry.topic || 'Planned Activity')}">${escapeHtml(entry.topic || 'Planned Activity')}</div>

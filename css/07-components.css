@@ -1691,7 +1691,7 @@ html.theme-dark .planner-slot-time-label {
   font-size: 10px;
   line-height: 1.15;
   width: 100%;
-  max-width: calc(100% - 6px);
+  max-width: calc(100% - 8px);
   text-align: left;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1702,7 +1702,7 @@ html.theme-dark .planner-slot-time-label {
   font-size: 8.5px;
   line-height: 1.15;
   width: 100%;
-  max-width: calc(100% - 6px);
+  max-width: calc(100% - 8px);
   text-align: left;
   opacity: 0.75;
   overflow: hidden;
@@ -1715,29 +1715,39 @@ html.theme-dark .planner-slot-time-label {
   position: absolute;
   top: 0;
   right: 0;
-  transform: translate(32%, -32%);
-  width: 16px;
-  height: 16px;
+  transform: translate(28%, -28%);
+  width: 20px;
+  height: 20px;
   border-radius: 9999px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 1.5px 3.5px rgba(0, 0, 0, 0.28);
   pointer-events: none;
   z-index: 10;
-  border: 1.5px solid #ffffff;
+  border: 2px solid #ffffff;
   box-sizing: border-box;
 }
 
 html.theme-dark .planner-pill-corner-badge {
   border-color: #0f172a;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 1.5px 4px rgba(0, 0, 0, 0.55);
 }
 
 .planner-pill-corner-badge svg {
-  width: 9.5px;
-  height: 9.5px;
+  width: 12.5px;
+  height: 12.5px;
   flex-shrink: 0;
+}
+
+@keyframes todayBadgePulse {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(217, 119, 6, 0.85); }
+  50% { transform: scale(1.22); box-shadow: 0 0 0 8px rgba(217, 119, 6, 0); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(217, 119, 6, 0); }
+}
+
+.cal-today-badge-highlight {
+  animation: todayBadgePulse 0.9s cubic-bezier(0.16, 1, 0.3, 1) 2 !important;
 }
 
 /* 3-State Subject Styling Helpers */
