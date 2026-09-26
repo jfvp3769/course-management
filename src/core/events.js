@@ -217,9 +217,6 @@
     onPlannerMonthSelectChange: (e, target, data) => {
       if (typeof window.onPlannerMonthSelectChange === 'function') window.onPlannerMonthSelectChange(e, target, data);
     },
-    onPlannerSectionFilterChange: (e, target, data) => {
-      if (typeof window.onPlannerSectionFilterChange === 'function') window.onPlannerSectionFilterChange(e, target, data);
-    },
     openPlannerDayInspector: (e, target, data) => {
       const dateKey = data.date || (target ? target.getAttribute('data-date') : '');
       if (typeof window.openPlannerDayInspector === 'function') window.openPlannerDayInspector(dateKey);

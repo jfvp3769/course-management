@@ -1,17 +1,15 @@
 /* ===========================================================================
- * MONTHLY PLANNER CALENDAR VIEW (Strategy 1 + Strategy 2 + View Switcher)
+ * MONTHLY PLANNER CALENDAR VIEW (Strategy 1 + View Switcher)
  * ---------------------------------------------------------------------------
  * Provides an interactive 1-month visual calendar grid for Tab 1
  * (Semester Schedule & Activity Matrix), featuring:
  * 1. Strategy 1: Sleek compact pills (~22-26px) with visible class limit (max 2)
  *    and a Day Inspector Flyout Modal for high-density days (up to 6 classes).
- * 2. Strategy 2: Course / Section Focus Filter Bar.
- * 3. View Switcher: Seamless toggling between "Monthly View" and "Weekly View".
+ * 2. View Switcher: Seamless toggling between "Monthly View" and "Weekly View".
  * ======================================================================== */
 
 function initPlannerMonthControls() {
   const monthSelect = document.getElementById('planner-month-select');
-  const sectionFilter = document.getElementById('planner-section-filter');
 
   // 1. Populate Distinct Months
   if (monthSelect && Array.isArray(semesterDates) && semesterDates.length > 0) {
@@ -50,29 +48,7 @@ function initPlannerMonthControls() {
     }
   }
 
-  // 2. Populate Section Filter
-  if (sectionFilter && courseData && Array.isArray(courseData.subjects)) {
-    const allSections = [];
-    courseData.subjects.forEach(sub => {
-      (sub.sections || []).forEach(sec => {
-        allSections.push(`${sub.code} - ${sec}`);
-      });
-    });
-
-    let filterHtml = '<option value="all">All Sections</option>';
-    allSections.forEach(secKey => {
-      const isSelected = (plannerSectionFilter === secKey) ? 'selected' : '';
-      filterHtml += `<option value="${escapeHtml(secKey)}" ${isSelected}>${escapeHtml(secKey)}</option>`;
-    });
-    sectionFilter.innerHTML = filterHtml;
-
-    if (plannerSectionFilter !== 'all' && !allSections.includes(plannerSectionFilter)) {
-      plannerSectionFilter = 'all';
-    }
-    sectionFilter.value = plannerSectionFilter;
-  }
-
-  // 3. Synchronize Switcher Buttons and Container Visibility
+  // 2. Synchronize Switcher Buttons and Container Visibility
   _updateViewSwitcherButtons();
   _syncPlannerViewContainers();
 }
@@ -103,7 +79,6 @@ function _syncPlannerViewContainers() {
   const matrixContainer = document.getElementById('planner-matrix-view-container');
   const monthNav = document.getElementById('planner-month-nav-container');
   const weekNav = document.getElementById('planner-week-nav-container');
-  const sectionFilterContainer = document.getElementById('planner-section-filter-container');
 
   if (plannerViewMode === 'month') {
     if (calContainer) {
@@ -122,10 +97,6 @@ function _syncPlannerViewContainers() {
       weekNav.classList.add('hidden');
       weekNav.classList.remove('flex');
     }
-    if (sectionFilterContainer) {
-      sectionFilterContainer.classList.remove('hidden');
-      sectionFilterContainer.classList.add('flex');
-    }
   } else {
     if (calContainer) {
       calContainer.classList.add('hidden');
@@ -142,10 +113,6 @@ function _syncPlannerViewContainers() {
     if (weekNav) {
       weekNav.classList.remove('hidden');
       weekNav.classList.add('flex');
-    }
-    if (sectionFilterContainer) {
-      sectionFilterContainer.classList.add('hidden');
-      sectionFilterContainer.classList.remove('flex');
     }
   }
 }
@@ -212,24 +179,6 @@ function onPlannerMonthSelectChange(e, target) {
   renderPlannerMonthCalendar();
   if (typeof autoResizeContentWindows === 'function') {
     autoResizeContentWindows();
-  }
-}
-
-function onPlannerSectionFilterChange(e, target) {
-  const sel = target || document.getElementById('planner-section-filter');
-  if (!sel) return;
-
-  plannerSectionFilter = sel.value || 'all';
-  saveAppState();
-  renderPlannerMonthCalendar();
-  if (typeof autoResizeContentWindows === 'function') {
-    autoResizeContentWindows();
-  }
-
-  if (plannerSectionFilter === 'all') {
-    showToast('Showing all scheduled sections', '🔍');
-  } else {
-    showToast(`Focused on: ${plannerSectionFilter}`, '🔍');
   }
 }
 
@@ -823,10 +772,6 @@ function _renderCalendarDayCell(g, isCurrentMonth, todayKey, timetableMap, meeti
     courseData.subjects.forEach(sub => {
       (sub.sections || []).forEach(sec => {
         const fullSecKey = `${sub.code} - ${sec}`;
-        if (plannerSectionFilter !== 'all' && plannerSectionFilter !== fullSecKey) {
-          return;
-        }
-
         const cellKey = `${dateKey}__${sub.code}__${sec}`;
         const entry = plannerEntries[cellKey];
         const timetableSlot = timetableMap[`${fullDay}__${sub.code}__${sec}`] || null;
@@ -1594,7 +1539,6 @@ if (typeof window !== 'undefined') {
   window.setPlannerViewMode = setPlannerViewMode;
   window.navigatePlannerMonth = navigatePlannerMonth;
   window.onPlannerMonthSelectChange = onPlannerMonthSelectChange;
-  window.onPlannerSectionFilterChange = onPlannerSectionFilterChange;
   window.openPlannerDayInspector = openPlannerDayInspector;
   window.closePlannerDayInspector = closePlannerDayInspector;
   window._calculateCalendarMeetingStats = _calculateCalendarMeetingStats;

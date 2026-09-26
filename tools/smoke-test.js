@@ -873,9 +873,12 @@ setTimeout(() => {
         const matrixContainer = document.getElementById('planner-matrix-view-container');
         const monthNav = document.getElementById('planner-month-nav-container');
         const weekNav = document.getElementById('planner-week-nav-container');
-        const sectionFilterContainer = document.getElementById('planner-section-filter-container');
         const btnMonth = document.getElementById('btn-planner-view-month');
         const btnWeek = document.getElementById('btn-planner-view-week');
+
+        // Verify section filter is completely absent
+        if (document.getElementById('planner-section-filter') !== null) return false;
+        if (document.getElementById('planner-section-filter-container') !== null) return false;
 
         // 1. Switch to Weekly View
         setPlannerViewMode('week');
@@ -884,7 +887,6 @@ setTimeout(() => {
         if (matrixContainer.classList.contains('hidden')) return false;
         if (!monthNav.classList.contains('hidden')) return false;
         if (weekNav.classList.contains('hidden')) return false;
-        if (!sectionFilterContainer.classList.contains('hidden')) return false;
         if (!btnWeek.classList.contains('font-bold')) return false;
         if (!btnWeek.classList.contains('app-themed-text')) return false;
         if (btnMonth.classList.contains('app-themed-text')) return false;
@@ -901,7 +903,6 @@ setTimeout(() => {
         if (!matrixContainer.classList.contains('hidden')) return false;
         if (monthNav.classList.contains('hidden')) return false;
         if (!weekNav.classList.contains('hidden')) return false;
-        if (sectionFilterContainer.classList.contains('hidden')) return false;
         if (!btnMonth.classList.contains('font-bold')) return false;
         if (!btnMonth.classList.contains('app-themed-text')) return false;
         if (btnWeek.classList.contains('app-themed-text')) return false;
@@ -934,33 +935,18 @@ setTimeout(() => {
         return true;
       })()`);
     }],
-    ['planner section filter filters displayed classes in monthly view', () => {
+    ['planner section filter is completely removed from toolbar and DOM', () => {
       return window.__probe(`(() => {
         initPlannerMonthControls();
         renderPlannerMonthCalendar();
 
         const filterSelect = document.getElementById('planner-section-filter');
-        if (!filterSelect || filterSelect.options.length < 2) return false;
+        const filterContainer = document.getElementById('planner-section-filter-container');
+        if (filterSelect !== null || filterContainer !== null) return false;
 
-        // Select specific section
-        const targetSection = filterSelect.options[1].value;
-        onPlannerSectionFilterChange(null, { value: targetSection });
-        if (plannerSectionFilter !== targetSection) return false;
-
-        // Verify only pills for targetSection appear
-        const targetParts = targetSection.split(' - ');
-        const targetCourse = targetParts[0];
-        const targetSec = targetParts[1];
+        // Verify monthly calendar renders scheduled class pills without filter restrictions
         const pills = document.querySelectorAll('#planner-calendar-view-container .planner-class-pill');
-        for (const p of pills) {
-          if (p.getAttribute('data-course') !== targetCourse || p.getAttribute('data-section') !== targetSec) {
-            return false;
-          }
-        }
-
-        // Reset filter
-        onPlannerSectionFilterChange(null, { value: 'all' });
-        if (plannerSectionFilter !== 'all') return false;
+        if (pills.length === 0) return false;
 
         return true;
       })()`);
