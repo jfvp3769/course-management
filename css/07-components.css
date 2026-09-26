@@ -1691,7 +1691,7 @@ html.theme-dark .planner-slot-time-label {
   font-size: 10px;
   line-height: 1.15;
   width: 100%;
-  max-width: calc(100% - 8px);
+  max-width: calc(100% - 14px);
   text-align: left;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1702,7 +1702,7 @@ html.theme-dark .planner-slot-time-label {
   font-size: 8.5px;
   line-height: 1.15;
   width: 100%;
-  max-width: calc(100% - 8px);
+  max-width: calc(100% - 14px);
   text-align: left;
   opacity: 0.75;
   overflow: hidden;
@@ -1710,34 +1710,26 @@ html.theme-dark .planner-slot-time-label {
   white-space: nowrap;
 }
 
-/* Floating Corner Activity Badge for Subject Pills (Calendar View Non-Hover) */
+/* Floating Corner Activity Icon for Subject Pills (Calendar View Non-Hover) - Clean icon, no circle badge */
 .planner-pill-corner-badge {
   position: absolute;
-  top: 0;
-  right: 0;
-  transform: translate(28%, -28%);
-  width: 20px;
-  height: 20px;
-  border-radius: 9999px;
+  top: 2px;
+  right: 2px;
+  width: 14px;
+  height: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 1.5px 3.5px rgba(0, 0, 0, 0.28);
   pointer-events: none;
   z-index: 10;
-  border: 2px solid #ffffff;
   box-sizing: border-box;
 }
 
-html.theme-dark .planner-pill-corner-badge {
-  border-color: #0f172a;
-  box-shadow: 0 1.5px 4px rgba(0, 0, 0, 0.55);
-}
-
 .planner-pill-corner-badge svg {
-  width: 12.5px;
-  height: 12.5px;
+  width: 12px;
+  height: 12px;
   flex-shrink: 0;
+  opacity: 0.9;
 }
 
 @keyframes todayBadgePulse {

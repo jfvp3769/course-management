@@ -530,7 +530,7 @@ function assignGridTracks(classes) {
  * - With Planned Activity: Solid/proper theme color (high contrast, full saturation/opacity).
  * - No Planned Activity: Muted/pale styling of the subject color (low opacity tint/light pastel fill with dashed border).
  */
-function getSubjectPillStyles(courseCode, hasPlannedActivity, isNoClass) {
+function getSubjectPillStyles(courseCode, hasPlannedActivity, isNoClass, sectionName = null) {
   // State 3: No Class / Cancelled
   // Neutral muted gray background (#f1f5f9), subtle gray border, with a distinct red/dark-gray strikethrough across the text.
   if (isNoClass) {
@@ -540,7 +540,9 @@ function getSubjectPillStyles(courseCode, hasPlannedActivity, isNoClass) {
   const sub = (courseData && Array.isArray(courseData.subjects))
     ? courseData.subjects.find(s => s.code === courseCode)
     : null;
-  const theme = (sub && sub.colorTheme ? sub.colorTheme.toLowerCase() : 'blue');
+  const secIdx = (sub && sub.sections && sectionName) ? Math.max(0, sub.sections.indexOf(sectionName)) : 0;
+  const secPal = (typeof getSectionPalette === 'function' && sub) ? getSectionPalette(sub, secIdx) : null;
+  const theme = (secPal && secPal.name ? secPal.name.toLowerCase() : (sub && sub.colorTheme ? sub.colorTheme.toLowerCase() : 'blue'));
 
   // State 1: Planned Activity (Solid subject color fill + bold white text)
   const solidThemes = {
@@ -652,16 +654,20 @@ function _renderSubgridColumn(period, dateKey, classes, isWeekend, isNoClassDate
 
   const pillsHtml = classes.map(c => {
     const hasActivity = !!(c.hasPlannedActivity);
-    const styleClasses = getSubjectPillStyles(c.course, hasActivity, c.isNoClass);
-    const tooltipText = `${c.course} (${c.section}) • ${formatTimeDisplay(c.startTime)} – ${formatTimeDisplay(c.endTime)}\n${c.room ? 'Room: ' + c.room + '\n' : ''}${c.stats.meetingNum ? 'Mtg #' + c.stats.meetingNum + ' (' + c.stats.meetingsLeft + ' left)\n' : ''}${c.topic || 'No topic planned yet'}`;
-
     const sub = (courseData && Array.isArray(courseData.subjects))
       ? courseData.subjects.find(s => s.code === c.course)
       : (c.sub || null);
+    const secIdx = (sub && sub.sections) ? Math.max(0, sub.sections.indexOf(c.section)) : 0;
+    const secPalette = (typeof getSectionPalette === 'function' && sub) ? getSectionPalette(sub, secIdx) : null;
+    const secBadgeStyle = (typeof getSectionBadgeStyle === 'function') ? getSectionBadgeStyle(secIdx) : '';
+    const secTopBorder = (typeof getSectionTopBorder === 'function') ? getSectionTopBorder(secIdx) : '';
 
-    let badgeColor = (sub && sub.badgeBg)
+    const styleClasses = getSubjectPillStyles(c.course, hasActivity, c.isNoClass, c.section);
+    const tooltipText = `${c.course} (${c.section}) • ${formatTimeDisplay(c.startTime)} – ${formatTimeDisplay(c.endTime)}\n${c.room ? 'Room: ' + c.room + '\n' : ''}${c.stats.meetingNum ? 'Mtg #' + c.stats.meetingNum + ' (' + c.stats.meetingsLeft + ' left)\n' : ''}${c.topic || 'No topic planned yet'}`;
+
+    let badgeColor = secPalette ? secPalette.badgeBg : ((sub && sub.badgeBg)
       ? sub.badgeBg
-      : 'bg-blue-100 dark:bg-[#0f274a] text-blue-800 dark:text-blue-200 border-blue-300 dark:border-blue-600';
+      : 'bg-blue-100 dark:bg-[#0f274a] text-blue-800 dark:text-blue-200 border-blue-300 dark:border-blue-600');
 
     if (c.type === 'Exam') {
       badgeColor = 'bg-amber-100 dark:bg-amber-950/70 text-amber-900 dark:text-amber-200 border-amber-300 dark:border-amber-800';
@@ -684,7 +690,7 @@ function _renderSubgridColumn(period, dateKey, classes, isWeekend, isNoClassDate
     const isCompleted = c.isDone;
     const badgeInfo = getActivityTypeBadgeInfo(c.type, c.isNoClass);
     const cornerBadgeHtml = badgeInfo ? `
-          <div class="planner-pill-corner-badge ${badgeInfo.bgClass}" title="${escapeHtml(badgeInfo.type)}">
+          <div class="planner-pill-corner-badge text-current" title="${escapeHtml(badgeInfo.type)}">
             ${badgeInfo.svg}
           </div>
         ` : '';
@@ -718,7 +724,7 @@ function _renderSubgridColumn(period, dateKey, classes, isWeekend, isNoClassDate
           title="${escapeHtml(tooltipText)}">
           ${cornerBadgeHtml}
           <span class="planner-pill-code font-bold text-[10px] leading-tight truncate text-left w-full">${escapeHtml(c.course)}</span>
-          <span class="planner-pill-section text-[8.5px] leading-tight text-left w-full opacity-75 truncate" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHtml(c.section)}</span>
+          <span class="planner-pill-section text-[8.5px] leading-tight text-left w-full font-bold truncate ${secIdx > 0 ? 'opacity-95' : 'opacity-80'}" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHtml(c.section)}</span>
         </div>
 
         <!-- In-Place Expanding Card on Hover (Weekly View Behavior) -->
@@ -728,19 +734,22 @@ function _renderSubgridColumn(period, dateKey, classes, isWeekend, isNoClassDate
           data-course="${escapeHtml(c.course)}" 
           data-section="${escapeHtml(c.section)}" 
           data-weekend="${isWeekend ? 'true' : 'false'}"
-          class="planner-calendar-expanded-card ${vPosClass} ${hPosClass} p-1.5 rounded-lg border ${badgeColor} shadow-xl flex flex-col gap-0.5 cursor-pointer select-none">
+          class="planner-calendar-expanded-card ${vPosClass} ${hPosClass} p-1.5 rounded-lg border ${badgeColor} ${secTopBorder} shadow-xl flex flex-col gap-0.5 cursor-pointer select-none">
           
-          <!-- Top Row: Meeting # & Status / Type Badges -->
+          <!-- Top Row: Section, Meeting # & Status / Type Badges -->
           <div class="flex items-center justify-between gap-1 overflow-hidden leading-tight">
-            ${!c.isNoClass ? `
-              <span class="font-extrabold text-[8.5px] uppercase tracking-tight truncate">Mtg #${meetingNum}</span>
-            ` : `
-              <span class="font-extrabold text-[8.5px] uppercase tracking-tight text-rose-700 dark:text-rose-300 truncate">${escapeHtml(c.type || 'No Class')}</span>
-            `}
+            <div class="flex items-center gap-1 min-w-0 overflow-hidden">
+              <span class="px-1.5 py-0.2 rounded font-black text-[8px] uppercase tracking-wider ${secBadgeStyle} shrink-0 shadow-2xs">${escapeHtml(c.section)}</span>
+              ${!c.isNoClass ? `
+                <span class="font-extrabold text-[8.5px] uppercase tracking-tight truncate opacity-85">Mtg #${meetingNum}</span>
+              ` : `
+                <span class="font-extrabold text-[8.5px] uppercase tracking-tight text-rose-700 dark:text-rose-300 truncate">${escapeHtml(c.type || 'No Class')}</span>
+              `}
+            </div>
             <div class="flex items-center gap-1 shrink-0">
               ${isCompleted ? '<span class="text-[7.5px] px-1 py-0.2 rounded font-black bg-emerald-600 text-white shrink-0">✓ Done</span>' : ''}
               ${badgeInfo ? `
-                <span class="inline-flex items-center justify-center w-5 h-5 rounded-full ${badgeInfo.bgClass} shadow-2xs shrink-0 ring-1 ring-white/60 dark:ring-slate-900/60" title="${escapeHtml(badgeInfo.type)}">
+                <span class="inline-flex items-center justify-center shrink-0 ${badgeInfo.textClass}" title="${escapeHtml(badgeInfo.type)}">
                   ${badgeInfo.svg}
                 </span>
               ` : ''}
@@ -1604,6 +1613,8 @@ if (typeof window !== 'undefined') {
   window.onAddActivitySubjectSelectChange = onAddActivitySubjectSelectChange;
   window.validateAddActivityTimeLive = validateAddActivityTimeLive;
   window.saveAddActivityModal = saveAddActivityModal;
+  window.getSectionTopBorder = getSectionTopBorder;
+  window.getSectionPalette = getSectionPalette;
   window.getActivityTypeBadgeInfo = getActivityTypeBadgeInfo;
 }
 

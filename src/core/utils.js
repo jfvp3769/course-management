@@ -24,6 +24,22 @@ function getSectionBadgeStyle(secIndex) {
   return sectionBadgeBorders[secIndex % sectionBadgeBorders.length];
 }
 
+function getSectionTopBorder(secIndex) {
+  if (typeof sectionTopBorders === 'undefined') return '';
+  return sectionTopBorders[secIndex % sectionTopBorders.length];
+}
+
+function getSectionPalette(sub, secIdx = 0) {
+  const paletteKeys = ['blue', 'amber', 'emerald', 'purple', 'rose', 'cyan', 'indigo', 'teal', 'orange', 'slate', 'lime', 'sky', 'pink', 'fuchsia', 'red', 'maroon'];
+  const baseTheme = (sub && sub.colorTheme ? sub.colorTheme.toLowerCase() : 'blue');
+  if (secIdx === 0) {
+    return (typeof COLOR_PALETTES !== 'undefined' && COLOR_PALETTES[baseTheme]) ? COLOR_PALETTES[baseTheme] : (typeof COLOR_PALETTES !== 'undefined' ? COLOR_PALETTES.blue : { badgeBg: sub?.badgeBg || '' });
+  }
+  const otherKeys = paletteKeys.filter(k => k !== baseTheme);
+  const pickedKey = otherKeys[(secIdx - 1) % otherKeys.length];
+  return (typeof COLOR_PALETTES !== 'undefined' && COLOR_PALETTES[pickedKey]) ? COLOR_PALETTES[pickedKey] : (typeof COLOR_PALETTES !== 'undefined' ? COLOR_PALETTES.amber : { badgeBg: sub?.badgeBg || '' });
+}
+
 // Security & Helper Utilities
 function escapeHtml(str) {
   if (str === null || str === undefined) return '';
@@ -163,7 +179,8 @@ function getActivityTypeBadgeInfo(rawType, isNoClass = false) {
       type: 'No Class / Suspended',
       iconName: 'ban',
       bgClass: 'bg-rose-600 text-white dark:bg-rose-500',
-      svg: `<svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/></svg>`
+      textClass: 'text-rose-600 dark:text-rose-400',
+      svg: `<svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/></svg>`
     };
   }
 
@@ -173,7 +190,8 @@ function getActivityTypeBadgeInfo(rawType, isNoClass = false) {
       type: 'Laboratory Work',
       iconName: 'flask-conical',
       bgClass: 'bg-cyan-600 text-white dark:bg-cyan-500',
-      svg: `<svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.527a2 2 0 0 1-.211.896L4.72 20.55a1 1 0 0 0 .9 1.45h12.76a1 1 0 0 0 .9-1.45l-5.069-10.127A2 2 0 0 1 14 9.527V2"/><path d="M8.5 2h7"/><path d="M7 16h10"/></svg>`
+      textClass: 'text-cyan-600 dark:text-cyan-400',
+      svg: `<svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.527a2 2 0 0 1-.211.896L4.72 20.55a1 1 0 0 0 .9 1.45h12.76a1 1 0 0 0 .9-1.45l-5.069-10.127A2 2 0 0 1 14 9.527V2"/><path d="M8.5 2h7"/><path d="M7 16h10"/></svg>`
     };
   }
 
@@ -183,7 +201,8 @@ function getActivityTypeBadgeInfo(rawType, isNoClass = false) {
       type: 'Seatwork / Recitation',
       iconName: 'pen-tool',
       bgClass: 'bg-emerald-600 text-white dark:bg-emerald-500',
-      svg: `<svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19 7-7 3 3-7 7-3-3z"/><path d="m18 13-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="m2 2 7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg>`
+      textClass: 'text-emerald-600 dark:text-emerald-400',
+      svg: `<svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19 7-7 3 3-7 7-3-3z"/><path d="m18 13-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="m2 2 7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg>`
     };
   }
 
@@ -193,7 +212,8 @@ function getActivityTypeBadgeInfo(rawType, isNoClass = false) {
       type: 'Quiz / Evaluation',
       iconName: 'clipboard-check',
       bgClass: 'bg-purple-600 text-white dark:bg-purple-500',
-      svg: `<svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/></svg>`
+      textClass: 'text-purple-600 dark:text-purple-400',
+      svg: `<svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/></svg>`
     };
   }
 
@@ -203,7 +223,8 @@ function getActivityTypeBadgeInfo(rawType, isNoClass = false) {
       type: 'Major Examination',
       iconName: 'award',
       bgClass: 'bg-amber-500 text-white dark:bg-amber-600',
-      svg: `<svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="m15.477 12.89 1.523 9.11L12 19l-5 3 1.523-9.11"/></svg>`
+      textClass: 'text-amber-600 dark:text-amber-400',
+      svg: `<svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="m15.477 12.89 1.523 9.11L12 19l-5 3 1.523-9.11"/></svg>`
     };
   }
 
@@ -213,7 +234,8 @@ function getActivityTypeBadgeInfo(rawType, isNoClass = false) {
       type: 'Field Work / Surveying',
       iconName: 'compass',
       bgClass: 'bg-teal-600 text-white dark:bg-teal-500',
-      svg: `<svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" fill="currentColor"/></svg>`
+      textClass: 'text-teal-600 dark:text-teal-400',
+      svg: `<svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" fill="currentColor"/></svg>`
     };
   }
 
@@ -223,7 +245,8 @@ function getActivityTypeBadgeInfo(rawType, isNoClass = false) {
       type: 'Makeup Class',
       iconName: 'calendar-clock',
       bgClass: 'bg-orange-500 text-white dark:bg-orange-600',
-      svg: `<svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 7.5V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h3.5"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h5"/><path d="M17.5 17.5 16 16.3V14"/><circle cx="16" cy="16" r="6"/></svg>`
+      textClass: 'text-orange-600 dark:text-orange-400',
+      svg: `<svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 7.5V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h3.5"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h5"/><path d="M17.5 17.5 16 16.3V14"/><circle cx="16" cy="16" r="6"/></svg>`
     };
   }
 
@@ -233,7 +256,8 @@ function getActivityTypeBadgeInfo(rawType, isNoClass = false) {
       type: 'Special Session',
       iconName: 'sparkles',
       bgClass: 'bg-violet-600 text-white dark:bg-violet-500',
-      svg: `<svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>`
+      textClass: 'text-violet-600 dark:text-violet-400',
+      svg: `<svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>`
     };
   }
 
@@ -242,10 +266,15 @@ function getActivityTypeBadgeInfo(rawType, isNoClass = false) {
     type: 'Lecture & Discussion',
     iconName: 'book-open',
     bgClass: 'bg-blue-600 text-white dark:bg-blue-500',
-    svg: `<svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>`
+    textClass: 'text-blue-600 dark:text-blue-400',
+    svg: `<svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>`
   };
 }
 
 if (typeof window !== 'undefined') {
+  window.getSectionAccent = getSectionAccent;
+  window.getSectionBadgeStyle = getSectionBadgeStyle;
+  window.getSectionTopBorder = getSectionTopBorder;
+  window.getSectionPalette = getSectionPalette;
   window.getActivityTypeBadgeInfo = getActivityTypeBadgeInfo;
 }

@@ -192,22 +192,28 @@ function _renderMatrixCell(d, sub, sec, secIdx, timetableMap, meetingCounters, t
     const weekendEntry = plannerEntries[cellKey];
     if (weekendEntry) {
       const isEntryCompleted = (weekendEntry.status === 'Completed') || (d.dateKey < todayKey);
-      let badgeColor = sub.badgeBg;
-      if (weekendEntry.type === 'Exam') badgeColor = 'bg-amber-100 text-amber-900 border-amber-300';
-      else if (weekendEntry.type === 'No Class') badgeColor = 'bg-rose-100 text-rose-800 border-rose-300';
-      else if (weekendEntry.type === 'Makeup Class') badgeColor = 'bg-amber-50 text-amber-950 border-amber-300';
-      else if (weekendEntry.type === 'Special Session') badgeColor = 'bg-violet-50 text-violet-950 border-violet-300';
+      const secPalette = (typeof getSectionPalette === 'function') ? getSectionPalette(sub, secIdx) : { badgeBg: sub.badgeBg };
+      const secBadgeStyle = (typeof getSectionBadgeStyle === 'function') ? getSectionBadgeStyle(secIdx) : '';
+      const secTopBorder = (typeof getSectionTopBorder === 'function') ? getSectionTopBorder(secIdx) : '';
+      let badgeColor = secPalette.badgeBg;
+      if (weekendEntry.type === 'Exam') badgeColor = 'bg-amber-100 text-amber-900 border-amber-300 dark:bg-amber-950 dark:text-amber-200 dark:border-amber-700';
+      else if (weekendEntry.type === 'No Class') badgeColor = 'bg-rose-100 text-rose-800 border-rose-300 dark:bg-rose-950 dark:text-rose-200 dark:border-rose-700';
+      else if (weekendEntry.type === 'Makeup Class') badgeColor = 'bg-amber-50 text-amber-950 border-amber-300 dark:bg-amber-950/60 dark:text-amber-200 dark:border-amber-700';
+      else if (weekendEntry.type === 'Special Session') badgeColor = 'bg-violet-50 text-violet-950 border-violet-300 dark:bg-violet-950/60 dark:text-violet-200 dark:border-violet-700';
 
       return `
             <td id="cell-${cellKey}" data-cell-key="${cellKey}" data-col="${colKey}" style="width: ${currentW}px; min-width: ${currentW}px; max-width: ${currentW}px;" class="p-1 border-r border-slate-200 dark:border-slate-800 bg-[#e8edf3] dark:bg-[#182234] cursor-pointer transition align-top relative group/card-cell matrix-cell-slot" data-action="openLessonModal" data-date="${d.dateKey}" data-course="${escapeHtml(sub.code)}" data-section="${escapeHtml(sec)}" data-weekend="${d.isWeekend ? 'true' : 'false'}" data-action-dragover="handleMatrixCellDragOver" data-action-dragleave="handleMatrixCellDragLeave" data-action-drop="handleMatrixCellDrop">
-              <div id="card-${cellKey}" draggable="true" data-action-dragstart="handleMatrixCardDragStart" data-action-dragend="handleMatrixCardDragEnd" data-cell-key="${cellKey}" data-date="${d.dateKey}" data-course="${escapeHtml(sub.code)}" data-section="${escapeHtml(sec)}" class="matrix-activity-card p-1 rounded-lg border ${badgeColor} shadow-xs space-y-0.5 overflow-hidden max-w-full min-w-0 transition-all duration-200 ease-out group-hover/card-cell:absolute group-hover/card-cell:left-1 group-hover/card-cell:right-1 group-hover/card-cell:top-1 group-hover/card-cell:z-22 group-hover/card-cell:shadow-xl group-hover/card-cell:scale-[1.02] cursor-grab active:cursor-grabbing">
+              <div id="card-${cellKey}" draggable="true" data-action-dragstart="handleMatrixCardDragStart" data-action-dragend="handleMatrixCardDragEnd" data-cell-key="${cellKey}" data-date="${d.dateKey}" data-course="${escapeHtml(sub.code)}" data-section="${escapeHtml(sec)}" class="matrix-activity-card p-1 rounded-lg border ${badgeColor} ${secTopBorder} shadow-xs space-y-0.5 overflow-hidden max-w-full min-w-0 transition-all duration-200 ease-out group-hover/card-cell:absolute group-hover/card-cell:left-1 group-hover/card-cell:right-1 group-hover/card-cell:top-1 group-hover/card-cell:z-22 group-hover/card-cell:shadow-xl group-hover/card-cell:scale-[1.02] cursor-grab active:cursor-grabbing">
                 <div class="flex items-center justify-between gap-1 overflow-hidden">
-                  <span class="font-extrabold text-[8.5px] uppercase tracking-tight text-amber-800 dark:text-amber-300 truncate">⚡ ${escapeHtml(weekendEntry.type || 'Weekend')}</span>
+                  <div class="flex items-center gap-1 min-w-0 overflow-hidden">
+                    <span class="px-1.5 py-0.2 rounded font-black text-[8px] uppercase tracking-wider ${secBadgeStyle} shrink-0 shadow-2xs">${escapeHtml(sec)}</span>
+                    <span class="font-extrabold text-[8.5px] uppercase tracking-tight text-amber-800 dark:text-amber-300 truncate">⚡ ${escapeHtml(weekendEntry.type || 'Weekend')}</span>
+                  </div>
                   <div class="flex items-center gap-1 shrink-0">
                     ${isEntryCompleted ? '<span class="text-[7.5px] px-1 py-0.2 rounded font-black bg-emerald-600 text-white shrink-0">✓ Done</span>' : ''}
                     ${(() => {
                       const bi = (typeof getActivityTypeBadgeInfo === 'function') ? getActivityTypeBadgeInfo(weekendEntry.type, false) : null;
-                      return bi ? `<span class="inline-flex items-center justify-center w-5 h-5 rounded-full ${bi.bgClass} shadow-2xs shrink-0 ring-1 ring-white/60 dark:ring-slate-900/60" title="${escapeHtml(bi.type)}">${bi.svg}</span>` : '';
+                      return bi ? `<span class="inline-flex items-center justify-center shrink-0 ${bi.textClass}" title="${escapeHtml(bi.type)}">${bi.svg}</span>` : '';
                     })()}
                   </div>
                 </div>
@@ -262,20 +268,26 @@ function _renderMatrixCell(d, sub, sec, secIdx, timetableMap, meetingCounters, t
       const meetingNum = meetingCounters[sub.code + '__' + sec];
 
       const isEntryCompleted = (entry.status === 'Completed') || (d.dateKey < todayKey);
-      let badgeColor = sub.badgeBg;
-      if (entry.type === 'Exam') badgeColor = 'bg-amber-100 text-amber-900 border-amber-300';
-      if (entry.type === 'No Class') badgeColor = 'bg-rose-100 text-rose-800 border-rose-300';
+      const secPalette = (typeof getSectionPalette === 'function') ? getSectionPalette(sub, secIdx) : { badgeBg: sub.badgeBg };
+      const secBadgeStyle = (typeof getSectionBadgeStyle === 'function') ? getSectionBadgeStyle(secIdx) : '';
+      const secTopBorder = (typeof getSectionTopBorder === 'function') ? getSectionTopBorder(secIdx) : '';
+      let badgeColor = secPalette.badgeBg;
+      if (entry.type === 'Exam') badgeColor = 'bg-amber-100 text-amber-900 border-amber-300 dark:bg-amber-950 dark:text-amber-200 dark:border-amber-700';
+      if (entry.type === 'No Class') badgeColor = 'bg-rose-100 text-rose-800 border-rose-300 dark:bg-rose-950 dark:text-rose-200 dark:border-rose-700';
 
       return `
             <td id="cell-${cellKey}" data-cell-key="${cellKey}" data-col="${colKey}" style="width: ${currentW}px; min-width: ${currentW}px; max-width: ${currentW}px;" class="p-1 border-r border-slate-200 dark:border-slate-700 cursor-pointer transition align-top relative group/card-cell matrix-cell-slot" data-action="openLessonModal" data-date="${d.dateKey}" data-course="${escapeHtml(sub.code)}" data-section="${escapeHtml(sec)}" data-weekend="${d.isWeekend ? 'true' : 'false'}" data-action-dragover="handleMatrixCellDragOver" data-action-dragleave="handleMatrixCellDragLeave" data-action-drop="handleMatrixCellDrop">
-              <div id="card-${cellKey}" draggable="true" data-action-dragstart="handleMatrixCardDragStart" data-action-dragend="handleMatrixCardDragEnd" data-cell-key="${cellKey}" data-date="${d.dateKey}" data-course="${escapeHtml(sub.code)}" data-section="${escapeHtml(sec)}" class="matrix-activity-card p-1 rounded-lg border ${badgeColor} shadow-xs space-y-0.5 overflow-hidden max-w-full min-w-0 transition-all duration-200 ease-out group-hover/card-cell:absolute group-hover/card-cell:left-1 group-hover/card-cell:right-1 group-hover/card-cell:top-1 group-hover/card-cell:z-22 group-hover/card-cell:shadow-xl group-hover/card-cell:scale-[1.02] cursor-grab active:cursor-grabbing">
+              <div id="card-${cellKey}" draggable="true" data-action-dragstart="handleMatrixCardDragStart" data-action-dragend="handleMatrixCardDragEnd" data-cell-key="${cellKey}" data-date="${d.dateKey}" data-course="${escapeHtml(sub.code)}" data-section="${escapeHtml(sec)}" class="matrix-activity-card p-1 rounded-lg border ${badgeColor} ${secTopBorder} shadow-xs space-y-0.5 overflow-hidden max-w-full min-w-0 transition-all duration-200 ease-out group-hover/card-cell:absolute group-hover/card-cell:left-1 group-hover/card-cell:right-1 group-hover/card-cell:top-1 group-hover/card-cell:z-22 group-hover/card-cell:shadow-xl group-hover/card-cell:scale-[1.02] cursor-grab active:cursor-grabbing">
                 <div class="flex items-center justify-between gap-1 overflow-hidden">
-                  ${!isNoClass ? `<span class="font-extrabold text-[8.5px] uppercase tracking-tight truncate">Mtg #${meetingNum}</span>` : `<span class="font-extrabold text-[8.5px] uppercase tracking-tight text-rose-700 dark:text-rose-300 truncate">${escapeHtml(entry.type || 'No Class')}</span>`}
+                  <div class="flex items-center gap-1 min-w-0 overflow-hidden">
+                    <span class="px-1.5 py-0.2 rounded font-black text-[8px] uppercase tracking-wider ${secBadgeStyle} shrink-0 shadow-2xs">${escapeHtml(sec)}</span>
+                    ${!isNoClass ? `<span class="font-extrabold text-[8.5px] uppercase tracking-tight truncate opacity-85">Mtg #${meetingNum}</span>` : `<span class="font-extrabold text-[8.5px] uppercase tracking-tight text-rose-700 dark:text-rose-300 truncate">${escapeHtml(entry.type || 'No Class')}</span>`}
+                  </div>
                   <div class="flex items-center gap-1 shrink-0">
                     ${isEntryCompleted ? '<span class="text-[7.5px] px-1 py-0.2 rounded font-black bg-emerald-600 text-white shrink-0">✓ Done</span>' : ''}
                     ${(() => {
                       const bi = (typeof getActivityTypeBadgeInfo === 'function') ? getActivityTypeBadgeInfo(entry.type, isNoClass) : null;
-                      return bi ? `<span class="inline-flex items-center justify-center w-5 h-5 rounded-full ${bi.bgClass} shadow-2xs shrink-0 ring-1 ring-white/60 dark:ring-slate-900/60" title="${escapeHtml(bi.type)}">${bi.svg}</span>` : '';
+                      return bi ? `<span class="inline-flex items-center justify-center shrink-0 ${bi.textClass}" title="${escapeHtml(bi.type)}">${bi.svg}</span>` : '';
                     })()}
                   </div>
                 </div>
@@ -313,24 +325,30 @@ function _renderMatrixCell(d, sub, sec, secIdx, timetableMap, meetingCounters, t
     if (entry) {
       const isNoClass = (entry.type === 'No Class') || (entry.topic && entry.topic.toLowerCase().includes('no class'));
       const isEntryCompleted = (entry.status === 'Completed') || (d.dateKey < todayKey);
-      let badgeColor = sub.badgeBg;
-      if (entry.type === 'Exam') badgeColor = 'bg-amber-100 text-amber-900 border-amber-300';
-      else if (entry.type === 'No Class') badgeColor = 'bg-rose-100 text-rose-800 border-rose-300';
-      else if (entry.type === 'Makeup Class') badgeColor = 'bg-amber-50/90 text-amber-950 border-amber-300';
-      else if (entry.type === 'Special Session') badgeColor = 'bg-violet-50/90 text-violet-950 border-violet-300';
+      const secPalette = (typeof getSectionPalette === 'function') ? getSectionPalette(sub, secIdx) : { badgeBg: sub.badgeBg };
+      const secBadgeStyle = (typeof getSectionBadgeStyle === 'function') ? getSectionBadgeStyle(secIdx) : '';
+      const secTopBorder = (typeof getSectionTopBorder === 'function') ? getSectionTopBorder(secIdx) : '';
+      let badgeColor = secPalette.badgeBg;
+      if (entry.type === 'Exam') badgeColor = 'bg-amber-100 text-amber-900 border-amber-300 dark:bg-amber-950 dark:text-amber-200 dark:border-amber-700';
+      else if (entry.type === 'No Class') badgeColor = 'bg-rose-100 text-rose-800 border-rose-300 dark:bg-rose-950 dark:text-rose-200 dark:border-rose-700';
+      else if (entry.type === 'Makeup Class') badgeColor = 'bg-amber-50/90 text-amber-950 border-amber-300 dark:bg-amber-950/60 dark:text-amber-200 dark:border-amber-700';
+      else if (entry.type === 'Special Session') badgeColor = 'bg-violet-50/90 text-violet-950 border-violet-300 dark:bg-violet-950/60 dark:text-violet-200 dark:border-violet-700';
 
       const displayType = entry.type || 'Special Session';
 
       return `
             <td id="cell-${cellKey}" data-cell-key="${cellKey}" data-col="${colKey}" style="width: ${currentW}px; min-width: ${currentW}px; max-width: ${currentW}px;" class="p-1 border-r border-slate-200 dark:border-slate-700 cursor-pointer transition align-top relative group/card-cell matrix-cell-slot" data-action="openLessonModal" data-date="${d.dateKey}" data-course="${escapeHtml(sub.code)}" data-section="${escapeHtml(sec)}" data-weekend="${d.isWeekend ? 'true' : 'false'}" data-action-dragover="handleMatrixCellDragOver" data-action-dragleave="handleMatrixCellDragLeave" data-action-drop="handleMatrixCellDrop">
-              <div id="card-${cellKey}" draggable="true" data-action-dragstart="handleMatrixCardDragStart" data-action-dragend="handleMatrixCardDragEnd" data-cell-key="${cellKey}" data-date="${d.dateKey}" data-course="${escapeHtml(sub.code)}" data-section="${escapeHtml(sec)}" class="matrix-activity-card p-1 rounded-lg border ${badgeColor} shadow-xs space-y-0.5 overflow-hidden max-w-full min-w-0 transition-all duration-200 ease-out group-hover/card-cell:absolute group-hover/card-cell:left-1 group-hover/card-cell:right-1 group-hover/card-cell:top-1 group-hover/card-cell:z-22 group-hover/card-cell:shadow-xl group-hover/card-cell:scale-[1.02] cursor-grab active:cursor-grabbing">
+              <div id="card-${cellKey}" draggable="true" data-action-dragstart="handleMatrixCardDragStart" data-action-dragend="handleMatrixCardDragEnd" data-cell-key="${cellKey}" data-date="${d.dateKey}" data-course="${escapeHtml(sub.code)}" data-section="${escapeHtml(sec)}" class="matrix-activity-card p-1 rounded-lg border ${badgeColor} ${secTopBorder} shadow-xs space-y-0.5 overflow-hidden max-w-full min-w-0 transition-all duration-200 ease-out group-hover/card-cell:absolute group-hover/card-cell:left-1 group-hover/card-cell:right-1 group-hover/card-cell:top-1 group-hover/card-cell:z-22 group-hover/card-cell:shadow-xl group-hover/card-cell:scale-[1.02] cursor-grab active:cursor-grabbing">
                 <div class="flex items-center justify-between gap-1 overflow-hidden">
-                  <span class="font-extrabold text-[8.5px] uppercase tracking-tight text-amber-800 dark:text-amber-300 truncate">⚡ ${escapeHtml(displayType)}</span>
+                  <div class="flex items-center gap-1 min-w-0 overflow-hidden">
+                    <span class="px-1.5 py-0.2 rounded font-black text-[8px] uppercase tracking-wider ${secBadgeStyle} shrink-0 shadow-2xs">${escapeHtml(sec)}</span>
+                    <span class="font-extrabold text-[8.5px] uppercase tracking-tight text-amber-800 dark:text-amber-300 truncate">⚡ ${escapeHtml(displayType)}</span>
+                  </div>
                   <div class="flex items-center gap-1 shrink-0">
                     ${isEntryCompleted ? '<span class="text-[7.5px] px-1 py-0.2 rounded font-black bg-emerald-600 text-white shrink-0">✓ Done</span>' : ''}
                     ${(() => {
                       const bi = (typeof getActivityTypeBadgeInfo === 'function') ? getActivityTypeBadgeInfo(entry.type, isNoClass) : null;
-                      return bi ? `<span class="inline-flex items-center justify-center w-5 h-5 rounded-full ${bi.bgClass} shadow-2xs shrink-0 ring-1 ring-white/60 dark:ring-slate-900/60" title="${escapeHtml(bi.type)}">${bi.svg}</span>` : '';
+                      return bi ? `<span class="inline-flex items-center justify-center shrink-0 ${bi.textClass}" title="${escapeHtml(bi.type)}">${bi.svg}</span>` : '';
                     })()}
                   </div>
                 </div>

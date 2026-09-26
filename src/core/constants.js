@@ -137,22 +137,41 @@ const sectionAccentColors = [
 ];
 
 const sectionBadgeBorders = [
-  'border-blue-600 text-blue-900 bg-blue-100/90',
-  'border-amber-600 text-amber-900 bg-amber-100/90',
-  'border-emerald-600 text-emerald-900 bg-emerald-100/90',
-  'border-purple-600 text-purple-900 bg-purple-100/90',
-  'border-rose-600 text-rose-900 bg-rose-100/90',
-  'border-cyan-600 text-cyan-900 bg-cyan-100/90',
-  'border-indigo-600 text-indigo-900 bg-indigo-100/90',
-  'border-teal-600 text-teal-900 bg-teal-100/90',
-  'border-orange-600 text-orange-900 bg-orange-100/90',
-  'border-slate-600 text-slate-900 bg-slate-200/90',
-  'border-lime-600 text-lime-900 bg-lime-100/90',
-  'border-sky-600 text-sky-900 bg-sky-100/90',
-  'border-pink-600 text-pink-900 bg-pink-100/90',
-  'border-fuchsia-600 text-fuchsia-900 bg-fuchsia-100/90',
-  'border-red-600 text-red-900 bg-red-100/90',
-  'border-msu-maroon text-rose-950 bg-rose-100/90'
+  'border-blue-600 text-blue-900 bg-blue-100/90 dark:border-blue-400 dark:text-blue-100 dark:bg-blue-950/80',
+  'border-amber-600 text-amber-900 bg-amber-100/90 dark:border-amber-400 dark:text-amber-100 dark:bg-amber-950/80',
+  'border-emerald-600 text-emerald-900 bg-emerald-100/90 dark:border-emerald-400 dark:text-emerald-100 dark:bg-emerald-950/80',
+  'border-purple-600 text-purple-900 bg-purple-100/90 dark:border-purple-400 dark:text-purple-100 dark:bg-purple-950/80',
+  'border-rose-600 text-rose-900 bg-rose-100/90 dark:border-rose-400 dark:text-rose-100 dark:bg-rose-950/80',
+  'border-cyan-600 text-cyan-900 bg-cyan-100/90 dark:border-cyan-400 dark:text-cyan-100 dark:bg-cyan-950/80',
+  'border-indigo-600 text-indigo-900 bg-indigo-100/90 dark:border-indigo-400 dark:text-indigo-100 dark:bg-indigo-950/80',
+  'border-teal-600 text-teal-900 bg-teal-100/90 dark:border-teal-400 dark:text-teal-100 dark:bg-teal-950/80',
+  'border-orange-600 text-orange-900 bg-orange-100/90 dark:border-orange-400 dark:text-orange-100 dark:bg-orange-950/80',
+  'border-slate-600 text-slate-900 bg-slate-200/90 dark:border-slate-400 dark:text-slate-100 dark:bg-slate-800/80',
+  'border-lime-600 text-lime-900 bg-lime-100/90 dark:border-lime-400 dark:text-lime-100 dark:bg-lime-950/80',
+  'border-sky-600 text-sky-900 bg-sky-100/90 dark:border-sky-400 dark:text-sky-100 dark:bg-sky-950/80',
+  'border-pink-600 text-pink-900 bg-pink-100/90 dark:border-pink-400 dark:text-pink-100 dark:bg-pink-950/80',
+  'border-fuchsia-600 text-fuchsia-900 bg-fuchsia-100/90 dark:border-fuchsia-400 dark:text-fuchsia-100 dark:bg-fuchsia-950/80',
+  'border-red-600 text-red-900 bg-red-100/90 dark:border-red-400 dark:text-red-100 dark:bg-red-950/80',
+  'border-msu-maroon text-rose-950 bg-rose-100/90 dark:border-rose-400 dark:text-rose-100 dark:bg-rose-950/80'
+];
+
+const sectionTopBorders = [
+  'border-t-[3px] border-t-blue-600 dark:border-t-blue-400',
+  'border-t-[3px] border-t-amber-500 dark:border-t-amber-400',
+  'border-t-[3px] border-t-emerald-600 dark:border-t-emerald-400',
+  'border-t-[3px] border-t-purple-600 dark:border-t-purple-400',
+  'border-t-[3px] border-t-rose-600 dark:border-t-rose-400',
+  'border-t-[3px] border-t-cyan-600 dark:border-t-cyan-400',
+  'border-t-[3px] border-t-indigo-600 dark:border-t-indigo-400',
+  'border-t-[3px] border-t-teal-600 dark:border-t-teal-400',
+  'border-t-[3px] border-t-orange-500 dark:border-t-orange-400',
+  'border-t-[3px] border-t-slate-600 dark:border-t-slate-400',
+  'border-t-[3px] border-t-lime-600 dark:border-t-lime-400',
+  'border-t-[3px] border-t-sky-600 dark:border-t-sky-400',
+  'border-t-[3px] border-t-pink-600 dark:border-t-pink-400',
+  'border-t-[3px] border-t-fuchsia-600 dark:border-t-fuchsia-400',
+  'border-t-[3px] border-t-red-600 dark:border-t-red-400',
+  'border-t-[3px] border-t-rose-700 dark:border-t-rose-400'
 ];
 
 // Default Seed Data for Academic Year 2026-2027
