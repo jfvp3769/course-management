@@ -1663,7 +1663,7 @@ html.theme-dark .planner-slot-time-label {
 }
 
 .planner-calendar-pill {
-  position: relative;
+  position: relative !important;
   display: flex !important;
   flex-direction: column !important;
   justify-content: center !important;
@@ -1672,7 +1672,7 @@ html.theme-dark .planner-slot-time-label {
   box-sizing: border-box !important;
   border-radius: 4px;
   cursor: pointer;
-  overflow: hidden;
+  overflow: visible !important;
   user-select: none;
   height: 100%;
   min-height: 14px;
@@ -1691,6 +1691,7 @@ html.theme-dark .planner-slot-time-label {
   font-size: 10px;
   line-height: 1.15;
   width: 100%;
+  max-width: calc(100% - 6px);
   text-align: left;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1701,11 +1702,42 @@ html.theme-dark .planner-slot-time-label {
   font-size: 8.5px;
   line-height: 1.15;
   width: 100%;
+  max-width: calc(100% - 6px);
   text-align: left;
   opacity: 0.75;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* Floating Corner Activity Badge for Subject Pills (Calendar View Non-Hover) */
+.planner-pill-corner-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: translate(32%, -32%);
+  width: 16px;
+  height: 16px;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  pointer-events: none;
+  z-index: 10;
+  border: 1.5px solid #ffffff;
+  box-sizing: border-box;
+}
+
+html.theme-dark .planner-pill-corner-badge {
+  border-color: #0f172a;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.planner-pill-corner-badge svg {
+  width: 9.5px;
+  height: 9.5px;
+  flex-shrink: 0;
 }
 
 /* 3-State Subject Styling Helpers */
