@@ -656,7 +656,7 @@ function _renderSubgridColumn(period, dateKey, classes, isWeekend, isNoClassDate
       ? courseData.subjects.find(s => s.code === c.course)
       : (c.sub || null);
     const secIdx = (sub && sub.sections) ? Math.max(0, sub.sections.indexOf(c.section)) : 0;
-    const secTopBorder = (typeof getSectionTopBorder === 'function') ? getSectionTopBorder(secIdx) : '';
+    const secTopBorder = (typeof getSectionTopBorder === 'function') ? getSectionTopBorder(secIdx, sub?.colorTheme) : '';
 
     const styleClasses = getSubjectPillStyles(c.course, hasActivity, c.isNoClass);
     const tooltipText = `${c.course} (${c.section}) • ${formatTimeDisplay(c.startTime)} – ${formatTimeDisplay(c.endTime)}\n${c.room ? 'Room: ' + c.room + '\n' : ''}${c.stats.meetingNum ? 'Mtg #' + c.stats.meetingNum + ' (' + c.stats.meetingsLeft + ' left)\n' : ''}${c.topic || 'No topic planned yet'}`;

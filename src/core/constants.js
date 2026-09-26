@@ -156,22 +156,20 @@ const sectionBadgeBorders = [
 ];
 
 const sectionTopBorders = [
-  'border-t-2 border-t-blue-600 dark:border-t-blue-400',
-  'border-t-2 border-t-amber-500 dark:border-t-amber-400',
-  'border-t-2 border-t-emerald-600 dark:border-t-emerald-400',
-  'border-t-2 border-t-purple-600 dark:border-t-purple-400',
-  'border-t-2 border-t-rose-600 dark:border-t-rose-400',
-  'border-t-2 border-t-cyan-600 dark:border-t-cyan-400',
-  'border-t-2 border-t-indigo-600 dark:border-t-indigo-400',
-  'border-t-2 border-t-teal-600 dark:border-t-teal-400',
-  'border-t-2 border-t-orange-500 dark:border-t-orange-400',
-  'border-t-2 border-t-slate-600 dark:border-t-slate-400',
-  'border-t-2 border-t-lime-600 dark:border-t-lime-400',
-  'border-t-2 border-t-sky-600 dark:border-t-sky-400',
-  'border-t-2 border-t-pink-600 dark:border-t-pink-400',
-  'border-t-2 border-t-fuchsia-600 dark:border-t-fuchsia-400',
-  'border-t-2 border-t-red-600 dark:border-t-red-400',
-  'border-t-2 border-t-rose-700 dark:border-t-rose-400'
+  'border-t-4 border-t-amber-400 dark:border-t-amber-300',
+  'border-t-4 border-t-emerald-400 dark:border-t-emerald-300',
+  'border-t-4 border-t-fuchsia-400 dark:border-t-fuchsia-300',
+  'border-t-4 border-t-cyan-400 dark:border-t-cyan-300',
+  'border-t-4 border-t-rose-400 dark:border-t-rose-300',
+  'border-t-4 border-t-blue-400 dark:border-t-blue-300',
+  'border-t-4 border-t-orange-400 dark:border-t-orange-300',
+  'border-t-4 border-t-purple-400 dark:border-t-purple-300',
+  'border-t-4 border-t-teal-400 dark:border-t-teal-300',
+  'border-t-4 border-t-lime-400 dark:border-t-lime-300',
+  'border-t-4 border-t-sky-400 dark:border-t-sky-300',
+  'border-t-4 border-t-pink-400 dark:border-t-pink-300',
+  'border-t-4 border-t-indigo-400 dark:border-t-indigo-300',
+  'border-t-4 border-t-yellow-400 dark:border-t-yellow-300'
 ];
 
 // Default Seed Data for Academic Year 2026-2027

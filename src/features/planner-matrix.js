@@ -148,7 +148,7 @@ function _renderMatrixHeader(thead) {
     sub.sections.forEach((sec, secIdx) => {
       const colKey = sub.code + '__' + sec;
       const currentW = columnWidths[colKey] || 205;
-      const badgeAccent = getSectionBadgeStyle(secIdx);
+      const badgeAccent = (typeof getSectionBadgeStyle === 'function') ? getSectionBadgeStyle(secIdx, sub.colorTheme) : '';
 
       const classroomLink = getClassroomLink(sub.code, sec);
       row2 += `
@@ -192,7 +192,7 @@ function _renderMatrixCell(d, sub, sec, secIdx, timetableMap, meetingCounters, t
     const weekendEntry = plannerEntries[cellKey];
     if (weekendEntry) {
       const isEntryCompleted = (weekendEntry.status === 'Completed') || (d.dateKey < todayKey);
-      const secTopBorder = (typeof getSectionTopBorder === 'function') ? getSectionTopBorder(secIdx) : '';
+      const secTopBorder = (typeof getSectionTopBorder === 'function') ? getSectionTopBorder(secIdx, sub?.colorTheme) : '';
       let badgeColor = sub.badgeBg;
       if (weekendEntry.type === 'Exam') badgeColor = 'bg-amber-100 text-amber-900 border-amber-300 dark:bg-amber-950 dark:text-amber-200 dark:border-amber-700';
       else if (weekendEntry.type === 'No Class') badgeColor = 'bg-rose-100 text-rose-800 border-rose-300 dark:bg-rose-950 dark:text-rose-200 dark:border-rose-700';
@@ -263,7 +263,7 @@ function _renderMatrixCell(d, sub, sec, secIdx, timetableMap, meetingCounters, t
       const meetingNum = meetingCounters[sub.code + '__' + sec];
 
       const isEntryCompleted = (entry.status === 'Completed') || (d.dateKey < todayKey);
-      const secTopBorder = (typeof getSectionTopBorder === 'function') ? getSectionTopBorder(secIdx) : '';
+      const secTopBorder = (typeof getSectionTopBorder === 'function') ? getSectionTopBorder(secIdx, sub?.colorTheme) : '';
       let badgeColor = sub.badgeBg;
       if (entry.type === 'Exam') badgeColor = 'bg-amber-100 text-amber-900 border-amber-300 dark:bg-amber-950 dark:text-amber-200 dark:border-amber-700';
       if (entry.type === 'No Class') badgeColor = 'bg-rose-100 text-rose-800 border-rose-300 dark:bg-rose-950 dark:text-rose-200 dark:border-rose-700';
@@ -315,7 +315,7 @@ function _renderMatrixCell(d, sub, sec, secIdx, timetableMap, meetingCounters, t
     if (entry) {
       const isNoClass = (entry.type === 'No Class') || (entry.topic && entry.topic.toLowerCase().includes('no class'));
       const isEntryCompleted = (entry.status === 'Completed') || (d.dateKey < todayKey);
-      const secTopBorder = (typeof getSectionTopBorder === 'function') ? getSectionTopBorder(secIdx) : '';
+      const secTopBorder = (typeof getSectionTopBorder === 'function') ? getSectionTopBorder(secIdx, sub?.colorTheme) : '';
       let badgeColor = sub.badgeBg;
       if (entry.type === 'Exam') badgeColor = 'bg-amber-100 text-amber-900 border-amber-300 dark:bg-amber-950 dark:text-amber-200 dark:border-amber-700';
       else if (entry.type === 'No Class') badgeColor = 'bg-rose-100 text-rose-800 border-rose-300 dark:bg-rose-950 dark:text-rose-200 dark:border-rose-700';

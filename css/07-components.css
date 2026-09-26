@@ -1668,7 +1668,7 @@ html.theme-dark .planner-slot-time-label {
   flex-direction: column !important;
   justify-content: center !important;
   align-items: flex-start !important;
-  padding: 4px 6px !important;
+  padding: 3px 5px !important;
   box-sizing: border-box !important;
   border-radius: 4px;
   cursor: pointer;
@@ -1704,7 +1704,8 @@ html.theme-dark .planner-slot-time-label {
   width: 100%;
   max-width: calc(100% - 14px);
   text-align: left;
-  opacity: 0.75;
+  opacity: 0.85;
+  font-weight: 600;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
